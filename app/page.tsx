@@ -451,7 +451,7 @@ export default function LocalPantryWebsite() {
                         onClick={() =>
                           setCart((current) => current.filter((_, i) => i !== index))
                         }
-                        className="text-sm underline"
+                        className="text-sm underline cursor-pointer"
                       >
                         Remove
                       </button>
