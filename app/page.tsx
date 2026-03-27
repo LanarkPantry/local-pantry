@@ -34,6 +34,7 @@ export default function LocalPantryWebsite() {
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const addOns: ShopItem[] = [
     {
@@ -134,9 +135,14 @@ export default function LocalPantryWebsite() {
   const addToCart = (item: ShopItem) => {
     setCart((current) => {
       const updated = [...current, item];
-      console.log("cart now:", updated);
       return updated;
     });
+
+    setSuccessMessage(`${item.name} added to basket`);
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 2000);
   };
 
   const total = useMemo(
@@ -428,6 +434,12 @@ export default function LocalPantryWebsite() {
             Prefer not to pay online? Just send us your order details and we’ll reply with your options.
           </p>
 
+          {successMessage && (
+            <div className="mb-4 text-center text-green-700 font-medium">
+              {successMessage}
+            </div>
+          )}
+
           <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
             <h3 className="font-serif text-2xl text-[#243328]">Your Basket</h3>
 
@@ -451,7 +463,7 @@ export default function LocalPantryWebsite() {
                         onClick={() =>
                           setCart((current) => current.filter((_, i) => i !== index))
                         }
-                        className="text-sm underline cursor-pointer"
+                        className="text-sm underline"
                       >
                         Remove
                       </button>
