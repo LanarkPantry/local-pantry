@@ -132,8 +132,9 @@ export default function LocalPantryWebsite() {
   };
 
   const addToCart = (item: ShopItem) => {
-    setCart((current) => [...current, item]);
-  };
+  alert(`${item.name} added to basket`);
+  setCart((current) => [...current, item]);
+};
 
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.price, 0),
