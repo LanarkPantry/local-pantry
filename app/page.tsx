@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type ShopItem = {
   name: string;
@@ -35,6 +35,7 @@ export default function LocalPantryWebsite() {
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const basketRef = useRef<HTMLDivElement | null>(null);
 
   const addOns: ShopItem[] = [
     {
@@ -143,6 +144,10 @@ export default function LocalPantryWebsite() {
     setTimeout(() => {
       setSuccessMessage("");
     }, 2000);
+
+    setTimeout(() => {
+      basketRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   const total = useMemo(
@@ -440,7 +445,7 @@ export default function LocalPantryWebsite() {
             </div>
           )}
 
-          <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
+          <div ref={basketRef} className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
             <h3 className="font-serif text-2xl text-[#243328]">Your Basket</h3>
 
             {cart.length === 0 ? (
@@ -463,7 +468,7 @@ export default function LocalPantryWebsite() {
                         onClick={() =>
                           setCart((current) => current.filter((_, i) => i !== index))
                         }
-                        className="text-sm underline cursor-pointer"
+                        className="text-sm underline"
                       >
                         Remove
                       </button>
