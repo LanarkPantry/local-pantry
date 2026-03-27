@@ -32,6 +32,8 @@ export default function LocalPantryWebsite() {
   const [cart, setCart] = useState<ShopItem[]>([]);
   const [isSubscription, setIsSubscription] = useState(true);
   const [deliveryNotes, setDeliveryNotes] = useState("");
+  const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   const addOns: ShopItem[] = [
     {
@@ -139,12 +141,43 @@ export default function LocalPantryWebsite() {
   );
 
   const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
-    `Hi The Local Pantry, I'd like to place ${
-      isSubscription ? "a weekly subscription" : "a one-off order"
-    }. Items: ${
-      cart.length ? cart.map((item) => item.name).join(", ") : "none yet"
-    }. Delivery notes: ${deliveryNotes || "none"}.`
+    "Hi The Local Pantry, I'd like to place an order."
   )}`;
+
+  const startCheckout = async () => {
+    try {
+      setCheckoutError("");
+      setIsLoadingCheckout(true);
+
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cart,
+          isSubscription,
+          deliveryNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Checkout failed.");
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      setCheckoutError(
+        error instanceof Error ? error.message : "Something went wrong."
+      );
+    } finally {
+      setIsLoadingCheckout(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f4efe9] text-[#243328]">
@@ -235,8 +268,9 @@ export default function LocalPantryWebsite() {
                   </div>
 
                   <button
+                    type="button"
                     onClick={() => addToCart(box)}
-                    className="mt-8 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm"
+                    className="relative z-10 mt-8 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm"
                   >
                     {box.cta}
                   </button>
@@ -283,8 +317,9 @@ export default function LocalPantryWebsite() {
                   </p>
 
                   <button
+                    type="button"
                     onClick={() => addToCart(item)}
-                    className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#334e39] to-[#475c40] px-4 py-3 font-serif text-2xl text-white"
+                    className="relative z-10 mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#334e39] to-[#475c40] px-4 py-3 font-serif text-2xl text-white"
                   >
                     Add
                   </button>
@@ -436,10 +471,22 @@ export default function LocalPantryWebsite() {
               Order via WhatsApp
             </a>
 
-            <button className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white">
-              {isSubscription ? "Start Weekly Subscription" : "Pay for One-Off Order"}
+            <button
+              onClick={startCheckout}
+              disabled={cart.length === 0 || isLoadingCheckout}
+              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white disabled:opacity-50"
+            >
+              {isLoadingCheckout
+                ? "Opening Stripe..."
+                : isSubscription
+                ? "Start Weekly Subscription"
+                : "Pay for One-Off Order"}
             </button>
           </div>
+
+          {checkoutError && (
+            <p className="mt-4 text-center text-sm text-red-700">{checkoutError}</p>
+          )}
 
           <p className="mt-5 text-center text-sm text-[#6d756a]">
             Pause or skip a week anytime once your Stripe subscription is live.
