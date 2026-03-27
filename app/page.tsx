@@ -29,7 +29,7 @@ type ProduceIdea = {
 export default function LocalPantryWebsite() {
   const [postcode, setPostcode] = useState("");
   const [postcodeValid, setPostcodeValid] = useState<boolean | null>(null);
-  const [cart, setCart] = useState<ShopItem[]>([]);
+  const [cart, setCart] = useState<ShopItem[]>(() => []);
   const [isSubscription, setIsSubscription] = useState(true);
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
@@ -132,9 +132,12 @@ export default function LocalPantryWebsite() {
   };
 
   const addToCart = (item: ShopItem) => {
-  alert(`${item.name} added to basket`);
-  setCart((current) => [...current, item]);
-};
+    setCart((current) => {
+      const updated = [...current, item];
+      console.log("cart now:", updated);
+      return updated;
+    });
+  };
 
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.price, 0),
@@ -437,8 +440,22 @@ export default function LocalPantryWebsite() {
                     key={`${item.name}-${index}`}
                     className="flex items-center justify-between border-b border-[#eee6da] pb-3 text-lg text-[#314534]"
                   >
-                    <span>{item.name}</span>
-                    <span>£{item.price.toFixed(2)}</span>
+                    <div>
+                      <span>{item.name}</span>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <span>£{item.price.toFixed(2)}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCart((current) => current.filter((_, i) => i !== index))
+                        }
+                        className="text-sm underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
                 ))}
 
