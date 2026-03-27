@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 type ShopItem = {
   name: string;
@@ -34,8 +34,7 @@ export default function LocalPantryWebsite() {
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const basketRef = useRef<HTMLDivElement | null>(null);
+  
 
   const addOns: ShopItem[] = [
     {
