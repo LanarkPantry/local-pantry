@@ -5,33 +5,15 @@ import { useMemo, useState } from "react";
 export default function LocalPantryWebsite() {
   const [postcode, setPostcode] = useState("");
   const [postcodeValid, setPostcodeValid] = useState<boolean | null>(null);
-  const [cart, setCart] = useState<
-    { name: string; price: number; image: string }[]
-  >([]);
+  const [cart, setCart] = useState<{ name: string; price: number; image: string }[]>([]);
   const [isSubscription, setIsSubscription] = useState(true);
   const [deliveryNotes, setDeliveryNotes] = useState("");
 
   const addOns = [
-    {
-      name: "Sorrel & Walnut Pesto",
-      price: 4.5,
-      image: "/sorrel-walnut-pesto.png",
-    },
-    {
-      name: "Rose Harissa",
-      price: 5.25,
-      image: "/rose-harissa.png",
-    },
-    {
-      name: "Salted Caramel Sauce",
-      price: 5,
-      image: "/salted-caramel.png",
-    },
-    {
-      name: "Dark Chocolate & Hazelnut Spread",
-      price: 5,
-      image: "/dark-chocolate.png",
-    },
+    { name: "Sorrel & Walnut Pesto", price: 4.5, image: "/sorrel-walnut-pesto.png" },
+    { name: "Rose Harissa", price: 5.25, image: "/rose-harissa.png" },
+    { name: "Salted Caramel Sauce", price: 5, image: "/salted-caramel.png" },
+    { name: "Dark Chocolate & Hazelnut Spread", price: 5, image: "/dark-chocolate.png" },
   ];
 
   const boxes = [
@@ -47,270 +29,133 @@ export default function LocalPantryWebsite() {
       name: "Family Harvest",
       price: 30,
       image: "/family-harvest-box.png",
-      contents: [
-        "Carrots",
-        "Potatoes",
-        "Tomatoes",
-        "Apples",
-        "Kale",
-        "Mushrooms",
-      ],
+      contents: ["Carrots", "Potatoes", "Tomatoes", "Apples", "Kale", "Mushrooms"],
       urgency: "Only 8 boxes left for this week",
       cta: "Choose Family Harvest",
     },
   ];
 
+  const jarRecipes = [
+    {
+      title: "Sorrel & Walnut Pesto",
+      recipe: "Toss through hot pasta with roasted veg and a splash of pasta water.",
+      ideas: ["Stir into potatoes", "Spread on toast", "Add to grain bowls"],
+    },
+    {
+      title: "Rose Harissa",
+      recipe: "Roast carrots and chickpeas with harissa, olive oil and a little honey.",
+      ideas: ["Mix into yoghurt", "Brush onto veg", "Add to sauces"],
+    },
+    {
+      title: "Salted Caramel Sauce",
+      recipe: "Drizzle over porridge with banana and a pinch of sea salt.",
+      ideas: ["Pancakes", "Brownies", "With apples"],
+    },
+    {
+      title: "Dark Chocolate & Hazelnut Spread",
+      recipe: "Spread on toast with strawberries or banana.",
+      ideas: ["Fill crepes", "Stir into oats", "Dip fruit"],
+    },
+  ];
+
+  const produceIdeas = [
+    {
+      title: "Roast Tin Supper",
+      text: "Roast potatoes, carrots, onions and finish with pesto or harissa.",
+    },
+    {
+      title: "Seasonal Soup",
+      text: "Blend soft veg with stock and finish with a swirl of pesto.",
+    },
+    {
+      title: "Fruit Breakfasts",
+      text: "Use fruit for smoothies, porridge toppings or quick salads.",
+    },
+  ];
+
   const checkPostcode = () => {
-    if (postcode.trim().toLowerCase().startsWith("g")) {
-      setPostcodeValid(true);
-    } else {
-      setPostcodeValid(false);
-    }
+    if (postcode.toLowerCase().startsWith("g")) setPostcodeValid(true);
+    else setPostcodeValid(false);
   };
 
-  const addToCart = (item: { name: string; price: number; image: string }) => {
-    setCart((current) => [...current, item]);
-  };
+  const addToCart = (item: any) => setCart((c) => [...c, item]);
 
-  const total = useMemo(
-    () => cart.reduce((sum, item) => sum + item.price, 0),
-    [cart],
-  );
+  const total = useMemo(() => cart.reduce((sum, i) => sum + i.price, 0), [cart]);
 
   const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
-    `Hi The Local Pantry, I'd like to place ${isSubscription ? "a weekly subscription" : "a one-off order"}. Items: ${
-      cart.length ? cart.map((i) => i.name).join(", ") : "none yet"
-    }. Delivery notes: ${deliveryNotes || "none"}.`,
+    `Hi The Local Pantry, I'd like to place ${isSubscription ? "a weekly subscription" : "a one-off order"} for: ${cart.map(i => i.name).join(", ")}`
   )}`;
 
   return (
     <div className="min-h-screen bg-[#f4efe9] text-[#243328]">
-      <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
-        <div className="text-sm tracking-[0.35em] text-[#60705f]">
-          THE LOCAL PANTRY
-        </div>
-        <div className="hidden md:flex items-center gap-3 rounded-full border border-[#d6cec2] bg-white/80 px-3 py-2 shadow-sm">
+      <header className="p-6 text-center font-serif text-xl tracking-widest">
+        THE LOCAL PANTRY
+      </header>
+
+      <section className="text-center px-6">
+        <h1 className="text-5xl font-serif">Fresh local produce delivered</h1>
+        <div className="mt-6">
           <input
+            placeholder="Enter postcode"
             value={postcode}
             onChange={(e) => setPostcode(e.target.value)}
-            placeholder="Check postcode"
-            className="w-40 bg-transparent text-sm outline-none placeholder:text-[#8b8b7c]"
+            className="border p-2"
           />
-          <button
-            onClick={checkPostcode}
-            className="rounded-full bg-[#2f4635] px-4 py-2 text-sm text-white"
-          >
+          <button onClick={checkPostcode} className="ml-2 bg-green-700 text-white px-4 py-2">
             Check
           </button>
         </div>
-      </header>
-
-      <section className="px-6 pb-8 pt-4 md:px-10">
-        <div className="mx-auto max-w-6xl text-center">
-          <h1 className="font-serif text-5xl tracking-tight text-[#233226] md:text-7xl">
-            The Local Pantry
-          </h1>
-          <p className="mx-auto mt-8 max-w-4xl font-serif text-2xl italic text-[#314534] md:text-5xl">
-            Delivering the best from local farms to your door.
-          </p>
-          <p className="mx-auto mt-6 max-w-2xl text-base text-[#6e7368] md:text-lg">
-            Seasonal fruit, veg and refillable pantry staples with a calm
-            premium farm shop feel.
-          </p>
-          {postcodeValid === true && (
-            <div className="mx-auto mt-6 inline-flex rounded-full border border-[#c8d3c4] bg-[#eef5ea] px-4 py-2 text-sm text-[#36553c]">
-              Great news — we currently deliver to your area.
-            </div>
-          )}
-          {postcodeValid === false && (
-            <div className="mx-auto mt-6 inline-flex rounded-full border border-[#ead3cf] bg-[#fff3f1] px-4 py-2 text-sm text-[#9a4f42]">
-              Not available yet — join the waitlist for your postcode.
-            </div>
-          )}
-        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-14 md:px-10">
-        <div className="grid gap-6 lg:grid-cols-2">
-          {boxes.map((box) => (
-            <div
-              key={box.name}
-              className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
-            >
-              <div className="overflow-hidden rounded-[22px] border border-[#e5ddcf] bg-white">
-                <img
-                  src={box.image}
-                  alt={box.name}
-                  className="h-[320px] w-full object-contain bg-[#f8f5ef] p-4"
-                />
-                <div className="px-8 pb-8 pt-6 text-center">
-                  <h2 className="font-serif text-4xl leading-none text-[#243328] md:text-5xl">
-                    {box.name}
-                  </h2>
-                  <p className="mt-4 font-serif text-3xl text-[#243328]">
-                    £{box.price} <span className="text-xl">per week</span>
-                  </p>
-
-                  <div className="mx-auto mt-8 max-w-md border-t border-[#d8d0c5] pt-6">
-                    <p className="font-serif text-2xl text-[#243328]">
-                      Typical contents:
-                    </p>
-                    <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-left text-lg text-[#38473b]">
-                      {box.contents.map((item) => (
-                        <div key={item}>• {item}</div>
-                      ))}
-                    </div>
-                    <p className="mt-6 border-t border-[#d8d0c5] pt-5 text-lg text-[#5f675c]">
-                      Changes weekly based on what’s fresh.
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => addToCart(box)}
-                    className="mt-8 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm"
-                  >
-                    {box.cta}
-                  </button>
-
-                  <div className="mt-4 rounded-2xl border border-[#e7d2a9] bg-[#f3dfb9] px-5 py-3 text-lg text-[#5d4f2a]">
-                    {box.urgency}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-10 md:px-10">
-        <div className="text-center">
-          <h2 className="font-serif text-4xl text-[#243328] md:text-6xl">
-            Gourmet Add-Ons
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-            Luxury pantry jars designed to sit beautifully alongside your weekly
-            harvest box.
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {addOns.map((item) => (
-            <div
-              key={item.name}
-              className="rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-3 shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
-            >
-              <div className="overflow-hidden rounded-[18px] border border-[#e5ddcf] bg-white">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="h-56 w-full object-contain bg-[#f8f5ef] p-4"
-                />
-                <div className="px-4 pb-5 pt-4 text-center">
-                  <h3 className="font-serif text-2xl leading-tight text-[#243328]">
-                    {item.name}
-                  </h3>
-                  <p className="mt-2 text-2xl text-[#243328]">
-                    £{item.price.toFixed(2)}
-                  </p>
-                  <button
-                    onClick={() => addToCart(item)}
-                    className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#334e39] to-[#475c40] px-4 py-3 font-serif text-2xl text-white"
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-4xl px-6 pb-16 pt-8 md:px-10">
-        <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
-          <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
-            <button
-              onClick={() => setIsSubscription(false)}
-              className={`rounded-2xl border px-8 py-4 font-serif text-2xl ${
-                !isSubscription
-                  ? "border-[#314534] bg-white text-[#243328]"
-                  : "border-[#d6cec2] bg-[#f4efe9] text-[#5f675c]"
-              }`}
-            >
-              One-Off Order
-            </button>
-            <button
-              onClick={() => setIsSubscription(true)}
-              className={`rounded-2xl px-8 py-4 font-serif text-2xl ${
-                isSubscription
-                  ? "bg-gradient-to-r from-[#334e39] to-[#5a5326] text-white"
-                  : "border border-[#d6cec2] bg-[#f4efe9] text-[#5f675c]"
-              }`}
-            >
-              Continue to Payment (Stripe)
+      <section className="grid md:grid-cols-2 gap-6 p-6">
+        {boxes.map((box) => (
+          <div key={box.name} className="bg-white p-4 rounded">
+            <img src={box.image} className="h-64 w-full object-contain" />
+            <h2 className="text-3xl font-serif mt-4">{box.name}</h2>
+            <p>£{box.price}/week</p>
+            <button onClick={() => addToCart(box)} className="mt-4 bg-green-800 text-white px-4 py-2">
+              Add
             </button>
           </div>
+        ))}
+      </section>
 
-          <p className="mt-8 text-center text-2xl text-[#3a4539]">
-            Prefer not to pay online? Just send us your order details and we’ll
-            reply with your options.
-          </p>
+      <section className="grid md:grid-cols-4 gap-4 p-6">
+        {addOns.map((item) => (
+          <div key={item.name} className="bg-white p-4 rounded">
+            <img src={item.image} className="h-48 w-full object-contain" />
+            <h3 className="font-serif">{item.name}</h3>
+            <button onClick={() => addToCart(item)} className="mt-2 bg-green-700 text-white px-3 py-1">
+              Add
+            </button>
+          </div>
+        ))}
+      </section>
 
-          <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <h3 className="font-serif text-2xl text-[#243328]">Your Basket</h3>
-            {cart.length === 0 ? (
-              <p className="mt-3 text-[#697166]">
-                Your basket is empty for now.
-              </p>
-            ) : (
-              <div className="mt-4 space-y-3">
-                {cart.map((item, i) => (
-                  <div
-                    key={`${item.name}-${i}`}
-                    className="flex items-center justify-between border-b border-[#eee6da] pb-3 text-lg text-[#314534]"
-                  >
-                    <span>{item.name}</span>
-                    <span>£{item.price.toFixed(2)}</span>
-                  </div>
+      <section className="p-6">
+        <h2 className="text-4xl font-serif text-center">What to cook this week</h2>
+
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          {jarRecipes.map((r) => (
+            <div key={r.title} className="bg-white p-4 rounded">
+              <h3 className="text-2xl font-serif">{r.title}</h3>
+              <p className="mt-2">{r.recipe}</p>
+              <ul className="mt-2">
+                {r.ideas.map((i) => (
+                  <li key={i}>• {i}</li>
                 ))}
-                <div className="flex items-center justify-between pt-2 text-2xl font-medium text-[#243328]">
-                  <span>Total</span>
-                  <span>£{total.toFixed(2)}</span>
-                </div>
-              </div>
-            )}
-          </div>
+              </ul>
+            </div>
+          ))}
+        </div>
 
-          <div className="mt-5 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <label className="block font-serif text-2xl text-[#243328]">
-              Delivery instructions
-            </label>
-            <textarea
-              value={deliveryNotes}
-              onChange={(e) => setDeliveryNotes(e.target.value)}
-              placeholder="Leave in porch, by side gate, with neighbour at number 12…"
-              className="mt-3 min-h-[120px] w-full rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4 text-lg outline-none placeholder:text-[#9aa099]"
-            />
-          </div>
-
-          <div className="mt-5 flex flex-col gap-4 md:flex-row">
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 rounded-2xl border border-[#d6cec2] bg-white px-6 py-4 text-center font-serif text-2xl text-[#243328]"
-            >
-              Order via WhatsApp
-            </a>
-            <button className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white">
-              {isSubscription
-                ? "Start Weekly Subscription"
-                : "Pay for One-Off Order"}
-            </button>
-          </div>
-
-          <p className="mt-5 text-center text-sm text-[#6d756a]">
-            Pause or skip a week anytime once your Stripe subscription is live.
-          </p>
+        <div className="grid md:grid-cols-3 gap-4 mt-6">
+          {produceIdeas.map((p) => (
+            <div key={p.title} className="bg-white p-4 rounded">
+              <h3 className="font-serif">{p.title}</h3>
+              <p>{p.text}</p>
+            </div>
+          ))}
         </div>
       </section>
     </div>
