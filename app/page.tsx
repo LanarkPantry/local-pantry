@@ -503,10 +503,13 @@ className="text-sm underline cursor-pointer"                      >
             </a>
 
             <button
-              onClick={startCheckout}
-              disabled={cart.length === 0 || isLoadingCheckout}
-              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white disabled:opacity-50"
-            >
+  onClick={() => {
+    alert("checkout clicked");
+    startCheckout();
+  }}
+  disabled={cart.length === 0 || isLoadingCheckout}
+  className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white disabled:opacity-50"
+>
               {isLoadingCheckout
                 ? "Opening Stripe..."
                 : isSubscription
