@@ -319,9 +319,9 @@ export default function LocalPantryWebsite() {
                 />
 
                 <div className="px-4 pb-5 pt-4 text-center">
-                  <h3 className="font-serif text-2xl leading-tight text-[#243328]">
-                    {item.name}
-                  </h3>
+                  <h3 className="font-serif text-2xl text-[#243328]">
+  Your Basket{cart.length > 0 ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})` : ""}
+</h3>
                   <p className="mt-2 text-2xl text-[#243328]">
                     £{item.price.toFixed(2)}
                   </p>
@@ -465,8 +465,7 @@ export default function LocalPantryWebsite() {
                         onClick={() =>
                           setCart((current) => current.filter((_, i) => i !== index))
                         }
-                        className="text-sm underline"
-                      >
+className="text-sm underline cursor-pointer"                      >
                         Remove
                       </button>
                     </div>
