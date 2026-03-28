@@ -34,7 +34,7 @@ export default function LocalPantryWebsite() {
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-  
+  const [successMessage, setSuccessMessage] = useState("");
 
   const addOns: ShopItem[] = [
     {
@@ -143,10 +143,6 @@ export default function LocalPantryWebsite() {
     setTimeout(() => {
       setSuccessMessage("");
     }, 2000);
-
-    setTimeout(() => {
-      basketRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
   };
 
   const total = useMemo(
@@ -444,8 +440,10 @@ export default function LocalPantryWebsite() {
             </div>
           )}
 
-          <div ref={basketRef} className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <h3 className="font-serif text-2xl text-[#243328]">Your Basket</h3>
+          <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
+            <h3 className="font-serif text-2xl text-[#243328]">
+              Your Basket{cart.length > 0 ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})` : ""}
+            </h3>
 
             {cart.length === 0 ? (
               <p className="mt-3 text-[#697166]">Your basket is empty for now.</p>
