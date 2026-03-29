@@ -29,7 +29,11 @@ type ProduceIdea = {
 export default function LocalPantryWebsite() {
   const [postcode, setPostcode] = useState("");
   const [postcodeValid, setPostcodeValid] = useState<boolean | null>(null);
+<<<<<<< HEAD
   const [cart, setCart] = useState<ShopItem[]>([]);
+=======
+  const [cart, setCart] = useState<ShopItem[]>(() => []);
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
   const [isSubscription, setIsSubscription] = useState(true);
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
@@ -72,6 +76,7 @@ export default function LocalPantryWebsite() {
       name: "Family Harvest",
       price: 30,
       image: "/family-harvest-box.png",
+<<<<<<< HEAD
       contents: [
         "Carrots",
         "Potatoes",
@@ -80,6 +85,9 @@ export default function LocalPantryWebsite() {
         "Kale",
         "Mushrooms",
       ],
+=======
+      contents: ["Carrots", "Potatoes", "Tomatoes", "Apples", "Kale", "Mushrooms"],
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
       urgency: "Only 8 boxes left for this week",
       cta: "Choose Family Harvest",
     },
@@ -91,22 +99,30 @@ export default function LocalPantryWebsite() {
       image: "/pesto-recipe.jpg",
       recipe:
         "Toss through hot pasta with roasted veg and a splash of pasta water for an easy, vibrant supper.",
+<<<<<<< HEAD
       ideas: [
         "Stir into warm potatoes",
         "Spread on toast with tomatoes",
         "Add to grain bowls",
       ],
+=======
+      ideas: ["Stir into warm potatoes", "Spread on toast with tomatoes", "Add to grain bowls"],
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
     },
     {
       title: "Rose Harissa",
       image: "/harissa-recipe.jpg",
       recipe:
         "Roast carrots and chickpeas with rose harissa, olive oil and a touch of honey for a simple traybake.",
+<<<<<<< HEAD
       ideas: [
         "Mix into yoghurt",
         "Brush onto roast veg",
         "Add to tomato sauces",
       ],
+=======
+      ideas: ["Mix into yoghurt", "Brush onto roast veg", "Add to tomato sauces"],
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
     },
     {
       title: "Salted Caramel Sauce",
@@ -148,7 +164,15 @@ export default function LocalPantryWebsite() {
   };
 
   const addToCart = (item: ShopItem) => {
+<<<<<<< HEAD
     setCart((current) => [...current, item]);
+=======
+    setCart((current) => {
+      const updated = [...current, item];
+      return updated;
+    });
+
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
     setSuccessMessage(`${item.name} added to basket`);
 
     setTimeout(() => {
@@ -158,11 +182,19 @@ export default function LocalPantryWebsite() {
 
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.price, 0),
+<<<<<<< HEAD
     [cart],
   );
 
   const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
     "Hi The Local Pantry, I'd like to place an order.",
+=======
+    [cart]
+  );
+
+  const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
+    "Hi The Local Pantry, I'd like to place an order."
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
   )}`;
 
   const startCheckout = async () => {
@@ -182,6 +214,7 @@ export default function LocalPantryWebsite() {
         }),
       });
 
+<<<<<<< HEAD
       const text = await response.text();
       console.log("Checkout response:", text);
 
@@ -192,6 +225,9 @@ export default function LocalPantryWebsite() {
       } catch {
         throw new Error("Checkout API returned HTML instead of JSON.");
       }
+=======
+      const data = await response.json();
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
 
       if (!response.ok) {
         throw new Error(data.error || "Checkout failed.");
@@ -199,12 +235,19 @@ export default function LocalPantryWebsite() {
 
       if (data.url) {
         window.location.href = data.url;
+<<<<<<< HEAD
       } else {
         throw new Error("No checkout URL returned.");
       }
     } catch (error) {
       setCheckoutError(
         error instanceof Error ? error.message : "Something went wrong.",
+=======
+      }
+    } catch (error) {
+      setCheckoutError(
+        error instanceof Error ? error.message : "Something went wrong."
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
       );
     } finally {
       setIsLoadingCheckout(false);
@@ -243,6 +286,7 @@ export default function LocalPantryWebsite() {
             Delivering the best from local farms to your door.
           </p>
           <p className="mx-auto mt-6 max-w-2xl text-base text-[#6e7368] md:text-lg">
+<<<<<<< HEAD
             Seasonal fruit, vegetables, dry goods and pantry staples, delivered
             direct to your door
           </p>
@@ -251,6 +295,11 @@ export default function LocalPantryWebsite() {
               {cart.length} item{cart.length === 1 ? "" : "s"} in basket
             </div>
           )}
+=======
+            Seasonal fruit, veg and refillable pantry staples with a calm premium farm shop feel.
+          </p>
+
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
           {postcodeValid === true && (
             <div className="mx-auto mt-6 inline-flex rounded-full border border-[#c8d3c4] bg-[#eef5ea] px-4 py-2 text-sm text-[#36553c]">
               Great news — we currently deliver to your area.
@@ -328,8 +377,12 @@ export default function LocalPantryWebsite() {
             Gourmet Add-Ons
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
+<<<<<<< HEAD
             Luxury pantry jars designed to sit beautifully alongside your weekly
             harvest box.
+=======
+            Luxury pantry jars designed to sit beautifully alongside your weekly harvest box.
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
           </p>
         </div>
 
@@ -347,9 +400,15 @@ export default function LocalPantryWebsite() {
                 />
 
                 <div className="px-4 pb-5 pt-4 text-center">
+<<<<<<< HEAD
                   <h3 className="font-serif text-2xl leading-tight text-[#243328]">
                     {item.name}
                   </h3>
+=======
+                  <h3 className="font-serif text-2xl text-[#243328]">
+  Your Basket{cart.length > 0 ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})` : ""}
+</h3>
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
                   <p className="mt-2 text-2xl text-[#243328]">
                     £{item.price.toFixed(2)}
                   </p>
@@ -375,8 +434,12 @@ export default function LocalPantryWebsite() {
               What To Cook This Week
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
+<<<<<<< HEAD
               Easy serving ideas to help customers make the most of their pantry
               jars, fruit and veg boxes.
+=======
+              Easy serving ideas to help customers make the most of their pantry jars, fruit and veg boxes.
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
             </p>
           </div>
 
@@ -397,7 +460,13 @@ export default function LocalPantryWebsite() {
                     {recipe.title}
                   </h3>
 
+<<<<<<< HEAD
                   <p className="mt-4 text-lg text-[#4d5a4f]">{recipe.recipe}</p>
+=======
+                  <p className="mt-4 text-lg text-[#4d5a4f]">
+                    {recipe.recipe}
+                  </p>
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
 
                   <div className="mt-5 border-t border-[#ece4d8] pt-4">
                     <p className="font-medium uppercase tracking-[0.15em] text-[#6c786c]">
@@ -458,18 +527,27 @@ export default function LocalPantryWebsite() {
           </div>
 
           <p className="mt-8 text-center text-2xl text-[#3a4539]">
+<<<<<<< HEAD
             Prefer not to pay online? Just send us your order details and we’ll
             reply with your options.
           </p>
 
           {successMessage && (
             <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-center text-base font-medium text-green-800">
+=======
+            Prefer not to pay online? Just send us your order details and we’ll reply with your options.
+          </p>
+
+          {successMessage && (
+            <div className="mb-4 text-center text-green-700 font-medium">
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
               {successMessage}
             </div>
           )}
 
           <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
             <h3 className="font-serif text-2xl text-[#243328]">
+<<<<<<< HEAD
               Your Basket
               {cart.length > 0
                 ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})`
@@ -480,6 +558,13 @@ export default function LocalPantryWebsite() {
               <p className="mt-3 text-[#697166]">
                 Your basket is empty for now.
               </p>
+=======
+              Your Basket{cart.length > 0 ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})` : ""}
+            </h3>
+
+            {cart.length === 0 ? (
+              <p className="mt-3 text-[#697166]">Your basket is empty for now.</p>
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
             ) : (
               <div className="mt-4 space-y-3">
                 {cart.map((item, index) => (
@@ -496,12 +581,18 @@ export default function LocalPantryWebsite() {
                       <button
                         type="button"
                         onClick={() =>
+<<<<<<< HEAD
                           setCart((current) =>
                             current.filter((_, i) => i !== index),
                           )
                         }
                         className="text-sm underline cursor-pointer"
                       >
+=======
+                          setCart((current) => current.filter((_, i) => i !== index))
+                        }
+className="text-sm underline cursor-pointer"                      >
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
                         Remove
                       </button>
                     </div>
@@ -539,6 +630,7 @@ export default function LocalPantryWebsite() {
             </a>
 
             <button
+<<<<<<< HEAD
               onClick={startCheckout}
               disabled={cart.length === 0 || isLoadingCheckout}
               className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white disabled:opacity-50"
@@ -548,13 +640,31 @@ export default function LocalPantryWebsite() {
                 : isSubscription
                   ? "Start Weekly Subscription"
                   : "Pay for One-Off Order"}
+=======
+  onClick={() => {
+    alert("checkout clicked");
+    startCheckout();
+  }}
+  disabled={cart.length === 0 || isLoadingCheckout}
+  className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white disabled:opacity-50"
+>
+              {isLoadingCheckout
+                ? "Opening Stripe..."
+                : isSubscription
+                ? "Start Weekly Subscription"
+                : "Pay for One-Off Order"}
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
             </button>
           </div>
 
           {checkoutError && (
+<<<<<<< HEAD
             <p className="mt-4 text-center text-sm text-red-700">
               {checkoutError}
             </p>
+=======
+            <p className="mt-4 text-center text-sm text-red-700">{checkoutError}</p>
+>>>>>>> aa7f09367e22ff2a6278faad3fdd9032ebb37454
           )}
 
           <p className="mt-5 text-center text-sm text-[#6d756a]">
