@@ -1,3 +1,4 @@
+// checkout route
 import Stripe from "stripe";
 
 export async function POST(req: Request) {
