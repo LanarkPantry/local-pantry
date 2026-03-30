@@ -155,7 +155,9 @@ export default function LocalPantryWebsite() {
       setSuccessMessage("");
     }, 2000);
   };
-
+  const getItemCount = (itemName: string) => {
+    return cart.filter((cartItem) => cartItem.name === itemName).length;
+  };
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.price, 0),
     [cart],
@@ -183,7 +185,7 @@ export default function LocalPantryWebsite() {
       });
 
       const text = await response.text();
-      console.log("Checkout response:", text);
+      console.log("Deploy test response:", text);
 
       let data;
 
@@ -304,13 +306,21 @@ export default function LocalPantryWebsite() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => addToCart(box)}
-                    className="relative z-10 mt-8 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm"
-                  >
-                    {box.cta}
-                  </button>
+                  <div className="mt-8">
+                    <button
+                      type="button"
+                      onClick={() => addToCart(box)}
+                      className="relative z-10 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm"
+                    >
+                      {box.cta}
+                    </button>
+
+                    {getItemCount(box.name) > 0 && (
+                      <p className="mt-3 text-lg text-[#36553c]">
+                        Added ({getItemCount(box.name)})
+                      </p>
+                    )}
+                  </div>
 
                   <div className="mt-4 rounded-2xl border border-[#e7d2a9] bg-[#f3dfb9] px-5 py-3 text-lg text-[#5d4f2a]">
                     {box.urgency}
@@ -354,13 +364,21 @@ export default function LocalPantryWebsite() {
                     £{item.price.toFixed(2)}
                   </p>
 
-                  <button
-                    type="button"
-                    onClick={() => addToCart(item)}
-                    className="relative z-10 mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#334e39] to-[#475c40] px-4 py-3 font-serif text-2xl text-white"
-                  >
-                    Add
-                  </button>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => addToCart(item)}
+                      className="relative z-10 w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#334e39] to-[#475c40] px-4 py-3 font-serif text-2xl text-white"
+                    >
+                      Add
+                    </button>
+
+                    {getItemCount(item.name) > 0 && (
+                      <p className="mt-2 text-base text-[#36553c]">
+                        Added ({getItemCount(item.name)})
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
