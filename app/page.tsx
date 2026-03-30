@@ -155,13 +155,29 @@ export default function LocalPantryWebsite() {
       setSuccessMessage("");
     }, 2000);
   };
+
   const getItemCount = (itemName: string) => {
     return cart.filter((cartItem) => cartItem.name === itemName).length;
   };
+
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.price, 0),
     [cart],
   );
+
+  const groupedCart = useMemo(() => {
+    const map = new Map<string, { item: ShopItem; quantity: number }>();
+
+    cart.forEach((item) => {
+      if (map.has(item.name)) {
+        map.get(item.name)!.quantity += 1;
+      } else {
+        map.set(item.name, { item, quantity: 1 });
+      }
+    });
+
+    return Array.from(map.values());
+  }, [cart]);
 
   const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
     "Hi The Local Pantry, I'd like to place an order.",
@@ -265,23 +281,47 @@ export default function LocalPantryWebsite() {
         </div>
       </header>
 
-      <section className="px-6 pb-8 pt-4 md:px-10">
-        <div className="mx-auto max-w-6xl text-center">
-          <h1 className="font-serif text-5xl tracking-tight text-[#233226] md:text-7xl">
+      <section className="px-6 pb-12 pt-10 md:px-10 md:pb-16 md:pt-16">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="text-sm uppercase tracking-[0.25em] text-[#6b776c]">
+            Seasonal groceries from local farms
+          </p>
+
+          <h1 className="mt-4 font-serif text-5xl tracking-tight text-[#233226] md:text-7xl">
             The Local Pantry
           </h1>
-          <p className="mx-auto mt-8 max-w-4xl font-serif text-2xl italic text-[#314534] md:text-5xl">
+
+          <p className="mx-auto mt-6 max-w-3xl font-serif text-2xl italic leading-tight text-[#314534] md:text-5xl">
             Delivering the best from local farms to your door.
           </p>
-          <p className="mx-auto mt-6 max-w-2xl text-base text-[#6e7368] md:text-lg">
+
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[#6e7368] md:text-lg">
             Seasonal fruit, vegetables, dry goods and pantry staples, delivered
-            direct to your door
+            direct to your door.
           </p>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a
+              href="#boxes"
+              className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
+            >
+              Shop harvest boxes
+            </a>
+
+            <a
+              href="#basket"
+              className="rounded-full border border-[#d6cec2] bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#faf7f2]"
+            >
+              View basket
+            </a>
+          </div>
+
           {cart.length > 0 && (
             <div className="mx-auto mt-6 inline-flex rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm text-[#243328] shadow-sm">
               {cart.length} item{cart.length === 1 ? "" : "s"} in basket
             </div>
           )}
+
           {postcodeValid === true && (
             <div className="mx-auto mt-6 inline-flex rounded-full border border-[#c8d3c4] bg-[#eef5ea] px-4 py-2 text-sm text-[#36553c]">
               Great news — we currently deliver to your area.
@@ -296,7 +336,7 @@ export default function LocalPantryWebsite() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-14 md:px-10">
+      <section id="boxes" className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         <div className="grid gap-6 lg:grid-cols-2">
           {boxes.map((box) => (
             <div
@@ -339,7 +379,7 @@ export default function LocalPantryWebsite() {
                     <button
                       type="button"
                       onClick={() => addToCart(box)}
-                      className="relative z-10 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm"
+                      className="relative z-10 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01]"
                     >
                       {box.cta}
                     </button>
@@ -361,7 +401,7 @@ export default function LocalPantryWebsite() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-10 md:px-10">
+      <section id="addons" className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         <div className="text-center">
           <h2 className="font-serif text-4xl text-[#243328] md:text-6xl">
             Gourmet Add-Ons
@@ -397,7 +437,7 @@ export default function LocalPantryWebsite() {
                     <button
                       type="button"
                       onClick={() => addToCart(item)}
-                      className="relative z-10 w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#334e39] to-[#475c40] px-4 py-3 font-serif text-2xl text-white"
+                      className="relative z-10 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-4 py-3 font-serif text-xl text-white shadow-sm transition hover:scale-[1.01]"
                     >
                       Add
                     </button>
@@ -415,7 +455,7 @@ export default function LocalPantryWebsite() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-10 md:px-10">
+      <section id="recipes" className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
           <div className="text-center">
             <h2 className="font-serif text-4xl text-[#243328] md:text-6xl">
@@ -478,7 +518,10 @@ export default function LocalPantryWebsite() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-6 pb-16 pt-8 md:px-10">
+      <section
+        id="basket"
+        className="mx-auto max-w-4xl px-6 pb-20 pt-10 md:px-10"
+      >
         <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
           <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
             <button
@@ -516,7 +559,7 @@ export default function LocalPantryWebsite() {
           )}
 
           <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <h3 className="font-serif text-2xl text-[#243328]">
+            <h3 className="font-serif text-3xl text-[#243328]">
               Your Basket
               {cart.length > 0
                 ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})`
@@ -529,25 +572,35 @@ export default function LocalPantryWebsite() {
               </p>
             ) : (
               <div className="mt-4 space-y-3">
-                {cart.map((item, index) => (
+                {groupedCart.map(({ item, quantity }) => (
                   <div
-                    key={`${item.name}-${index}`}
-                    className="flex items-center justify-between border-b border-[#eee6da] pb-3 text-lg text-[#314534]"
+                    key={item.name}
+                    className="flex items-center justify-between border-b border-[#eee6da] pb-4 text-lg text-[#314534]"
                   >
                     <div>
-                      <span>{item.name}</span>
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-[#6d756a]">
+                        £{item.price.toFixed(2)} × {quantity}
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <span>£{item.price.toFixed(2)}</span>
+                      <span className="font-medium">
+                        £{(item.price * quantity).toFixed(2)}
+                      </span>
+
                       <button
                         type="button"
                         onClick={() =>
-                          setCart((current) =>
-                            current.filter((_, i) => i !== index),
-                          )
+                          setCart((current) => {
+                            const index = current.findIndex(
+                              (cartItem) => cartItem.name === item.name,
+                            );
+                            if (index === -1) return current;
+                            return current.filter((_, i) => i !== index);
+                          })
                         }
-                        className="text-sm underline cursor-pointer"
+                        className="cursor-pointer text-sm underline"
                       >
                         Remove
                       </button>
@@ -555,10 +608,14 @@ export default function LocalPantryWebsite() {
                   </div>
                 ))}
 
-                <div className="flex items-center justify-between pt-2 text-2xl font-medium text-[#243328]">
+                <div className="flex items-center justify-between pt-4 text-2xl font-medium text-[#243328]">
                   <span>Total</span>
                   <span>£{total.toFixed(2)}</span>
                 </div>
+
+                <p className="mt-2 text-sm text-[#6d756a]">
+                  Delivery calculated at checkout.
+                </p>
               </div>
             )}
           </div>
@@ -588,7 +645,7 @@ export default function LocalPantryWebsite() {
             <button
               onClick={startCheckout}
               disabled={cart.length === 0 || isLoadingCheckout}
-              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white disabled:opacity-50"
+              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01] disabled:opacity-50 disabled:hover:scale-100"
             >
               {isLoadingCheckout
                 ? "Opening Stripe..."
