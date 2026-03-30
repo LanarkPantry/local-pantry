@@ -239,7 +239,7 @@ export default function LocalPantryWebsite() {
 
           <nav className="hidden md:flex items-center gap-6">
             <a
-              href="#boxes"
+              href="/shop"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Boxes
@@ -302,10 +302,10 @@ export default function LocalPantryWebsite() {
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              href="#boxes"
+              href="/shop"
               className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
             >
-              Shop harvest boxes
+              Shop our products
             </a>
 
             <a
@@ -333,125 +333,6 @@ export default function LocalPantryWebsite() {
               Not available yet — join the waitlist for your postcode.
             </div>
           )}
-        </div>
-      </section>
-
-      <section id="boxes" className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
-        <div className="grid gap-6 lg:grid-cols-2">
-          {boxes.map((box) => (
-            <div
-              key={box.name}
-              className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
-            >
-              <div className="overflow-hidden rounded-[22px] border border-[#e5ddcf] bg-white">
-                <img
-                  src={box.image}
-                  alt={box.name}
-                  className="h-[320px] w-full object-contain bg-[#f8f5ef] p-4"
-                />
-
-                <div className="px-8 pb-8 pt-6 text-center">
-                  <h2 className="font-serif text-4xl leading-none text-[#243328] md:text-5xl">
-                    {box.name}
-                  </h2>
-
-                  <p className="mt-4 font-serif text-3xl text-[#243328]">
-                    £{box.price} <span className="text-xl">per week</span>
-                  </p>
-
-                  <div className="mx-auto mt-8 max-w-md border-t border-[#d8d0c5] pt-6">
-                    <p className="font-serif text-2xl text-[#243328]">
-                      Typical contents:
-                    </p>
-
-                    <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-left text-lg text-[#38473b]">
-                      {box.contents.map((item) => (
-                        <div key={item}>• {item}</div>
-                      ))}
-                    </div>
-
-                    <p className="mt-6 border-t border-[#d8d0c5] pt-5 text-lg text-[#5f675c]">
-                      Changes weekly based on what’s fresh.
-                    </p>
-                  </div>
-
-                  <div className="mt-8">
-                    <button
-                      type="button"
-                      onClick={() => addToCart(box)}
-                      className="relative z-10 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01]"
-                    >
-                      {box.cta}
-                    </button>
-
-                    {getItemCount(box.name) > 0 && (
-                      <p className="mt-3 text-lg text-[#36553c]">
-                        Added ({getItemCount(box.name)})
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="mt-4 rounded-2xl border border-[#e7d2a9] bg-[#f3dfb9] px-5 py-3 text-lg text-[#5d4f2a]">
-                    {box.urgency}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="addons" className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
-        <div className="text-center">
-          <h2 className="font-serif text-4xl text-[#243328] md:text-6xl">
-            Gourmet Add-Ons
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-            Luxury pantry jars designed to sit beautifully alongside your weekly
-            harvest box.
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {addOns.map((item) => (
-            <div
-              key={item.name}
-              className="rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-3 shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
-            >
-              <div className="overflow-hidden rounded-[18px] border border-[#e5ddcf] bg-white">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="h-56 w-full object-contain bg-[#f8f5ef] p-4"
-                />
-
-                <div className="px-4 pb-5 pt-4 text-center">
-                  <h3 className="font-serif text-2xl leading-tight text-[#243328]">
-                    {item.name}
-                  </h3>
-                  <p className="mt-2 text-2xl text-[#243328]">
-                    £{item.price.toFixed(2)}
-                  </p>
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={() => addToCart(item)}
-                      className="relative z-10 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-4 py-3 font-serif text-xl text-white shadow-sm transition hover:scale-[1.01]"
-                    >
-                      Add
-                    </button>
-
-                    {getItemCount(item.name) > 0 && (
-                      <p className="mt-2 text-base text-[#36553c]">
-                        Added ({getItemCount(item.name)})
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
