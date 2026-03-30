@@ -215,24 +215,53 @@ export default function LocalPantryWebsite() {
 
   return (
     <div className="min-h-screen bg-[#f4efe9] text-[#243328]">
-      <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
-        <div className="text-sm tracking-[0.35em] text-[#60705f]">
-          THE LOCAL PANTRY
-        </div>
+      <header className="sticky top-0 z-30 border-b border-[#e6ddd2] bg-[#f4efe9]/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
+          <div className="text-sm tracking-[0.35em] text-[#60705f]">
+            THE LOCAL PANTRY
+          </div>
 
-        <div className="hidden md:flex items-center gap-3 rounded-full border border-[#d6cec2] bg-white/80 px-3 py-2 shadow-sm">
-          <input
-            value={postcode}
-            onChange={(e) => setPostcode(e.target.value)}
-            placeholder="Check postcode"
-            className="w-40 bg-transparent text-sm outline-none placeholder:text-[#8b8b7c]"
-          />
-          <button
-            onClick={checkPostcode}
-            className="rounded-full bg-[#2f4635] px-4 py-2 text-sm text-white"
-          >
-            Check
-          </button>
+          <nav className="hidden md:flex items-center gap-6">
+            <a
+              href="#boxes"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Boxes
+            </a>
+            <a
+              href="#addons"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Add-Ons
+            </a>
+            <a
+              href="#recipes"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Recipes
+            </a>
+            <a
+              href="#basket"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Basket
+            </a>
+          </nav>
+
+          <div className="hidden md:flex items-center gap-3 rounded-full border border-[#d6cec2] bg-white/90 px-3 py-2 shadow-sm">
+            <input
+              value={postcode}
+              onChange={(e) => setPostcode(e.target.value)}
+              placeholder="Check postcode"
+              className="w-40 bg-transparent text-sm outline-none placeholder:text-[#8b8b7c]"
+            />
+            <button
+              onClick={checkPostcode}
+              className="rounded-full bg-[#2f4635] px-4 py-2 text-sm text-white transition hover:bg-[#243328]"
+            >
+              Check
+            </button>
+          </div>
         </div>
       </header>
 
