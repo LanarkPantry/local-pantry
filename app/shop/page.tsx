@@ -3,90 +3,74 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
+import type { ShopItem as CartShopItem } from "../cart-context";
 
-type ShopItem = {
-  name: string;
-  price: number;
-  description: string;
+type ShopDisplayItem = CartShopItem & {
   details?: string;
   category: "boxes" | "pantry";
   buttonLabel?: string;
+  weeklyIncludes?: string[];
 };
 
-const produceBoxes: ShopItem[] = [
+const produceBoxes: ShopDisplayItem[] = [
   {
-    name: "Essential Produce Box",
-    price: 18,
+    name: "Weekly Produce Box",
+    price: 20,
+    image: "/weekly-harvest-box.png",
     category: "boxes",
-    buttonLabel: "Add box",
+    buttonLabel: "Add weekly box",
     description:
-      "A smaller weekly produce box for one to two people, with a balanced mix of fruit and vegetables.",
+      "A smaller produce box with a useful mix of everyday fruit and veg.",
     details:
-      "Contents change week to week depending on market availability. A practical base for the week rather than a fixed list.",
+      "Contents change week to week depending on availability, so the mix is not fixed.",
+    weeklyIncludes: ["Carrots", "Potatoes", "Leeks", "Apples", "Onions"],
   },
   {
     name: "Family Produce Box",
     price: 30,
+    image: "/family-harvest-box.png",
     category: "boxes",
-    buttonLabel: "Add box",
+    buttonLabel: "Add family box",
     description:
-      "A larger produce box for families or households that cook regularly through the week.",
+      "A larger produce box for households that cook regularly through the week.",
     details:
-      "Built around a wider quantity of seasonal fruit and vegetables sourced from market suppliers, with contents adjusted week by week.",
+      "Designed as a fuller weekly box, with contents changing depending on what is available.",
+    weeklyIncludes: ["Carrots", "Potatoes", "Tomatoes", "Apples", "Greens"],
   },
 ];
 
-const pantryItems: ShopItem[] = [
+const pantryItems: ShopDisplayItem[] = [
   {
-    name: "Passata",
-    price: 2.8,
-    category: "pantry",
-    description:
-      "A simple pantry staple for soups, sauces, and midweek cooking.",
-    details:
-      "Easy to keep on hand and useful across a range of everyday meals.",
-  },
-  {
-    name: "Green Olives",
-    price: 3.9,
-    category: "pantry",
-    description:
-      "A savoury pantry extra that works well for grazing boards, salads, or simple suppers.",
-    details: "A useful jar to keep in for quick lunches and easy hosting.",
-  },
-  {
-    name: "Chilli Jam",
+    name: "Sorrel & Walnut Pesto",
     price: 4.5,
+    image: "/sorrel-walnut-pesto.png",
     category: "pantry",
     description:
-      "A sweet and savoury condiment for sandwiches, cheese, roasted vegetables, and simple dinners.",
-    details: "A small extra that adds variety without overcomplicating a meal.",
+      "A fresh, savoury jar for pasta, toast, or spooning over roasted vegetables.",
   },
   {
-    name: "Porridge Oats",
-    price: 3.2,
+    name: "Rose Harissa",
+    price: 5.25,
+    image: "/rose-harissa.png",
     category: "pantry",
     description:
-      "A dry-goods staple for breakfast, baking, or keeping the cupboard stocked with the basics.",
-    details: "A useful everyday item as the pantry range expands beyond jars.",
+      "A gently spiced pantry extra for roasting, dressing, or adding warmth to simple meals.",
   },
   {
-    name: "Red Lentils",
-    price: 3.6,
+    name: "Salted Caramel Sauce",
+    price: 5.0,
+    image: "/salted-caramel.png",
     category: "pantry",
     description:
-      "A versatile dry-goods staple for soups, dals, traybakes, and simple weeknight cooking.",
-    details:
-      "Quick to cook and practical for households building a regular pantry order.",
+      "A rich, smooth sauce for desserts, baking, or adding something extra to a simple pudding.",
   },
   {
-    name: "Almonds",
-    price: 4.9,
+    name: "Dark Chocolate & Hazelnut Spread",
+    price: 5.0,
+    image: "/dark-chocolate.png",
     category: "pantry",
     description:
-      "A cupboard staple for snacking, baking, breakfast bowls, or adding texture to simple meals.",
-    details:
-      "A straightforward pantry extra that fits naturally with weekly essentials.",
+      "A chocolate spread for toast, baking, or keeping in the cupboard as a useful sweet extra.",
   },
 ];
 
@@ -106,7 +90,7 @@ export default function ShopPage() {
 
   const getQuantity = (itemName: string) => quantityByName[itemName] ?? 0;
 
-  const renderAddControls = (item: ShopItem) => {
+  const renderAddControls = (item: ShopDisplayItem) => {
     const quantity = getQuantity(item.name);
 
     if (quantity === 0) {
@@ -202,9 +186,9 @@ export default function ShopPage() {
             </h1>
 
             <p className="mt-4 max-w-2xl text-[#667164]">
-              Build your order with a weekly produce box and a few pantry
-              additions. Produce is sourced from market suppliers, and contents
-              may change week to week depending on availability.
+              Build your order with a produce box and a few pantry additions.
+              Produce is sourced from market suppliers, and contents can change
+              week to week depending on availability.
             </p>
           </div>
 
@@ -214,8 +198,8 @@ export default function ShopPage() {
                 A simple way to order
               </p>
               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                Start with produce, add pantry items if needed, then choose
-                one-off or weekly in the basket.
+                Start with a produce box, add pantry items if needed, then
+                choose one-off or weekly in the basket.
               </p>
             </div>
 
@@ -252,9 +236,8 @@ export default function ShopPage() {
               Choose your base for the week
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
-              These boxes are designed to make weekly ordering simple. The
-              contents are not fixed, so the mix may vary depending on what is
-              available at market that week.
+              These boxes are designed to make weekly ordering simple. The mix
+              changes depending on what is available and looking good that week.
             </p>
           </div>
 
@@ -292,15 +275,23 @@ export default function ShopPage() {
                     </p>
                   )}
 
-                  <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-white p-4">
-                    <p className="text-sm font-medium text-[#243328]">
-                      Before checkout
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      You can choose one-off or weekly in the basket after
-                      adding your box.
-                    </p>
-                  </div>
+                  {item.weeklyIncludes && (
+                    <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-white p-4">
+                      <p className="text-sm font-medium text-[#243328]">
+                        This week may include
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {item.weeklyIncludes.map((entry) => (
+                          <span
+                            key={entry}
+                            className="rounded-full border border-[#e5ddcf] bg-[#fbfaf8] px-3 py-1 text-sm text-[#5f675c]"
+                          >
+                            {entry}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     {renderAddControls(item)}
@@ -326,16 +317,15 @@ export default function ShopPage() {
               Pantry additions
             </p>
             <h2 className="mt-2 font-serif text-3xl md:text-4xl">
-              Add a few cupboard essentials
+              Useful extras
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
-              A small pantry range to round out the order, starting with jars
-              and expanding into practical dry goods such as oats, nuts, grains,
-              and other everyday basics.
+              A small selection of pantry essentials and useful extras to round
+              out the weekly order.
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2">
             {pantryItems.map((item) => {
               const quantity = getQuantity(item.name);
 
@@ -346,10 +336,7 @@ export default function ShopPage() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
-                        Pantry item
-                      </p>
-                      <h3 className="mt-2 font-serif text-2xl text-[#243328]">
+                      <h3 className="font-serif text-2xl text-[#243328]">
                         {item.name}
                       </h3>
                     </div>
@@ -362,12 +349,6 @@ export default function ShopPage() {
                   <p className="mt-4 text-sm leading-7 text-[#667164]">
                     {item.description}
                   </p>
-
-                  {item.details && (
-                    <p className="mt-3 text-sm leading-7 text-[#667164]">
-                      {item.details}
-                    </p>
-                  )}
 
                   <div className="mt-6 flex flex-col gap-3">
                     {renderAddControls(item)}
@@ -382,38 +363,6 @@ export default function ShopPage() {
                 </article>
               );
             })}
-          </div>
-        </section>
-
-        <section className="mt-10 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
-            <p className="text-sm font-medium text-[#243328]">
-              Clear next step
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[#667164]">
-              Basket totals update as you add items, so it&apos;s always obvious
-              what&apos;s in the order.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
-            <p className="text-sm font-medium text-[#243328]">
-              Flexible ordering
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[#667164]">
-              You don&apos;t need to decide between one-off and weekly until the
-              basket step.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
-            <p className="text-sm font-medium text-[#243328]">
-              Built for simple weekly shops
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[#667164]">
-              Start with produce, then add pantry extras only where they make
-              sense.
-            </p>
           </div>
         </section>
       </div>
