@@ -22,7 +22,14 @@ export default function BasketPage() {
   const totalItems = useMemo(() => cart.length, [cart]);
 
   const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
-    "Hi The Local Pantry, I'd like to place an order.",
+    `Hi The Local Pantry, I'd like to place an order.
+
+Order type: ${isSubscription ? "Weekly subscription" : "One-off order"}
+Items: ${groupedCart
+      .map(({ item, quantity }) => `${item.name} x${quantity}`)
+      .join(", ")}
+Total: £${total.toFixed(2)}
+${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
   )}`;
 
   const startCheckout = async () => {
@@ -73,12 +80,11 @@ export default function BasketPage() {
 
   return (
     <main className="min-h-screen bg-[#f4efe9] px-6 py-10 text-[#243328] md:px-10">
-      <div className="mx-auto max-w-5xl">
-        {/* HEADER */}
+      <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
           <Link
             href="/"
-            className="text-sm tracking-[0.35em] text-[#60705f] hover:text-[#243328]"
+            className="text-sm tracking-[0.35em] text-[#60705f] transition hover:text-[#243328]"
           >
             THE LOCAL PANTRY
           </Link>
@@ -86,21 +92,21 @@ export default function BasketPage() {
           <nav className="flex items-center gap-6">
             <Link
               href="/"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+              className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
             >
               Home
             </Link>
 
             <Link
               href="/shop"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+              className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
             >
               Shop
             </Link>
 
             <Link
               href="/recipes"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+              className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
             >
               Recipes
             </Link>
@@ -114,155 +120,288 @@ export default function BasketPage() {
           </nav>
         </div>
 
-        {/* BACK LINK */}
         <div className="mb-6">
           <Link
             href="/shop"
-            className="text-sm text-[#5f675c] underline underline-offset-4 hover:text-[#243328]"
+            className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
           >
             ← Continue shopping
           </Link>
         </div>
 
-        {/* MAIN CARD */}
-        <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
-          <div className="text-center">
-            <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
-              Your order
-            </p>
+        <div className="mb-8 max-w-3xl">
+          <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
+            Your order
+          </p>
+          <h1 className="mt-3 font-serif text-4xl md:text-6xl">Basket</h1>
+          <p className="mt-4 max-w-2xl text-[#667164]">
+            Review your items, choose how you&apos;d like to order, and add any
+            delivery notes before checkout.
+          </p>
+        </div>
 
-            <h1 className="mt-3 font-serif text-4xl md:text-6xl">Basket</h1>
+        {cart.length === 0 ? (
+          <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-8 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-10">
+            <div className="mx-auto max-w-2xl text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#ddd4c8] bg-white text-2xl">
+                🧺
+              </div>
 
-            <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-              Review your items, choose your order type, then continue to secure
-              checkout.
-            </p>
-          </div>
+              <h2 className="mt-6 font-serif text-3xl md:text-4xl">
+                Your basket is empty
+              </h2>
 
-          {/* ORDER TYPE */}
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 md:flex-row">
-            <button
-              onClick={() => setIsSubscription(false)}
-              className={`rounded-2xl border px-8 py-4 font-serif text-2xl ${
-                !isSubscription
-                  ? "border-[#314534] bg-white text-[#243328]"
-                  : "border-[#d6cec2] bg-[#f4efe9] text-[#5f675c]"
-              }`}
-            >
-              One-Off Order
-            </button>
+              <p className="mx-auto mt-4 max-w-xl text-[#667164]">
+                Start with a produce box or add a few pantry items to build your
+                weekly order.
+              </p>
 
-            <button
-              onClick={() => setIsSubscription(true)}
-              className={`rounded-2xl px-8 py-4 font-serif text-2xl ${
-                isSubscription
-                  ? "bg-gradient-to-r from-[#334e39] to-[#5a5326] text-white"
-                  : "border border-[#d6cec2] bg-[#f4efe9] text-[#5f675c]"
-              }`}
-            >
-              Weekly Subscription
-            </button>
-          </div>
-
-          {/* BASKET ITEMS */}
-          <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <h2 className="font-serif text-3xl">
-              Your Basket
-              {totalItems > 0
-                ? ` (${totalItems} item${totalItems === 1 ? "" : "s"})`
-                : ""}
-            </h2>
-
-            {cart.length === 0 ? (
-              <div className="mt-4">
-                <p className="text-[#697166]">Your basket is empty for now.</p>
-
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/shop"
-                  className="mt-4 inline-block rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white"
+                  className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  Go to Shop
+                  Browse the shop
+                </Link>
+
+                <Link
+                  href="/"
+                  className="rounded-full border border-[#d6cec2] bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                >
+                  Back to homepage
                 </Link>
               </div>
-            ) : (
-              <div className="mt-4 space-y-3">
-                {groupedCart.map(({ item, quantity }) => (
-                  <div
-                    key={item.name}
-                    className="flex flex-col gap-4 border-b pb-4 md:flex-row md:items-center md:justify-between"
-                  >
-                    <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-[#6d756a]">
-                        £{item.price.toFixed(2)} × {quantity}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-4">
-                      <div className="flex items-center rounded-full border bg-[#fbfaf8]">
-                        <button
-                          onClick={() => removeOneFromCart(item.name)}
-                          className="px-3 py-2"
-                        >
-                          −
-                        </button>
-
-                        <span className="px-2">{quantity}</span>
-
-                        <button
-                          onClick={() => addToCart(item)}
-                          className="px-3 py-2"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <span>£{(item.price * quantity).toFixed(2)}</span>
-
-                      <button
-                        onClick={() => clearItemFromCart(item.name)}
-                        className="text-sm underline"
-                      >
-                        Remove all
-                      </button>
-                    </div>
+            </div>
+          </section>
+        ) : (
+          <div className="grid gap-6 lg:grid-cols-[1.5fr_0.9fr]">
+            <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
+              <div className="rounded-2xl border border-[#e5ddcf] bg-white p-5 md:p-6">
+                <div className="flex flex-col gap-2 border-b border-[#ece4d8] pb-5 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <h2 className="font-serif text-3xl">Your basket</h2>
+                    <p className="mt-1 text-sm text-[#697166]">
+                      {totalItems} item{totalItems === 1 ? "" : "s"} in your
+                      order
+                    </p>
                   </div>
-                ))}
 
-                <div className="flex justify-between pt-4 text-2xl">
-                  <span>Total</span>
-                  <span>£{total.toFixed(2)}</span>
+                  <p className="text-sm text-[#697166]">
+                    Adjust quantities before checkout
+                  </p>
+                </div>
+
+                <div className="mt-5 space-y-4">
+                  {groupedCart.map(({ item, quantity }) => (
+                    <div
+                      key={item.name}
+                      className="flex flex-col gap-4 border-b border-[#f0e8dc] pb-4 md:flex-row md:items-center md:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-lg font-medium text-[#243328]">
+                          {item.name}
+                        </div>
+                        <div className="mt-1 text-sm text-[#6d756a]">
+                          £{item.price.toFixed(2)} each
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                        <div className="inline-flex w-fit items-center rounded-full border border-[#ddd4c8] bg-[#fbfaf8]">
+                          <button
+                            onClick={() => removeOneFromCart(item.name)}
+                            className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
+                            aria-label={`Decrease quantity of ${item.name}`}
+                          >
+                            −
+                          </button>
+
+                          <span className="min-w-[2rem] text-center text-sm">
+                            {quantity}
+                          </span>
+
+                          <button
+                            onClick={() => addToCart(item)}
+                            className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
+                            aria-label={`Increase quantity of ${item.name}`}
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <div className="min-w-[72px] text-sm font-medium text-[#243328] sm:text-right">
+                          £{(item.price * quantity).toFixed(2)}
+                        </div>
+
+                        <button
+                          onClick={() => clearItemFromCart(item.name)}
+                          className="w-fit text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
+                        >
+                          Remove all
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex items-center justify-between border-t border-[#ece4d8] pt-5">
+                  <span className="font-serif text-2xl">Total</span>
+                  <span className="font-serif text-2xl">
+                    £{total.toFixed(2)}
+                  </span>
                 </div>
               </div>
-            )}
+
+              <div className="mt-6 rounded-2xl border border-[#ddd4c8] bg-[#efe8dd] p-5 md:p-6">
+                <div className="max-w-2xl">
+                  <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+                    Order type
+                  </p>
+                  <h2 className="mt-2 font-serif text-3xl">
+                    Choose how you&apos;d like to order
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-[#667164]">
+                    Pick a one-off order if you&apos;re ordering just for this
+                    week, or choose a weekly subscription if you&apos;d like a
+                    regular delivery. You can review the details again at
+                    checkout.
+                  </p>
+                </div>
+
+                <div className="mt-5 grid gap-3 md:grid-cols-2">
+                  <button
+                    onClick={() => setIsSubscription(false)}
+                    className={`rounded-2xl border p-5 text-left transition ${
+                      !isSubscription
+                        ? "border-[#314534] bg-white shadow-[0_10px_25px_rgba(36,51,40,0.06)]"
+                        : "border-[#d6cec2] bg-[#f4efe9] hover:bg-[#f8f3ed]"
+                    }`}
+                  >
+                    <div className="font-serif text-2xl text-[#243328]">
+                      One-off order
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      Best if you&apos;re ordering occasionally or trying a box
+                      for the first time.
+                    </p>
+                  </button>
+
+                  <button
+                    onClick={() => setIsSubscription(true)}
+                    className={`rounded-2xl border p-5 text-left transition ${
+                      isSubscription
+                        ? "border-[#314534] bg-white shadow-[0_10px_25px_rgba(36,51,40,0.06)]"
+                        : "border-[#d6cec2] bg-[#f4efe9] hover:bg-[#f8f3ed]"
+                    }`}
+                  >
+                    <div className="font-serif text-2xl text-[#243328]">
+                      Weekly subscription
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      A simple recurring order for households who want a regular
+                      weekly delivery.
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-2xl border border-[#ddd4c8] bg-white p-5 md:p-6">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+                    Delivery notes
+                  </p>
+                  <h2 className="mt-2 font-serif text-3xl">
+                    Anything we should know?
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-[#667164]">
+                    Add any useful details for delivery, such as a safe place,
+                    gate code, or timing preference.
+                  </p>
+                </div>
+
+                <label htmlFor="delivery-notes" className="sr-only">
+                  Delivery notes
+                </label>
+                <textarea
+                  id="delivery-notes"
+                  value={deliveryNotes}
+                  onChange={(e) => setDeliveryNotes(e.target.value)}
+                  rows={5}
+                  placeholder="For example: Please leave by the side gate if no one is in."
+                  className="mt-5 w-full rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
+                />
+              </div>
+            </section>
+
+            <aside className="lg:sticky lg:top-8 lg:self-start">
+              <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
+                <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+                  Order summary
+                </p>
+
+                <div className="mt-4 rounded-2xl border border-[#e5ddcf] bg-white p-5">
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] pb-4">
+                    <span className="text-sm text-[#667164]">Items</span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      {totalItems}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
+                    <span className="text-sm text-[#667164]">Order type</span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      {isSubscription ? "Weekly" : "One-off"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4">
+                    <span className="font-serif text-2xl text-[#243328]">
+                      Total
+                    </span>
+                    <span className="font-serif text-2xl text-[#243328]">
+                      £{total.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-5 space-y-3">
+                  <button
+                    onClick={startCheckout}
+                    disabled={cart.length === 0 || isLoadingCheckout}
+                    className="w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isLoadingCheckout
+                      ? "Opening checkout..."
+                      : "Continue to checkout"}
+                  </button>
+
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block w-full rounded-2xl border border-[#d6cec2] bg-white px-6 py-4 text-center text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                  >
+                    Order via WhatsApp instead
+                  </a>
+                </div>
+
+                {checkoutError && (
+                  <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {checkoutError}
+                  </p>
+                )}
+
+                <div className="mt-6 rounded-2xl bg-[#efe8dd] p-4">
+                  <p className="text-sm leading-6 text-[#5f675c]">
+                    Final delivery timing and any order details can be confirmed
+                    at checkout. If you prefer, you can also place the order by
+                    WhatsApp.
+                  </p>
+                </div>
+              </div>
+            </aside>
           </div>
-
-          {/* CTA */}
-          <div className="mt-5 flex flex-col gap-4 md:flex-row">
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 rounded-2xl border bg-white px-6 py-4 text-center"
-            >
-              Order via WhatsApp
-            </a>
-
-            <button
-              onClick={startCheckout}
-              disabled={cart.length === 0 || isLoadingCheckout}
-              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 text-white"
-            >
-              {isLoadingCheckout
-                ? "Opening checkout..."
-                : "Continue to checkout"}
-            </button>
-          </div>
-
-          {checkoutError && (
-            <p className="mt-4 text-center text-red-700">{checkoutError}</p>
-          )}
-        </div>
+        )}
       </div>
     </main>
   );
