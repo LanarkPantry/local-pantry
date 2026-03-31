@@ -165,6 +165,10 @@ export default function HomePage() {
                 View basket{totalItems > 0 ? ` (${totalItems})` : ""}
               </Link>
             </div>
+
+            <p className="mt-5 text-sm text-white/75">
+              Weekly delivery across selected local areas.
+            </p>
           </div>
         </div>
       </section>
@@ -177,19 +181,18 @@ export default function HomePage() {
             </p>
             <h2 className="mt-3 font-serif text-3xl">Chosen each week</h2>
             <p className="mt-3 leading-7 text-[#5f675c]">
-              Fruit and veg selected for quality, season, and how you actually
-              want to cook.
+              Fruit and veg chosen for quality and how you actually cook.
             </p>
           </div>
 
           <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              A focused range
+              Pantry essentials
             </p>
-            <h2 className="mt-3 font-serif text-3xl">Simple essentials</h2>
+            <h2 className="mt-3 font-serif text-3xl">Simple additions</h2>
             <p className="mt-3 leading-7 text-[#5f675c]">
-              A small selection of pantry jars and useful extras, kept simple
-              and chosen well.
+              A small selection of pantry essentials and useful extras, kept
+              simple and chosen well.
             </p>
           </div>
 
@@ -200,7 +203,7 @@ export default function HomePage() {
             <h2 className="mt-3 font-serif text-3xl">Delivered simply</h2>
             <p className="mt-3 leading-7 text-[#5f675c]">
               Build your basket in a few minutes and keep the weekly shop
-              feeling straightforward.
+              straightforward.
             </p>
           </div>
         </div>
