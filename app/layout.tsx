@@ -1,19 +1,21 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import { CartProvider } from "./cart-context";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "The Local Pantry",
-  description: "Premium local fruit, veg and pantry staples",
+  description: "Seasonal groceries from local farms",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+    <html lang="en">
+      <body>
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }
