@@ -25,9 +25,13 @@ export default function BasketPage() {
     `Hi The Local Pantry, I'd like to place an order.
 
 Order type: ${isSubscription ? "Weekly subscription" : "One-off order"}
-Items: ${groupedCart
-      .map(({ item, quantity }) => `${item.name} x${quantity}`)
-      .join(", ")}
+Items: ${
+      groupedCart.length > 0
+        ? groupedCart
+            .map(({ item, quantity }) => `${item.name} x${quantity}`)
+            .join(", ")
+        : "No items yet"
+    }
 Total: £${total.toFixed(2)}
 ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
   )}`;
@@ -79,7 +83,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
   };
 
   return (
-    <main className="min-h-screen bg-[#f4efe9] px-6 py-10 text-[#243328] md:px-10">
+    <main className="min-h-screen bg-[#f4efe9] px-5 py-8 text-[#243328] md:px-10 md:py-10">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
           <Link
@@ -89,7 +93,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
             THE LOCAL PANTRY
           </Link>
 
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-5 sm:gap-6">
             <Link
               href="/"
               className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
@@ -136,7 +140,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
           <h1 className="mt-3 font-serif text-4xl md:text-6xl">Basket</h1>
           <p className="mt-4 max-w-2xl text-[#667164]">
             Review your items, choose how you&apos;d like to order, and add any
-            delivery notes before checkout.
+            useful delivery notes before checkout.
           </p>
         </div>
 
@@ -152,9 +156,38 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
               </h2>
 
               <p className="mx-auto mt-4 max-w-xl text-[#667164]">
-                Start with a produce box or add a few pantry items to build your
-                weekly order.
+                Start with a produce box, then add pantry items to build a
+                simple weekly order.
               </p>
+
+              <div className="mt-8 grid gap-3 text-left sm:grid-cols-3">
+                <div className="rounded-2xl border border-[#e5ddcf] bg-white p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Weekly produce boxes
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    A straightforward base for the week.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-[#e5ddcf] bg-white p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Pantry essentials
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Jars, staples, and everyday add-ons.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-[#e5ddcf] bg-white p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Order your way
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Choose a one-off order or a weekly subscription.
+                  </p>
+                </div>
+              </div>
 
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
@@ -175,7 +208,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
           </section>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1.5fr_0.9fr]">
-            <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
+            <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
               <div className="rounded-2xl border border-[#e5ddcf] bg-white p-5 md:p-6">
                 <div className="flex flex-col gap-2 border-b border-[#ece4d8] pb-5 sm:flex-row sm:items-end sm:justify-between">
                   <div>
@@ -198,7 +231,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                       className="flex flex-col gap-4 border-b border-[#f0e8dc] pb-4 md:flex-row md:items-center md:justify-between"
                     >
                       <div className="min-w-0">
-                        <div className="text-lg font-medium text-[#243328]">
+                        <div className="text-base font-medium text-[#243328] md:text-lg">
                           {item.name}
                         </div>
                         <div className="mt-1 text-sm text-[#6d756a]">
@@ -263,8 +296,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                   <p className="mt-3 text-sm leading-7 text-[#667164]">
                     Pick a one-off order if you&apos;re ordering just for this
                     week, or choose a weekly subscription if you&apos;d like a
-                    regular delivery. You can review the details again at
-                    checkout.
+                    regular delivery.
                   </p>
                 </div>
 
@@ -277,13 +309,23 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                         : "border-[#d6cec2] bg-[#f4efe9] hover:bg-[#f8f3ed]"
                     }`}
                   >
-                    <div className="font-serif text-2xl text-[#243328]">
-                      One-off order
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-serif text-2xl text-[#243328]">
+                          One-off order
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-[#667164]">
+                          Suitable for occasional orders or trying the service
+                          for the first time.
+                        </p>
+                      </div>
+
+                      {!isSubscription && (
+                        <span className="rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
+                          Selected
+                        </span>
+                      )}
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Best if you&apos;re ordering occasionally or trying a box
-                      for the first time.
-                    </p>
                   </button>
 
                   <button
@@ -294,13 +336,23 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                         : "border-[#d6cec2] bg-[#f4efe9] hover:bg-[#f8f3ed]"
                     }`}
                   >
-                    <div className="font-serif text-2xl text-[#243328]">
-                      Weekly subscription
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-serif text-2xl text-[#243328]">
+                          Weekly subscription
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-[#667164]">
+                          A recurring weekly order for households who want a
+                          regular delivery rhythm.
+                        </p>
+                      </div>
+
+                      {isSubscription && (
+                        <span className="rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
+                          Selected
+                        </span>
+                      )}
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      A simple recurring order for households who want a regular
-                      weekly delivery.
-                    </p>
                   </button>
                 </div>
               </div>
@@ -330,6 +382,44 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                   placeholder="For example: Please leave by the side gate if no one is in."
                   className="mt-5 w-full rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
                 />
+
+                <div className="mt-2 flex items-center justify-between gap-4">
+                  <p className="text-xs text-[#7a8478]">
+                    Keep notes brief and delivery-specific.
+                  </p>
+                  <p className="text-xs text-[#7a8478]">
+                    {deliveryNotes.length}/200
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Simple checkout
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Review your order and continue when you&apos;re ready.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Flexible ordering
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Choose one-off or weekly, depending on what suits you.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Prefer WhatsApp?
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    You can place the same order there instead.
+                  </p>
+                </div>
               </div>
             </section>
 
@@ -351,6 +441,13 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                     <span className="text-sm text-[#667164]">Order type</span>
                     <span className="text-sm font-medium text-[#243328]">
                       {isSubscription ? "Weekly" : "One-off"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
+                    <span className="text-sm text-[#667164]">Checkout</span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      Secure
                     </span>
                   </div>
 
@@ -392,10 +489,22 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                 )}
 
                 <div className="mt-6 rounded-2xl bg-[#efe8dd] p-4">
-                  <p className="text-sm leading-6 text-[#5f675c]">
-                    Final delivery timing and any order details can be confirmed
-                    at checkout. If you prefer, you can also place the order by
-                    WhatsApp.
+                  <p className="text-sm font-medium text-[#243328]">
+                    Before you check out
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                    You&apos;ll be able to review the order details again before
+                    payment is completed.
+                  </p>
+                </div>
+
+                <div className="mt-3 rounded-2xl border border-[#ddd4c8] bg-white p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Need a different ordering route?
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    WhatsApp is available if you&apos;d prefer to place the same
+                    order there instead of using checkout.
                   </p>
                 </div>
               </div>
