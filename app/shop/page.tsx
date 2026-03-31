@@ -3,9 +3,12 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
-import type { ShopItem as CartShopItem } from "../cart-context";
 
-type ShopDisplayItem = CartShopItem & {
+type ShopDisplayItem = {
+  name: string;
+  price: number;
+  image: string;
+  description: string;
   details?: string;
   category: "boxes" | "pantry";
   buttonLabel?: string;
@@ -90,13 +93,21 @@ export default function ShopPage() {
 
   const getQuantity = (itemName: string) => quantityByName[itemName] ?? 0;
 
+  const addDisplayItemToCart = (item: ShopDisplayItem) => {
+    addToCart({
+      name: item.name,
+      price: item.price,
+      image: item.image,
+    });
+  };
+
   const renderAddControls = (item: ShopDisplayItem) => {
     const quantity = getQuantity(item.name);
 
     if (quantity === 0) {
       return (
         <button
-          onClick={() => addToCart(item)}
+          onClick={() => addDisplayItemToCart(item)}
           className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
         >
           {item.buttonLabel ?? "Add to basket"}
@@ -120,7 +131,7 @@ export default function ShopPage() {
           </span>
 
           <button
-            onClick={() => addToCart(item)}
+            onClick={() => addDisplayItemToCart(item)}
             aria-label={`Increase quantity of ${item.name}`}
             className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
           >
