@@ -2,143 +2,15 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useCart } from "./cart-context";
 
-type ShopItem = {
-  name: string;
-  price: number;
-  image: string;
-};
+export default function HomePage() {
+  const { cart } = useCart();
 
-type BoxItem = ShopItem & {
-  contents: string[];
-  urgency: string;
-  cta: string;
-};
-
-type RecipeItem = {
-  title: string;
-  image: string;
-  recipe: string;
-  ideas: string[];
-};
-
-type ProduceIdea = {
-  title: string;
-  text: string;
-};
-
-export default function LocalPantryWebsite() {
   const [postcode, setPostcode] = useState("");
   const [postcodeValid, setPostcodeValid] = useState<boolean | null>(null);
-  const [cart, setCart] = useState<ShopItem[]>([]);
-  const [isSubscription, setIsSubscription] = useState(true);
-  const [deliveryNotes, setDeliveryNotes] = useState("");
-  const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
-  const addOns: ShopItem[] = [
-    {
-      name: "Sorrel & Walnut Pesto",
-      price: 4.5,
-      image: "/sorrel-walnut-pesto.png",
-    },
-    {
-      name: "Rose Harissa",
-      price: 5.25,
-      image: "/rose-harissa.png",
-    },
-    {
-      name: "Salted Caramel Sauce",
-      price: 5,
-      image: "/salted-caramel.png",
-    },
-    {
-      name: "Dark Chocolate & Hazelnut Spread",
-      price: 5,
-      image: "/dark-chocolate.png",
-    },
-  ];
-
-  const boxes: BoxItem[] = [
-    {
-      name: "Weekly Harvest",
-      price: 20,
-      image: "/weekly-harvest-box.png",
-      contents: ["Carrots", "Potatoes", "Leeks", "Lettuce", "Onions", "Apples"],
-      urgency: "Limited slots available this week.",
-      cta: "Subscribe Weekly",
-    },
-    {
-      name: "Family Harvest",
-      price: 30,
-      image: "/family-harvest-box.png",
-      contents: [
-        "Carrots",
-        "Potatoes",
-        "Tomatoes",
-        "Apples",
-        "Kale",
-        "Mushrooms",
-      ],
-      urgency: "Only 8 boxes left for this week",
-      cta: "Choose Family Harvest",
-    },
-  ];
-
-  const jarRecipes: RecipeItem[] = [
-    {
-      title: "Sorrel & Walnut Pesto",
-      image: "/pesto-recipe.jpg",
-      recipe:
-        "Toss through hot pasta with roasted veg and a splash of pasta water for an easy, vibrant supper.",
-      ideas: [
-        "Stir into warm potatoes",
-        "Spread on toast with tomatoes",
-        "Add to grain bowls",
-      ],
-    },
-    {
-      title: "Rose Harissa",
-      image: "/harissa-recipe.jpg",
-      recipe:
-        "Roast carrots and chickpeas with rose harissa, olive oil and a touch of honey for a simple traybake.",
-      ideas: [
-        "Mix into yoghurt",
-        "Brush onto roast veg",
-        "Add to tomato sauces",
-      ],
-    },
-    {
-      title: "Salted Caramel Sauce",
-      image: "/caramel-recipe.jpg",
-      recipe:
-        "Drizzle over porridge with banana and a pinch of sea salt for a soft, indulgent breakfast.",
-      ideas: ["Pour over pancakes", "Swirl into brownies", "Serve with apples"],
-    },
-    {
-      title: "Dark Chocolate & Hazelnut Spread",
-      image: "/chocolate-recipe.jpg",
-      recipe:
-        "Spread onto toasted sourdough and top with sliced strawberries or banana for an easy sweet treat.",
-      ideas: ["Fill crepes", "Stir into oats", "Dip fruit"],
-    },
-  ];
-
-  const produceIdeas: ProduceIdea[] = [
-    {
-      title: "Roast Tin Supper",
-      text: "Roast potatoes, carrots and onions, then finish with pesto or harissa for an easy midweek dinner.",
-    },
-    {
-      title: "Seasonal Soup",
-      text: "Blend softer vegetables with stock and herbs, then serve with toast and a swirl of pesto.",
-    },
-    {
-      title: "Fruit Breakfasts",
-      text: "Use bananas, apples, oranges and berries for smoothies, porridge toppings or quick fruit salads.",
-    },
-  ];
+  const totalItems = useMemo(() => cart.length, [cart]);
 
   const checkPostcode = () => {
     if (postcode.trim().toLowerCase().startsWith("g")) {
@@ -148,90 +20,9 @@ export default function LocalPantryWebsite() {
     }
   };
 
-  const addToCart = (item: ShopItem) => {
-    setCart((current) => [...current, item]);
-    setSuccessMessage(`${item.name} added to basket`);
-
-    setTimeout(() => {
-      setSuccessMessage("");
-    }, 2000);
-  };
-
-  const getItemCount = (itemName: string) => {
-    return cart.filter((cartItem) => cartItem.name === itemName).length;
-  };
-
-  const total = useMemo(
-    () => cart.reduce((sum, item) => sum + item.price, 0),
-    [cart],
-  );
-
-  const groupedCart = useMemo(() => {
-    const map = new Map<string, { item: ShopItem; quantity: number }>();
-
-    cart.forEach((item) => {
-      if (map.has(item.name)) {
-        map.get(item.name)!.quantity += 1;
-      } else {
-        map.set(item.name, { item, quantity: 1 });
-      }
-    });
-
-    return Array.from(map.values());
-  }, [cart]);
-
-  const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
-    "Hi The Local Pantry, I'd like to place an order.",
-  )}`;
-
-  const startCheckout = async () => {
-    try {
-      setCheckoutError("");
-      setIsLoadingCheckout(true);
-
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cart,
-          isSubscription,
-          deliveryNotes,
-        }),
-      });
-
-      const text = await response.text();
-      console.log("Deploy test response:", text);
-
-      let data;
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error("Checkout API returned HTML instead of JSON.");
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error || "Checkout failed.");
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No checkout URL returned.");
-      }
-    } catch (error) {
-      setCheckoutError(
-        error instanceof Error ? error.message : "Something went wrong.",
-      );
-    } finally {
-      setIsLoadingCheckout(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-[#f4efe9] text-[#243328]">
+    <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
+      {/* HEADER */}
       <header className="sticky top-0 z-30 border-b border-[#e6ddd2] bg-[#f4efe9]/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
           <Link
@@ -241,316 +32,162 @@ export default function LocalPantryWebsite() {
             THE LOCAL PANTRY
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden items-center gap-6 md:flex">
             <Link
               href="/"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+              className="text-sm text-[#243328] underline underline-offset-4"
             >
               Home
             </Link>
+
             <Link
               href="/shop"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Shop
             </Link>
-            <a
-              href="#recipes"
+
+            <Link
+              href="/recipes"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Recipes
-            </a>
+            </Link>
+
             <Link
               href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
-              Basket{cart.length > 0 ? ` (${cart.length})` : ""}
+              Basket{totalItems > 0 ? ` (${totalItems})` : ""}
             </Link>
           </nav>
 
-          <div className="hidden md:flex items-center gap-3 rounded-full border border-[#d6cec2] bg-white/90 px-3 py-2 shadow-sm">
+          <Link
+            href="/basket"
+            className="hidden rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-[#faf7f2] md:inline-flex"
+          >
+            View basket{totalItems > 0 ? ` (${totalItems})` : ""}
+          </Link>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section className="px-6 pb-16 pt-10 md:px-10 md:pb-24 md:pt-16">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <p className="text-sm uppercase tracking-[0.25em] text-[#6b776c]">
+              Seasonal groceries from local farms
+            </p>
+
+            <h1 className="mt-4 font-serif text-5xl leading-none tracking-tight md:text-7xl">
+              A more thoughtful way to shop each week.
+            </h1>
+
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#5f675c] md:text-xl">
+              Fresh fruit, vegetables and pantry favourites, chosen with care
+              and delivered to your door. Seasonal, local, and designed to feel
+              like a small weekly luxury.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/shop"
+                className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
+              >
+                Shop the harvest
+              </Link>
+
+              <Link
+                href="/basket"
+                className="rounded-full border border-[#d6cec2] bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#faf7f2]"
+              >
+                View basket{totalItems > 0 ? ` (${totalItems})` : ""}
+              </Link>
+            </div>
+          </div>
+
+          {/* HERO IMAGE */}
+          <div className="overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-white shadow-[0_16px_40px_rgba(36,51,40,0.08)]">
+            <img
+              src="/weekly-harvest-box.png"
+              alt="Seasonal harvest box"
+              className="h-[360px] w-full bg-[#f8f5ef] p-6 object-contain md:h-[520px]"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* BRAND VALUES */}
+      <section className="px-6 pb-16 md:px-10 md:pb-24">
+        <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
+          <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
+            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+              Local first
+            </p>
+            <h2 className="mt-3 font-serif text-3xl">Sourced with care</h2>
+            <p className="mt-3 text-[#5f675c] leading-7">
+              We work with local farms and small producers to bring you food
+              that feels fresher, more thoughtful and more connected to place.
+            </p>
+          </div>
+
+          <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
+            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+              Seasonal rhythm
+            </p>
+            <h2 className="mt-3 font-serif text-3xl">Chosen for the week</h2>
+            <p className="mt-3 text-[#5f675c] leading-7">
+              Boxes change with what’s growing and tasting best, so your weekly
+              shop always feels varied, abundant and in season.
+            </p>
+          </div>
+
+          <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
+            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+              Delivered simply
+            </p>
+            <h2 className="mt-3 font-serif text-3xl">
+              Easy to fit around life
+            </h2>
+            <p className="mt-3 text-[#5f675c] leading-7">
+              Order once or build a weekly habit, with simple delivery and
+              flexible options that work around your routine.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* POSTCODE */}
+      <section className="px-6 pb-16 md:px-10 md:pb-24">
+        <div className="mx-auto max-w-4xl rounded-[30px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 text-center shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
+          <h2 className="font-serif text-4xl md:text-5xl">
+            Check your postcode
+          </h2>
+
+          <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
             <input
               value={postcode}
               onChange={(e) => setPostcode(e.target.value)}
-              placeholder="Check postcode"
-              className="w-40 bg-transparent text-sm outline-none placeholder:text-[#8b8b7c]"
+              placeholder="Enter postcode"
+              className="flex-1 rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm outline-none"
             />
             <button
               onClick={checkPostcode}
-              className="rounded-full bg-[#2f4635] px-4 py-2 text-sm text-white transition hover:bg-[#243328]"
+              className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white"
             >
               Check
             </button>
           </div>
-        </div>
-      </header>
-
-      <section className="px-6 pb-12 pt-10 md:px-10 md:pb-16 md:pt-16">
-        <div className="mx-auto max-w-5xl text-center">
-          <p className="text-sm uppercase tracking-[0.25em] text-[#6b776c]">
-            Seasonal groceries from local farms
-          </p>
-
-          <h1 className="mt-4 font-serif text-5xl tracking-tight text-[#233226] md:text-7xl">
-            The Local Pantry
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-3xl font-serif text-2xl italic leading-tight text-[#314534] md:text-5xl">
-            Delivering the best from local farms to your door.
-          </p>
-
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[#6e7368] md:text-lg">
-            Seasonal fruit, vegetables, dry goods and pantry staples, delivered
-            direct to your door.
-          </p>
-
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/shop"
-              className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
-            >
-              Shop our products
-            </Link>
-
-            <Link
-              href="/basket"
-              className="rounded-full border border-[#d6cec2] bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#faf7f2]"
-            >
-              View basket{cart.length > 0 ? ` (${cart.length})` : ""}
-            </Link>
-          </div>
-
-          {cart.length > 0 && (
-            <div className="mx-auto mt-6 inline-flex rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm text-[#243328] shadow-sm">
-              {cart.length} item{cart.length === 1 ? "" : "s"} in basket
-            </div>
-          )}
 
           {postcodeValid === true && (
-            <div className="mx-auto mt-6 inline-flex rounded-full border border-[#c8d3c4] bg-[#eef5ea] px-4 py-2 text-sm text-[#36553c]">
-              Great news — we currently deliver to your area.
-            </div>
+            <div className="mt-6 text-green-700">We deliver to your area</div>
           )}
 
           {postcodeValid === false && (
-            <div className="mx-auto mt-6 inline-flex rounded-full border border-[#ead3cf] bg-[#fff3f1] px-4 py-2 text-sm text-[#9a4f42]">
-              Not available yet — join the waitlist for your postcode.
-            </div>
+            <div className="mt-6 text-red-600">Not available yet</div>
           )}
         </div>
       </section>
-
-      <section id="recipes" className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
-        <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
-          <div className="text-center">
-            <h2 className="font-serif text-4xl text-[#243328] md:text-6xl">
-              What To Cook This Week
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-              Easy serving ideas to help customers make the most of their pantry
-              jars, fruit and veg boxes.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
-            {jarRecipes.map((recipe) => (
-              <div
-                key={recipe.title}
-                className="overflow-hidden rounded-[22px] border border-[#e0d7ca] bg-white shadow-sm"
-              >
-                <img
-                  src={recipe.image}
-                  alt={recipe.title}
-                  className="h-64 w-full object-cover"
-                />
-
-                <div className="p-6">
-                  <h3 className="font-serif text-3xl text-[#243328]">
-                    {recipe.title}
-                  </h3>
-
-                  <p className="mt-4 text-lg text-[#4d5a4f]">{recipe.recipe}</p>
-
-                  <div className="mt-5 border-t border-[#ece4d8] pt-4">
-                    <p className="font-medium uppercase tracking-[0.15em] text-[#6c786c]">
-                      Also lovely with
-                    </p>
-
-                    <ul className="mt-3 space-y-2 text-[#4d5a4f]">
-                      {recipe.ideas.map((idea) => (
-                        <li key={idea}>• {idea}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {produceIdeas.map((idea) => (
-              <div
-                key={idea.title}
-                className="rounded-[22px] border border-[#e0d7ca] bg-white p-6 text-center"
-              >
-                <h3 className="font-serif text-3xl text-[#243328]">
-                  {idea.title}
-                </h3>
-                <p className="mt-4 text-lg text-[#4d5a4f]">{idea.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="basket"
-        className="mx-auto max-w-4xl px-6 pb-20 pt-10 md:px-10"
-      >
-        <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
-          <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
-            <button
-              onClick={() => setIsSubscription(false)}
-              className={`rounded-2xl border px-8 py-4 font-serif text-2xl ${
-                !isSubscription
-                  ? "border-[#314534] bg-white text-[#243328]"
-                  : "border-[#d6cec2] bg-[#f4efe9] text-[#5f675c]"
-              }`}
-            >
-              One-Off Order
-            </button>
-
-            <button
-              onClick={() => setIsSubscription(true)}
-              className={`rounded-2xl px-8 py-4 font-serif text-2xl ${
-                isSubscription
-                  ? "bg-gradient-to-r from-[#334e39] to-[#5a5326] text-white"
-                  : "border border-[#d6cec2] bg-[#f4efe9] text-[#5f675c]"
-              }`}
-            >
-              Continue to Payment (Stripe)
-            </button>
-          </div>
-
-          <p className="mt-8 text-center text-2xl text-[#3a4539]">
-            Prefer not to pay online? Just send us your order details and we’ll
-            reply with your options.
-          </p>
-
-          {successMessage && (
-            <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-center text-base font-medium text-green-800">
-              {successMessage}
-            </div>
-          )}
-
-          <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <h3 className="font-serif text-3xl text-[#243328]">
-              Your Basket
-              {cart.length > 0
-                ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})`
-                : ""}
-            </h3>
-
-            {cart.length === 0 ? (
-              <p className="mt-3 text-[#697166]">
-                Your basket is empty for now.
-              </p>
-            ) : (
-              <div className="mt-4 space-y-3">
-                {groupedCart.map(({ item, quantity }) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-between border-b border-[#eee6da] pb-4 text-lg text-[#314534]"
-                  >
-                    <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-[#6d756a]">
-                        £{item.price.toFixed(2)} × {quantity}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <span className="font-medium">
-                        £{(item.price * quantity).toFixed(2)}
-                      </span>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCart((current) => {
-                            const index = current.findIndex(
-                              (cartItem) => cartItem.name === item.name,
-                            );
-                            if (index === -1) return current;
-                            return current.filter((_, i) => i !== index);
-                          })
-                        }
-                        className="cursor-pointer text-sm underline"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="flex items-center justify-between pt-4 text-2xl font-medium text-[#243328]">
-                  <span>Total</span>
-                  <span>£{total.toFixed(2)}</span>
-                </div>
-
-                <p className="mt-2 text-sm text-[#6d756a]">
-                  Delivery calculated at checkout.
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <label className="block font-serif text-2xl text-[#243328]">
-              Delivery instructions
-            </label>
-            <textarea
-              value={deliveryNotes}
-              onChange={(e) => setDeliveryNotes(e.target.value)}
-              placeholder="Leave in porch, by side gate, with neighbour at number 12…"
-              className="mt-3 min-h-[120px] w-full rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4 text-lg outline-none placeholder:text-[#9aa099]"
-            />
-          </div>
-
-          <div className="mt-5 flex flex-col gap-4 md:flex-row">
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 rounded-2xl border border-[#d6cec2] bg-white px-6 py-4 text-center font-serif text-2xl text-[#243328]"
-            >
-              Order via WhatsApp
-            </a>
-
-            <button
-              onClick={startCheckout}
-              disabled={cart.length === 0 || isLoadingCheckout}
-              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01] disabled:opacity-50 disabled:hover:scale-100"
-            >
-              {isLoadingCheckout
-                ? "Opening Stripe..."
-                : isSubscription
-                  ? "Start Weekly Subscription"
-                  : "Pay for One-Off Order"}
-            </button>
-          </div>
-
-          {checkoutError && (
-            <p className="mt-4 text-center text-sm text-red-700">
-              {checkoutError}
-            </p>
-          )}
-
-          <p className="mt-5 text-center text-sm text-[#6d756a]">
-            Pause or skip a week anytime once your Stripe subscription is live.
-          </p>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

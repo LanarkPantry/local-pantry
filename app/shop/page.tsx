@@ -104,6 +104,12 @@ export default function ShopPage() {
               Shop
             </Link>
             <Link
+              href="/recipes"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Recipes
+            </Link>
+            <Link
               href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
