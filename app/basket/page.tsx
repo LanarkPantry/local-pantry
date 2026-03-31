@@ -74,6 +74,7 @@ export default function BasketPage() {
   return (
     <main className="min-h-screen bg-[#f4efe9] px-6 py-10 text-[#243328] md:px-10">
       <div className="mx-auto max-w-5xl">
+        {/* HEADER */}
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
           <Link
             href="/"
@@ -89,12 +90,21 @@ export default function BasketPage() {
             >
               Home
             </Link>
+
             <Link
               href="/shop"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Shop
             </Link>
+
+            <Link
+              href="/recipes"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Recipes
+            </Link>
+
             <Link
               href="/basket"
               className="text-sm text-[#243328] underline underline-offset-4"
@@ -104,6 +114,7 @@ export default function BasketPage() {
           </nav>
         </div>
 
+        {/* BACK LINK */}
         <div className="mb-6">
           <Link
             href="/shop"
@@ -113,20 +124,22 @@ export default function BasketPage() {
           </Link>
         </div>
 
+        {/* MAIN CARD */}
         <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
           <div className="text-center">
             <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
               Your order
             </p>
-            <h1 className="mt-3 font-serif text-4xl text-[#243328] md:text-6xl">
-              Basket
-            </h1>
+
+            <h1 className="mt-3 font-serif text-4xl md:text-6xl">Basket</h1>
+
             <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
               Review your items, choose your order type, then continue to secure
               checkout.
             </p>
           </div>
 
+          {/* ORDER TYPE */}
           <div className="mt-8 flex flex-col items-center justify-center gap-3 md:flex-row">
             <button
               onClick={() => setIsSubscription(false)}
@@ -151,8 +164,9 @@ export default function BasketPage() {
             </button>
           </div>
 
+          {/* BASKET ITEMS */}
           <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <h2 className="font-serif text-3xl text-[#243328]">
+            <h2 className="font-serif text-3xl">
               Your Basket
               {totalItems > 0
                 ? ` (${totalItems} item${totalItems === 1 ? "" : "s"})`
@@ -165,7 +179,7 @@ export default function BasketPage() {
 
                 <Link
                   href="/shop"
-                  className="mt-4 inline-block rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
+                  className="mt-4 inline-block rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white"
                 >
                   Go to Shop
                 </Link>
@@ -175,7 +189,7 @@ export default function BasketPage() {
                 {groupedCart.map(({ item, quantity }) => (
                   <div
                     key={item.name}
-                    className="flex flex-col gap-4 border-b border-[#eee6da] pb-4 text-lg text-[#314534] md:flex-row md:items-center md:justify-between"
+                    className="flex flex-col gap-4 border-b pb-4 md:flex-row md:items-center md:justify-between"
                   >
                     <div>
                       <div className="font-medium">{item.name}</div>
@@ -185,38 +199,29 @@ export default function BasketPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
-                      <div className="flex items-center rounded-full border border-[#ddd4c8] bg-[#fbfaf8]">
+                      <div className="flex items-center rounded-full border bg-[#fbfaf8]">
                         <button
-                          type="button"
                           onClick={() => removeOneFromCart(item.name)}
-                          className="px-3 py-2 text-lg text-[#243328] transition hover:bg-[#f1ece5]"
-                          aria-label={`Decrease quantity of ${item.name}`}
+                          className="px-3 py-2"
                         >
                           −
                         </button>
 
-                        <span className="min-w-[2.5rem] text-center text-sm font-medium text-[#243328]">
-                          {quantity}
-                        </span>
+                        <span className="px-2">{quantity}</span>
 
                         <button
-                          type="button"
                           onClick={() => addToCart(item)}
-                          className="px-3 py-2 text-lg text-[#243328] transition hover:bg-[#f1ece5]"
-                          aria-label={`Increase quantity of ${item.name}`}
+                          className="px-3 py-2"
                         >
                           +
                         </button>
                       </div>
 
-                      <span className="font-medium">
-                        £{(item.price * quantity).toFixed(2)}
-                      </span>
+                      <span>£{(item.price * quantity).toFixed(2)}</span>
 
                       <button
-                        type="button"
                         onClick={() => clearItemFromCart(item.name)}
-                        className="cursor-pointer text-sm underline text-[#6d756a] hover:text-[#243328]"
+                        className="text-sm underline"
                       >
                         Remove all
                       </button>
@@ -224,48 +229,21 @@ export default function BasketPage() {
                   </div>
                 ))}
 
-                <div className="flex items-center justify-between pt-4 text-2xl font-medium text-[#243328]">
+                <div className="flex justify-between pt-4 text-2xl">
                   <span>Total</span>
                   <span>£{total.toFixed(2)}</span>
                 </div>
-
-                <p className="mt-2 text-sm text-[#6d756a]">
-                  Delivery calculated at checkout.
-                </p>
               </div>
             )}
           </div>
 
-          <div className="mt-5 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <label className="block font-serif text-2xl text-[#243328]">
-              Delivery instructions
-            </label>
-            <textarea
-              value={deliveryNotes}
-              onChange={(e) => setDeliveryNotes(e.target.value)}
-              placeholder="Leave in porch, by side gate, with neighbour at number 12…"
-              className="mt-3 min-h-[120px] w-full rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4 text-lg outline-none placeholder:text-[#9aa099]"
-            />
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-[#e5ddcf] bg-white p-5">
-            <h3 className="font-medium text-[#243328]">Checkout information</h3>
-            <ul className="mt-3 space-y-2 text-sm text-[#6d756a]">
-              <li>• Secure payment powered by Stripe</li>
-              <li>• Delivery cost is shown before payment is completed</li>
-              <li>
-                • You’ll be redirected to Stripe to finish your order safely
-              </li>
-              {isSubscription && <li>• You can pause or skip a week later</li>}
-            </ul>
-          </div>
-
+          {/* CTA */}
           <div className="mt-5 flex flex-col gap-4 md:flex-row">
             <a
               href={whatsappLink}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 rounded-2xl border border-[#d6cec2] bg-white px-6 py-4 text-center font-serif text-2xl text-[#243328]"
+              className="flex-1 rounded-2xl border bg-white px-6 py-4 text-center"
             >
               Order via WhatsApp
             </a>
@@ -273,25 +251,17 @@ export default function BasketPage() {
             <button
               onClick={startCheckout}
               disabled={cart.length === 0 || isLoadingCheckout}
-              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01] disabled:opacity-50 disabled:hover:scale-100"
+              className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 text-white"
             >
               {isLoadingCheckout
-                ? "Opening secure checkout..."
-                : isSubscription
-                  ? "Continue to secure checkout"
-                  : "Pay securely with Stripe"}
+                ? "Opening checkout..."
+                : "Continue to checkout"}
             </button>
           </div>
 
           {checkoutError && (
-            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
-              {checkoutError}
-            </div>
+            <p className="mt-4 text-center text-red-700">{checkoutError}</p>
           )}
-
-          <p className="mt-5 text-center text-sm text-[#6d756a]">
-            Secure checkout with Stripe.
-          </p>
         </div>
       </div>
     </main>

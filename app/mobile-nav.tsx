@@ -19,29 +19,39 @@ export default function MobileNav() {
       )}
 
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#e6ddd2] bg-white/95 backdrop-blur md:hidden">
-        <nav className="mx-auto flex max-w-md items-center justify-around px-4 py-3">
+        <nav className="mx-auto flex max-w-md items-center justify-around px-2 py-3">
           <Link
             href="/"
-            className="flex min-w-[72px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
           >
             <span className="text-lg">🏠</span>
-            <span className="text-xs font-medium">Home</span>
+            <span className="text-[11px] font-medium">Home</span>
           </Link>
 
           <Link
             href="/shop"
-            className="flex min-w-[72px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
           >
             <span className="text-lg">🛍️</span>
-            <span className="text-xs font-medium">Shop</span>
+            <span className="text-[11px] font-medium">Shop</span>
+          </Link>
+
+          <Link
+            href="/recipes"
+            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+          >
+            <span className="text-lg">🍽️</span>
+            <span className="text-[11px] font-medium">Recipes</span>
           </Link>
 
           <Link
             href="/basket"
-            className="flex min-w-[72px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
           >
             <span className="text-lg">🛒</span>
-            <span className="text-xs font-medium">Basket</span>
+            <span className="text-[11px] font-medium">
+              Basket{totalItems > 0 ? ` (${totalItems})` : ""}
+            </span>
           </Link>
         </nav>
       </div>
