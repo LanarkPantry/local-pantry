@@ -12,6 +12,7 @@ type CartContextType = {
   cart: ShopItem[];
   addToCart: (item: ShopItem) => void;
   removeOneFromCart: (itemName: string) => void;
+  clearItemFromCart: (itemName: string) => void;
   clearCart: () => void;
   getItemCount: (itemName: string) => number;
   total: number;
@@ -46,11 +47,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const removeOneFromCart = (itemName: string) => {
     setCart((current) => {
       const index = current.findIndex((item) => item.name === itemName);
-
       if (index === -1) return current;
-
       return current.filter((_, i) => i !== index);
     });
+  };
+
+  const clearItemFromCart = (itemName: string) => {
+    setCart((current) => current.filter((item) => item.name !== itemName));
   };
 
   const clearCart = () => {
@@ -85,6 +88,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         cart,
         addToCart,
         removeOneFromCart,
+        clearItemFromCart,
         clearCart,
         getItemCount,
         total,

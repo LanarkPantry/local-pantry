@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
 
 export default function BasketPage() {
-  const { cart, groupedCart, total, removeOneFromCart } = useCart();
+  const {
+    cart,
+    groupedCart,
+    total,
+    addToCart,
+    removeOneFromCart,
+    clearItemFromCart,
+  } = useCart();
 
   const [isSubscription, setIsSubscription] = useState(true);
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+
+  const totalItems = useMemo(() => cart.length, [cart]);
 
   const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
     "Hi The Local Pantry, I'd like to place an order.",
@@ -90,7 +99,7 @@ export default function BasketPage() {
               href="/basket"
               className="text-sm text-[#243328] underline underline-offset-4"
             >
-              Basket{cart.length > 0 ? ` (${cart.length})` : ""}
+              Basket{totalItems > 0 ? ` (${totalItems})` : ""}
             </Link>
           </nav>
         </div>
@@ -145,8 +154,8 @@ export default function BasketPage() {
           <div className="mt-8 rounded-2xl border border-[#e5ddcf] bg-white p-5">
             <h2 className="font-serif text-3xl text-[#243328]">
               Your Basket
-              {cart.length > 0
-                ? ` (${cart.length} item${cart.length === 1 ? "" : "s"})`
+              {totalItems > 0
+                ? ` (${totalItems} item${totalItems === 1 ? "" : "s"})`
                 : ""}
             </h2>
 
@@ -166,7 +175,7 @@ export default function BasketPage() {
                 {groupedCart.map(({ item, quantity }) => (
                   <div
                     key={item.name}
-                    className="flex items-center justify-between border-b border-[#eee6da] pb-4 text-lg text-[#314534]"
+                    className="flex flex-col gap-4 border-b border-[#eee6da] pb-4 text-lg text-[#314534] md:flex-row md:items-center md:justify-between"
                   >
                     <div>
                       <div className="font-medium">{item.name}</div>
@@ -175,17 +184,41 @@ export default function BasketPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-4">
+                      <div className="flex items-center rounded-full border border-[#ddd4c8] bg-[#fbfaf8]">
+                        <button
+                          type="button"
+                          onClick={() => removeOneFromCart(item.name)}
+                          className="px-3 py-2 text-lg text-[#243328] transition hover:bg-[#f1ece5]"
+                          aria-label={`Decrease quantity of ${item.name}`}
+                        >
+                          −
+                        </button>
+
+                        <span className="min-w-[2.5rem] text-center text-sm font-medium text-[#243328]">
+                          {quantity}
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => addToCart(item)}
+                          className="px-3 py-2 text-lg text-[#243328] transition hover:bg-[#f1ece5]"
+                          aria-label={`Increase quantity of ${item.name}`}
+                        >
+                          +
+                        </button>
+                      </div>
+
                       <span className="font-medium">
                         £{(item.price * quantity).toFixed(2)}
                       </span>
 
                       <button
                         type="button"
-                        onClick={() => removeOneFromCart(item.name)}
-                        className="cursor-pointer text-sm underline"
+                        onClick={() => clearItemFromCart(item.name)}
+                        className="cursor-pointer text-sm underline text-[#6d756a] hover:text-[#243328]"
                       >
-                        Remove
+                        Remove all
                       </button>
                     </div>
                   </div>
@@ -215,6 +248,18 @@ export default function BasketPage() {
             />
           </div>
 
+          <div className="mt-5 rounded-2xl border border-[#e5ddcf] bg-white p-5">
+            <h3 className="font-medium text-[#243328]">Checkout information</h3>
+            <ul className="mt-3 space-y-2 text-sm text-[#6d756a]">
+              <li>• Secure payment powered by Stripe</li>
+              <li>• Delivery cost is shown before payment is completed</li>
+              <li>
+                • You’ll be redirected to Stripe to finish your order safely
+              </li>
+              {isSubscription && <li>• You can pause or skip a week later</li>}
+            </ul>
+          </div>
+
           <div className="mt-5 flex flex-col gap-4 md:flex-row">
             <a
               href={whatsappLink}
@@ -231,17 +276,17 @@ export default function BasketPage() {
               className="flex-1 rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01] disabled:opacity-50 disabled:hover:scale-100"
             >
               {isLoadingCheckout
-                ? "Opening Stripe..."
+                ? "Opening secure checkout..."
                 : isSubscription
-                  ? "Start Weekly Subscription"
-                  : "Pay for One-Off Order"}
+                  ? "Continue to secure checkout"
+                  : "Pay securely with Stripe"}
             </button>
           </div>
 
           {checkoutError && (
-            <p className="mt-4 text-center text-sm text-red-700">
+            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
               {checkoutError}
-            </p>
+            </div>
           )}
 
           <p className="mt-5 text-center text-sm text-[#6d756a]">
