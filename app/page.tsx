@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type ShopItem = {
@@ -233,35 +234,38 @@ export default function LocalPantryWebsite() {
     <div className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <header className="sticky top-0 z-30 border-b border-[#e6ddd2] bg-[#f4efe9]/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
-          <div className="text-sm tracking-[0.35em] text-[#60705f]">
+          <Link
+            href="/"
+            className="text-sm tracking-[0.35em] text-[#60705f] hover:text-[#243328]"
+          >
             THE LOCAL PANTRY
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-6">
-            <a
+            <Link
+              href="/"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Home
+            </Link>
+            <Link
               href="/shop"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
-              Boxes
-            </a>
-            <a
-              href="#addons"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Add-Ons
-            </a>
+              Shop
+            </Link>
             <a
               href="#recipes"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Recipes
             </a>
-            <a
-              href="#basket"
+            <Link
+              href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
-              Basket
-            </a>
+              Basket{cart.length > 0 ? ` (${cart.length})` : ""}
+            </Link>
           </nav>
 
           <div className="hidden md:flex items-center gap-3 rounded-full border border-[#d6cec2] bg-white/90 px-3 py-2 shadow-sm">
@@ -301,19 +305,19 @@ export default function LocalPantryWebsite() {
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
+            <Link
               href="/shop"
               className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
             >
               Shop our products
-            </a>
+            </Link>
 
-            <a
-              href="#basket"
+            <Link
+              href="/basket"
               className="rounded-full border border-[#d6cec2] bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#faf7f2]"
             >
-              View basket
-            </a>
+              View basket{cart.length > 0 ? ` (${cart.length})` : ""}
+            </Link>
           </div>
 
           {cart.length > 0 && (

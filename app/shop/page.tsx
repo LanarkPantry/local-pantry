@@ -1,10 +1,8 @@
 "use client";
 
-type ShopItem = {
-  name: string;
-  price: number;
-  image: string;
-};
+import Link from "next/link";
+import { useState } from "react";
+import { useCart, type ShopItem } from "../cart-context";
 
 type BoxItem = ShopItem & {
   contents: string[];
@@ -13,6 +11,9 @@ type BoxItem = ShopItem & {
 };
 
 export default function ShopPage() {
+  const { cart, addToCart, getItemCount } = useCart();
+  const [successMessage, setSuccessMessage] = useState("");
+
   const addOns: ShopItem[] = [
     {
       name: "Sorrel & Walnut Pesto",
@@ -62,14 +63,80 @@ export default function ShopPage() {
     },
   ];
 
+  const handleAddToCart = (item: ShopItem) => {
+    addToCart(item);
+    setSuccessMessage(`${item.name} added to basket`);
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 2000);
+  };
+
   return (
-    <main className="min-h-screen bg-[#f4efe9] px-6 py-16 text-[#243328]">
+    <main className="min-h-screen bg-[#f4efe9] px-6 py-10 text-[#243328] md:px-10">
       <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
+          <Link
+            href="/"
+            className="text-sm tracking-[0.35em] text-[#60705f] hover:text-[#243328]"
+          >
+            THE LOCAL PANTRY
+          </Link>
+
+          <nav className="flex items-center gap-6">
+            <Link
+              href="/"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Home
+            </Link>
+            <Link
+              href="/shop"
+              className="text-sm text-[#243328] underline underline-offset-4"
+            >
+              Shop
+            </Link>
+            <Link
+              href="/basket"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Basket{cart.length > 0 ? ` (${cart.length})` : ""}
+            </Link>
+          </nav>
+        </div>
+
         <div className="text-center">
-          <h1 className="font-serif text-5xl md:text-7xl">Shop</h1>
+          <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
+            Seasonal groceries from local farms
+          </p>
+
+          <h1 className="mt-3 font-serif text-5xl md:text-7xl">Shop</h1>
+
           <p className="mx-auto mt-4 max-w-2xl text-lg text-[#6d756a]">
             Browse our seasonal harvest boxes and pantry extras.
           </p>
+
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/"
+              className="rounded-full border border-[#d6cec2] bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#faf7f2]"
+            >
+              Back to Home
+            </Link>
+
+            <Link
+              href="/basket"
+              className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
+            >
+              View Basket{cart.length > 0 ? ` (${cart.length})` : ""}
+            </Link>
+          </div>
+
+          {successMessage && (
+            <div className="mx-auto mt-6 inline-flex rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-800">
+              {successMessage}
+            </div>
+          )}
         </div>
 
         <section className="mt-14">
@@ -87,7 +154,7 @@ export default function ShopPage() {
                   <img
                     src={box.image}
                     alt={box.name}
-                    className="h-[320px] w-full object-contain bg-[#f8f5ef] p-4"
+                    className="h-[320px] w-full bg-[#f8f5ef] p-4 object-contain"
                   />
 
                   <div className="px-8 pb-8 pt-6 text-center">
@@ -121,9 +188,13 @@ export default function ShopPage() {
 
                     <button
                       type="button"
+                      onClick={() => handleAddToCart(box)}
                       className="mt-6 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01]"
                     >
                       {box.cta}
+                      {getItemCount(box.name) > 0
+                        ? ` (${getItemCount(box.name)})`
+                        : ""}
                     </button>
                   </div>
                 </div>
@@ -153,22 +224,27 @@ export default function ShopPage() {
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="h-56 w-full object-contain bg-[#f8f5ef] p-4"
+                    className="h-56 w-full bg-[#f8f5ef] p-4 object-contain"
                   />
 
                   <div className="px-4 pb-5 pt-4 text-center">
                     <h3 className="font-serif text-2xl leading-tight text-[#243328]">
                       {item.name}
                     </h3>
+
                     <p className="mt-2 text-2xl text-[#243328]">
                       £{item.price.toFixed(2)}
                     </p>
 
                     <button
                       type="button"
+                      onClick={() => handleAddToCart(item)}
                       className="mt-4 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-4 py-3 font-serif text-xl text-white shadow-sm transition hover:scale-[1.01]"
                     >
-                      Add
+                      Add to Basket
+                      {getItemCount(item.name) > 0
+                        ? ` (${getItemCount(item.name)})`
+                        : ""}
                     </button>
                   </div>
                 </div>
