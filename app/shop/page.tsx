@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useCart, type ShopItem } from "../cart-context";
 
 type BoxItem = ShopItem & {
@@ -12,7 +12,11 @@ type BoxItem = ShopItem & {
 
 export default function ShopPage() {
   const { cart, addToCart, getItemCount } = useCart();
+
   const [successMessage, setSuccessMessage] = useState("");
+  const [lastAddedItem, setLastAddedItem] = useState<string | null>(null);
+
+  const totalItems = useMemo(() => cart.length, [cart]);
 
   const addOns: ShopItem[] = [
     {
@@ -66,15 +70,18 @@ export default function ShopPage() {
   const handleAddToCart = (item: ShopItem) => {
     addToCart(item);
     setSuccessMessage(`${item.name} added to basket`);
+    setLastAddedItem(item.name);
 
+    setTimeout(() => setSuccessMessage(""), 2000);
     setTimeout(() => {
-      setSuccessMessage("");
-    }, 2000);
+      setLastAddedItem((current) => (current === item.name ? null : current));
+    }, 1200);
   };
 
   return (
     <main className="min-h-screen bg-[#f4efe9] px-6 py-10 text-[#243328] md:px-10">
       <div className="mx-auto max-w-7xl">
+        {/* HEADER */}
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
           <Link
             href="/"
@@ -100,11 +107,12 @@ export default function ShopPage() {
               href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
-              Basket{cart.length > 0 ? ` (${cart.length})` : ""}
+              Basket{totalItems > 0 ? ` (${totalItems})` : ""}
             </Link>
           </nav>
         </div>
 
+        {/* HERO */}
         <div className="text-center">
           <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
             Seasonal groceries from local farms
@@ -128,7 +136,7 @@ export default function ShopPage() {
               href="/basket"
               className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#243328]"
             >
-              View Basket{cart.length > 0 ? ` (${cart.length})` : ""}
+              View Basket{totalItems > 0 ? ` (${totalItems})` : ""}
             </Link>
           </div>
 
@@ -139,117 +147,105 @@ export default function ShopPage() {
           )}
         </div>
 
+        {/* BOXES */}
         <section className="mt-14">
-          <h2 className="font-serif text-4xl text-[#243328] md:text-5xl">
-            Harvest Boxes
-          </h2>
+          <h2 className="font-serif text-4xl md:text-5xl">Harvest Boxes</h2>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            {boxes.map((box) => (
-              <div
-                key={box.name}
-                className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
-              >
-                <div className="overflow-hidden rounded-[22px] border border-[#e5ddcf] bg-white">
-                  <img
-                    src={box.image}
-                    alt={box.name}
-                    className="h-[320px] w-full bg-[#f8f5ef] p-4 object-contain"
-                  />
+            {boxes.map((box) => {
+              const count = getItemCount(box.name);
+              const added = lastAddedItem === box.name;
 
-                  <div className="px-8 pb-8 pt-6 text-center">
-                    <h3 className="font-serif text-4xl leading-none text-[#243328] md:text-5xl">
-                      {box.name}
-                    </h3>
+              return (
+                <div
+                  key={box.name}
+                  className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 shadow transition hover:-translate-y-1 hover:shadow-md"
+                >
+                  <div className="overflow-hidden rounded-[22px] border border-[#e5ddcf] bg-white">
+                    <img
+                      src={box.image}
+                      alt={box.name}
+                      className="h-[320px] w-full bg-[#f8f5ef] p-4 object-contain"
+                    />
 
-                    <p className="mt-4 font-serif text-3xl text-[#243328]">
-                      £{box.price} <span className="text-xl">per week</span>
-                    </p>
+                    <div className="px-8 pb-8 pt-6 text-center">
+                      <h3 className="font-serif text-4xl md:text-5xl">
+                        {box.name}
+                      </h3>
 
-                    <div className="mx-auto mt-8 max-w-md border-t border-[#d8d0c5] pt-6">
-                      <p className="font-serif text-2xl text-[#243328]">
-                        Typical contents:
+                      <p className="mt-4 font-serif text-3xl">
+                        £{box.price} <span className="text-xl">per week</span>
                       </p>
 
-                      <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-left text-lg text-[#38473b]">
-                        {box.contents.map((item) => (
-                          <div key={item}>• {item}</div>
-                        ))}
+                      <div className="mt-4 rounded-2xl border border-[#e7d2a9] bg-[#f3dfb9] px-5 py-3 text-lg">
+                        {box.urgency}
                       </div>
 
-                      <p className="mt-6 border-t border-[#d8d0c5] pt-5 text-lg text-[#5f675c]">
-                        Changes weekly based on what’s fresh.
-                      </p>
-                    </div>
+                      <button
+                        onClick={() => handleAddToCart(box)}
+                        className="mt-6 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white transition hover:scale-[1.01]"
+                      >
+                        {added ? "Added ✓" : box.cta}
+                      </button>
 
-                    <div className="mt-4 rounded-2xl border border-[#e7d2a9] bg-[#f3dfb9] px-5 py-3 text-lg text-[#5d4f2a]">
-                      {box.urgency}
+                      {count > 0 && (
+                        <p className="mt-2 text-sm text-[#5f675c]">
+                          {count} in basket
+                        </p>
+                      )}
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleAddToCart(box)}
-                      className="mt-6 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 font-serif text-2xl text-white shadow-sm transition hover:scale-[1.01]"
-                    >
-                      {box.cta}
-                      {getItemCount(box.name) > 0
-                        ? ` (${getItemCount(box.name)})`
-                        : ""}
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
+        {/* ADD ONS */}
         <section className="mt-16">
           <div className="text-center">
-            <h2 className="font-serif text-4xl text-[#243328] md:text-6xl">
-              Gourmet Add-Ons
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-              Luxury pantry jars designed to sit beautifully alongside your
-              weekly harvest box.
-            </p>
+            <h2 className="font-serif text-4xl md:text-6xl">Gourmet Add-Ons</h2>
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {addOns.map((item) => (
-              <div
-                key={item.name}
-                className="rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-3 shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
-              >
-                <div className="overflow-hidden rounded-[18px] border border-[#e5ddcf] bg-white">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="h-56 w-full bg-[#f8f5ef] p-4 object-contain"
-                  />
+            {addOns.map((item) => {
+              const count = getItemCount(item.name);
+              const added = lastAddedItem === item.name;
 
-                  <div className="px-4 pb-5 pt-4 text-center">
-                    <h3 className="font-serif text-2xl leading-tight text-[#243328]">
-                      {item.name}
-                    </h3>
+              return (
+                <div
+                  key={item.name}
+                  className="rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-3 shadow transition hover:-translate-y-1 hover:shadow-md"
+                >
+                  <div className="overflow-hidden rounded-[18px] border border-[#e5ddcf] bg-white">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-56 w-full bg-[#f8f5ef] p-4 object-contain"
+                    />
 
-                    <p className="mt-2 text-2xl text-[#243328]">
-                      £{item.price.toFixed(2)}
-                    </p>
+                    <div className="px-4 pb-5 pt-4 text-center">
+                      <h3 className="font-serif text-2xl">{item.name}</h3>
 
-                    <button
-                      type="button"
-                      onClick={() => handleAddToCart(item)}
-                      className="mt-4 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-4 py-3 font-serif text-xl text-white shadow-sm transition hover:scale-[1.01]"
-                    >
-                      Add to Basket
-                      {getItemCount(item.name) > 0
-                        ? ` (${getItemCount(item.name)})`
-                        : ""}
-                    </button>
+                      <p className="mt-2 text-2xl">£{item.price.toFixed(2)}</p>
+
+                      <button
+                        onClick={() => handleAddToCart(item)}
+                        className="mt-4 w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-4 py-3 font-serif text-xl text-white transition hover:scale-[1.01]"
+                      >
+                        {added ? "Added ✓" : "Add to basket"}
+                      </button>
+
+                      {count > 0 && (
+                        <p className="mt-2 text-sm text-[#5f675c]">
+                          {count} in basket
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </div>
