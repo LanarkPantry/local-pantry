@@ -4,19 +4,75 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCart } from "./cart-context";
 
+const DELIVERY_OUTWARD_CODES = [
+  "G1",
+  "G2",
+  "G3",
+  "G4",
+  "G11",
+  "G12",
+  "G13",
+  "G20",
+  "G31",
+  "G41",
+  "G42",
+  "G43",
+  "G44",
+  "G51",
+  "G52",
+  "G53",
+];
+
+function normalisePostcode(value: string) {
+  return value.toUpperCase().replace(/\s+/g, "").trim();
+}
+
+function formatPostcode(value: string) {
+  const cleaned = normalisePostcode(value);
+
+  if (cleaned.length <= 3) return cleaned;
+
+  return `${cleaned.slice(0, -3)} ${cleaned.slice(-3)}`;
+}
+
+function isValidUkPostcode(value: string) {
+  const postcode = formatPostcode(value);
+  return /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(postcode);
+}
+
+function getOutwardCode(value: string) {
+  const cleaned = normalisePostcode(value);
+  const match = cleaned.match(/^([A-Z]{1,2}\d[A-Z\d]?)/);
+  return match ? match[1] : "";
+}
+
 export default function HomePage() {
   const { cart } = useCart();
 
   const [postcode, setPostcode] = useState("");
-  const [postcodeValid, setPostcodeValid] = useState<boolean | null>(null);
+  const [postcodeStatus, setPostcodeStatus] = useState<
+    "idle" | "available" | "unavailable" | "invalid"
+  >("idle");
 
   const totalItems = useMemo(() => cart.length, [cart]);
 
   const checkPostcode = () => {
-    if (postcode.trim().toLowerCase().startsWith("g")) {
-      setPostcodeValid(true);
+    if (!postcode.trim()) {
+      setPostcodeStatus("invalid");
+      return;
+    }
+
+    if (!isValidUkPostcode(postcode)) {
+      setPostcodeStatus("invalid");
+      return;
+    }
+
+    const outwardCode = getOutwardCode(postcode);
+
+    if (DELIVERY_OUTWARD_CODES.includes(outwardCode)) {
+      setPostcodeStatus("available");
     } else {
-      setPostcodeValid(false);
+      setPostcodeStatus("unavailable");
     }
   };
 
@@ -82,17 +138,16 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto flex min-h-[78vh] max-w-7xl items-end px-6 pb-14 pt-16 md:px-10 md:pb-20">
           <div className="max-w-3xl text-white">
             <p className="text-sm uppercase tracking-[0.25em] text-white/80">
-              Seasonal groceries from local farms
+              Carefully chosen, week to week
             </p>
 
             <h1 className="mt-4 font-serif text-5xl leading-none tracking-tight text-white/95 md:text-7xl">
-              A more thoughtful way to shop each week.
+              The fresh part of your weekly shop, done well.
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
-              Fresh fruit, vegetables and pantry favourites, chosen with care
-              and delivered to your door. Seasonal, local, and designed to feel
-              like a small weekly luxury.
+              Fresh produce and a small selection of pantry essentials, chosen
+              carefully each week.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -100,7 +155,7 @@ export default function HomePage() {
                 href="/shop"
                 className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#f5f1ea]"
               >
-                Shop the harvest
+                Shop the range
               </Link>
 
               <Link
@@ -118,36 +173,34 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
           <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              Local first
+              Fresh produce
             </p>
-            <h2 className="mt-3 font-serif text-3xl">Sourced with care</h2>
+            <h2 className="mt-3 font-serif text-3xl">Chosen each week</h2>
             <p className="mt-3 leading-7 text-[#5f675c]">
-              We work with local farms and small producers to bring you food
-              that feels fresher, more thoughtful and more connected to place.
+              Fruit and veg selected for quality, season, and how you actually
+              want to cook.
             </p>
           </div>
 
           <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              Seasonal rhythm
+              A focused range
             </p>
-            <h2 className="mt-3 font-serif text-3xl">Chosen for the week</h2>
+            <h2 className="mt-3 font-serif text-3xl">Simple essentials</h2>
             <p className="mt-3 leading-7 text-[#5f675c]">
-              Boxes change with what’s growing and tasting best, so your weekly
-              shop always feels varied, abundant and in season.
+              A small selection of pantry jars and useful extras, kept simple
+              and chosen well.
             </p>
           </div>
 
           <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              Delivered simply
+              Easy each week
             </p>
-            <h2 className="mt-3 font-serif text-3xl">
-              Easy to fit around life
-            </h2>
+            <h2 className="mt-3 font-serif text-3xl">Delivered simply</h2>
             <p className="mt-3 leading-7 text-[#5f675c]">
-              Order once or build a weekly habit, with simple delivery and
-              flexible options that work around your routine.
+              Build your basket in a few minutes and keep the weekly shop
+              feeling straightforward.
             </p>
           </div>
         </div>
@@ -164,16 +217,25 @@ export default function HomePage() {
           </h2>
 
           <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-            We’re currently delivering across selected local areas and expanding
-            carefully as we grow.
+            We currently deliver to selected areas and are expanding carefully.
+            Enter your postcode to see whether delivery is available where you
+            are.
           </p>
 
           <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
             <input
               value={postcode}
-              onChange={(e) => setPostcode(e.target.value)}
+              onChange={(e) => {
+                setPostcode(e.target.value);
+                if (postcodeStatus !== "idle") setPostcodeStatus("idle");
+              }}
+              onBlur={() => {
+                if (postcode.trim()) {
+                  setPostcode(formatPostcode(postcode));
+                }
+              }}
               placeholder="Enter postcode"
-              className="flex-1 rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm outline-none placeholder:text-[#8b8b7c]"
+              className="flex-1 rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm uppercase tracking-[0.08em] outline-none placeholder:normal-case placeholder:tracking-normal placeholder:text-[#8b8b7c]"
             />
             <button
               onClick={checkPostcode}
@@ -183,46 +245,23 @@ export default function HomePage() {
             </button>
           </div>
 
-          {postcodeValid === true && (
+          {postcodeStatus === "available" && (
             <div className="mt-6 inline-flex rounded-full border border-[#c8d3c4] bg-[#eef5ea] px-4 py-2 text-sm text-[#36553c]">
               Great news — we currently deliver to your area.
             </div>
           )}
 
-          {postcodeValid === false && (
+          {postcodeStatus === "unavailable" && (
             <div className="mt-6 inline-flex rounded-full border border-[#ead3cf] bg-[#fff3f1] px-4 py-2 text-sm text-[#9a4f42]">
-              Not available yet — join the waitlist.
+              Not available yet — we’re expanding carefully into new areas.
             </div>
           )}
-        </div>
-      </section>
 
-      <section className="px-6 pb-24 md:px-10">
-        <div className="mx-auto max-w-6xl rounded-[32px] bg-[#2f4635] px-6 py-10 text-white md:px-10">
-          <h2 className="font-serif text-4xl md:text-5xl">
-            Start your weekly shop the better way.
-          </h2>
-
-          <p className="mt-4 max-w-2xl text-white/80">
-            Choose a seasonal box, add a few favourites, and make your week feel
-            a little more considered.
-          </p>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/shop"
-              className="rounded-full bg-white px-6 py-3 text-center text-sm font-medium text-[#243328]"
-            >
-              Shop now
-            </Link>
-
-            <Link
-              href="/basket"
-              className="rounded-full border border-white/30 px-6 py-3 text-center text-sm"
-            >
-              View basket{totalItems > 0 ? ` (${totalItems})` : ""}
-            </Link>
-          </div>
+          {postcodeStatus === "invalid" && (
+            <div className="mt-6 inline-flex rounded-full border border-[#e6dccf] bg-[#fbf7f1] px-4 py-2 text-sm text-[#7a6753]">
+              Please enter a valid UK postcode, for example G12 8QQ.
+            </div>
+          )}
         </div>
       </section>
     </main>
