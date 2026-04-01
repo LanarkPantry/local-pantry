@@ -216,7 +216,7 @@ export default function ShopPage() {
       return (
         <button
           onClick={() => addDisplayItemToCart(item)}
-          className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+          className="inline-flex w-full items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
         >
           {item.buttonLabel ?? "Add to basket"}
         </button>
@@ -224,8 +224,8 @@ export default function ShopPage() {
     }
 
     return (
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="inline-flex items-center rounded-full border border-[#d8d0c4] bg-white">
+      <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="inline-flex items-center self-start rounded-full border border-[#d8d0c4] bg-white">
           <button
             onClick={() => removeOneFromCart(item.name)}
             aria-label={`Decrease quantity of ${item.name}`}
@@ -265,29 +265,29 @@ export default function ShopPage() {
         className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
       >
         <div className="flex flex-col sm:flex-row">
-          <div className="border-b border-[#e9dfd2] bg-[#eee7dc] p-4 sm:w-[200px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
+          <div className="border-b border-[#e9dfd2] bg-[#eee7dc] p-4 sm:w-[190px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
             <div className="flex h-full items-center justify-center rounded-[20px] bg-[#f8f4ee] p-4">
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-32 w-full object-contain sm:h-36"
+                className="h-28 w-full object-contain sm:h-36"
               />
             </div>
           </div>
 
           <div className="flex flex-1 flex-col justify-between p-5 md:p-6">
             <div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-3">
                 <div className="max-w-2xl">
                   <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
                     {label}
                   </p>
-                  <h3 className="mt-2 font-serif text-2xl text-[#243328] md:text-[2rem]">
+                  <h3 className="mt-2 font-serif text-[1.75rem] leading-tight text-[#243328] md:text-[2rem]">
                     {item.name}
                   </h3>
                 </div>
 
-                <div className="shrink-0 rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
+                <div className="self-start rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
                   £{item.price.toFixed(2)}
                 </div>
               </div>
@@ -309,13 +309,13 @@ export default function ShopPage() {
               )}
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-6 flex flex-col gap-3">
               {renderAddControls(item)}
 
               {quantity > 0 && helperText ? (
-                <p className="text-xs text-[#7a8478]">{helperText}</p>
+                <p className="text-xs leading-6 text-[#7a8478]">{helperText}</p>
               ) : quantity > 0 ? (
-                <p className="text-xs text-[#7a8478]">
+                <p className="text-xs leading-6 text-[#7a8478]">
                   Easy to add alongside the rest of your weekly order.
                 </p>
               ) : null}
@@ -327,9 +327,9 @@ export default function ShopPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f4efe9] px-5 py-8 text-[#243328] md:px-10 md:py-10">
+    <main className="min-h-screen bg-[#f4efe9] px-4 py-6 text-[#243328] sm:px-5 md:px-10 md:py-10">
       <div className="mx-auto max-w-6xl pb-24 md:pb-10">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
+        <div className="mb-8 flex flex-col gap-4 border-b border-[#ddd4c8] pb-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/"
             className="text-sm tracking-[0.35em] text-[#60705f] transition hover:text-[#243328]"
@@ -337,38 +337,38 @@ export default function ShopPage() {
             THE LOCAL PANTRY
           </Link>
 
-          <nav className="flex items-center gap-5 sm:gap-6">
+          <nav className="-mx-1 flex items-center gap-5 overflow-x-auto px-1 sm:gap-6">
             <Link
               href="/"
-              className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
+              className="shrink-0 text-sm text-[#4f5e52] transition hover:text-[#243328]"
             >
               Home
             </Link>
 
             <Link
               href="/shop"
-              className="text-sm text-[#243328] underline underline-offset-4"
+              className="shrink-0 text-sm text-[#243328] underline underline-offset-4"
             >
               Shop
             </Link>
 
             <Link
               href="/recipes"
-              className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
+              className="shrink-0 text-sm text-[#4f5e52] transition hover:text-[#243328]"
             >
               Recipes
             </Link>
 
             <Link
               href={basketHref}
-              className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
+              className="shrink-0 text-sm text-[#4f5e52] transition hover:text-[#243328]"
             >
               Basket{totalItems > 0 ? ` (${totalItems})` : ""}
             </Link>
           </nav>
         </div>
 
-        <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
+        <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
             <div className="max-w-3xl">
               <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
@@ -380,30 +380,30 @@ export default function ShopPage() {
                 <br className="hidden sm:block" /> thoughtfully chosen
               </h1>
 
-              <p className="mt-4 max-w-2xl text-[#667164]">
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[#667164] md:text-base">
                 Build your order with a produce box, a few pantry jars, and a
                 small selection of useful cupboard things that make simple
                 cooking feel easier through the week.
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a
                   href="#produce-boxes"
-                  className="inline-flex rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
                   Shop produce boxes
                 </a>
 
                 <a
                   href="#pantry-additions"
-                  className="inline-flex rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
                 >
                   Browse pantry items
                 </a>
 
                 <a
                   href="#cook-from-the-cupboard"
-                  className="inline-flex rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
                 >
                   Explore cupboard goods
                 </a>
@@ -453,7 +453,7 @@ export default function ShopPage() {
                     : "Nothing added yet"}
                 </p>
 
-                <p className="mt-2 text-sm text-[#667164]">
+                <p className="mt-2 text-sm leading-6 text-[#667164]">
                   {totalItems > 0
                     ? `Current total: £${total.toFixed(2)}`
                     : "Add a produce box to get started, then top up with pantry and cupboard essentials."}
@@ -510,7 +510,7 @@ export default function ShopPage() {
           </div>
         </section>
 
-        <section id="produce-boxes" className="mt-8 scroll-mt-24">
+        <section id="produce-boxes" className="mt-10 scroll-mt-24">
           <div className="mb-5">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
               Produce boxes
@@ -538,23 +538,23 @@ export default function ShopPage() {
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="h-52 w-full object-contain md:h-64"
+                        className="h-48 w-full object-contain md:h-64"
                       />
                     </div>
                   </div>
 
-                  <div className="p-6 md:p-7">
-                    <div className="flex items-start justify-between gap-4">
+                  <div className="p-5 md:p-7">
+                    <div className="flex flex-col gap-3">
                       <div>
                         <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
                           Produce box
                         </p>
-                        <h3 className="mt-2 font-serif text-3xl text-[#243328]">
+                        <h3 className="mt-2 font-serif text-3xl leading-tight text-[#243328]">
                           {item.name}
                         </h3>
                       </div>
 
-                      <div className="shrink-0 rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
+                      <div className="self-start rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
                         £{item.price.toFixed(2)}
                       </div>
                     </div>
@@ -593,7 +593,7 @@ export default function ShopPage() {
                       </div>
                     )}
 
-                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="mt-6 flex flex-col gap-3">
                       {renderAddControls(item)}
 
                       {quantity > 0 && (
@@ -612,7 +612,7 @@ export default function ShopPage() {
           </div>
         </section>
 
-        <section id="pantry-additions" className="mt-10 scroll-mt-24">
+        <section id="pantry-additions" className="mt-12 scroll-mt-24">
           <div className="mb-5">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
               Pantry additions
@@ -637,7 +637,7 @@ export default function ShopPage() {
           </div>
         </section>
 
-        <section id="cook-from-the-cupboard" className="mt-10 scroll-mt-24">
+        <section id="cook-from-the-cupboard" className="mt-12 scroll-mt-24">
           <div className="mb-5">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
               Cook from the cupboard
@@ -662,7 +662,7 @@ export default function ShopPage() {
           </div>
         </section>
 
-        <section id="a-few-good-extras" className="mt-10 scroll-mt-24">
+        <section id="a-few-good-extras" className="mt-12 scroll-mt-24">
           <div className="mb-5">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
               A few good extras

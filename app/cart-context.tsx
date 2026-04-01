@@ -11,6 +11,7 @@ export type ShopItem = {
 type CartContextType = {
   cart: ShopItem[];
   addToCart: (item: ShopItem) => void;
+  addManyToCart: (items: ShopItem[]) => void;
   removeOneFromCart: (itemName: string) => void;
   clearItemFromCart: (itemName: string) => void;
   clearCart: () => void;
@@ -44,10 +45,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart((current) => [...current, item]);
   };
 
+  const addManyToCart = (items: ShopItem[]) => {
+    if (items.length === 0) return;
+
+    setCart((current) => [...current, ...items]);
+  };
+
   const removeOneFromCart = (itemName: string) => {
     setCart((current) => {
       const index = current.findIndex((item) => item.name === itemName);
+
       if (index === -1) return current;
+
       return current.filter((_, i) => i !== index);
     });
   };
@@ -87,6 +96,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       value={{
         cart,
         addToCart,
+        addManyToCart,
         removeOneFromCart,
         clearItemFromCart,
         clearCart,
