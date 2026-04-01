@@ -11,6 +11,7 @@ type ShopDisplayItem = {
   description: string;
   details?: string;
   category: "boxes" | "pantry" | "cupboard" | "extras";
+  checkoutType: "subscription" | "one-off";
   buttonLabel?: string;
   weeklyIncludes?: string[];
   bestFor?: string;
@@ -24,19 +25,22 @@ const produceBoxes: ShopDisplayItem[] = [
     price: 20,
     image: "/weekly-harvest-box.png",
     category: "boxes",
+    checkoutType: "subscription",
     buttonLabel: "Add weekly box",
     description:
       "A smaller produce box with a useful mix of everyday fruit and veg.",
     details:
-      "Contents change week to week depending on availability, so the mix is not fixed.",
+      "Best suited to weekly delivery. Contents change week to week depending on availability, so the mix is not fixed.",
     weeklyIncludes: ["Carrots", "Potatoes", "Leeks", "Apples", "Onions"],
     bestFor: "Best for 1–2 people or lighter weekly cooking",
+    note: "Best as a weekly subscription",
   },
   {
     name: "Family Produce Box",
     price: 30,
     image: "/family-harvest-box.png",
     category: "boxes",
+    checkoutType: "subscription",
     buttonLabel: "Add family box",
     description:
       "A larger produce box for households that cook regularly through the week.",
@@ -44,6 +48,7 @@ const produceBoxes: ShopDisplayItem[] = [
       "Designed as a fuller weekly box, with contents changing depending on what is available.",
     weeklyIncludes: ["Carrots", "Potatoes", "Tomatoes", "Apples", "Greens"],
     bestFor: "Best for families or households cooking most nights",
+    note: "Best as a weekly subscription",
   },
 ];
 
@@ -53,28 +58,41 @@ const pantryItems: ShopDisplayItem[] = [
     price: 4.5,
     image: "/sorrel-walnut-pesto.png",
     category: "pantry",
+    checkoutType: "one-off",
     description: "A fresh, savoury jar for pasta or roasted vegetables.",
+    details:
+      "A useful one-off add-on to include with your weekly box or order.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Rose Harissa",
     price: 5.25,
     image: "/rose-harissa.png",
     category: "pantry",
+    checkoutType: "one-off",
     description: "A gently spiced pantry extra for roasting or dressing.",
+    details: "Easy to add when you want a little more flavour in the week.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Salted Caramel Sauce",
     price: 5.0,
     image: "/salted-caramel.png",
     category: "pantry",
+    checkoutType: "one-off",
     description: "A rich sauce for desserts or simple extras.",
+    details: "A simple one-off extra rather than part of a weekly base order.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Dark Chocolate & Hazelnut Spread",
     price: 5.0,
     image: "/dark-chocolate.png",
     category: "pantry",
+    checkoutType: "one-off",
     description: "A simple chocolate spread for toast or baking.",
+    details: "A good add-on when you want something sweet in the cupboard.",
+    note: "Usually added as a one-off",
   },
 ];
 
@@ -84,77 +102,90 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 4.95,
     image: "/images/cupboard/casarecce.jpg",
     category: "cupboard",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A slightly more special pasta shape that still feels easy to cook with.",
     details:
       "Good with pesto, harissa, greens, roasted vegetables, or whatever needs using up.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Orzo Pasta",
     price: 4.5,
     image: "/images/cupboard/orzo.jpg",
     category: "cupboard",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A very flexible pasta for quick bowls, soups, traybakes, and easy midweek cooking.",
     details:
       "Especially useful when you want something fast, simple, and not too heavy.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Giant Couscous",
     price: 4.75,
     image: "/images/cupboard/giant-couscous.jpg",
     category: "cupboard",
+    checkoutType: "one-off",
     weight: "500g",
     description: "A useful grain-like cupboard staple that works warm or cold.",
     details:
       "Good with roast vegetables, herbs, dressings, and spoonfuls of something punchy from the fridge.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Polenta",
     price: 4.25,
     image: "/images/cupboard/polenta.jpg",
     category: "cupboard",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A comforting base for soft bowls, roasted vegetables, and simple suppers.",
     details:
       "Naturally gluten-free and especially good with greens, beans, pesto, or harissa.",
-    note: "Naturally gluten-free",
+    note: "Usually added as a one-off",
   },
   {
     name: "Puy Lentils",
     price: 4.95,
     image: "/images/cupboard/puy-lentils.jpg",
     category: "cupboard",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A pantry staple with a little more structure, good for warm salads and batch cooking.",
     details:
       "Useful to cook ahead and keep in the fridge for easy lunches, bowls, and simple dinners.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Short Grain Rice",
     price: 4.75,
     image: "/images/cupboard/short-grain-rice.jpg",
     category: "cupboard",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A versatile rice for risotto-style cooking, gentle puddings, and simple sides.",
     details:
       "One of the most useful cupboard basics if you want something that works for sweet or savoury cooking.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Farro",
     price: 5.5,
     image: "/images/cupboard/farro.jpg",
     category: "cupboard",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A nutty, chewy grain that makes simple bowls and salads feel a little more special.",
     details:
       "Especially good with roast vegetables, herbs, soft cheeses, and bold jars like harissa or pesto.",
+    note: "Usually added as a one-off",
   },
 ];
 
@@ -164,36 +195,44 @@ const extraItems: ShopDisplayItem[] = [
     price: 4.95,
     image: "/images/extras/almonds.jpg",
     category: "extras",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "An everyday nut to keep on hand for baking, breakfast, salads, and simple cooking.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Walnuts",
     price: 5.5,
     image: "/images/extras/walnuts.jpg",
     category: "extras",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A savoury-leaning extra that works beautifully with grains, leaves, roast veg, and cheese.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Hazelnuts",
     price: 5.95,
     image: "/images/extras/hazelnuts.jpg",
     category: "extras",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A slightly more special nut that works especially well with sweet things and darker flavours.",
+    note: "Usually added as a one-off",
   },
   {
     name: "Cashews",
     price: 5.25,
     image: "/images/extras/cashews.jpg",
     category: "extras",
+    checkoutType: "one-off",
     weight: "500g",
     description:
       "A soft, useful nut for snacking, cooking, and adding a little richness to simple meals.",
+    note: "Usually added as a one-off",
   },
 ];
 
@@ -218,7 +257,25 @@ export default function ShopPage() {
       name: item.name,
       price: item.price,
       image: item.image,
+      category: item.category,
+      checkoutType: item.checkoutType,
     });
+  };
+
+  const renderOrderBadge = (item: ShopDisplayItem) => {
+    if (item.checkoutType === "subscription") {
+      return (
+        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+          Subscription-friendly
+        </div>
+      );
+    }
+
+    return (
+      <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+        One-off add-on
+      </div>
+    );
   };
 
   const renderAddControls = (item: ShopDisplayItem) => {
@@ -308,11 +365,7 @@ export default function ShopPage() {
                 </div>
               </div>
 
-              {item.note && (
-                <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
-                  {item.note}
-                </div>
-              )}
+              <div className="mt-4">{renderOrderBadge(item)}</div>
 
               <p className="mt-4 text-sm leading-7 text-[#667164]">
                 {item.description}
@@ -332,7 +385,7 @@ export default function ShopPage() {
                 <p className="text-xs leading-6 text-[#7a8478]">{helperText}</p>
               ) : quantity > 0 ? (
                 <p className="text-xs leading-6 text-[#7a8478]">
-                  Easy to add alongside the rest of your weekly order.
+                  Easy to add alongside the rest of your order.
                 </p>
               ) : null}
             </div>
@@ -392,14 +445,14 @@ export default function ShopPage() {
               </p>
 
               <h1 className="mt-3 font-serif text-4xl leading-tight md:text-6xl">
-                Weekly essentials,
-                <br className="hidden sm:block" /> thoughtfully chosen
+                Weekly boxes first,
+                <br className="hidden sm:block" /> then useful extras
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#667164] md:text-base">
-                Build your order with a produce box, a few pantry jars, and a
-                small selection of useful cupboard things that make simple
-                cooking feel easier through the week.
+                Start with a produce box if you want a regular weekly order,
+                then add pantry jars, cupboard goods, and extras as one-off
+                additions.
               </p>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -428,30 +481,29 @@ export default function ShopPage() {
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#ddd4c8] bg-white px-4 py-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Seasonal & flexible
+                    Boxes suit weekly delivery
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#667164]">
-                    Produce changes with availability, so your box is never too
-                    rigid.
+                    Fruit and veg boxes are the strongest fit for subscription.
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-[#ddd4c8] bg-white px-4 py-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Easy weekly ordering
+                    Add-ons stay flexible
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#667164]">
-                    Start with a box, then add a few useful extras in seconds.
+                    Pantry jars and extras work well as one-off additions.
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-[#ddd4c8] bg-white px-4 py-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Cook from the cupboard
+                    Choose at basket
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#667164]">
-                    A small range of grains, pasta, and extras that help turn
-                    good ingredients into easy meals.
+                    You can review everything before choosing one-off or
+                    subscription.
                   </p>
                 </div>
               </div>
@@ -472,7 +524,7 @@ export default function ShopPage() {
                 <p className="mt-2 text-sm leading-6 text-[#667164]">
                   {totalItems > 0
                     ? `Current total: £${total.toFixed(2)}`
-                    : "Add a produce box to get started, then top up with pantry and cupboard essentials."}
+                    : "Start with a produce box, then add a few useful extras if you like."}
                 </p>
 
                 <Link
@@ -488,9 +540,13 @@ export default function ShopPage() {
                   How ordering works
                 </p>
                 <ol className="mt-3 space-y-2 text-sm leading-6 text-[#667164]">
-                  <li>1. Choose your produce box</li>
-                  <li>2. Add jars, cupboard goods, or extras if you like</li>
-                  <li>3. Review your basket and checkout options</li>
+                  <li>
+                    1. Choose a produce box if you want a weekly base order
+                  </li>
+                  <li>2. Add pantry, cupboard goods, or extras as needed</li>
+                  <li>
+                    3. Review your basket and choose how you’d like to order
+                  </li>
                 </ol>
               </div>
             </div>
@@ -535,7 +591,7 @@ export default function ShopPage() {
               Choose your base for the week
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
-              These boxes are designed to make weekly ordering simple. The mix
+              These are the strongest fit for regular weekly ordering. The mix
               changes depending on what is available and looking good that week.
             </p>
           </div>
@@ -575,11 +631,14 @@ export default function ShopPage() {
                       </div>
                     </div>
 
-                    {item.bestFor && (
-                      <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
-                        {item.bestFor}
-                      </div>
-                    )}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {item.bestFor && (
+                        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+                          {item.bestFor}
+                        </div>
+                      )}
+                      {renderOrderBadge(item)}
+                    </div>
 
                     <p className="mt-5 text-sm leading-7 text-[#667164]">
                       {item.description}
@@ -637,8 +696,8 @@ export default function ShopPage() {
               Useful jars and extras
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
-              A small selection of pantry jars and useful additions to round out
-              the weekly order.
+              These work best as flexible one-off additions alongside a box or a
+              single weekly order.
             </p>
           </div>
 
@@ -647,7 +706,7 @@ export default function ShopPage() {
               renderCompactCard(
                 item,
                 "Pantry item",
-                "You can adjust quantities here or review everything in the basket.",
+                "These are usually best treated as one-off add-ons.",
               ),
             )}
           </div>
@@ -662,8 +721,8 @@ export default function ShopPage() {
               Good things to cook with through the week
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
-              A small range of pasta, grains, and useful staples that make it
-              easier to turn good produce and pantry jars into simple meals.
+              Pasta, grains, and staples that make it easier to turn good
+              produce and pantry jars into simple meals.
             </p>
           </div>
 
@@ -672,7 +731,7 @@ export default function ShopPage() {
               renderCompactCard(
                 item,
                 "Cupboard good",
-                "A useful addition for weeknight cooking.",
+                "These are usually best treated as one-off add-ons.",
               ),
             )}
           </div>
@@ -697,7 +756,7 @@ export default function ShopPage() {
               renderCompactCard(
                 item,
                 "Extra",
-                "Easy to add alongside the rest of your weekly order.",
+                "These are usually best treated as one-off add-ons.",
               ),
             )}
           </div>

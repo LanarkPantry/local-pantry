@@ -6,6 +6,8 @@ export type ShopItem = {
   name: string;
   price: number;
   image: string;
+  category?: "boxes" | "pantry" | "cupboard" | "extras";
+  checkoutType?: "subscription" | "one-off";
 };
 
 type CartContextType = {
@@ -18,6 +20,8 @@ type CartContextType = {
   getItemCount: (itemName: string) => number;
   total: number;
   groupedCart: { item: ShopItem; quantity: number }[];
+  subscriptionItems: ShopItem[];
+  oneOffItems: ShopItem[];
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -30,9 +34,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     if (savedCart) {
       try {
-        setCart(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+
+        if (Array.isArray(parsedCart)) {
+          setCart(parsedCart);
+        } else {
+          setCart([]);
+        }
       } catch {
         console.error("Failed to parse saved cart");
+        setCart([]);
       }
     }
   }, []);
@@ -91,6 +102,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return Array.from(map.values());
   }, [cart]);
 
+  const subscriptionItems = useMemo(() => {
+    return cart.filter((item) => item.checkoutType === "subscription");
+  }, [cart]);
+
+  const oneOffItems = useMemo(() => {
+    return cart.filter((item) => item.checkoutType !== "subscription");
+  }, [cart]);
+
   return (
     <CartContext.Provider
       value={{
@@ -103,6 +122,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         getItemCount,
         total,
         groupedCart,
+        subscriptionItems,
+        oneOffItems,
       }}
     >
       {children}

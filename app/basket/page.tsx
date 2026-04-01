@@ -15,6 +15,8 @@ export default function BasketPage() {
     addToCart,
     removeOneFromCart,
     clearItemFromCart,
+    subscriptionItems,
+    oneOffItems,
   } = useCart();
 
   const [isSubscription, setIsSubscription] = useState(true);
@@ -23,6 +25,14 @@ export default function BasketPage() {
   const [checkoutError, setCheckoutError] = useState("");
 
   const totalItems = cart.length;
+
+  const subscriptionSubtotal = useMemo(() => {
+    return subscriptionItems.reduce((sum, item) => sum + item.price, 0);
+  }, [subscriptionItems]);
+
+  const oneOffSubtotal = useMemo(() => {
+    return oneOffItems.reduce((sum, item) => sum + item.price, 0);
+  }, [oneOffItems]);
 
   const subtotal = total;
   const delivery =
@@ -33,6 +43,21 @@ export default function BasketPage() {
       ? FREE_DELIVERY_THRESHOLD - subtotal
       : 0;
 
+  const subscriptionItemCount = subscriptionItems.length;
+  const oneOffItemCount = oneOffItems.length;
+
+  const groupedSubscriptionItems = useMemo(() => {
+    return groupedCart.filter(
+      ({ item }) => item.checkoutType === "subscription",
+    );
+  }, [groupedCart]);
+
+  const groupedOneOffItems = useMemo(() => {
+    return groupedCart.filter(
+      ({ item }) => item.checkoutType !== "subscription",
+    );
+  }, [groupedCart]);
+
   const basketSummaryText = useMemo(() => {
     if (groupedCart.length === 0) return "No items yet";
 
@@ -41,6 +66,10 @@ export default function BasketPage() {
       .join(", ");
   }, [groupedCart]);
 
+  const whatsappOrderTypeText = isSubscription
+    ? "Weekly subscription with one-off add-ons"
+    : "One-off order";
+
   const whatsappLink = `https://wa.me/447576613770?text=${encodeURIComponent(
     `Hi The Local Pantry,
 
@@ -48,11 +77,14 @@ I'd like to place an order:
 
 ${basketSummaryText}
 
-Order type: ${isSubscription ? "Weekly subscription" : "One-off order"}
+Order type: ${whatsappOrderTypeText}
+
+Subscription-friendly items: ${subscriptionItemCount}
+One-off items: ${oneOffItemCount}
 
 Subtotal: £${subtotal.toFixed(2)}
 Delivery: ${delivery === 0 ? "Free" : `£${delivery.toFixed(2)}`}
-Total: £${orderTotal.toFixed(2)}
+Total today: £${orderTotal.toFixed(2)}
 ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}
 
 Thanks!`,
@@ -75,6 +107,8 @@ Thanks!`,
           subtotal,
           delivery,
           total: orderTotal,
+          subscriptionItems,
+          oneOffItems,
         }),
       });
 
@@ -105,6 +139,85 @@ Thanks!`,
     } finally {
       setIsLoadingCheckout(false);
     }
+  };
+
+  const renderGroupedItems = (
+    items: typeof groupedCart,
+    emptyText: string,
+    helperText: string,
+  ) => {
+    if (items.length === 0) {
+      return <p className="text-sm leading-6 text-[#667164]">{emptyText}</p>;
+    }
+
+    return (
+      <div className="space-y-4">
+        {items.map(({ item, quantity }) => (
+          <div
+            key={item.name}
+            className="flex flex-col gap-4 border-b border-[#f0e8dc] pb-4 md:flex-row md:items-center md:justify-between"
+          >
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="text-base font-medium text-[#243328] md:text-lg">
+                  {item.name}
+                </div>
+
+                <span className="rounded-full border border-[#ddd4c8] bg-[#fbfaf8] px-3 py-1 text-xs text-[#5f675c]">
+                  {item.checkoutType === "subscription"
+                    ? "Subscription-friendly"
+                    : "One-off add-on"}
+                </span>
+              </div>
+
+              <div className="mt-1 text-sm text-[#6d756a]">
+                £{item.price.toFixed(2)} each
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="inline-flex w-fit items-center rounded-full border border-[#ddd4c8] bg-[#fbfaf8]">
+                <button
+                  type="button"
+                  onClick={() => removeOneFromCart(item.name)}
+                  className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
+                  aria-label={`Decrease quantity of ${item.name}`}
+                >
+                  −
+                </button>
+
+                <span className="min-w-[2rem] text-center text-sm">
+                  {quantity}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => addToCart(item)}
+                  className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
+                  aria-label={`Increase quantity of ${item.name}`}
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="min-w-[72px] text-sm font-medium text-[#243328] sm:text-right">
+                £{(item.price * quantity).toFixed(2)}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => clearItemFromCart(item.name)}
+                className="w-fit text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
+              >
+                Remove all
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <p className="text-sm leading-6 text-[#667164]">{helperText}</p>
+      </div>
+    );
   };
 
   return (
@@ -187,25 +300,25 @@ Thanks!`,
 
               <p className="mx-auto mt-4 max-w-xl text-[#667164]">
                 Start with a produce box, then add pantry items and useful
-                extras to build a simple weekly order.
+                extras to build your order.
               </p>
 
               <div className="mt-8 grid gap-3 text-left sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#e5ddcf] bg-white p-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Weekly produce boxes
+                    Produce boxes
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    A straightforward base for the week.
+                    The strongest fit for weekly subscription.
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-[#e5ddcf] bg-white p-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Pantry essentials
+                    One-off add-ons
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Jars, staples, and everyday add-ons.
+                    Pantry jars, cupboard goods, and extras stay flexible.
                   </p>
                 </div>
 
@@ -254,60 +367,39 @@ Thanks!`,
                   </p>
                 </div>
 
-                <div className="mt-5 space-y-4">
-                  {groupedCart.map(({ item, quantity }) => (
-                    <div
-                      key={item.name}
-                      className="flex flex-col gap-4 border-b border-[#f0e8dc] pb-4 md:flex-row md:items-center md:justify-between"
-                    >
-                      <div className="min-w-0">
-                        <div className="text-base font-medium text-[#243328] md:text-lg">
-                          {item.name}
-                        </div>
-                        <div className="mt-1 text-sm text-[#6d756a]">
-                          £{item.price.toFixed(2)} each
-                        </div>
-                      </div>
+                <div className="mt-6 rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Subscription-friendly items
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    These are the items that suit weekly recurring delivery
+                    best.
+                  </p>
 
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                        <div className="inline-flex w-fit items-center rounded-full border border-[#ddd4c8] bg-[#fbfaf8]">
-                          <button
-                            type="button"
-                            onClick={() => removeOneFromCart(item.name)}
-                            className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
-                            aria-label={`Decrease quantity of ${item.name}`}
-                          >
-                            −
-                          </button>
+                  <div className="mt-4">
+                    {renderGroupedItems(
+                      groupedSubscriptionItems,
+                      "You have no subscription-friendly items in your basket yet.",
+                      "These items can form the weekly part of your order.",
+                    )}
+                  </div>
+                </div>
 
-                          <span className="min-w-[2rem] text-center text-sm">
-                            {quantity}
-                          </span>
+                <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    One-off add-ons
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    These are the flexible extras you can add as needed.
+                  </p>
 
-                          <button
-                            type="button"
-                            onClick={() => addToCart(item)}
-                            className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
-                            aria-label={`Increase quantity of ${item.name}`}
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        <div className="min-w-[72px] text-sm font-medium text-[#243328] sm:text-right">
-                          £{(item.price * quantity).toFixed(2)}
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => clearItemFromCart(item.name)}
-                          className="w-fit text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
-                        >
-                          Remove all
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                  <div className="mt-4">
+                    {renderGroupedItems(
+                      groupedOneOffItems,
+                      "You have no one-off add-ons in your basket yet.",
+                      "These can stay as one-off extras, even if you choose subscription.",
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-6 space-y-3 border-t border-[#ece4d8] pt-5">
@@ -324,7 +416,7 @@ Thanks!`,
                   </div>
 
                   <div className="flex items-center justify-between border-t border-[#ece4d8] pt-3">
-                    <span className="font-serif text-2xl">Total</span>
+                    <span className="font-serif text-2xl">Total today</span>
                     <span className="font-serif text-2xl">
                       £{orderTotal.toFixed(2)}
                     </span>
@@ -354,9 +446,9 @@ Thanks!`,
                     Choose how you&apos;d like to order
                   </h2>
                   <p className="mt-3 text-sm leading-7 text-[#667164]">
-                    Pick a one-off order if you&apos;re ordering just for this
-                    week, or choose a weekly subscription if you&apos;d like a
-                    regular delivery.
+                    Weekly subscription works best when you have a produce box
+                    in your basket. One-off order is there if you&apos;re
+                    ordering just for this week.
                   </p>
                 </div>
 
@@ -376,8 +468,8 @@ Thanks!`,
                           One-off order
                         </div>
                         <p className="mt-2 text-sm leading-6 text-[#667164]">
-                          Suitable for occasional orders or trying the service
-                          for the first time.
+                          Everything is treated as a one-time order for this
+                          week.
                         </p>
                       </div>
 
@@ -404,8 +496,8 @@ Thanks!`,
                           Weekly subscription
                         </div>
                         <p className="mt-2 text-sm leading-6 text-[#667164]">
-                          A recurring weekly order for households who want a
-                          regular delivery rhythm.
+                          Subscription-friendly items recur weekly. One-off
+                          add-ons stay flexible.
                         </p>
                       </div>
 
@@ -417,6 +509,31 @@ Thanks!`,
                     </div>
                   </button>
                 </div>
+
+                {isSubscription && subscriptionItemCount === 0 && (
+                  <div className="mt-4 rounded-2xl border border-[#e4d8cb] bg-[#fbf6f0] p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      No subscription-friendly items yet
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      Add a produce box if you want the weekly subscription
+                      option to make the most sense.
+                    </p>
+                  </div>
+                )}
+
+                {isSubscription && subscriptionItemCount > 0 && (
+                  <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-white p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      What happens with this order
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      Your subscription-friendly items are intended to form the
+                      weekly part of your order. Your pantry extras and add-ons
+                      can stay more flexible.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="mt-6 rounded-2xl border border-[#ddd4c8] bg-white p-5 md:p-6">
@@ -460,19 +577,19 @@ Thanks!`,
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Straightforward checkout
+                    Boxes work well weekly
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Review your order and continue when you&apos;re ready.
+                    Produce boxes are the strongest fit for subscription.
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Flexible ordering
+                    Add-ons stay flexible
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Choose one-off or weekly, depending on what suits you.
+                    Pantry and cupboard extras can still be treated as one-offs.
                   </p>
                 </div>
 
@@ -502,16 +619,45 @@ Thanks!`,
                   </div>
 
                   <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
-                    <span className="text-sm text-[#667164]">Order type</span>
+                    <span className="text-sm text-[#667164]">
+                      Subscription-friendly
+                    </span>
                     <span className="text-sm font-medium text-[#243328]">
-                      {isSubscription ? "Weekly" : "One-off"}
+                      {subscriptionItemCount}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
-                    <span className="text-sm text-[#667164]">Subtotal</span>
+                    <span className="text-sm text-[#667164]">
+                      One-off add-ons
+                    </span>
                     <span className="text-sm font-medium text-[#243328]">
-                      £{subtotal.toFixed(2)}
+                      {oneOffItemCount}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
+                    <span className="text-sm text-[#667164]">Order type</span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      {isSubscription ? "Weekly subscription" : "One-off"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
+                    <span className="text-sm text-[#667164]">
+                      Subscription items
+                    </span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      £{subscriptionSubtotal.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
+                    <span className="text-sm text-[#667164]">
+                      One-off items
+                    </span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      £{oneOffSubtotal.toFixed(2)}
                     </span>
                   </div>
 
@@ -522,16 +668,9 @@ Thanks!`,
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
-                    <span className="text-sm text-[#667164]">Checkout</span>
-                    <span className="text-sm font-medium text-[#243328]">
-                      Secure
-                    </span>
-                  </div>
-
                   <div className="flex items-center justify-between pt-4">
                     <span className="font-serif text-2xl text-[#243328]">
-                      Total
+                      Total today
                     </span>
                     <span className="font-serif text-2xl text-[#243328]">
                       £{orderTotal.toFixed(2)}
@@ -546,6 +685,18 @@ Thanks!`,
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
                     Local delivery is £2.50 for orders below £30, and free for
                     orders of £30 or more.
+                  </p>
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-white p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Today&apos;s checkout
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Today you&apos;re paying £{orderTotal.toFixed(2)}.
+                    {isSubscription
+                      ? " The weekly part of the order should come from your subscription-friendly items."
+                      : " Everything is being treated as a one-off order."}
                   </p>
                 </div>
 

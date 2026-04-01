@@ -236,6 +236,7 @@ export default function RecipesPage() {
     if (quantity === 0) {
       return (
         <button
+          type="button"
           onClick={() => addRecipeProductToCart(product)}
           className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
         >
@@ -248,6 +249,7 @@ export default function RecipesPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <div className="inline-flex items-center self-start rounded-full border border-[#d8d0c4] bg-white">
           <button
+            type="button"
             onClick={() => removeOneFromCart(product.name)}
             aria-label={`Decrease quantity of ${product.name}`}
             className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
@@ -260,6 +262,7 @@ export default function RecipesPage() {
           </span>
 
           <button
+            type="button"
             onClick={() => addRecipeProductToCart(product)}
             aria-label={`Increase quantity of ${product.name}`}
             className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
@@ -290,6 +293,7 @@ export default function RecipesPage() {
             src={recipe.image}
             alt={recipe.alt}
             fill
+            sizes="(max-width: 767px) 100vw, 50vw"
             className="object-cover"
           />
         </div>
@@ -372,6 +376,7 @@ export default function RecipesPage() {
 
               <div className="mt-4 flex flex-col gap-3">
                 <button
+                  type="button"
                   onClick={() => addRecipeBundleToCart(recipe)}
                   className="inline-flex items-center justify-center self-start rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
                 >

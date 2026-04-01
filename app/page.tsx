@@ -1,14 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useCart } from "./cart-context";
-import PostcodeChecker from "./components/PostcodeChecker";
 
 export default function HomePage() {
   const { cart } = useCart();
-
   const totalItems = useMemo(() => cart.length, [cart]);
+
+  const [postcode, setPostcode] = useState("");
+  const [message, setMessage] = useState("");
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+
+  function handlePostcodeCheck(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const cleaned = postcode.replace(/\s+/g, "").toUpperCase();
+
+    if (!cleaned) {
+      setIsAvailable(false);
+      setMessage("Please enter your postcode.");
+      return;
+    }
+
+    if (cleaned.startsWith("ML11")) {
+      setIsAvailable(true);
+      setMessage("Good news — we deliver to your area.");
+      return;
+    }
+
+    setIsAvailable(false);
+    setMessage("We’re not delivering to your area just yet.");
+  }
 
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
@@ -143,7 +166,56 @@ export default function HomePage() {
         </div>
       </section>
 
-      <PostcodeChecker />
+      <section className="px-6 pb-20 md:px-10 md:pb-24">
+        <div className="mx-auto max-w-4xl rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 md:p-10">
+          <div className="max-w-2xl">
+            <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
+              Delivery checker
+            </p>
+
+            <h2 className="mt-3 font-serif text-3xl md:text-4xl">
+              Check if we deliver to your area
+            </h2>
+
+            <p className="mt-4 leading-7 text-[#5f675c]">
+              Enter your postcode below to see if we’re currently delivering in
+              your area.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handlePostcodeCheck}
+            className="mt-8 flex flex-col gap-3 sm:flex-row"
+          >
+            <input
+              type="text"
+              value={postcode}
+              onChange={(e) => setPostcode(e.target.value)}
+              placeholder="Enter your postcode"
+              className="w-full rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
+            />
+
+            <button
+              type="submit"
+              className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+            >
+              Check postcode
+            </button>
+          </form>
+
+          {message && (
+            <div
+              className={`mt-5 rounded-[20px] px-5 py-4 text-sm leading-6 ${
+                isAvailable
+                  ? "border border-[#bfd3bf] bg-[#edf6ed] text-[#243328]"
+                  : "border border-[#e4d8cb] bg-[#fbf6f0] text-[#6a5c4f]"
+              }`}
+            >
+              {message}
+            </div>
+          )}
+        </div>
+      </section>
     </main>
   );
 }
