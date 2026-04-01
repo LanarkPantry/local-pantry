@@ -141,6 +141,10 @@ Thanks!`,
     }
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const renderGroupedItems = (
     items: typeof groupedCart,
     emptyText: string,
@@ -227,7 +231,7 @@ Thanks!`,
         £{orderTotal.toFixed(2)}.
       </div>
 
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-6xl pb-24 md:pb-10">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
           <Link
             href="/"
@@ -437,18 +441,22 @@ Thanks!`,
                 )}
               </div>
 
-              <div className="mt-6 rounded-2xl border border-[#ddd4c8] bg-[#efe8dd] p-5 md:p-6">
+              <div className="mt-6 rounded-2xl border border-[#ddd4c8] bg-[#e8dfd3] p-5 md:p-6">
                 <div className="max-w-2xl">
                   <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
                     Order type
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
-                    Choose how you&apos;d like to order
+                    How would you like this order to work?
                   </h2>
                   <p className="mt-3 text-sm leading-7 text-[#667164]">
                     Weekly subscription works best when you have a produce box
                     in your basket. One-off order is there if you&apos;re
                     ordering just for this week.
+                  </p>
+                  <p className="mt-3 text-sm font-medium text-[#243328]">
+                    Only your produce box repeats weekly. Everything else is a
+                    one-off.
                   </p>
                 </div>
 
@@ -475,7 +483,7 @@ Thanks!`,
 
                       {!isSubscription && (
                         <span className="rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
-                          Selected
+                          ✓ Selected
                         </span>
                       )}
                     </div>
@@ -496,19 +504,26 @@ Thanks!`,
                           Weekly subscription
                         </div>
                         <p className="mt-2 text-sm leading-6 text-[#667164]">
-                          Subscription-friendly items recur weekly. One-off
-                          add-ons stay flexible.
+                          Only your produce box repeats weekly. Add-ons stay
+                          one-off and flexible.
                         </p>
                       </div>
 
                       {isSubscription && (
                         <span className="rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
-                          Selected
+                          ✓ Selected
                         </span>
                       )}
                     </div>
                   </button>
                 </div>
+
+                <p className="mt-4 text-sm leading-6 text-[#667164]">
+                  If you choose a weekly subscription, only your produce box
+                  will repeat each week. Pantry items and extras are one-off,
+                  and you can add them anytime through the site or WhatsApp —
+                  we&apos;ll include them in your next delivery.
+                </p>
 
                 {isSubscription && subscriptionItemCount === 0 && (
                   <div className="mt-4 rounded-2xl border border-[#e4d8cb] bg-[#fbf6f0] p-4">
@@ -528,9 +543,9 @@ Thanks!`,
                       What happens with this order
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Your subscription-friendly items are intended to form the
-                      weekly part of your order. Your pantry extras and add-ons
-                      can stay more flexible.
+                      Only your produce box will repeat each week. Pantry items
+                      and extras are one-off and will be included in your next
+                      delivery.
                     </p>
                   </div>
                 )}
@@ -695,7 +710,7 @@ Thanks!`,
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
                     Today you&apos;re paying £{orderTotal.toFixed(2)}.
                     {isSubscription
-                      ? " The weekly part of the order should come from your subscription-friendly items."
+                      ? " Only your produce box is intended to repeat weekly."
                       : " Everything is being treated as a one-off order."}
                   </p>
                 </div>
@@ -756,6 +771,28 @@ Thanks!`,
           </div>
         )}
       </div>
+
+      {totalItems > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ddd4c8] bg-[#f7f2eb]/95 px-4 py-2 backdrop-blur md:hidden">
+          <div className="mx-auto flex max-w-6xl items-center gap-2">
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-xs font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+            >
+              Back to top
+            </button>
+
+            <Link
+              href="/basket"
+              className="flex-1 rounded-full bg-[#2f4635] px-4 py-2 text-center text-sm font-medium text-white transition hover:opacity-90"
+            >
+              {totalItems} item{totalItems === 1 ? "" : "s"} · £
+              {total.toFixed(2)}
+            </Link>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
