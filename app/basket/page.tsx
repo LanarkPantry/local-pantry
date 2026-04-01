@@ -33,23 +33,6 @@ export default function BasketPage() {
       ? FREE_DELIVERY_THRESHOLD - subtotal
       : 0;
 
-  const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
-    `Hi The Local Pantry, I'd like to place an order.
-
-Order type: ${isSubscription ? "Weekly subscription" : "One-off order"}
-Items: ${
-      groupedCart.length > 0
-        ? groupedCart
-            .map(({ item, quantity }) => `${item.name} x${quantity}`)
-            .join(", ")
-        : "No items yet"
-    }
-Subtotal: £${subtotal.toFixed(2)}
-Delivery: ${delivery === 0 ? "Free" : `£${delivery.toFixed(2)}`}
-Total: £${orderTotal.toFixed(2)}
-${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
-  )}`;
-
   const basketSummaryText = useMemo(() => {
     if (groupedCart.length === 0) return "No items yet";
 
@@ -57,6 +40,23 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
       .map(({ item, quantity }) => `${item.name} x${quantity}`)
       .join(", ");
   }, [groupedCart]);
+
+  const whatsappLink = `https://wa.me/447576613770?text=${encodeURIComponent(
+    `Hi The Local Pantry,
+
+I'd like to place an order:
+
+${basketSummaryText}
+
+Order type: ${isSubscription ? "Weekly subscription" : "One-off order"}
+
+Subtotal: £${subtotal.toFixed(2)}
+Delivery: ${delivery === 0 ? "Free" : `£${delivery.toFixed(2)}`}
+Total: £${orderTotal.toFixed(2)}
+${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}
+
+Thanks!`,
+  )}`;
 
   const startCheckout = async () => {
     try {
@@ -567,8 +567,13 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                     rel="noreferrer"
                     className="block w-full rounded-2xl border border-[#d6cec2] bg-white px-6 py-4 text-center text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
                   >
-                    Order via WhatsApp instead
+                    Order directly via WhatsApp
                   </a>
+
+                  <p className="text-center text-xs text-[#7a8478]">
+                    We&apos;ll confirm your order and delivery details with you
+                    directly.
+                  </p>
                 </div>
 
                 {checkoutError && (
