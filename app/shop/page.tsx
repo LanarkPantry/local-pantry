@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
 
@@ -78,7 +78,6 @@ const pantryItems: ShopDisplayItem[] = [
 
 export default function ShopPage() {
   const { cart, groupedCart, total, addToCart, removeOneFromCart } = useCart();
-  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const totalItems = useMemo(() => cart.length, [cart]);
 
@@ -88,17 +87,6 @@ export default function ShopPage() {
       return acc;
     }, {});
   }, [groupedCart]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 700);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const basketHref = "/basket";
 
@@ -110,10 +98,6 @@ export default function ShopPage() {
       price: item.price,
       image: item.image,
     });
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const renderAddControls = (item: ShopDisplayItem) => {
@@ -496,16 +480,6 @@ export default function ShopPage() {
           </div>
         </section>
       </div>
-
-      {showBackToTop && (
-        <button
-          onClick={scrollToTop}
-          aria-label="Back to top"
-          className="fixed bottom-24 right-4 z-40 rounded-full border border-[#d8d0c4] bg-white px-4 py-3 text-sm font-medium text-[#243328] shadow-[0_12px_24px_rgba(36,51,40,0.12)] transition hover:bg-[#faf7f2] md:bottom-6 md:right-6"
-        >
-          ↑ Back to top
-        </button>
-      )}
 
       {totalItems > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ddd4c8] bg-[#f7f2eb]/95 px-4 py-3 backdrop-blur md:hidden">
