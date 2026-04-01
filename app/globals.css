@@ -19,8 +19,39 @@
   }
 }
 
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
