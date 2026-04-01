@@ -4,6 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
 
+const DELIVERY_FEE = 2.5;
+const FREE_DELIVERY_THRESHOLD = 30;
+
 export default function BasketPage() {
   const {
     cart,
@@ -19,7 +22,16 @@ export default function BasketPage() {
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
-  const totalItems = useMemo(() => cart.length, [cart]);
+  const totalItems = cart.length;
+
+  const subtotal = total;
+  const delivery =
+    subtotal >= FREE_DELIVERY_THRESHOLD || subtotal === 0 ? 0 : DELIVERY_FEE;
+  const orderTotal = subtotal + delivery;
+  const remainingForFreeDelivery =
+    subtotal > 0 && subtotal < FREE_DELIVERY_THRESHOLD
+      ? FREE_DELIVERY_THRESHOLD - subtotal
+      : 0;
 
   const whatsappLink = `https://wa.me/447000000000?text=${encodeURIComponent(
     `Hi The Local Pantry, I'd like to place an order.
@@ -32,9 +44,19 @@ Items: ${
             .join(", ")
         : "No items yet"
     }
-Total: £${total.toFixed(2)}
+Subtotal: £${subtotal.toFixed(2)}
+Delivery: ${delivery === 0 ? "Free" : `£${delivery.toFixed(2)}`}
+Total: £${orderTotal.toFixed(2)}
 ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
   )}`;
+
+  const basketSummaryText = useMemo(() => {
+    if (groupedCart.length === 0) return "No items yet";
+
+    return groupedCart
+      .map(({ item, quantity }) => `${item.name} x${quantity}`)
+      .join(", ");
+  }, [groupedCart]);
 
   const startCheckout = async () => {
     try {
@@ -50,6 +72,9 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
           cart,
           isSubscription,
           deliveryNotes,
+          subtotal,
+          delivery,
+          total: orderTotal,
         }),
       });
 
@@ -84,6 +109,11 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
 
   return (
     <main className="min-h-screen bg-[#f4efe9] px-5 py-8 text-[#243328] md:px-10 md:py-10">
+      <div aria-live="polite" className="sr-only">
+        {totalItems} item{totalItems === 1 ? "" : "s"} in basket. Current total
+        £{orderTotal.toFixed(2)}.
+      </div>
+
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#ddd4c8] pb-4">
           <Link
@@ -156,8 +186,8 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
               </h2>
 
               <p className="mx-auto mt-4 max-w-xl text-[#667164]">
-                Start with a produce box, then add pantry items to build a
-                simple weekly order.
+                Start with a produce box, then add pantry items and useful
+                extras to build a simple weekly order.
               </p>
 
               <div className="mt-8 grid gap-3 text-left sm:grid-cols-3">
@@ -242,6 +272,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                         <div className="inline-flex w-fit items-center rounded-full border border-[#ddd4c8] bg-[#fbfaf8]">
                           <button
+                            type="button"
                             onClick={() => removeOneFromCart(item.name)}
                             className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
                             aria-label={`Decrease quantity of ${item.name}`}
@@ -254,6 +285,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                           </span>
 
                           <button
+                            type="button"
                             onClick={() => addToCart(item)}
                             className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
                             aria-label={`Increase quantity of ${item.name}`}
@@ -267,6 +299,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                         </div>
 
                         <button
+                          type="button"
                           onClick={() => clearItemFromCart(item.name)}
                           className="w-fit text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
                         >
@@ -277,12 +310,39 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                   ))}
                 </div>
 
-                <div className="mt-6 flex items-center justify-between border-t border-[#ece4d8] pt-5">
-                  <span className="font-serif text-2xl">Total</span>
-                  <span className="font-serif text-2xl">
-                    £{total.toFixed(2)}
-                  </span>
+                <div className="mt-6 space-y-3 border-t border-[#ece4d8] pt-5">
+                  <div className="flex items-center justify-between text-sm text-[#667164]">
+                    <span>Subtotal</span>
+                    <span>£{subtotal.toFixed(2)}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm text-[#667164]">
+                    <span>Delivery</span>
+                    <span>
+                      {delivery === 0 ? "Free" : `£${delivery.toFixed(2)}`}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-[#ece4d8] pt-3">
+                    <span className="font-serif text-2xl">Total</span>
+                    <span className="font-serif text-2xl">
+                      £{orderTotal.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
+
+                {remainingForFreeDelivery > 0 && (
+                  <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[#f8f4ee] p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      Add £{remainingForFreeDelivery.toFixed(2)} more for free
+                      delivery
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      A pantry jar, cupboard staple, or a useful extra could get
+                      you there.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="mt-6 rounded-2xl border border-[#ddd4c8] bg-[#efe8dd] p-5 md:p-6">
@@ -302,6 +362,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
 
                 <div className="mt-5 grid gap-3 md:grid-cols-2">
                   <button
+                    type="button"
                     onClick={() => setIsSubscription(false)}
                     className={`rounded-2xl border p-5 text-left transition ${
                       !isSubscription
@@ -329,6 +390,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => setIsSubscription(true)}
                     className={`rounded-2xl border p-5 text-left transition ${
                       isSubscription
@@ -377,7 +439,9 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                 <textarea
                   id="delivery-notes"
                   value={deliveryNotes}
-                  onChange={(e) => setDeliveryNotes(e.target.value)}
+                  onChange={(e) =>
+                    setDeliveryNotes(e.target.value.slice(0, 200))
+                  }
                   rows={5}
                   placeholder="For example: Please leave by the side gate if no one is in."
                   className="mt-5 w-full rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
@@ -396,7 +460,7 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Simple checkout
+                    Straightforward checkout
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
                     Review your order and continue when you&apos;re ready.
@@ -445,6 +509,20 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                   </div>
 
                   <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
+                    <span className="text-sm text-[#667164]">Subtotal</span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      £{subtotal.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
+                    <span className="text-sm text-[#667164]">Delivery</span>
+                    <span className="text-sm font-medium text-[#243328]">
+                      {delivery === 0 ? "Free" : `£${delivery.toFixed(2)}`}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#f0e8dc] py-4">
                     <span className="text-sm text-[#667164]">Checkout</span>
                     <span className="text-sm font-medium text-[#243328]">
                       Secure
@@ -456,13 +534,24 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
                       Total
                     </span>
                     <span className="font-serif text-2xl text-[#243328]">
-                      £{total.toFixed(2)}
+                      £{orderTotal.toFixed(2)}
                     </span>
                   </div>
                 </div>
 
+                <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Delivery area
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Local delivery is £2.50 for orders below £30, and free for
+                    orders of £30 or more.
+                  </p>
+                </div>
+
                 <div className="mt-5 space-y-3">
                   <button
+                    type="button"
                     onClick={startCheckout}
                     disabled={cart.length === 0 || isLoadingCheckout}
                     className="w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
@@ -500,11 +589,10 @@ ${deliveryNotes ? `Delivery notes: ${deliveryNotes}` : ""}`,
 
                 <div className="mt-3 rounded-2xl border border-[#ddd4c8] bg-white p-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Need a different ordering route?
+                    Your basket summary
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    WhatsApp is available if you&apos;d prefer to place the same
-                    order there instead of using checkout.
+                    {basketSummaryText}
                   </p>
                 </div>
               </div>
