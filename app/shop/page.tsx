@@ -10,10 +10,11 @@ type ShopDisplayItem = {
   image: string;
   description: string;
   details?: string;
-  category: "boxes" | "pantry";
+  category: "boxes" | "pantry" | "cupboard" | "extras";
   buttonLabel?: string;
   weeklyIncludes?: string[];
   bestFor?: string;
+  note?: string;
 };
 
 const produceBoxes: ShopDisplayItem[] = [
@@ -73,6 +74,114 @@ const pantryItems: ShopDisplayItem[] = [
     image: "/dark-chocolate.png",
     category: "pantry",
     description: "A simple chocolate spread for toast or baking.",
+  },
+];
+
+const cupboardItems: ShopDisplayItem[] = [
+  {
+    name: "Casarecce Pasta",
+    price: 4.95,
+    image: "/images/cupboard/casarecce.jpg",
+    category: "cupboard",
+    description:
+      "A slightly more special pasta shape that still feels easy to cook with.",
+    details:
+      "Good with pesto, harissa, greens, roasted vegetables, or whatever needs using up.",
+  },
+  {
+    name: "Orzo Pasta",
+    price: 4.5,
+    image: "/images/cupboard/orzo.jpg",
+    category: "cupboard",
+    description:
+      "A very flexible pasta for quick bowls, soups, traybakes, and easy midweek cooking.",
+    details:
+      "Especially useful when you want something fast, simple, and not too heavy.",
+  },
+  {
+    name: "Giant Couscous",
+    price: 4.75,
+    image: "/images/cupboard/giant-couscous.jpg",
+    category: "cupboard",
+    description: "A useful grain-like cupboard staple that works warm or cold.",
+    details:
+      "Good with roast vegetables, herbs, dressings, and spoonfuls of something punchy from the fridge.",
+  },
+  {
+    name: "Polenta",
+    price: 4.25,
+    image: "/images/cupboard/polenta.jpg",
+    category: "cupboard",
+    description:
+      "A comforting base for soft bowls, roasted vegetables, and simple suppers.",
+    details:
+      "Naturally gluten-free and especially good with greens, beans, pesto, or harissa.",
+    note: "Naturally gluten-free",
+  },
+  {
+    name: "Puy Lentils",
+    price: 4.95,
+    image: "/images/cupboard/puy-lentils.jpg",
+    category: "cupboard",
+    description:
+      "A pantry staple with a little more structure, good for warm salads and batch cooking.",
+    details:
+      "Useful to cook ahead and keep in the fridge for easy lunches, bowls, and simple dinners.",
+  },
+  {
+    name: "Short Grain Rice",
+    price: 4.75,
+    image: "/images/cupboard/short-grain-rice.jpg",
+    category: "cupboard",
+    description:
+      "A versatile rice for risotto-style cooking, gentle puddings, and simple sides.",
+    details:
+      "One of the most useful cupboard basics if you want something that works for sweet or savoury cooking.",
+  },
+  {
+    name: "Farro",
+    price: 5.5,
+    image: "/images/cupboard/farro.jpg",
+    category: "cupboard",
+    description:
+      "A nutty, chewy grain that makes simple bowls and salads feel a little more special.",
+    details:
+      "Especially good with roast vegetables, herbs, soft cheeses, and bold jars like harissa or pesto.",
+  },
+];
+
+const extraItems: ShopDisplayItem[] = [
+  {
+    name: "Almonds",
+    price: 4.95,
+    image: "/images/extras/almonds.jpg",
+    category: "extras",
+    description:
+      "An everyday nut to keep on hand for baking, breakfast, salads, and simple cooking.",
+  },
+  {
+    name: "Walnuts",
+    price: 5.5,
+    image: "/images/extras/walnuts.jpg",
+    category: "extras",
+    description:
+      "A savoury-leaning extra that works beautifully with grains, leaves, roast veg, and cheese.",
+  },
+  {
+    name: "Hazelnuts",
+    price: 5.95,
+    image: "/images/extras/hazelnuts.jpg",
+    category: "extras",
+    description:
+      "A slightly more special nut that works especially well with sweet things and darker flavours.",
+  },
+  {
+    name: "Cashews",
+    price: 5.25,
+    image: "/images/extras/cashews.jpg",
+    category: "extras",
+    description:
+      "A soft, useful nut for snacking, cooking, and adding a little richness to simple meals.",
   },
 ];
 
@@ -143,6 +252,80 @@ export default function ShopPage() {
     );
   };
 
+  const renderCompactCard = (
+    item: ShopDisplayItem,
+    label: string,
+    helperText?: string,
+  ) => {
+    const quantity = getQuantity(item.name);
+
+    return (
+      <article
+        key={item.name}
+        className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
+      >
+        <div className="flex flex-col sm:flex-row">
+          <div className="border-b border-[#e9dfd2] bg-[#eee7dc] p-4 sm:w-[200px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
+            <div className="flex h-full items-center justify-center rounded-[20px] bg-[#f8f4ee] p-4">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="h-32 w-full object-contain sm:h-36"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-1 flex-col justify-between p-5 md:p-6">
+            <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="max-w-2xl">
+                  <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
+                    {label}
+                  </p>
+                  <h3 className="mt-2 font-serif text-2xl text-[#243328] md:text-[2rem]">
+                    {item.name}
+                  </h3>
+                </div>
+
+                <div className="shrink-0 rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
+                  £{item.price.toFixed(2)}
+                </div>
+              </div>
+
+              {item.note && (
+                <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+                  {item.note}
+                </div>
+              )}
+
+              <p className="mt-4 text-sm leading-7 text-[#667164]">
+                {item.description}
+              </p>
+
+              {item.details && (
+                <p className="mt-3 text-sm leading-7 text-[#667164]">
+                  {item.details}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              {renderAddControls(item)}
+
+              {quantity > 0 && helperText ? (
+                <p className="text-xs text-[#7a8478]">{helperText}</p>
+              ) : quantity > 0 ? (
+                <p className="text-xs text-[#7a8478]">
+                  Easy to add alongside the rest of your weekly order.
+                </p>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  };
+
   return (
     <main className="min-h-screen bg-[#f4efe9] px-5 py-8 text-[#243328] md:px-10 md:py-10">
       <div className="mx-auto max-w-6xl pb-24 md:pb-10">
@@ -198,9 +381,9 @@ export default function ShopPage() {
               </h1>
 
               <p className="mt-4 max-w-2xl text-[#667164]">
-                Build your order with a produce box and a few pantry additions.
-                Contents can change through the seasons, so each week feels
-                fresh, flexible, and easy to cook from.
+                Build your order with a produce box, a few pantry jars, and a
+                small selection of useful cupboard things that make simple
+                cooking feel easier through the week.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -216,6 +399,13 @@ export default function ShopPage() {
                   className="inline-flex rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
                 >
                   Browse pantry items
+                </a>
+
+                <a
+                  href="#cook-from-the-cupboard"
+                  className="inline-flex rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                >
+                  Explore cupboard goods
                 </a>
               </div>
 
@@ -241,11 +431,11 @@ export default function ShopPage() {
 
                 <div className="rounded-2xl border border-[#ddd4c8] bg-white px-4 py-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Simple basket flow
+                    Cook from the cupboard
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#667164]">
-                    Review everything together, then choose one-off or weekly in
-                    your basket.
+                    A small range of grains, pasta, and extras that help turn
+                    good ingredients into easy meals.
                   </p>
                 </div>
               </div>
@@ -266,7 +456,7 @@ export default function ShopPage() {
                 <p className="mt-2 text-sm text-[#667164]">
                   {totalItems > 0
                     ? `Current total: £${total.toFixed(2)}`
-                    : "Add a produce box to get started, then top up with pantry extras."}
+                    : "Add a produce box to get started, then top up with pantry and cupboard essentials."}
                 </p>
 
                 <Link
@@ -283,7 +473,7 @@ export default function ShopPage() {
                 </p>
                 <ol className="mt-3 space-y-2 text-sm leading-6 text-[#667164]">
                   <li>1. Choose your produce box</li>
-                  <li>2. Add pantry extras if you like</li>
+                  <li>2. Add jars, cupboard goods, or extras if you like</li>
                   <li>3. Review your basket and checkout options</li>
                 </ol>
               </div>
@@ -304,6 +494,18 @@ export default function ShopPage() {
               className="rounded-full border border-[#d8d0c4] bg-white px-4 py-2 text-sm text-[#243328] transition hover:bg-[#faf7f2]"
             >
               Jump to pantry additions
+            </a>
+            <a
+              href="#cook-from-the-cupboard"
+              className="rounded-full border border-[#d8d0c4] bg-white px-4 py-2 text-sm text-[#243328] transition hover:bg-[#faf7f2]"
+            >
+              Jump to cupboard goods
+            </a>
+            <a
+              href="#a-few-good-extras"
+              className="rounded-full border border-[#d8d0c4] bg-white px-4 py-2 text-sm text-[#243328] transition hover:bg-[#faf7f2]"
+            >
+              Jump to extras
             </a>
           </div>
         </section>
@@ -416,67 +618,72 @@ export default function ShopPage() {
               Pantry additions
             </p>
             <h2 className="mt-2 font-serif text-3xl md:text-4xl">
-              Useful extras
+              Useful jars and extras
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
-              A small selection of pantry essentials and useful extras to round
-              out the weekly order.
+              A small selection of pantry jars and useful additions to round out
+              the weekly order.
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            {pantryItems.map((item) => {
-              const quantity = getQuantity(item.name);
+          <div className="grid gap-4">
+            {pantryItems.map((item) =>
+              renderCompactCard(
+                item,
+                "Pantry item",
+                "You can adjust quantities here or review everything in the basket.",
+              ),
+            )}
+          </div>
+        </section>
 
-              return (
-                <article
-                  key={item.name}
-                  className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
-                >
-                  <div className="border-b border-[#e9dfd2] bg-[#eee7dc] p-4 md:p-5">
-                    <div className="flex items-center justify-center rounded-[22px] bg-[#f8f4ee] p-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-56 w-full object-contain md:h-64"
-                      />
-                    </div>
-                  </div>
+        <section id="cook-from-the-cupboard" className="mt-10 scroll-mt-24">
+          <div className="mb-5">
+            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+              Cook from the cupboard
+            </p>
+            <h2 className="mt-2 font-serif text-3xl md:text-4xl">
+              Good things to cook with through the week
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
+              A small range of pasta, grains, and useful staples that make it
+              easier to turn good produce and pantry jars into simple meals.
+            </p>
+          </div>
 
-                  <div className="p-5 md:p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
-                          Pantry item
-                        </p>
-                        <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                          {item.name}
-                        </h3>
-                      </div>
+          <div className="grid gap-4">
+            {cupboardItems.map((item) =>
+              renderCompactCard(
+                item,
+                "Cupboard good",
+                "A useful addition for weeknight cooking.",
+              ),
+            )}
+          </div>
+        </section>
 
-                      <div className="shrink-0 rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
-                        £{item.price.toFixed(2)}
-                      </div>
-                    </div>
+        <section id="a-few-good-extras" className="mt-10 scroll-mt-24">
+          <div className="mb-5">
+            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+              A few good extras
+            </p>
+            <h2 className="mt-2 font-serif text-3xl md:text-4xl">
+              Useful things to keep on hand
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667164]">
+              A few simple extras for baking, breakfasts, salads, sweet things,
+              and adding a little more depth to everyday cooking.
+            </p>
+          </div>
 
-                    <p className="mt-4 text-sm leading-7 text-[#667164]">
-                      {item.description}
-                    </p>
-
-                    <div className="mt-6 flex flex-col gap-3">
-                      {renderAddControls(item)}
-
-                      {quantity > 0 && (
-                        <p className="text-xs text-[#7a8478]">
-                          You can adjust quantities here or review everything in
-                          the basket.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+          <div className="grid gap-4">
+            {extraItems.map((item) =>
+              renderCompactCard(
+                item,
+                "Extra",
+                "Easy to add alongside the rest of your weekly order.",
+              ),
+            )}
           </div>
         </section>
       </div>
