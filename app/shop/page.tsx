@@ -15,6 +15,7 @@ type ShopDisplayItem = {
   weeklyIncludes?: string[];
   bestFor?: string;
   note?: string;
+  weight?: string;
 };
 
 const produceBoxes: ShopDisplayItem[] = [
@@ -83,6 +84,7 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 4.95,
     image: "/images/cupboard/casarecce.jpg",
     category: "cupboard",
+    weight: "500g",
     description:
       "A slightly more special pasta shape that still feels easy to cook with.",
     details:
@@ -93,6 +95,7 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 4.5,
     image: "/images/cupboard/orzo.jpg",
     category: "cupboard",
+    weight: "500g",
     description:
       "A very flexible pasta for quick bowls, soups, traybakes, and easy midweek cooking.",
     details:
@@ -103,6 +106,7 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 4.75,
     image: "/images/cupboard/giant-couscous.jpg",
     category: "cupboard",
+    weight: "500g",
     description: "A useful grain-like cupboard staple that works warm or cold.",
     details:
       "Good with roast vegetables, herbs, dressings, and spoonfuls of something punchy from the fridge.",
@@ -112,6 +116,7 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 4.25,
     image: "/images/cupboard/polenta.jpg",
     category: "cupboard",
+    weight: "500g",
     description:
       "A comforting base for soft bowls, roasted vegetables, and simple suppers.",
     details:
@@ -123,6 +128,7 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 4.95,
     image: "/images/cupboard/puy-lentils.jpg",
     category: "cupboard",
+    weight: "500g",
     description:
       "A pantry staple with a little more structure, good for warm salads and batch cooking.",
     details:
@@ -133,6 +139,7 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 4.75,
     image: "/images/cupboard/short-grain-rice.jpg",
     category: "cupboard",
+    weight: "500g",
     description:
       "A versatile rice for risotto-style cooking, gentle puddings, and simple sides.",
     details:
@@ -143,6 +150,7 @@ const cupboardItems: ShopDisplayItem[] = [
     price: 5.5,
     image: "/images/cupboard/farro.jpg",
     category: "cupboard",
+    weight: "500g",
     description:
       "A nutty, chewy grain that makes simple bowls and salads feel a little more special.",
     details:
@@ -156,6 +164,7 @@ const extraItems: ShopDisplayItem[] = [
     price: 4.95,
     image: "/images/extras/almonds.jpg",
     category: "extras",
+    weight: "500g",
     description:
       "An everyday nut to keep on hand for baking, breakfast, salads, and simple cooking.",
   },
@@ -164,6 +173,7 @@ const extraItems: ShopDisplayItem[] = [
     price: 5.5,
     image: "/images/extras/walnuts.jpg",
     category: "extras",
+    weight: "500g",
     description:
       "A savoury-leaning extra that works beautifully with grains, leaves, roast veg, and cheese.",
   },
@@ -172,6 +182,7 @@ const extraItems: ShopDisplayItem[] = [
     price: 5.95,
     image: "/images/extras/hazelnuts.jpg",
     category: "extras",
+    weight: "500g",
     description:
       "A slightly more special nut that works especially well with sweet things and darker flavours.",
   },
@@ -180,6 +191,7 @@ const extraItems: ShopDisplayItem[] = [
     price: 5.25,
     image: "/images/extras/cashews.jpg",
     category: "extras",
+    weight: "500g",
     description:
       "A soft, useful nut for snacking, cooking, and adding a little richness to simple meals.",
   },
@@ -215,6 +227,7 @@ export default function ShopPage() {
     if (quantity === 0) {
       return (
         <button
+          type="button"
           onClick={() => addDisplayItemToCart(item)}
           className="inline-flex w-full items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
         >
@@ -227,6 +240,7 @@ export default function ShopPage() {
       <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
         <div className="inline-flex items-center self-start rounded-full border border-[#d8d0c4] bg-white">
           <button
+            type="button"
             onClick={() => removeOneFromCart(item.name)}
             aria-label={`Decrease quantity of ${item.name}`}
             className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
@@ -239,6 +253,7 @@ export default function ShopPage() {
           </span>
 
           <button
+            type="button"
             onClick={() => addDisplayItemToCart(item)}
             aria-label={`Increase quantity of ${item.name}`}
             className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
@@ -289,6 +304,7 @@ export default function ShopPage() {
 
                 <div className="self-start rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
                   £{item.price.toFixed(2)}
+                  {item.weight ? ` · ${item.weight}` : ""}
                 </div>
               </div>
 
