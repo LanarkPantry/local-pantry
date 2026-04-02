@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     if (items.length === 0) {
       return NextResponse.json(
-        { error: "No basket items were provided." },
+        { error: "No ingredients were provided." },
         { status: 400 },
       );
     }
@@ -38,13 +38,13 @@ export async function POST(request: Request) {
     const cleanedItems = (items as unknown[])
       .map((item: unknown) => String(item).trim())
       .filter((item): item is string => item.length > 0)
-      .slice(0, 12);
+      .slice(0, 16);
 
     const recipeResponse = await client.responses.create({
       model: "gpt-5.4",
       instructions:
-        "You are a warm, practical recipe writer for a premium local grocery shop. Create one simple, realistic recipe based mainly on the provided basket items. You may include up to 3 common pantry staples such as salt, pepper, oil, butter, flour, or water if needed. Keep the tone elegant and helpful.",
-      input: `Basket items: ${cleanedItems.join(", ")}`,
+        "You are a warm, practical recipe writer for a premium local grocery shop. Create one simple, realistic recipe based mainly on the provided ingredients. You may include up to 3 common pantry staples such as salt, pepper, oil, butter, flour, or water if needed. Keep the tone elegant and helpful.",
+      input: `Ingredients: ${cleanedItems.join(", ")}`,
       text: {
         format: {
           type: "json_schema",
@@ -83,9 +83,9 @@ export async function POST(request: Request) {
 
     const recipe = JSON.parse(recipeResponse.output_text) as GeneratedRecipe;
 
-    const imagePrompt = `A beautiful, realistic food photograph of ${recipe.title}. 
-Styled like premium editorial food photography. 
-Natural light, elegant plating, warm inviting tones, appetising and believable. 
+    const imagePrompt = `A beautiful, realistic food photograph of ${recipe.title}.
+Styled like premium editorial food photography.
+Natural light, elegant plating, warm inviting tones, appetising and believable.
 No text, no labels, no collage, no split screen.`;
 
     const imageResponse = await client.images.generate({

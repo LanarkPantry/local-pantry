@@ -25,6 +25,7 @@ export default function RecipesPage() {
 
   const recipeSectionRef = useRef<HTMLDivElement | null>(null);
 
+  const [customIngredients, setCustomIngredients] = useState("");
   const [generatedRecipe, setGeneratedRecipe] =
     useState<GeneratedRecipe | null>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
@@ -39,10 +40,21 @@ export default function RecipesPage() {
   const sweetRecipes = recipes.filter((recipe) => recipe.category === "sweet");
   const featuredRecipes = recipes.slice(0, 2);
 
+  const typedIngredients = useMemo(() => {
+    return customIngredients
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }, [customIngredients]);
+
+  const allIngredients = useMemo(() => {
+    return Array.from(new Set([...basketIngredients, ...typedIngredients]));
+  }, [basketIngredients, typedIngredients]);
+
   async function handleGenerateRecipe() {
-    if (basketIngredients.length === 0) {
+    if (allIngredients.length === 0) {
       setAiError(
-        "Your basket is empty. Add a few items first, then try again.",
+        "Add some ingredients from your basket, type your own ingredients, or use both.",
       );
       setGeneratedRecipe(null);
       setGeneratedImageUrl(null);
@@ -66,7 +78,7 @@ export default function RecipesPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          items: basketIngredients,
+          items: allIngredients,
         }),
       });
 
@@ -176,12 +188,12 @@ export default function RecipesPage() {
               </p>
 
               <h2 className="mt-2 font-serif text-2xl md:text-3xl">
-                What can I cook from my basket?
+                What can I cook today?
               </h2>
 
               <p className="mt-3 text-sm leading-7 text-[#5f675c] md:text-base">
-                We’ll use the items currently in your basket to suggest one
-                simple recipe idea and an image to go with it.
+                Use the items in your basket, type your own ingredients, or
+                combine both for a recipe idea and image.
               </p>
             </div>
 
@@ -207,6 +219,45 @@ export default function RecipesPage() {
                 </p>
               )}
 
+              <div className="mt-6">
+                <label
+                  htmlFor="custom-ingredients"
+                  className="text-sm font-medium text-[#243328]"
+                >
+                  Ingredients you want to cook with
+                </label>
+                <p className="mt-2 text-sm leading-6 text-[#6b776c]">
+                  Type ingredients separated by commas, for example: carrots,
+                  potatoes, rice
+                </p>
+                <textarea
+                  id="custom-ingredients"
+                  value={customIngredients}
+                  onChange={(e) => setCustomIngredients(e.target.value)}
+                  placeholder="e.g. carrots, potatoes, rice"
+                  rows={4}
+                  className="mt-3 w-full rounded-[20px] border border-[#d6cec2] bg-white px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
+                />
+              </div>
+
+              {allIngredients.length > 0 && (
+                <div className="mt-6">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Ingredients being used
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {allIngredients.map((ingredient) => (
+                      <span
+                        key={ingredient}
+                        className="rounded-full border border-[#d6cec2] bg-[#f9f6f1] px-3 py-1.5 text-sm text-[#4f5e52]"
+                      >
+                        {ingredient}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-5">
                 <button
                   type="button"
@@ -216,7 +267,7 @@ export default function RecipesPage() {
                 >
                   {isGenerating
                     ? "Creating a fresh idea..."
-                    : "Generate recipe from my basket"}
+                    : "Generate recipe idea"}
                 </button>
               </div>
 
