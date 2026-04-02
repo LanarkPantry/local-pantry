@@ -310,9 +310,18 @@ export default function PlannerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f4ec] pb-28 text-[#213128]">
-      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-4 sm:px-6 sm:pt-8">
-        <section className="rounded-[28px] border border-[#dfe6da] bg-white/90 p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] sm:p-6">
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f4ec] pb-28 text-[#213128]">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.12]"
+          style={{ backgroundImage: "url('/hero.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-[rgba(247,244,236,0.86)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(248,245,238,0.80),rgba(244,240,231,0.92))]" />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-6xl px-4 pb-10 pt-4 sm:px-6 sm:pt-8">
+        <section className="rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
@@ -331,7 +340,7 @@ export default function PlannerPage() {
               <div className="flex flex-wrap gap-2">
                 <Link
                   href="/recipes"
-                  className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[#f7f8f4]"
+                  className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
                 >
                   Browse recipes
                 </Link>
@@ -345,7 +354,7 @@ export default function PlannerPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl bg-[#f6f8f3] px-4 py-3">
+              <div className="rounded-2xl bg-[rgba(246,248,243,0.86)] px-4 py-3 backdrop-blur-sm">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
                   Planned
                 </p>
@@ -354,7 +363,7 @@ export default function PlannerPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-[#f6f8f3] px-4 py-3">
+              <div className="rounded-2xl bg-[rgba(246,248,243,0.86)] px-4 py-3 backdrop-blur-sm">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
                   Planner recipes
                 </p>
@@ -363,7 +372,7 @@ export default function PlannerPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-[#f6f8f3] px-4 py-3">
+              <div className="rounded-2xl bg-[rgba(246,248,243,0.86)] px-4 py-3 backdrop-blur-sm">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
                   Saved favourites
                 </p>
@@ -374,14 +383,14 @@ export default function PlannerPage() {
             </div>
 
             {statusMessage ? (
-              <div className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[#fbfcfa] px-3 py-1.5 text-xs text-[#58675e]">
+              <div className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-xs text-[#58675e] backdrop-blur-sm">
                 {statusMessage}
               </div>
             ) : null}
           </div>
         </section>
 
-        <section className="mt-4 rounded-[28px] border border-[#dfe6da] bg-white/90 p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] sm:p-6">
+        <section className="mt-4 rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
@@ -398,7 +407,7 @@ export default function PlannerPage() {
               disabled={!activeRecipe}
               className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-medium transition ${
                 activeRecipe
-                  ? "border border-[#d4dcd0] bg-white text-[#59685f] hover:bg-[#f7f8f4]"
+                  ? "border border-[#d4dcd0] bg-[rgba(255,255,255,0.82)] text-[#59685f] hover:bg-white"
                   : "bg-[#eef2eb] text-[#8a968e]"
               }`}
             >
@@ -423,7 +432,7 @@ export default function PlannerPage() {
                     className={`w-[124px] shrink-0 rounded-2xl border px-3 py-3 text-left transition ${
                       isActive
                         ? "border-[#213128] bg-[#213128] text-white"
-                        : "border-[#dde4d8] bg-[#fbfcfa] text-[#213128] hover:bg-[#f7f8f4]"
+                        : "border-[#dde4d8] bg-[rgba(251,252,250,0.80)] text-[#213128] hover:bg-[rgba(255,255,255,0.92)]"
                     }`}
                   >
                     <p
@@ -443,7 +452,7 @@ export default function PlannerPage() {
           </div>
 
           <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_1.3fr]">
-            <div className="rounded-3xl bg-[#f6f8f3] p-4">
+            <div className="rounded-3xl bg-[rgba(246,248,243,0.84)] p-4 backdrop-blur-sm">
               <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
                 Selected day
               </p>
@@ -466,7 +475,7 @@ export default function PlannerPage() {
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-white px-4 py-6">
+                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-6 backdrop-blur-sm">
                   <p className="text-base font-medium text-[#213128]">
                     Nothing planned yet
                   </p>
@@ -478,7 +487,7 @@ export default function PlannerPage() {
               )}
             </div>
 
-            <div className="rounded-3xl bg-[#fcfcfa] p-4">
+            <div className="rounded-3xl bg-[rgba(252,252,250,0.82)] p-4 backdrop-blur-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
@@ -489,7 +498,7 @@ export default function PlannerPage() {
                   </h3>
                 </div>
 
-                <div className="flex rounded-full bg-[#eef2eb] p-1">
+                <div className="flex rounded-full bg-[rgba(238,242,235,0.9)] p-1">
                   <button
                     type="button"
                     onClick={() => setShowSaved(false)}
@@ -516,7 +525,7 @@ export default function PlannerPage() {
               </div>
 
               {visibleRecipes.length === 0 ? (
-                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-white px-4 py-6">
+                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-6 backdrop-blur-sm">
                   <p className="text-base font-medium text-[#213128]">
                     {showSaved
                       ? "No saved favourites yet"
@@ -537,7 +546,7 @@ export default function PlannerPage() {
                     return (
                       <article
                         key={recipe.id}
-                        className="overflow-hidden rounded-3xl border border-[#e2e8de] bg-white"
+                        className="overflow-hidden rounded-3xl border border-[#e2e8de] bg-[rgba(255,255,255,0.86)] backdrop-blur-sm"
                       >
                         <div className="relative">
                           {image ? (
@@ -584,7 +593,7 @@ export default function PlannerPage() {
                                 className={`inline-flex min-h-[42px] items-center rounded-full px-4 text-sm font-medium transition ${
                                   inPlanner
                                     ? "bg-[#eef2eb] text-[#7d897f]"
-                                    : "border border-[#d5ddd1] bg-white text-[#213128] hover:bg-[#f7f8f4]"
+                                    : "border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] text-[#213128] hover:bg-white"
                                 }`}
                               >
                                 {inPlanner ? "In planner" : "Keep in planner"}
@@ -595,7 +604,7 @@ export default function PlannerPage() {
                                 onClick={() =>
                                   removeRecipeFromPlanner(recipe.id)
                                 }
-                                className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[#f7f8f4]"
+                                className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
                               >
                                 Remove
                               </button>
@@ -611,7 +620,7 @@ export default function PlannerPage() {
           </div>
         </section>
 
-        <section className="mt-4 rounded-[28px] border border-[#dfe6da] bg-white/90 p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] sm:p-6">
+        <section className="mt-4 rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
@@ -644,8 +653,8 @@ export default function PlannerPage() {
                   onClick={() => setSelectedDay(day)}
                   className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
                     selectedDay === day
-                      ? "border-[#213128] bg-[#f7faf6]"
-                      : "border-[#e1e7dd] bg-[#fcfcfa] hover:bg-[#f8faf7]"
+                      ? "border-[#213128] bg-[rgba(247,250,246,0.88)]"
+                      : "border-[#e1e7dd] bg-[rgba(252,252,250,0.82)] hover:bg-[rgba(255,255,255,0.92)]"
                   }`}
                 >
                   <RecipeImage recipe={recipe} compact />
