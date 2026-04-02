@@ -17,9 +17,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const cleanedItems = items
-      .map((item) => String(item).trim())
-      .filter(Boolean)
+    const cleanedItems = (items as unknown[])
+      .map((item: unknown) => String(item).trim())
+      .filter((item): item is string => item.length > 0)
       .slice(0, 12);
 
     const response = await client.responses.create({
@@ -36,12 +36,8 @@ export async function POST(request: Request) {
             type: "object",
             additionalProperties: false,
             properties: {
-              title: {
-                type: "string",
-              },
-              description: {
-                type: "string",
-              },
+              title: { type: "string" },
+              description: { type: "string" },
               ingredientsUsed: {
                 type: "array",
                 items: { type: "string" },
@@ -70,8 +66,18 @@ export async function POST(request: Request) {
     const recipe = JSON.parse(response.output_text);
 
     return NextResponse.json({ recipe });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Recipe generation failed:", error);
+
+    if (error?.status === 429 || error?.code === "insufficient_quota") {
+      return NextResponse.json(
+        {
+          error:
+            "Your AI recipe feature is connected, but your OpenAI API account does not currently have available quota or billing set up yet.",
+        },
+        { status: 429 },
+      );
+    }
 
     return NextResponse.json(
       { error: "Something went wrong while generating the recipe." },
