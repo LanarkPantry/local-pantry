@@ -204,6 +204,13 @@ export default function ShopPage() {
             </Link>
 
             <Link
+              href="/planner"
+              className="shrink-0 text-sm text-[#4f5e52] transition hover:text-[#243328]"
+            >
+              Planner
+            </Link>
+
+            <Link
               href={basketHref}
               className="shrink-0 text-sm text-[#4f5e52] transition hover:text-[#243328]"
             >

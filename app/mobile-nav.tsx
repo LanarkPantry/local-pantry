@@ -22,7 +22,7 @@ export default function MobileNav() {
         <nav className="mx-auto flex max-w-md items-center justify-around px-2 py-3">
           <Link
             href="/"
-            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+            className="flex min-w-[56px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
           >
             <span className="text-lg">🏠</span>
             <span className="text-[11px] font-medium">Home</span>
@@ -30,7 +30,7 @@ export default function MobileNav() {
 
           <Link
             href="/shop"
-            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+            className="flex min-w-[56px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
           >
             <span className="text-lg">🛍️</span>
             <span className="text-[11px] font-medium">Shop</span>
@@ -38,15 +38,23 @@ export default function MobileNav() {
 
           <Link
             href="/recipes"
-            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+            className="flex min-w-[56px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
           >
             <span className="text-lg">🍽️</span>
             <span className="text-[11px] font-medium">Recipes</span>
           </Link>
 
           <Link
+            href="/planner"
+            className="flex min-w-[56px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+          >
+            <span className="text-lg">🗓️</span>
+            <span className="text-[11px] font-medium">Planner</span>
+          </Link>
+
+          <Link
             href="/basket"
-            className="flex min-w-[64px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
+            className="flex min-w-[56px] flex-col items-center gap-1 text-[#4f5e52] transition hover:text-[#243328]"
           >
             <span className="text-lg">🛒</span>
             <span className="text-[11px] font-medium">

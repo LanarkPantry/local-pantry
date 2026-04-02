@@ -289,6 +289,13 @@ Thanks!`,
               </Link>
 
               <Link
+                href="/planner"
+                className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
+              >
+                Planner
+              </Link>
+
+              <Link
                 href="/basket"
                 className="text-sm text-[#243328] underline underline-offset-4"
               >

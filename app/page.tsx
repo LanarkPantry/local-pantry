@@ -67,6 +67,13 @@ export default function HomePage() {
             </Link>
 
             <Link
+              href="/planner"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Planner
+            </Link>
+
+            <Link
               href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
@@ -116,10 +123,10 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/basket"
+                href="/planner"
                 className="rounded-full border border-white/40 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
               >
-                View basket{totalItems > 0 ? ` (${totalItems})` : ""}
+                Plan your week
               </Link>
             </div>
 

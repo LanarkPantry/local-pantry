@@ -495,6 +495,13 @@ export default function RecipesPage() {
             </Link>
 
             <Link
+              href="/planner"
+              className="shrink-0 text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Planner
+            </Link>
+
+            <Link
               href="/basket"
               className="shrink-0 text-sm text-[#4f5e52] hover:text-[#243328]"
             >
