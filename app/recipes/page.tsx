@@ -95,6 +95,7 @@ export default function RecipesPage() {
   }, [cart]);
 
   const recipeSectionRef = useRef<HTMLDivElement | null>(null);
+  const generatedRecipeRef = useRef<HTMLDivElement | null>(null);
 
   const [customIngredients, setCustomIngredients] = useState("");
   const [includeBasketIngredients, setIncludeBasketIngredients] =
@@ -223,6 +224,19 @@ export default function RecipesPage() {
 
     return () => window.clearTimeout(timeout);
   }, [basketMessage]);
+
+  useEffect(() => {
+    if (!generatedRecipe && !aiError) return;
+
+    const timeout = window.setTimeout(() => {
+      generatedRecipeRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 150);
+
+    return () => window.clearTimeout(timeout);
+  }, [generatedRecipe, aiError]);
 
   const isCurrentRecipeSaved = useMemo(() => {
     if (!generatedRecipe) return false;
@@ -374,11 +388,6 @@ export default function RecipesPage() {
 
       setGeneratedRecipe(data.recipe);
       setGeneratedImageUrl(data.imageUrl ?? null);
-
-      recipeSectionRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
     } catch (error) {
       console.error(error);
       setAiError(
@@ -456,11 +465,6 @@ export default function RecipesPage() {
     setSaveMessage("");
     setPlannerMessage("");
     setBasketMessage("");
-
-    recipeSectionRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
   }
 
   function handleAddSavedRecipeToPlanner(recipe: SavedRecipe) {
@@ -841,270 +845,302 @@ export default function RecipesPage() {
               )}
             </div>
 
-            {generatedRecipe && (
-              <div className="mt-6 overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-white">
-                {generatedImageUrl && (
-                  <img
-                    src={generatedImageUrl}
-                    alt={generatedRecipe.title}
-                    className="h-[280px] w-full object-cover md:h-[380px]"
-                  />
-                )}
-
-                <div className="p-6 md:p-8">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
-                    Your recipe
-                  </p>
-
-                  <h3 className="mt-2 font-serif text-2xl md:text-3xl">
-                    {generatedRecipe.title}
-                  </h3>
-
-                  <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5f675c] md:text-base">
-                    {generatedRecipe.description}
-                  </p>
-
-                  <div className="mt-6 grid gap-6 md:grid-cols-2">
-                    <div>
-                      <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
-                        Ingredients used
-                      </h4>
-                      <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
-                        {generatedRecipe.ingredientsUsed.map((item) => (
-                          <li key={item}>• {item}</li>
-                        ))}
-                      </ul>
-
-                      {generatedRecipe.pantryStaples.length > 0 && (
-                        <>
-                          <h4 className="mt-5 text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
-                            Pantry staples
-                          </h4>
-                          <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
-                            {generatedRecipe.pantryStaples.map((item) => (
-                              <li key={item}>• {item}</li>
-                            ))}
-                          </ul>
-                        </>
-                      )}
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
-                        Method
-                      </h4>
-                      <ol className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
-                        {generatedRecipe.steps.map((step, index) => (
-                          <li key={`${index}-${step}`} className="flex gap-3">
-                            <span className="mt-[2px] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-xs">
-                              {index + 1}
-                            </span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ol>
+            <div ref={generatedRecipeRef} className="mt-6 scroll-mt-24">
+              {isGenerating && (
+                <div className="overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-white">
+                  <div className="flex h-[220px] items-center justify-center border-b border-[#ece4d8] bg-[#f8f4ee]">
+                    <div className="text-center">
+                      <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#d6cec2] border-t-[#243328]" />
+                      <p className="mt-4 font-medium text-[#243328]">
+                        Creating your recipe
+                      </p>
+                      <p className="mt-2 text-sm text-[#667164]">
+                        Just a moment — we&apos;re pulling it together.
+                      </p>
                     </div>
                   </div>
 
-                  <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-5">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                      <div className="max-w-2xl">
-                        <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
-                          Shop this recipe
-                        </p>
-                        <h4 className="mt-2 font-serif text-xl md:text-2xl">
-                          Turn this idea into your next basket.
+                  <div className="p-6 md:p-8">
+                    <div className="h-4 w-24 rounded-full bg-[#f1ebe3]" />
+                    <div className="mt-4 h-9 w-3/4 rounded-full bg-[#f1ebe3]" />
+                    <div className="mt-4 space-y-3">
+                      <div className="h-4 w-full rounded-full bg-[#f1ebe3]" />
+                      <div className="h-4 w-11/12 rounded-full bg-[#f1ebe3]" />
+                      <div className="h-4 w-4/5 rounded-full bg-[#f1ebe3]" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {generatedRecipe && (
+                <div className="overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-white">
+                  {generatedImageUrl && (
+                    <img
+                      src={generatedImageUrl}
+                      alt={generatedRecipe.title}
+                      className="h-[280px] w-full object-cover md:h-[380px]"
+                    />
+                  )}
+
+                  <div className="p-6 md:p-8">
+                    <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
+                      Your recipe
+                    </p>
+
+                    <h3 className="mt-2 font-serif text-2xl md:text-3xl">
+                      {generatedRecipe.title}
+                    </h3>
+
+                    <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5f675c] md:text-base">
+                      {generatedRecipe.description}
+                    </p>
+
+                    <div className="mt-6 grid gap-6 md:grid-cols-2">
+                      <div>
+                        <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                          Ingredients used
                         </h4>
-                        <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                          We’ve matched the recipe to products already in your
-                          shop where we can.
-                        </p>
+                        <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
+                          {generatedRecipe.ingredientsUsed.map((item) => (
+                            <li key={item}>• {item}</li>
+                          ))}
+                        </ul>
+
+                        {generatedRecipe.pantryStaples.length > 0 && (
+                          <>
+                            <h4 className="mt-5 text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                              Pantry staples
+                            </h4>
+                            <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
+                              {generatedRecipe.pantryStaples.map((item) => (
+                                <li key={item}>• {item}</li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
                       </div>
 
-                      <div className="rounded-[18px] border border-[#ddd4c8] bg-white px-4 py-3">
-                        <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
-                          Estimated added cost
-                        </p>
-                        <p className="mt-1 font-serif text-2xl text-[#243328]">
-                          £{matchedShopTotal.toFixed(2)}
-                        </p>
+                      <div>
+                        <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                          Method
+                        </h4>
+                        <ol className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
+                          {generatedRecipe.steps.map((step, index) => (
+                            <li key={`${index}-${step}`} className="flex gap-3">
+                              <span className="mt-[2px] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-xs">
+                                {index + 1}
+                              </span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ol>
                       </div>
                     </div>
 
-                    {ingredientBreakdown.availableFromShop.length > 0 ? (
-                      <>
-                        <div className="mt-5 grid gap-3 md:grid-cols-2">
-                          {ingredientBreakdown.availableFromShop.map((item) => (
-                            <div
-                              key={item.productName}
-                              className="rounded-[18px] border border-[#d6cec2] bg-white p-4"
-                            >
-                              <p className="text-sm font-medium text-[#243328]">
-                                {item.productName}
-                              </p>
-                              <p className="mt-1 text-sm text-[#5f675c]">
-                                Matches: {item.ingredient}
-                              </p>
-                              <p className="mt-2 text-sm text-[#5f675c]">
-                                £{item.price.toFixed(2)}
-                              </p>
-                            </div>
-                          ))}
+                    <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-5">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div className="max-w-2xl">
+                          <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
+                            Shop this recipe
+                          </p>
+                          <h4 className="mt-2 font-serif text-xl md:text-2xl">
+                            Turn this idea into your next basket.
+                          </h4>
+                          <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                            We’ve matched the recipe to products already in your
+                            shop where we can.
+                          </p>
                         </div>
 
-                        <div className="mt-5 flex flex-wrap gap-3">
-                          <button
-                            type="button"
-                            onClick={handleAddAvailableItemsToBasket}
-                            className="rounded-full bg-[#243328] px-5 py-2 text-sm text-white transition hover:opacity-90"
-                          >
-                            Add available items to basket
-                          </button>
-
-                          <Link
-                            href="/basket"
-                            className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea]"
-                          >
-                            Review basket
-                          </Link>
+                        <div className="rounded-[18px] border border-[#ddd4c8] bg-white px-4 py-3">
+                          <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                            Estimated added cost
+                          </p>
+                          <p className="mt-1 font-serif text-2xl text-[#243328]">
+                            £{matchedShopTotal.toFixed(2)}
+                          </p>
                         </div>
-                      </>
-                    ) : (
-                      <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-white p-4">
-                        <p className="text-sm leading-6 text-[#5f675c]">
-                          We couldn’t find direct shop matches for this recipe
-                          just yet, but you can still use the ingredient list as
-                          a guide for your next order.
-                        </p>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="mt-6 grid gap-4 md:grid-cols-3">
-                    <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
-                      <p className="text-sm font-medium text-[#243328]">
-                        You already have
-                      </p>
-
-                      {ingredientBreakdown.alreadyHave.length > 0 ? (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {ingredientBreakdown.alreadyHave.map((item) => (
-                            <span
-                              key={item}
-                              className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
-                            >
-                              {item}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="mt-3 text-sm leading-6 text-[#6b776c]">
-                          Nothing in this recipe appears to be in your basket
-                          yet.
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
-                      <p className="text-sm font-medium text-[#243328]">
-                        Available from our shop
-                      </p>
 
                       {ingredientBreakdown.availableFromShop.length > 0 ? (
-                        <div className="mt-3 space-y-2">
-                          {ingredientBreakdown.availableFromShop.map((item) => (
-                            <div
-                              key={item.productName}
-                              className="rounded-[16px] border border-[#d6cec2] bg-white px-3 py-3"
+                        <>
+                          <div className="mt-5 grid gap-3 md:grid-cols-2">
+                            {ingredientBreakdown.availableFromShop.map(
+                              (item) => (
+                                <div
+                                  key={item.productName}
+                                  className="rounded-[18px] border border-[#d6cec2] bg-white p-4"
+                                >
+                                  <p className="text-sm font-medium text-[#243328]">
+                                    {item.productName}
+                                  </p>
+                                  <p className="mt-1 text-sm text-[#5f675c]">
+                                    Matches: {item.ingredient}
+                                  </p>
+                                  <p className="mt-2 text-sm text-[#5f675c]">
+                                    £{item.price.toFixed(2)}
+                                  </p>
+                                </div>
+                              ),
+                            )}
+                          </div>
+
+                          <div className="mt-5 flex flex-wrap gap-3">
+                            <button
+                              type="button"
+                              onClick={handleAddAvailableItemsToBasket}
+                              className="rounded-full bg-[#243328] px-5 py-2 text-sm text-white transition hover:opacity-90"
                             >
-                              <p className="text-sm font-medium text-[#243328]">
-                                {item.productName}
-                              </p>
-                              <p className="mt-1 text-sm text-[#5f675c]">
-                                Matches: {item.ingredient}
-                              </p>
-                              <p className="mt-1 text-sm text-[#5f675c]">
-                                £{item.price.toFixed(2)}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
+                              Add available items to basket
+                            </button>
+
+                            <Link
+                              href="/basket"
+                              className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea]"
+                            >
+                              Review basket
+                            </Link>
+                          </div>
+                        </>
                       ) : (
-                        <p className="mt-3 text-sm leading-6 text-[#6b776c]">
-                          We couldn’t find a direct shop match for the remaining
-                          ingredients this time.
-                        </p>
+                        <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-white p-4">
+                          <p className="text-sm leading-6 text-[#5f675c]">
+                            We couldn’t find direct shop matches for this recipe
+                            just yet, but you can still use the ingredient list
+                            as a guide for your next order.
+                          </p>
+                        </div>
                       )}
                     </div>
 
-                    <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
-                      <p className="text-sm font-medium text-[#243328]">
-                        Still need elsewhere
-                      </p>
+                    <div className="mt-6 grid gap-4 md:grid-cols-3">
+                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                        <p className="text-sm font-medium text-[#243328]">
+                          You already have
+                        </p>
 
-                      {ingredientBreakdown.stillNeedElsewhere.length > 0 ? (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {ingredientBreakdown.stillNeedElsewhere.map(
-                            (item) => (
+                        {ingredientBreakdown.alreadyHave.length > 0 ? (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {ingredientBreakdown.alreadyHave.map((item) => (
                               <span
                                 key={item}
                                 className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
                               >
                                 {item}
                               </span>
-                            ),
-                          )}
-                        </div>
-                      ) : (
-                        <p className="mt-3 text-sm leading-6 text-[#6b776c]">
-                          You’re in good shape for this one.
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="mt-3 text-sm leading-6 text-[#6b776c]">
+                            Nothing in this recipe appears to be in your basket
+                            yet.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                        <p className="text-sm font-medium text-[#243328]">
+                          Available from our shop
                         </p>
-                      )}
+
+                        {ingredientBreakdown.availableFromShop.length > 0 ? (
+                          <div className="mt-3 space-y-2">
+                            {ingredientBreakdown.availableFromShop.map(
+                              (item) => (
+                                <div
+                                  key={item.productName}
+                                  className="rounded-[16px] border border-[#d6cec2] bg-white px-3 py-3"
+                                >
+                                  <p className="text-sm font-medium text-[#243328]">
+                                    {item.productName}
+                                  </p>
+                                  <p className="mt-1 text-sm text-[#5f675c]">
+                                    Matches: {item.ingredient}
+                                  </p>
+                                  <p className="mt-1 text-sm text-[#5f675c]">
+                                    £{item.price.toFixed(2)}
+                                  </p>
+                                </div>
+                              ),
+                            )}
+                          </div>
+                        ) : (
+                          <p className="mt-3 text-sm leading-6 text-[#6b776c]">
+                            We couldn’t find a direct shop match for the
+                            remaining ingredients this time.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                        <p className="text-sm font-medium text-[#243328]">
+                          Still need elsewhere
+                        </p>
+
+                        {ingredientBreakdown.stillNeedElsewhere.length > 0 ? (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {ingredientBreakdown.stillNeedElsewhere.map(
+                              (item) => (
+                                <span
+                                  key={item}
+                                  className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
+                                >
+                                  {item}
+                                </span>
+                              ),
+                            )}
+                          </div>
+                        ) : (
+                          <p className="mt-3 text-sm leading-6 text-[#6b776c]">
+                            You’re in good shape for this one.
+                          </p>
+                        )}
+                      </div>
                     </div>
+
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={handleGenerateRecipe}
+                        disabled={isGenerating}
+                        className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isGenerating ? "Creating..." : "Try another idea"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveFavourite}
+                        disabled={isCurrentRecipeSaved}
+                        className="rounded-full bg-[#dde7d8] px-5 py-2 text-sm text-[#243328] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isCurrentRecipeSaved
+                          ? "Already saved"
+                          : "Save to favourites"}
+                      </button>
+                    </div>
+
+                    {saveMessage && (
+                      <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                        {saveMessage}
+                      </div>
+                    )}
+
+                    {plannerMessage && (
+                      <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                        {plannerMessage}
+                      </div>
+                    )}
+
+                    {basketMessage && (
+                      <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                        {basketMessage}
+                      </div>
+                    )}
                   </div>
-
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={handleGenerateRecipe}
-                      disabled={isGenerating}
-                      className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isGenerating ? "Creating..." : "Try another idea"}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleSaveFavourite}
-                      disabled={isCurrentRecipeSaved}
-                      className="rounded-full bg-[#dde7d8] px-5 py-2 text-sm text-[#243328] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isCurrentRecipeSaved
-                        ? "Already saved"
-                        : "Save to favourites"}
-                    </button>
-                  </div>
-
-                  {saveMessage && (
-                    <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                      {saveMessage}
-                    </div>
-                  )}
-
-                  {plannerMessage && (
-                    <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                      {plannerMessage}
-                    </div>
-                  )}
-
-                  {basketMessage && (
-                    <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                      {basketMessage}
-                    </div>
-                  )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </section>
