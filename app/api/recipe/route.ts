@@ -9,6 +9,15 @@ type GeneratedRecipe = {
   steps: string[];
 };
 
+const quickStartPromptMap: Record<string, string> = {
+  "quick-tonight":
+    "Keep it especially quick and straightforward, ideally something that feels realistic for a weeknight and avoids unnecessary steps.",
+  comforting:
+    "Lean into something warm, cosy, satisfying, and comforting, while still feeling elegant and believable.",
+  "use-what-ive-got":
+    "Prioritise making the most of the provided ingredients and minimise extra additions or waste.",
+};
+
 export async function POST(request: Request) {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -27,6 +36,14 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const items = Array.isArray(body.items) ? body.items : [];
+    const quickStart =
+      typeof body.quickStart === "string" ? body.quickStart : "";
+    const preferences = Array.isArray(body.preferences)
+      ? body.preferences
+          .map((item: unknown) => String(item).trim())
+          .filter((item: string) => item.length > 0)
+          .slice(0, 8)
+      : [];
 
     if (items.length === 0) {
       return NextResponse.json(
@@ -40,11 +57,30 @@ export async function POST(request: Request) {
       .filter((item): item is string => item.length > 0)
       .slice(0, 16);
 
+    const quickStartInstruction = quickStartPromptMap[quickStart] ?? "";
+    const preferencesInstruction =
+      preferences.length > 0
+        ? `Respect these user preferences where reasonably possible: ${preferences.join(", ")}.`
+        : "";
+
     const recipeResponse = await client.responses.create({
       model: "gpt-5.4",
-      instructions:
-        "You are a warm, practical recipe writer for a premium local grocery shop. Create one simple, realistic recipe based mainly on the provided ingredients. You may include up to 3 common pantry staples such as salt, pepper, oil, butter, flour, or water if needed. Keep the tone elegant and helpful.",
-      input: `Ingredients: ${cleanedItems.join(", ")}`,
+      instructions: `
+You are a warm, practical recipe writer for a premium local grocery shop.
+
+Create one simple, realistic recipe based mainly on the provided ingredients.
+You may include up to 3 common pantry staples such as salt, pepper, oil, butter, flour, or water if needed.
+Keep the tone elegant, calm, and helpful.
+Make the recipe feel useful for a real customer, not like a chef demo.
+Avoid overly complicated techniques or niche ingredients.
+${quickStartInstruction}
+${preferencesInstruction}
+      `.trim(),
+      input: `
+Ingredients: ${cleanedItems.join(", ")}
+Quick start style: ${quickStart || "none"}
+Preferences: ${preferences.length > 0 ? preferences.join(", ") : "none"}
+      `.trim(),
       text: {
         format: {
           type: "json_schema",
