@@ -26,8 +26,21 @@ type SavedRecipe = {
   savedAt: string;
 };
 
+type PlannerRecipe = {
+  id: string;
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+  pantryStaples: string[];
+  steps: string[];
+  imageUrl: string | null;
+  savedAt: string;
+  addedToPlannerAt: string;
+};
+
 const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
 const PREFERENCES_STORAGE_KEY = "tlp_recipe_preferences";
+const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
 
 const quickStartOptions = [
   {
@@ -94,7 +107,9 @@ export default function RecipesPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiError, setAiError] = useState("");
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
+  const [plannerRecipes, setPlannerRecipes] = useState<PlannerRecipe[]>([]);
   const [saveMessage, setSaveMessage] = useState("");
+  const [plannerMessage, setPlannerMessage] = useState("");
   const [selectedQuickStart, setSelectedQuickStart] = useState<string>("");
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
   const [basketMessage, setBasketMessage] = useState("");
@@ -136,6 +151,26 @@ export default function RecipesPage() {
     }
 
     try {
+      const storedPlannerRecipes = localStorage.getItem(
+        PLANNER_RECIPES_STORAGE_KEY,
+      );
+
+      if (!storedPlannerRecipes) {
+        setPlannerRecipes([]);
+      } else {
+        const parsedPlannerRecipes = JSON.parse(
+          storedPlannerRecipes,
+        ) as PlannerRecipe[];
+        setPlannerRecipes(
+          Array.isArray(parsedPlannerRecipes) ? parsedPlannerRecipes : [],
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load planner recipes:", error);
+      setPlannerRecipes([]);
+    }
+
+    try {
       const storedPreferences = localStorage.getItem(PREFERENCES_STORAGE_KEY);
 
       if (!storedPreferences) {
@@ -168,6 +203,16 @@ export default function RecipesPage() {
 
     return () => window.clearTimeout(timeout);
   }, [saveMessage]);
+
+  useEffect(() => {
+    if (!plannerMessage) return;
+
+    const timeout = window.setTimeout(() => {
+      setPlannerMessage("");
+    }, 2500);
+
+    return () => window.clearTimeout(timeout);
+  }, [plannerMessage]);
 
   useEffect(() => {
     if (!basketMessage) return;
@@ -304,6 +349,7 @@ export default function RecipesPage() {
       setIsGenerating(true);
       setAiError("");
       setSaveMessage("");
+      setPlannerMessage("");
       setBasketMessage("");
       setGeneratedRecipe(null);
       setGeneratedImageUrl(null);
@@ -386,6 +432,15 @@ export default function RecipesPage() {
       FAVOURITES_STORAGE_KEY,
       JSON.stringify(updatedRecipes),
     );
+
+    const updatedPlannerRecipes = plannerRecipes.filter(
+      (recipe) => recipe.id !== recipeId,
+    );
+    setPlannerRecipes(updatedPlannerRecipes);
+    localStorage.setItem(
+      PLANNER_RECIPES_STORAGE_KEY,
+      JSON.stringify(updatedPlannerRecipes),
+    );
   }
 
   function handleOpenSavedRecipe(recipe: SavedRecipe) {
@@ -399,12 +454,39 @@ export default function RecipesPage() {
     setGeneratedImageUrl(recipe.imageUrl);
     setAiError("");
     setSaveMessage("");
+    setPlannerMessage("");
     setBasketMessage("");
 
     recipeSectionRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
+  }
+
+  function handleAddSavedRecipeToPlanner(recipe: SavedRecipe) {
+    const alreadyAdded = plannerRecipes.some((item) => item.id === recipe.id);
+
+    if (alreadyAdded) {
+      setPlannerMessage("That recipe is already ready in your planner.");
+      return;
+    }
+
+    const plannerRecipe: PlannerRecipe = {
+      ...recipe,
+      addedToPlannerAt: new Date().toISOString(),
+    };
+
+    const updatedPlannerRecipes = [plannerRecipe, ...plannerRecipes];
+    setPlannerRecipes(updatedPlannerRecipes);
+    localStorage.setItem(
+      PLANNER_RECIPES_STORAGE_KEY,
+      JSON.stringify(updatedPlannerRecipes),
+    );
+    setPlannerMessage("Added to planner.");
+  }
+
+  function isRecipeInPlanner(recipeId: string) {
+    return plannerRecipes.some((recipe) => recipe.id === recipeId);
   }
 
   function togglePreference(preference: string) {
@@ -1009,6 +1091,12 @@ export default function RecipesPage() {
                     </div>
                   )}
 
+                  {plannerMessage && (
+                    <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                      {plannerMessage}
+                    </div>
+                  )}
+
                   {basketMessage && (
                     <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
                       {basketMessage}
@@ -1099,6 +1187,17 @@ export default function RecipesPage() {
 
                       <button
                         type="button"
+                        onClick={() => handleAddSavedRecipeToPlanner(recipe)}
+                        disabled={isRecipeInPlanner(recipe.id)}
+                        className="rounded-full bg-[#dde7d8] px-5 py-2 text-sm text-[#243328] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isRecipeInPlanner(recipe.id)
+                          ? "In planner"
+                          : "Add to planner"}
+                      </button>
+
+                      <button
+                        type="button"
                         onClick={() => handleRemoveFavourite(recipe.id)}
                         className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea]"
                       >
@@ -1108,6 +1207,12 @@ export default function RecipesPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {plannerMessage && (
+            <div className="mt-6 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+              {plannerMessage}
             </div>
           )}
         </div>

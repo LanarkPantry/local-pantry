@@ -14,6 +14,18 @@ type SavedRecipe = {
   savedAt: string;
 };
 
+type PlannerRecipe = {
+  id: string;
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+  pantryStaples: string[];
+  steps: string[];
+  imageUrl: string | null;
+  savedAt: string;
+  addedToPlannerAt: string;
+};
+
 type PlannedMeal = {
   day: string;
   recipeId: string;
@@ -23,6 +35,7 @@ type PlannedMeal = {
 };
 
 const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
+const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
 const WEEKLY_PLANNER_STORAGE_KEY = "tlp_weekly_planner_meals";
 
 const WEEK_DAYS = [
@@ -37,6 +50,7 @@ const WEEK_DAYS = [
 
 export default function PlannerPage() {
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
+  const [plannerRecipes, setPlannerRecipes] = useState<PlannerRecipe[]>([]);
   const [plannedMeals, setPlannedMeals] = useState<PlannedMeal[]>([]);
   const [selectedRecipeByDay, setSelectedRecipeByDay] = useState<
     Record<string, string>
@@ -55,6 +69,26 @@ export default function PlannerPage() {
     } catch (error) {
       console.error("Failed to load saved recipes for planner:", error);
       setSavedRecipes([]);
+    }
+
+    try {
+      const storedPlannerRecipes = localStorage.getItem(
+        PLANNER_RECIPES_STORAGE_KEY,
+      );
+
+      if (!storedPlannerRecipes) {
+        setPlannerRecipes([]);
+      } else {
+        const parsedPlannerRecipes = JSON.parse(
+          storedPlannerRecipes,
+        ) as PlannerRecipe[];
+        setPlannerRecipes(
+          Array.isArray(parsedPlannerRecipes) ? parsedPlannerRecipes : [],
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load planner-ready recipes:", error);
+      setPlannerRecipes([]);
     }
 
     try {
@@ -85,6 +119,17 @@ export default function PlannerPage() {
     );
   }, [plannedMeals]);
 
+  const plannerChoices = useMemo(() => {
+    if (plannerRecipes.length > 0) {
+      return plannerRecipes;
+    }
+
+    return savedRecipes.map((recipe) => ({
+      ...recipe,
+      addedToPlannerAt: recipe.savedAt,
+    }));
+  }, [plannerRecipes, savedRecipes]);
+
   const plannedCount = plannedMeals.length;
 
   const mealsByDay = useMemo(() => {
@@ -99,7 +144,7 @@ export default function PlannerPage() {
 
     if (!selectedRecipeId) return;
 
-    const recipe = savedRecipes.find((item) => item.id === selectedRecipeId);
+    const recipe = plannerChoices.find((item) => item.id === selectedRecipeId);
 
     if (!recipe) return;
 
@@ -123,6 +168,22 @@ export default function PlannerPage() {
 
   function removeMealFromDay(day: string) {
     const updatedMeals = plannedMeals.filter((item) => item.day !== day);
+    setPlannedMeals(updatedMeals);
+  }
+
+  function removePlannerRecipe(recipeId: string) {
+    const updatedPlannerRecipes = plannerRecipes.filter(
+      (recipe) => recipe.id !== recipeId,
+    );
+    setPlannerRecipes(updatedPlannerRecipes);
+    localStorage.setItem(
+      PLANNER_RECIPES_STORAGE_KEY,
+      JSON.stringify(updatedPlannerRecipes),
+    );
+
+    const updatedMeals = plannedMeals.filter(
+      (meal) => meal.recipeId !== recipeId,
+    );
     setPlannedMeals(updatedMeals);
   }
 
@@ -190,8 +251,8 @@ export default function PlannerPage() {
             Weekly planner
           </h1>
           <p className="mt-3 text-sm leading-6 text-[#667164] md:text-base">
-            Build a simple week of meals from your saved favourites, then turn
-            it into a more thoughtful, shop-ready routine over time.
+            Bring together the recipes you want to cook this week, then shape
+            them into a calm, realistic meal plan.
           </p>
         </div>
 
@@ -200,24 +261,22 @@ export default function PlannerPage() {
             <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-6">
               <div className="rounded-2xl border border-[#e5ddcf] bg-white p-4 md:p-6">
                 <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
-                  Saved favourites
+                  Ready for planning
                 </p>
-                <h2 className="mt-2 font-serif text-3xl">
-                  Recipes to plan with
-                </h2>
+                <h2 className="mt-2 font-serif text-3xl">Planner recipes</h2>
                 <p className="mt-3 text-sm leading-6 text-[#667164]">
-                  Choose from recipes you have already saved on the recipes
-                  page.
+                  Add favourites from the recipes page, then use them here to
+                  shape your week more easily.
                 </p>
 
-                {savedRecipes.length === 0 ? (
+                {plannerChoices.length === 0 ? (
                   <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-5">
                     <p className="text-sm font-medium text-[#243328]">
-                      No saved favourites yet
+                      Nothing in your planner yet
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Save a few recipe ideas first, then come back here to plan
-                      your week.
+                      Go to recipes, save a few ideas you like, and add them to
+                      your planner.
                     </p>
 
                     <Link
@@ -229,35 +288,64 @@ export default function PlannerPage() {
                   </div>
                 ) : (
                   <div className="mt-5 space-y-4">
-                    {savedRecipes.map((recipe) => (
-                      <div
-                        key={recipe.id}
-                        className="rounded-2xl border border-[#e7dfd3] bg-[#fbfaf8] p-4"
-                      >
-                        <div className="flex items-start gap-4">
-                          {recipe.imageUrl ? (
-                            <img
-                              src={recipe.imageUrl}
-                              alt={recipe.title}
-                              className="h-20 w-20 rounded-2xl object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-[#ddd4c8] bg-white text-2xl">
-                              🍽️
-                            </div>
-                          )}
+                    {plannerChoices.map((recipe) => {
+                      const isExplicitPlannerRecipe = plannerRecipes.some(
+                        (item) => item.id === recipe.id,
+                      );
 
-                          <div className="min-w-0 flex-1">
-                            <h3 className="text-base font-medium text-[#243328]">
-                              {recipe.title}
-                            </h3>
-                            <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#667164]">
-                              {recipe.description}
-                            </p>
+                      return (
+                        <div
+                          key={recipe.id}
+                          className="rounded-2xl border border-[#e7dfd3] bg-[#fbfaf8] p-4"
+                        >
+                          <div className="flex items-start gap-4">
+                            {recipe.imageUrl ? (
+                              <img
+                                src={recipe.imageUrl}
+                                alt={recipe.title}
+                                className="h-20 w-20 rounded-2xl object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-[#ddd4c8] bg-white text-2xl">
+                                🍽️
+                              </div>
+                            )}
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="text-base font-medium text-[#243328]">
+                                  {recipe.title}
+                                </h3>
+
+                                {isExplicitPlannerRecipe && (
+                                  <span className="rounded-full border border-[#ddd4c8] bg-white px-3 py-1 text-[11px] text-[#5f675c]">
+                                    Added from recipes
+                                  </span>
+                                )}
+                              </div>
+
+                              <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#667164]">
+                                {recipe.description}
+                              </p>
+
+                              {isExplicitPlannerRecipe && (
+                                <div className="mt-3">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      removePlannerRecipe(recipe.id)
+                                    }
+                                    className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
+                                  >
+                                    Remove from planner list
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -343,8 +431,8 @@ export default function PlannerPage() {
                             }
                             className="w-full rounded-2xl border border-[#ddd4c8] bg-white px-4 py-3 text-sm text-[#243328] outline-none transition focus:border-[#314534]"
                           >
-                            <option value="">Choose a saved recipe</option>
-                            {savedRecipes.map((recipe) => (
+                            <option value="">Choose a planner recipe</option>
+                            {plannerChoices.map((recipe) => (
                               <option key={recipe.id} value={recipe.id}>
                                 {recipe.title}
                               </option>
