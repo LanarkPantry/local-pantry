@@ -53,8 +53,15 @@ function safeWrite<T>(key: string, value: T) {
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // Fail silently for beginner-safe behaviour.
+    // silent on purpose
   }
+}
+
+function buildEmptyWeek(): WeeklyMeals {
+  return DAYS.reduce((acc, day) => {
+    acc[day] = null;
+    return acc;
+  }, {} as WeeklyMeals);
 }
 
 function toId(value: unknown, fallback: string) {
@@ -114,26 +121,69 @@ function normalizeRecipe(recipe: any, index: number): RecipeLike {
   };
 }
 
-function buildEmptyWeek(): WeeklyMeals {
-  return DAYS.reduce((acc, day) => {
-    acc[day] = null;
-    return acc;
-  }, {} as WeeklyMeals);
-}
-
 function truncate(text: string, limit: number) {
   if (!text) return "";
   if (text.length <= limit) return text;
   return `${text.slice(0, limit).trim()}…`;
 }
 
+function getRecipeImage(recipe?: RecipeLike | null) {
+  if (!recipe) return "";
+  return recipe.imageUrl || recipe.image || "";
+}
+
+function getInitials(title: string) {
+  const words = title.split(" ").filter(Boolean);
+  return words
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase() || "")
+    .join("");
+}
+
+function RecipeImage({
+  recipe,
+  compact = false,
+}: {
+  recipe?: RecipeLike | null;
+  compact?: boolean;
+}) {
+  const image = getRecipeImage(recipe);
+
+  if (image) {
+    return (
+      <div
+        className={`overflow-hidden rounded-2xl bg-[#e8eee5] ${
+          compact ? "h-14 w-14" : "h-28 w-full"
+        }`}
+      >
+        <img
+          src={image}
+          alt={recipe?.title || "Recipe"}
+          className="h-full w-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`flex items-center justify-center rounded-2xl bg-[#dde6d8] text-[#516254] ${
+        compact
+          ? "h-14 w-14 text-sm font-semibold"
+          : "h-28 w-full text-lg font-semibold"
+      }`}
+    >
+      {recipe?.title ? getInitials(recipe.title) : "TLP"}
+    </div>
+  );
+}
+
 export default function PlannerPage() {
   const [savedRecipes, setSavedRecipes] = useState<RecipeLike[]>([]);
   const [plannerRecipes, setPlannerRecipes] = useState<RecipeLike[]>([]);
   const [weeklyMeals, setWeeklyMeals] = useState<WeeklyMeals>(buildEmptyWeek());
-  const [selectedByDay, setSelectedByDay] = useState<Record<string, string>>(
-    {},
-  );
+  const [selectedDay, setSelectedDay] = useState<string>("Monday");
+  const [showSaved, setShowSaved] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
@@ -158,6 +208,11 @@ export default function PlannerPage() {
     setSavedRecipes(normalisedSaved);
     setPlannerRecipes(normalisedPlanner);
     setWeeklyMeals(cleanedWeek);
+
+    const firstUnplanned = DAYS.find((day) => !cleanedWeek[day]);
+    if (firstUnplanned) {
+      setSelectedDay(firstUnplanned);
+    }
   }, []);
 
   useEffect(() => {
@@ -180,7 +235,7 @@ export default function PlannerPage() {
     return map;
   }, [savedRecipes, plannerRecipes]);
 
-  const plannerIds = useMemo(
+  const plannerRecipeIds = useMemo(
     () => new Set(plannerRecipes.map((recipe) => recipe.id)),
     [plannerRecipes],
   );
@@ -189,19 +244,11 @@ export default function PlannerPage() {
     return DAYS.filter((day) => Boolean(weeklyMeals[day])).length;
   }, [weeklyMeals]);
 
-  const unplannedDays = DAYS.filter((day) => !weeklyMeals[day]);
+  const activeRecipe = weeklyMeals[selectedDay]
+    ? recipesById.get(weeklyMeals[selectedDay] as string) || null
+    : null;
 
-  const weekRecipes = useMemo(() => {
-    const ids = DAYS.map((day) => weeklyMeals[day]).filter(
-      (value): value is string => Boolean(value),
-    );
-
-    const uniqueIds = Array.from(new Set(ids));
-
-    return uniqueIds
-      .map((id) => recipesById.get(id))
-      .filter((recipe): recipe is RecipeLike => Boolean(recipe));
-  }, [weeklyMeals, recipesById]);
+  const visibleRecipes = showSaved ? savedRecipes : plannerRecipes;
 
   function persistPlannerRecipes(next: RecipeLike[]) {
     setPlannerRecipes(next);
@@ -214,14 +261,35 @@ export default function PlannerPage() {
   }
 
   function addRecipeToPlanner(recipe: RecipeLike) {
-    if (plannerIds.has(recipe.id)) {
-      setStatusMessage("Already in planner recipes");
+    if (plannerRecipeIds.has(recipe.id)) {
+      setStatusMessage("Already in planner");
       return;
     }
 
     const next = [recipe, ...plannerRecipes];
     persistPlannerRecipes(next);
+    setShowSaved(false);
     setStatusMessage("Added to planner");
+  }
+
+  function assignRecipeToSelectedDay(recipe: RecipeLike) {
+    const next = {
+      ...weeklyMeals,
+      [selectedDay]: recipe.id,
+    };
+
+    persistWeeklyMeals(next);
+    setStatusMessage(`${recipe.title} added to ${selectedDay}`);
+  }
+
+  function clearSelectedDay() {
+    const next = {
+      ...weeklyMeals,
+      [selectedDay]: null,
+    };
+
+    persistWeeklyMeals(next);
+    setStatusMessage(`${selectedDay} cleared`);
   }
 
   function removeRecipeFromPlanner(recipeId: string) {
@@ -241,393 +309,357 @@ export default function PlannerPage() {
     setStatusMessage("Removed from planner");
   }
 
-  function assignRecipeToDay(day: string) {
-    const chosenId = selectedByDay[day];
-    if (!chosenId) return;
-
-    const next = {
-      ...weeklyMeals,
-      [day]: chosenId,
-    };
-
-    persistWeeklyMeals(next);
-    setStatusMessage(`Saved for ${day}`);
-  }
-
-  function clearDay(day: string) {
-    const next = {
-      ...weeklyMeals,
-      [day]: null,
-    };
-
-    persistWeeklyMeals(next);
-    setStatusMessage(`${day} cleared`);
-  }
-
-  function clearWholeWeek() {
-    persistWeeklyMeals(buildEmptyWeek());
-    setStatusMessage("Week cleared");
-  }
-
   return (
     <main className="min-h-screen bg-[#f7f4ec] pb-28 text-[#213128]">
-      <div className="mx-auto flex w-full max-w-6xl flex-col px-4 pb-10 pt-5 sm:px-6 sm:pt-8">
-        <div className="mb-5">
-          <p className="mb-2 text-[11px] uppercase tracking-[0.22em] text-[#6a7b70]">
-            Plan your week
-          </p>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h1 className="text-3xl font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-4xl">
-                Weekly planner
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#55645b] sm:text-base">
-                Keep the week feeling calm. Choose a few meals you actually want
-                to cook, place them where they fit, and keep your next shop in
-                sight.
-              </p>
-            </div>
-
-            {statusMessage ? (
-              <div className="hidden rounded-full border border-[#d8dfd3] bg-white px-3 py-1.5 text-xs text-[#536257] sm:block">
-                {statusMessage}
-              </div>
-            ) : null}
-          </div>
-
-          {statusMessage ? (
-            <div className="mt-3 inline-flex rounded-full border border-[#d8dfd3] bg-white px-3 py-1.5 text-xs text-[#536257] sm:hidden">
-              {statusMessage}
-            </div>
-          ) : null}
-        </div>
-
-        <section className="mb-5 rounded-3xl border border-[#dde4d8] bg-white/90 p-4 shadow-[0_8px_30px_rgba(31,43,36,0.04)] sm:p-5">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl bg-[#f6f8f3] p-4">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-[#738276]">
-                This week
-              </p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#213128]">
-                {plannedCount}/7
-              </p>
-              <p className="mt-1 text-sm text-[#5c6b62]">
-                meals placed into the week
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-[#f6f8f3] p-4">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-[#738276]">
-                Planner recipes
-              </p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#213128]">
-                {plannerRecipes.length}
-              </p>
-              <p className="mt-1 text-sm text-[#5c6b62]">
-                ready to drop into a day
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-[#f6f8f3] p-4">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-[#738276]">
-                Still open
-              </p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#213128]">
-                {unplannedDays.length}
-              </p>
-              <p className="mt-1 text-sm text-[#5c6b62]">days left flexible</p>
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link
-              href="/recipes"
-              className="inline-flex items-center rounded-full bg-[#213128] px-4 py-2 text-sm font-medium text-white transition hover:opacity-95"
-            >
-              Browse recipes
-            </Link>
-            <Link
-              href="/shop"
-              className="inline-flex items-center rounded-full border border-[#cfd8c9] bg-white px-4 py-2 text-sm font-medium text-[#213128] transition hover:bg-[#f7f8f4]"
-            >
-              Browse shop
-            </Link>
-            <button
-              type="button"
-              onClick={clearWholeWeek}
-              className="inline-flex items-center rounded-full border border-transparent px-4 py-2 text-sm font-medium text-[#66766b] transition hover:bg-[#f3f5f1]"
-            >
-              Clear week
-            </button>
-          </div>
-        </section>
-
-        <section className="mb-5 rounded-3xl border border-[#dde4d8] bg-white/90 p-4 shadow-[0_8px_30px_rgba(31,43,36,0.04)] sm:p-5">
-          <div className="mb-3 flex items-end justify-between gap-3">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#738276]">
-                Quick start
-              </p>
-              <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                Add favourites into the planner
-              </h2>
-            </div>
-            {savedRecipes.length > 0 ? (
-              <span className="text-xs text-[#66766b]">
-                {savedRecipes.length} saved
-              </span>
-            ) : null}
-          </div>
-
-          {savedRecipes.length === 0 ? (
-            <div className="rounded-2xl bg-[#f7f8f4] p-4">
-              <p className="text-sm leading-6 text-[#59685f]">
-                You have no saved favourites yet. Start in Recipes, save a few
-                ideas you love, then they will show up here ready for the week.
-              </p>
-              <Link
-                href="/recipes"
-                className="mt-3 inline-flex items-center rounded-full bg-[#213128] px-4 py-2 text-sm font-medium text-white"
-              >
-                Go to recipes
-              </Link>
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {savedRecipes.slice(0, 6).map((recipe) => {
-                const alreadyAdded = plannerIds.has(recipe.id);
-
-                return (
-                  <article
-                    key={recipe.id}
-                    className="rounded-2xl border border-[#e3e8df] bg-[#fcfcfa] p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="text-base font-medium leading-6 text-[#213128]">
-                          {recipe.title}
-                        </h3>
-                        <p className="mt-1 text-sm leading-6 text-[#627168]">
-                          {recipe.description
-                            ? truncate(recipe.description, 92)
-                            : "A saved idea ready to use this week."}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => addRecipeToPlanner(recipe)}
-                        disabled={alreadyAdded}
-                        className={`inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition ${
-                          alreadyAdded
-                            ? "cursor-default bg-[#eef2eb] text-[#6a786f]"
-                            : "bg-[#213128] text-white hover:opacity-95"
-                        }`}
-                      >
-                        {alreadyAdded ? "In planner" : "Add to planner"}
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        <section className="mb-5 rounded-3xl border border-[#dde4d8] bg-white/90 p-4 shadow-[0_8px_30px_rgba(31,43,36,0.04)] sm:p-5">
-          <div className="mb-3 flex items-end justify-between gap-3">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#738276]">
-                Ready for planning
-              </p>
-              <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                Planner recipes
-              </h2>
-            </div>
-            <span className="text-xs text-[#66766b]">
-              {plannerRecipes.length} available
-            </span>
-          </div>
-
-          {plannerRecipes.length === 0 ? (
-            <div className="rounded-2xl bg-[#f7f8f4] p-4">
-              <p className="text-sm leading-6 text-[#59685f]">
-                Nothing in your planner yet. Add a few saved favourites above,
-                then place them into the week below.
-              </p>
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {plannerRecipes.map((recipe) => (
-                <article
-                  key={recipe.id}
-                  className="rounded-2xl border border-[#e3e8df] bg-[#fcfcfa] p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-base font-medium leading-6 text-[#213128]">
-                        {recipe.title}
-                      </h3>
-                      <p className="mt-1 text-sm leading-6 text-[#627168]">
-                        {recipe.description
-                          ? truncate(recipe.description, 96)
-                          : "Kept here so you can drop it into the week whenever it fits."}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeRecipeFromPlanner(recipe.id)}
-                      className="shrink-0 rounded-full border border-[#d9dfd5] px-3 py-1.5 text-xs font-medium text-[#66756c] transition hover:bg-[#f5f7f3]"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="rounded-3xl border border-[#dde4d8] bg-white/90 p-4 shadow-[0_8px_30px_rgba(31,43,36,0.04)] sm:p-5">
-          <div className="mb-4">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#738276]">
-              This week
-            </p>
-            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
-              Your plan
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-[#5c6b62]">
-              Keep it realistic. Two or three dinners is already a good week.
-            </p>
-          </div>
-
-          <div className="grid gap-3 lg:grid-cols-2">
-            {DAYS.map((day) => {
-              const assignedId = weeklyMeals[day];
-              const assignedRecipe = assignedId
-                ? recipesById.get(assignedId)
-                : null;
-
-              return (
-                <article
-                  key={day}
-                  className="rounded-2xl border border-[#e3e8df] bg-[#fcfcfa] p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-base font-semibold text-[#213128]">
-                        {day}
-                      </h3>
-                      <p className="mt-1 text-sm text-[#627168]">
-                        {assignedRecipe
-                          ? assignedRecipe.title
-                          : "Nothing planned yet."}
-                      </p>
-                    </div>
-
-                    {assignedRecipe ? (
-                      <button
-                        type="button"
-                        onClick={() => clearDay(day)}
-                        className="rounded-full border border-[#d9dfd5] px-3 py-1.5 text-xs font-medium text-[#66756c] transition hover:bg-[#f5f7f3]"
-                      >
-                        Clear
-                      </button>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                    <select
-                      value={selectedByDay[day] || ""}
-                      onChange={(e) =>
-                        setSelectedByDay((prev) => ({
-                          ...prev,
-                          [day]: e.target.value,
-                        }))
-                      }
-                      className="min-h-[44px] w-full rounded-2xl border border-[#d6ddd1] bg-white px-3 text-sm text-[#213128] outline-none transition focus:border-[#9eaf9f]"
-                    >
-                      <option value="">Choose a planner recipe</option>
-                      {plannerRecipes.map((recipe) => (
-                        <option key={recipe.id} value={recipe.id}>
-                          {recipe.title}
-                        </option>
-                      ))}
-                    </select>
-
-                    <button
-                      type="button"
-                      onClick={() => assignRecipeToDay(day)}
-                      disabled={!selectedByDay[day]}
-                      className={`min-h-[44px] rounded-2xl px-4 text-sm font-medium transition ${
-                        selectedByDay[day]
-                          ? "bg-[#213128] text-white hover:opacity-95"
-                          : "bg-[#eef2eb] text-[#86938a]"
-                      }`}
-                    >
-                      Save
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          <div className="mt-5 rounded-2xl bg-[#f6f8f3] p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-4 sm:px-6 sm:pt-8">
+        <section className="rounded-[28px] border border-[#dfe6da] bg-white/90 p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] sm:p-6">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.22em] text-[#738276]">
-                  Week at a glance
+                <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
+                  Weekly planner
                 </p>
-                <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                  Keep the next step visible
-                </h3>
-                <p className="mt-1 text-sm leading-6 text-[#5c6b62]">
-                  {plannedCount === 0
-                    ? "No meals planned yet. Start with two or three simple dinners."
-                    : `${plannedCount} meal${
-                        plannedCount === 1 ? "" : "s"
-                      } planned for the week.`}
+                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-[#1f2b24] sm:text-4xl">
+                  Plan with less scrolling
+                </h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d6b62] sm:text-base">
+                  Pick a day, tap a recipe, and build a week that already feels
+                  half sorted.
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-2">
                 <Link
                   href="/recipes"
-                  className="inline-flex items-center rounded-full border border-[#cfd8c9] bg-white px-4 py-2 text-sm font-medium text-[#213128] transition hover:bg-[#f9faf7]"
+                  className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[#f7f8f4]"
                 >
-                  Add more ideas
+                  Browse recipes
                 </Link>
                 <Link
                   href="/shop"
-                  className="inline-flex items-center rounded-full bg-[#213128] px-4 py-2 text-sm font-medium text-white transition hover:opacity-95"
+                  className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
                 >
-                  Browse shop for the week
+                  Go to shop
                 </Link>
               </div>
             </div>
 
-            {weekRecipes.length > 0 ? (
-              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {weekRecipes.map((recipe) => (
-                  <div
-                    key={recipe.id}
-                    className="rounded-2xl border border-[#dfe6da] bg-white px-4 py-3"
-                  >
-                    <p className="text-sm font-medium text-[#213128]">
-                      {recipe.title}
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-[#66756c]">
-                      {recipe.description
-                        ? truncate(recipe.description, 70)
-                        : "Added to this week."}
-                    </p>
-                  </div>
-                ))}
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-[#f6f8f3] px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
+                  Planned
+                </p>
+                <p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#213128]">
+                  {plannedCount}/7
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[#f6f8f3] px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
+                  Planner recipes
+                </p>
+                <p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#213128]">
+                  {plannerRecipes.length}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[#f6f8f3] px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
+                  Saved favourites
+                </p>
+                <p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#213128]">
+                  {savedRecipes.length}
+                </p>
+              </div>
+            </div>
+
+            {statusMessage ? (
+              <div className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[#fbfcfa] px-3 py-1.5 text-xs text-[#58675e]">
+                {statusMessage}
               </div>
             ) : null}
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[28px] border border-[#dfe6da] bg-white/90 p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] sm:p-6">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
+                This week
+              </p>
+              <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                Choose a day
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={clearSelectedDay}
+              disabled={!activeRecipe}
+              className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-medium transition ${
+                activeRecipe
+                  ? "border border-[#d4dcd0] bg-white text-[#59685f] hover:bg-[#f7f8f4]"
+                  : "bg-[#eef2eb] text-[#8a968e]"
+              }`}
+            >
+              Clear {selectedDay}
+            </button>
+          </div>
+
+          <div className="mt-4 overflow-x-auto pb-1">
+            <div className="flex min-w-max gap-2">
+              {DAYS.map((day) => {
+                const recipeId = weeklyMeals[day];
+                const recipe = recipeId
+                  ? recipesById.get(recipeId) || null
+                  : null;
+                const isActive = selectedDay === day;
+
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => setSelectedDay(day)}
+                    className={`w-[124px] shrink-0 rounded-2xl border px-3 py-3 text-left transition ${
+                      isActive
+                        ? "border-[#213128] bg-[#213128] text-white"
+                        : "border-[#dde4d8] bg-[#fbfcfa] text-[#213128] hover:bg-[#f7f8f4]"
+                    }`}
+                  >
+                    <p
+                      className={`text-xs uppercase tracking-[0.16em] ${
+                        isActive ? "text-white/75" : "text-[#7b877d]"
+                      }`}
+                    >
+                      {day.slice(0, 3)}
+                    </p>
+                    <p className="mt-2 text-sm font-medium leading-5">
+                      {recipe ? truncate(recipe.title, 28) : "Open"}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_1.3fr]">
+            <div className="rounded-3xl bg-[#f6f8f3] p-4">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
+                Selected day
+              </p>
+              <h3 className="mt-1 text-2xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                {selectedDay}
+              </h3>
+
+              {activeRecipe ? (
+                <div className="mt-4 space-y-3">
+                  <RecipeImage recipe={activeRecipe} />
+                  <div>
+                    <p className="text-lg font-medium text-[#213128]">
+                      {activeRecipe.title}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-[#617067]">
+                      {activeRecipe.description
+                        ? truncate(activeRecipe.description, 130)
+                        : "Placed into your week and ready when you are."}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-white px-4 py-6">
+                  <p className="text-base font-medium text-[#213128]">
+                    Nothing planned yet
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-[#617067]">
+                    Tap a recipe on the right and it will drop straight into{" "}
+                    {selectedDay}.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-3xl bg-[#fcfcfa] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
+                    Add into {selectedDay}
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                    Tap a recipe card
+                  </h3>
+                </div>
+
+                <div className="flex rounded-full bg-[#eef2eb] p-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowSaved(false)}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
+                      !showSaved
+                        ? "bg-white text-[#213128] shadow-sm"
+                        : "text-[#68776d]"
+                    }`}
+                  >
+                    Planner
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowSaved(true)}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
+                      showSaved
+                        ? "bg-white text-[#213128] shadow-sm"
+                        : "text-[#68776d]"
+                    }`}
+                  >
+                    Saved
+                  </button>
+                </div>
+              </div>
+
+              {visibleRecipes.length === 0 ? (
+                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-white px-4 py-6">
+                  <p className="text-base font-medium text-[#213128]">
+                    {showSaved
+                      ? "No saved favourites yet"
+                      : "No planner recipes yet"}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-[#617067]">
+                    {showSaved
+                      ? "Save a few recipes first, then they will appear here."
+                      : "Use your saved recipes to build a planner collection for the week."}
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {visibleRecipes.map((recipe) => {
+                    const inPlanner = plannerRecipeIds.has(recipe.id);
+                    const image = getRecipeImage(recipe);
+
+                    return (
+                      <article
+                        key={recipe.id}
+                        className="overflow-hidden rounded-3xl border border-[#e2e8de] bg-white"
+                      >
+                        <div className="relative">
+                          {image ? (
+                            <img
+                              src={image}
+                              alt={recipe.title}
+                              className="h-36 w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-36 w-full items-center justify-center bg-[#dde6d8] text-lg font-semibold text-[#536458]">
+                              {getInitials(recipe.title)}
+                            </div>
+                          )}
+
+                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(31,43,36,0.35)] to-transparent" />
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <p className="text-base font-semibold text-white">
+                              {recipe.title}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3 p-4">
+                          <p className="text-sm leading-6 text-[#617067]">
+                            {recipe.description
+                              ? truncate(recipe.description, 86)
+                              : "A calm, useful meal idea ready for the week."}
+                          </p>
+
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => assignRecipeToSelectedDay(recipe)}
+                              className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                            >
+                              Add to {selectedDay}
+                            </button>
+
+                            {showSaved ? (
+                              <button
+                                type="button"
+                                onClick={() => addRecipeToPlanner(recipe)}
+                                disabled={inPlanner}
+                                className={`inline-flex min-h-[42px] items-center rounded-full px-4 text-sm font-medium transition ${
+                                  inPlanner
+                                    ? "bg-[#eef2eb] text-[#7d897f]"
+                                    : "border border-[#d5ddd1] bg-white text-[#213128] hover:bg-[#f7f8f4]"
+                                }`}
+                              >
+                                {inPlanner ? "In planner" : "Keep in planner"}
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeRecipeFromPlanner(recipe.id)
+                                }
+                                className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[#f7f8f4]"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[28px] border border-[#dfe6da] bg-white/90 p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
+                Week view
+              </p>
+              <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                Your meals at a glance
+              </h2>
+            </div>
+
+            <Link
+              href="/shop"
+              className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+            >
+              Build the weekly shop
+            </Link>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {DAYS.map((day) => {
+              const recipeId = weeklyMeals[day];
+              const recipe = recipeId
+                ? recipesById.get(recipeId) || null
+                : null;
+
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => setSelectedDay(day)}
+                  className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                    selectedDay === day
+                      ? "border-[#213128] bg-[#f7faf6]"
+                      : "border-[#e1e7dd] bg-[#fcfcfa] hover:bg-[#f8faf7]"
+                  }`}
+                >
+                  <RecipeImage recipe={recipe} compact />
+                  <div className="min-w-0">
+                    <p className="text-xs uppercase tracking-[0.16em] text-[#7c887e]">
+                      {day}
+                    </p>
+                    <p className="mt-1 truncate text-sm font-medium text-[#213128]">
+                      {recipe ? recipe.title : "Nothing planned"}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </section>
       </div>
