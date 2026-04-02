@@ -1,21 +1,79 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useCart } from "../cart-context";
 import RecipeCard from "../components/RecipeCard";
 import { prompts, recipes, useItUpIdeas } from "./recipes-data";
+
+type GeneratedRecipe = {
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+  pantryStaples: string[];
+  steps: string[];
+};
 
 export default function RecipesPage() {
   const { cart } = useCart();
 
   const totalItems = useMemo(() => cart.length, [cart]);
 
+  const basketIngredients = useMemo(() => {
+    return Array.from(new Set(cart.map((item) => item.name)));
+  }, [cart]);
+
+  const [generatedRecipe, setGeneratedRecipe] =
+    useState<GeneratedRecipe | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiError, setAiError] = useState("");
+
   const savouryRecipes = recipes.filter(
     (recipe) => recipe.category === "savoury",
   );
   const sweetRecipes = recipes.filter((recipe) => recipe.category === "sweet");
   const featuredRecipes = recipes.slice(0, 2);
+
+  async function handleGenerateRecipe() {
+    if (basketIngredients.length === 0) {
+      setAiError(
+        "Your basket is empty. Add a few items first, then try again.",
+      );
+      setGeneratedRecipe(null);
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+      setAiError("");
+      setGeneratedRecipe(null);
+
+      const response = await fetch("/api/recipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: basketIngredients,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate recipe.");
+      }
+
+      setGeneratedRecipe(data.recipe);
+    } catch (error) {
+      console.error(error);
+      setAiError(
+        "We couldn’t generate a recipe just now. Please try again in a moment.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
@@ -84,6 +142,127 @@ export default function RecipesPage() {
               Useful ideas built around good pantry things, flexible cooking,
               and making the most of what you already have.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12">
+        <div className="mx-auto max-w-6xl">
+          <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 md:p-8">
+            <div className="max-w-3xl">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
+                AI recipe suggestion
+              </p>
+
+              <h2 className="mt-2 font-serif text-2xl md:text-3xl">
+                What can I cook from my basket?
+              </h2>
+
+              <p className="mt-3 text-sm leading-7 text-[#5f675c] md:text-base">
+                We’ll use the items currently in your basket to suggest one
+                simple recipe idea.
+              </p>
+            </div>
+
+            <div className="mt-6 rounded-[22px] border border-[#e1d8cc] bg-white/70 p-5">
+              <p className="text-sm font-medium text-[#243328]">
+                Basket ingredients
+              </p>
+
+              {basketIngredients.length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {basketIngredients.map((ingredient) => (
+                    <span
+                      key={ingredient}
+                      className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
+                    >
+                      {ingredient}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-[#7a8478]">
+                  Your basket is empty at the moment.
+                </p>
+              )}
+
+              <div className="mt-5">
+                <button
+                  type="button"
+                  onClick={handleGenerateRecipe}
+                  disabled={isGenerating}
+                  className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isGenerating
+                    ? "Generating your recipe..."
+                    : "Generate recipe from my basket"}
+                </button>
+              </div>
+
+              {aiError && (
+                <div className="mt-4 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
+                  {aiError}
+                </div>
+              )}
+            </div>
+
+            {generatedRecipe && (
+              <div className="mt-6 rounded-[24px] border border-[#d8d0c4] bg-white p-6 md:p-8">
+                <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
+                  Your recipe
+                </p>
+
+                <h3 className="mt-2 font-serif text-2xl md:text-3xl">
+                  {generatedRecipe.title}
+                </h3>
+
+                <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5f675c] md:text-base">
+                  {generatedRecipe.description}
+                </p>
+
+                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                  <div>
+                    <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                      Ingredients used
+                    </h4>
+                    <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
+                      {generatedRecipe.ingredientsUsed.map((item) => (
+                        <li key={item}>• {item}</li>
+                      ))}
+                    </ul>
+
+                    {generatedRecipe.pantryStaples.length > 0 && (
+                      <>
+                        <h4 className="mt-5 text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                          Pantry staples
+                        </h4>
+                        <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
+                          {generatedRecipe.pantryStaples.map((item) => (
+                            <li key={item}>• {item}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                      Method
+                    </h4>
+                    <ol className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
+                      {generatedRecipe.steps.map((step, index) => (
+                        <li key={`${index}-${step}`} className="flex gap-3">
+                          <span className="mt-[2px] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-xs">
+                            {index + 1}
+                          </span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
