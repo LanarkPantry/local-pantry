@@ -26,6 +26,8 @@ export default function RecipesPage() {
   const recipeSectionRef = useRef<HTMLDivElement | null>(null);
 
   const [customIngredients, setCustomIngredients] = useState("");
+  const [includeBasketIngredients, setIncludeBasketIngredients] =
+    useState(false);
   const [generatedRecipe, setGeneratedRecipe] =
     useState<GeneratedRecipe | null>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
@@ -48,13 +50,17 @@ export default function RecipesPage() {
   }, [customIngredients]);
 
   const allIngredients = useMemo(() => {
-    return Array.from(new Set([...basketIngredients, ...typedIngredients]));
-  }, [basketIngredients, typedIngredients]);
+    const combined = includeBasketIngredients
+      ? [...typedIngredients, ...basketIngredients]
+      : [...typedIngredients];
+
+    return Array.from(new Set(combined));
+  }, [typedIngredients, basketIngredients, includeBasketIngredients]);
 
   async function handleGenerateRecipe() {
     if (allIngredients.length === 0) {
       setAiError(
-        "Add some ingredients from your basket, type your own ingredients, or use both.",
+        "Type some ingredients, include your basket ingredients, or use both.",
       );
       setGeneratedRecipe(null);
       setGeneratedImageUrl(null);
@@ -192,34 +198,13 @@ export default function RecipesPage() {
               </h2>
 
               <p className="mt-3 text-sm leading-7 text-[#5f675c] md:text-base">
-                Use the items in your basket, type your own ingredients, or
-                combine both for a recipe idea and image.
+                Type your own ingredients, optionally include your basket items,
+                and get a recipe idea with an image.
               </p>
             </div>
 
             <div className="mt-6 rounded-[22px] border border-[#e1d8cc] bg-white/70 p-5">
-              <p className="text-sm font-medium text-[#243328]">
-                Basket ingredients
-              </p>
-
-              {basketIngredients.length > 0 ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {basketIngredients.map((ingredient) => (
-                    <span
-                      key={ingredient}
-                      className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
-                    >
-                      {ingredient}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 text-sm leading-6 text-[#7a8478]">
-                  Your basket is empty at the moment.
-                </p>
-              )}
-
-              <div className="mt-6">
+              <div className="mt-0">
                 <label
                   htmlFor="custom-ingredients"
                   className="text-sm font-medium text-[#243328]"
@@ -227,17 +212,60 @@ export default function RecipesPage() {
                   Ingredients you want to cook with
                 </label>
                 <p className="mt-2 text-sm leading-6 text-[#6b776c]">
-                  Type ingredients separated by commas, for example: carrots,
-                  potatoes, rice
+                  Type ingredients separated by commas, for example: basil,
+                  tofu, rice
                 </p>
                 <textarea
                   id="custom-ingredients"
                   value={customIngredients}
                   onChange={(e) => setCustomIngredients(e.target.value)}
-                  placeholder="e.g. carrots, potatoes, rice"
+                  placeholder="e.g. basil, tofu, rice"
                   rows={4}
                   className="mt-3 w-full rounded-[20px] border border-[#d6cec2] bg-white px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
                 />
+              </div>
+
+              <div className="mt-5 rounded-[18px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={includeBasketIngredients}
+                    onChange={(e) =>
+                      setIncludeBasketIngredients(e.target.checked)
+                    }
+                    className="mt-1 h-4 w-4 rounded border-[#cfc6ba] text-[#243328] focus:ring-[#a9b2a3]"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-[#243328]">
+                      Include basket ingredients
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-[#6b776c]">
+                      Add the ingredients currently in your basket to the recipe
+                      idea as well.
+                    </p>
+                  </div>
+                </label>
+
+                {includeBasketIngredients && (
+                  <div className="mt-4">
+                    {basketIngredients.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {basketIngredients.map((ingredient) => (
+                          <span
+                            key={ingredient}
+                            className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
+                          >
+                            {ingredient}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm leading-6 text-[#7a8478]">
+                        Your basket is empty at the moment.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {allIngredients.length > 0 && (
