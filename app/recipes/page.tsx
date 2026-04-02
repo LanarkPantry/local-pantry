@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useCart } from "../cart-context";
 import RecipeCard from "../components/RecipeCard";
 import { prompts, recipes, useItUpIdeas } from "./recipes-data";
@@ -22,6 +22,8 @@ export default function RecipesPage() {
   const basketIngredients = useMemo(() => {
     return Array.from(new Set(cart.map((item) => item.name)));
   }, [cart]);
+
+  const recipeSectionRef = useRef<HTMLDivElement | null>(null);
 
   const [generatedRecipe, setGeneratedRecipe] =
     useState<GeneratedRecipe | null>(null);
@@ -47,6 +49,11 @@ export default function RecipesPage() {
       return;
     }
 
+    recipeSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+
     try {
       setIsGenerating(true);
       setAiError("");
@@ -71,6 +78,11 @@ export default function RecipesPage() {
 
       setGeneratedRecipe(data.recipe);
       setGeneratedImageUrl(data.imageUrl ?? null);
+
+      recipeSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     } catch (error) {
       console.error(error);
       setAiError(
@@ -152,7 +164,10 @@ export default function RecipesPage() {
         </div>
       </section>
 
-      <section className="border-b border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12">
+      <section
+        ref={recipeSectionRef}
+        className="border-b border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12"
+      >
         <div className="mx-auto max-w-6xl">
           <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 md:p-8">
             <div className="max-w-3xl">
