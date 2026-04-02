@@ -25,6 +25,9 @@ export default function RecipesPage() {
 
   const [generatedRecipe, setGeneratedRecipe] =
     useState<GeneratedRecipe | null>(null);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
+    null,
+  );
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiError, setAiError] = useState("");
 
@@ -40,6 +43,7 @@ export default function RecipesPage() {
         "Your basket is empty. Add a few items first, then try again.",
       );
       setGeneratedRecipe(null);
+      setGeneratedImageUrl(null);
       return;
     }
 
@@ -47,6 +51,7 @@ export default function RecipesPage() {
       setIsGenerating(true);
       setAiError("");
       setGeneratedRecipe(null);
+      setGeneratedImageUrl(null);
 
       const response = await fetch("/api/recipe", {
         method: "POST",
@@ -65,6 +70,7 @@ export default function RecipesPage() {
       }
 
       setGeneratedRecipe(data.recipe);
+      setGeneratedImageUrl(data.imageUrl ?? null);
     } catch (error) {
       console.error(error);
       setAiError(
@@ -160,7 +166,7 @@ export default function RecipesPage() {
 
               <p className="mt-3 text-sm leading-7 text-[#5f675c] md:text-base">
                 We’ll use the items currently in your basket to suggest one
-                simple recipe idea.
+                simple recipe idea and an image to go with it.
               </p>
             </div>
 
@@ -194,7 +200,7 @@ export default function RecipesPage() {
                   className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isGenerating
-                    ? "Generating your recipe..."
+                    ? "Generating recipe and image..."
                     : "Generate recipe from my basket"}
                 </button>
               </div>
@@ -207,58 +213,68 @@ export default function RecipesPage() {
             </div>
 
             {generatedRecipe && (
-              <div className="mt-6 rounded-[24px] border border-[#d8d0c4] bg-white p-6 md:p-8">
-                <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
-                  Your recipe
-                </p>
+              <div className="mt-6 overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-white">
+                {generatedImageUrl && (
+                  <img
+                    src={generatedImageUrl}
+                    alt={generatedRecipe.title}
+                    className="h-[280px] w-full object-cover md:h-[380px]"
+                  />
+                )}
 
-                <h3 className="mt-2 font-serif text-2xl md:text-3xl">
-                  {generatedRecipe.title}
-                </h3>
+                <div className="p-6 md:p-8">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
+                    Your recipe
+                  </p>
 
-                <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5f675c] md:text-base">
-                  {generatedRecipe.description}
-                </p>
+                  <h3 className="mt-2 font-serif text-2xl md:text-3xl">
+                    {generatedRecipe.title}
+                  </h3>
 
-                <div className="mt-6 grid gap-6 md:grid-cols-2">
-                  <div>
-                    <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
-                      Ingredients used
-                    </h4>
-                    <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
-                      {generatedRecipe.ingredientsUsed.map((item) => (
-                        <li key={item}>• {item}</li>
-                      ))}
-                    </ul>
+                  <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5f675c] md:text-base">
+                    {generatedRecipe.description}
+                  </p>
 
-                    {generatedRecipe.pantryStaples.length > 0 && (
-                      <>
-                        <h4 className="mt-5 text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
-                          Pantry staples
-                        </h4>
-                        <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
-                          {generatedRecipe.pantryStaples.map((item) => (
-                            <li key={item}>• {item}</li>
-                          ))}
-                        </ul>
-                      </>
-                    )}
-                  </div>
+                  <div className="mt-6 grid gap-6 md:grid-cols-2">
+                    <div>
+                      <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                        Ingredients used
+                      </h4>
+                      <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
+                        {generatedRecipe.ingredientsUsed.map((item) => (
+                          <li key={item}>• {item}</li>
+                        ))}
+                      </ul>
 
-                  <div>
-                    <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
-                      Method
-                    </h4>
-                    <ol className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
-                      {generatedRecipe.steps.map((step, index) => (
-                        <li key={`${index}-${step}`} className="flex gap-3">
-                          <span className="mt-[2px] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-xs">
-                            {index + 1}
-                          </span>
-                          <span>{step}</span>
-                        </li>
-                      ))}
-                    </ol>
+                      {generatedRecipe.pantryStaples.length > 0 && (
+                        <>
+                          <h4 className="mt-5 text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                            Pantry staples
+                          </h4>
+                          <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243328]">
+                            {generatedRecipe.pantryStaples.map((item) => (
+                              <li key={item}>• {item}</li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                        Method
+                      </h4>
+                      <ol className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
+                        {generatedRecipe.steps.map((step, index) => (
+                          <li key={`${index}-${step}`} className="flex gap-3">
+                            <span className="mt-[2px] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-xs">
+                              {index + 1}
+                            </span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
                   </div>
                 </div>
               </div>
