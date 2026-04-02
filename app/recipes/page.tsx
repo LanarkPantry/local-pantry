@@ -200,7 +200,7 @@ export default function RecipesPage() {
                   className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isGenerating
-                    ? "Generating recipe and image..."
+                    ? "Creating a fresh idea..."
                     : "Generate recipe from my basket"}
                 </button>
               </div>
@@ -275,6 +275,17 @@ export default function RecipesPage() {
                         ))}
                       </ol>
                     </div>
+                  </div>
+
+                  <div className="mt-6 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={handleGenerateRecipe}
+                      disabled={isGenerating}
+                      className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isGenerating ? "Creating..." : "Try another idea"}
+                    </button>
                   </div>
                 </div>
               </div>
