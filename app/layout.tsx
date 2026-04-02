@@ -15,9 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-[#f4efe9] text-[#243328]">
+      <body className="text-[#243328] antialiased">
         <Providers>
-          <div className="pb-32 md:pb-0">{children}</div>
+          <div className="relative pb-32 md:pb-0">{children}</div>
           <MobileNav />
         </Providers>
       </body>
