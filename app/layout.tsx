@@ -10,15 +10,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className="text-[#243328] antialiased">
         <Providers>
-          <div className="relative pb-32 md:pb-0">{children}</div>
-          <MobileNav />
+          <div className="relative z-10 pb-32 md:pb-0">{children}</div>
+
+          <div className="relative z-10">
+            <MobileNav />
+          </div>
         </Providers>
       </body>
     </html>
