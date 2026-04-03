@@ -6,6 +6,16 @@ import MobileNav from "./mobile-nav";
 export const metadata: Metadata = {
   title: "The Local Pantry",
   description: "Seasonal groceries from local farms",
+  applicationName: "The Local Pantry",
+  icons: {
+    icon: "/icon-512.png",
+    apple: "/apple-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "The Local Pantry",
+  },
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
 import ShopRecipeCard from "./shop-recipe-card";
@@ -12,8 +12,78 @@ import {
   produceBoxes,
 } from "./shop-data";
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
+
+const INSTALL_PROMPT_DISMISSED_KEY = "tlp_home_screen_prompt_dismissed";
+
 export default function ShopPage() {
   const { cart, groupedCart, addToCart, removeOneFromCart } = useCart();
+
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallCard, setShowInstallCard] = useState(false);
+  const [isIos, setIsIos] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const dismissed =
+      localStorage.getItem(INSTALL_PROMPT_DISMISSED_KEY) === "1";
+
+    const ios =
+      /iphone|ipad|ipod/i.test(window.navigator.userAgent) &&
+      !("MSStream" in window);
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      // @ts-expect-error - iOS Safari standalone property
+      window.navigator.standalone === true;
+
+    setIsIos(ios);
+    setIsStandalone(standalone);
+
+    if (!dismissed && !standalone) {
+      setShowInstallCard(true);
+    }
+
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
+    };
+  }, []);
+
+  const dismissInstallCard = () => {
+    setShowInstallCard(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, "1");
+    }
+  };
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    await deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === "accepted") {
+      setShowInstallCard(false);
+      localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, "1");
+    }
+
+    setDeferredPrompt(null);
+  };
 
   const totalItems = useMemo(() => cart.length, [cart]);
 
@@ -231,6 +301,64 @@ export default function ShopPage() {
             Basket{totalItems > 0 ? ` (${totalItems})` : ""}
           </Link>
         </div>
+
+        {showInstallCard && !isStandalone ? (
+          <section className="mb-4 rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.82)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="max-w-xl">
+                <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
+                  Quick access
+                </p>
+                <h2 className="mt-2 font-serif text-[1.6rem] leading-tight text-[#243328]">
+                  Add The Local Pantry to your home screen
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[#667164]">
+                  Makes planning and ordering through the week a bit easier.
+                </p>
+
+                {isIos ? (
+                  <p className="mt-3 text-sm text-[#5f675c]">
+                    On iPhone, tap the share icon, then choose{" "}
+                    <span className="font-medium text-[#243328]">
+                      Add to Home Screen
+                    </span>
+                    .
+                  </p>
+                ) : deferredPrompt ? (
+                  <p className="mt-3 text-sm text-[#5f675c]">
+                    You can add The Local Pantry to your home screen and use it
+                    like an app.
+                  </p>
+                ) : (
+                  <p className="mt-3 text-sm text-[#5f675c]">
+                    You can save The Local Pantry to your home screen for easier
+                    access during the week.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                {!isIos && deferredPrompt ? (
+                  <button
+                    type="button"
+                    onClick={handleInstallClick}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Add to home screen
+                  </button>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={dismissInstallCard}
+                  className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.78)] px-5 py-3 text-sm text-[#243328] transition hover:bg-[#f4efe9]"
+                >
+                  Not now
+                </button>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         <section className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
           <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-6">
