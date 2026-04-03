@@ -310,17 +310,8 @@ export default function PlannerPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f4ec] pb-28 text-[#213128]">
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.12]"
-          style={{ backgroundImage: "url('/hero.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-[rgba(247,244,236,0.86)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(248,245,238,0.80),rgba(244,240,231,0.92))]" />
-      </div>
-
-      <div className="relative mx-auto w-full max-w-6xl px-4 pb-10 pt-4 sm:px-6 sm:pt-8">
+    <main className="min-h-screen overflow-x-clip text-[#213128]">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-4 sm:px-6 sm:pt-8">
         <section className="rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -354,7 +345,7 @@ export default function PlannerPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl bg-[rgba(246,248,243,0.86)] px-4 py-3 backdrop-blur-sm">
+              <div className="rounded-2xl bg-[rgba(246,248,243,0.84)] px-4 py-3 backdrop-blur-sm">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
                   Planned
                 </p>
@@ -363,7 +354,7 @@ export default function PlannerPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-[rgba(246,248,243,0.86)] px-4 py-3 backdrop-blur-sm">
+              <div className="rounded-2xl bg-[rgba(246,248,243,0.84)] px-4 py-3 backdrop-blur-sm">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
                   Planner recipes
                 </p>
@@ -372,7 +363,7 @@ export default function PlannerPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-[rgba(246,248,243,0.86)] px-4 py-3 backdrop-blur-sm">
+              <div className="rounded-2xl bg-[rgba(246,248,243,0.84)] px-4 py-3 backdrop-blur-sm">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
                   Saved favourites
                 </p>
@@ -432,7 +423,7 @@ export default function PlannerPage() {
                     className={`w-[124px] shrink-0 rounded-2xl border px-3 py-3 text-left transition ${
                       isActive
                         ? "border-[#213128] bg-[#213128] text-white"
-                        : "border-[#dde4d8] bg-[rgba(251,252,250,0.80)] text-[#213128] hover:bg-[rgba(255,255,255,0.92)]"
+                        : "border-[#dde4d8] bg-[rgba(251,252,250,0.8)] text-[#213128] hover:bg-[rgba(255,255,255,0.92)]"
                     }`}
                   >
                     <p

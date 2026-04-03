@@ -34,8 +34,8 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
-      <header className="sticky top-0 z-30 border-b border-[#e6ddd2] bg-[#f4efe9]/90 backdrop-blur">
+    <main className="min-h-screen text-[#243328]">
+      <header className="sticky top-0 z-30 border-b border-[rgba(230,221,210,0.9)] bg-[rgba(244,239,233,0.72)] backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
           <Link
             href="/"
@@ -83,7 +83,7 @@ export default function HomePage() {
 
           <Link
             href="/basket"
-            className="hidden rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-[#faf7f2] md:inline-flex"
+            className="hidden rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-white md:inline-flex"
           >
             View basket{totalItems > 0 ? ` (${totalItems})` : ""}
           </Link>
@@ -139,7 +139,7 @@ export default function HomePage() {
 
       <section className="px-6 pb-16 pt-16 md:px-10 md:pb-24 md:pt-20">
         <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
-          <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
+          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-6 backdrop-blur-md">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
               Fresh produce
             </p>
@@ -149,7 +149,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
+          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-6 backdrop-blur-md">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
               Pantry essentials
             </p>
@@ -160,7 +160,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
+          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-6 backdrop-blur-md">
             <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
               Easy each week
             </p>
@@ -174,7 +174,7 @@ export default function HomePage() {
       </section>
 
       <section className="px-6 pb-20 md:px-10 md:pb-24">
-        <div className="mx-auto max-w-4xl rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 md:p-10">
+        <div className="mx-auto max-w-4xl rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-6 backdrop-blur-md md:p-10">
           <div className="max-w-2xl">
             <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
               Delivery checker
@@ -199,7 +199,7 @@ export default function HomePage() {
               value={postcode}
               onChange={(e) => setPostcode(e.target.value)}
               placeholder="Enter your postcode"
-              className="w-full rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
+              className="w-full rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
             />
 
             <button

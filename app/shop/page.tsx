@@ -40,14 +40,14 @@ export default function ShopPage() {
   const renderOrderBadge = (item: ShopDisplayItem) => {
     if (item.checkoutType === "subscription") {
       return (
-        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
           Subscription-friendly
         </div>
       );
     }
 
     return (
-      <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+      <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
         One-off add-on
       </div>
     );
@@ -70,7 +70,7 @@ export default function ShopPage() {
 
     return (
       <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="inline-flex items-center self-start rounded-full border border-[#d8d0c4] bg-white">
+        <div className="inline-flex items-center self-start rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.88)]">
           <button
             type="button"
             onClick={() => removeOneFromCart(item.name)}
@@ -109,11 +109,11 @@ export default function ShopPage() {
     return (
       <article
         key={item.name}
-        className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
+        className="overflow-hidden rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md"
       >
         <div className="flex flex-col sm:flex-row">
-          <div className="border-b border-[#e9dfd2] bg-[#eee7dc] p-4 sm:w-[190px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
-            <div className="flex h-full items-center justify-center rounded-[20px] bg-[#f8f4ee] p-4">
+          <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.72)] p-4 sm:w-[190px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
+            <div className="flex h-full items-center justify-center rounded-[20px] bg-[rgba(248,244,238,0.82)] p-4">
               <img
                 src={item.image}
                 alt={item.name}
@@ -134,7 +134,7 @@ export default function ShopPage() {
                   </h3>
                 </div>
 
-                <div className="self-start rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
+                <div className="self-start rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm font-medium text-[#243328]">
                   £{item.price.toFixed(2)}
                   {item.weight ? ` · ${item.weight}` : ""}
                 </div>
@@ -171,9 +171,9 @@ export default function ShopPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f4efe9] px-4 py-6 text-[#243328] sm:px-5 md:px-10 md:py-10">
+    <main className="min-h-screen px-4 py-6 text-[#243328] sm:px-5 md:px-10 md:py-10">
       <div className="mx-auto max-w-6xl pb-24 md:pb-10">
-        <div className="mb-8 flex flex-col gap-4 border-b border-[#ddd4c8] pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 flex flex-col gap-4 border-b border-[rgba(221,212,200,0.9)] pb-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/"
             className="text-sm tracking-[0.35em] text-[#60705f] transition hover:text-[#243328]"
@@ -219,7 +219,7 @@ export default function ShopPage() {
           </nav>
         </div>
 
-        <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
+        <section className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-8">
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
             <div className="max-w-3xl">
               <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
@@ -247,21 +247,21 @@ export default function ShopPage() {
 
                 <a
                   href="#pantry-additions"
-                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
                 >
                   Browse pantry items
                 </a>
 
                 <a
                   href="#cook-from-the-cupboard"
-                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
                 >
                   Explore cupboard goods
                 </a>
               </div>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-[#ddd4c8] bg-white px-4 py-4">
+                <div className="rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] px-4 py-4">
                   <p className="text-sm font-medium text-[#243328]">
                     Boxes suit weekly delivery
                   </p>
@@ -270,7 +270,7 @@ export default function ShopPage() {
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-[#ddd4c8] bg-white px-4 py-4">
+                <div className="rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] px-4 py-4">
                   <p className="text-sm font-medium text-[#243328]">
                     Add-ons stay flexible
                   </p>
@@ -279,7 +279,7 @@ export default function ShopPage() {
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-[#ddd4c8] bg-white px-4 py-4">
+                <div className="rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] px-4 py-4">
                   <p className="text-sm font-medium text-[#243328]">
                     Choose at basket
                   </p>
@@ -291,8 +291,8 @@ export default function ShopPage() {
               </div>
             </div>
 
-            <div className="rounded-[24px] border border-[#ddd4c8] bg-[#efe8dd] p-5">
-              <div className="rounded-2xl border border-[#ddd4c8] bg-[#f7f2eb] p-4">
+            <div className="rounded-[24px] border border-[#ddd4c8] bg-[rgba(239,232,221,0.72)] p-5 backdrop-blur-sm">
+              <div className="rounded-2xl border border-[#ddd4c8] bg-[rgba(247,242,235,0.78)] p-4">
                 <p className="text-sm uppercase tracking-[0.16em] text-[#6b776c]">
                   Your basket
                 </p>
@@ -311,13 +311,13 @@ export default function ShopPage() {
 
                 <Link
                   href={basketHref}
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#faf7f2]"
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
                 >
                   {totalItems > 0 ? "Review basket" : "View basket"}
                 </Link>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-white p-4">
+              <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] p-4">
                 <p className="text-sm font-medium text-[#243328]">
                   How ordering works
                 </p>
@@ -339,25 +339,25 @@ export default function ShopPage() {
           <div className="flex flex-wrap gap-3">
             <a
               href="#produce-boxes"
-              className="rounded-full border border-[#d8d0c4] bg-white px-4 py-2 text-sm text-[#243328] transition hover:bg-[#faf7f2]"
+              className="rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
             >
               Jump to produce boxes
             </a>
             <a
               href="#pantry-additions"
-              className="rounded-full border border-[#d8d0c4] bg-white px-4 py-2 text-sm text-[#243328] transition hover:bg-[#faf7f2]"
+              className="rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
             >
               Jump to pantry additions
             </a>
             <a
               href="#cook-from-the-cupboard"
-              className="rounded-full border border-[#d8d0c4] bg-white px-4 py-2 text-sm text-[#243328] transition hover:bg-[#faf7f2]"
+              className="rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
             >
               Jump to cupboard goods
             </a>
             <a
               href="#a-few-good-extras"
-              className="rounded-full border border-[#d8d0c4] bg-white px-4 py-2 text-sm text-[#243328] transition hover:bg-[#faf7f2]"
+              className="rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
             >
               Jump to extras
             </a>
@@ -385,10 +385,10 @@ export default function ShopPage() {
               return (
                 <article
                   key={item.name}
-                  className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
+                  className="overflow-hidden rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md"
                 >
-                  <div className="border-b border-[#e9dfd2] bg-[#eee7dc] p-4 md:p-5">
-                    <div className="flex items-center justify-center rounded-[22px] bg-[#f8f4ee] p-4">
+                  <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.72)] p-4 md:p-5">
+                    <div className="flex items-center justify-center rounded-[22px] bg-[rgba(248,244,238,0.84)] p-4">
                       <img
                         src={item.image}
                         alt={item.name}
@@ -408,14 +408,14 @@ export default function ShopPage() {
                         </h3>
                       </div>
 
-                      <div className="self-start rounded-full border border-[#ddd4c8] bg-white px-4 py-2 text-sm font-medium text-[#243328]">
+                      <div className="self-start rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm font-medium text-[#243328]">
                         £{item.price.toFixed(2)}
                       </div>
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-2">
                       {item.bestFor && (
-                        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+                        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
                           {item.bestFor}
                         </div>
                       )}
@@ -433,7 +433,7 @@ export default function ShopPage() {
                     )}
 
                     {item.weeklyIncludes && (
-                      <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-white p-4">
+                      <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] p-4">
                         <p className="text-sm font-medium text-[#243328]">
                           This week may include
                         </p>
@@ -441,7 +441,7 @@ export default function ShopPage() {
                           {item.weeklyIncludes.map((entry) => (
                             <span
                               key={entry}
-                              className="rounded-full border border-[#e5ddcf] bg-[#fbfaf8] px-3 py-1 text-sm text-[#5f675c]"
+                              className="rounded-full border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] px-3 py-1 text-sm text-[#5f675c]"
                             >
                               {entry}
                             </span>
@@ -546,7 +546,7 @@ export default function ShopPage() {
       </div>
 
       {totalItems > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ddd4c8] bg-[#f7f2eb]/95 px-4 py-3 backdrop-blur md:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ddd4c8] bg-[rgba(247,242,235,0.9)] px-4 py-3 backdrop-blur-md md:hidden">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-sm font-medium text-[#243328]">

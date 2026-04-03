@@ -539,8 +539,8 @@ export default function RecipesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
-      <header className="sticky top-0 z-30 border-b border-[#e6ddd2] bg-[#f4efe9]/90 backdrop-blur">
+    <main className="min-h-screen text-[#243328]">
+      <header className="sticky top-0 z-30 border-b border-[rgba(230,221,210,0.9)] bg-[rgba(244,239,233,0.72)] backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 md:px-10">
           <div className="flex items-center justify-between gap-4">
             <Link
@@ -552,7 +552,7 @@ export default function RecipesPage() {
 
             <Link
               href="/basket"
-              className="inline-flex shrink-0 rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-[#faf7f2]"
+              className="inline-flex shrink-0 rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.84)] px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-white"
             >
               View basket{totalItems > 0 ? ` (${totalItems})` : ""}
             </Link>
@@ -597,7 +597,7 @@ export default function RecipesPage() {
         </div>
       </header>
 
-      <section className="border-b border-[#e6ddd2] px-4 pb-8 pt-10 sm:px-6 md:px-10 md:pb-10 md:pt-12">
+      <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-8 pt-10 sm:px-6 md:px-10 md:pb-10 md:pt-12">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-[0.22em] text-[#6b776c]">
@@ -616,7 +616,7 @@ export default function RecipesPage() {
         </div>
       </section>
 
-      <section className="border-b border-[#e6ddd2] px-4 py-8 sm:px-6 md:px-10 md:py-10">
+      <section className="border-b border-[rgba(230,221,210,0.86)] px-4 py-8 sm:px-6 md:px-10 md:py-10">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
@@ -646,9 +646,9 @@ export default function RecipesPage() {
                   }
                   className={`rounded-[22px] border p-5 text-left transition ${
                     isActive
-                      ? "border-[#aab7a4] bg-[#e9f0e4]"
-                      : "border-[#ddd4c8] bg-[#f7f2eb] hover:bg-[#f4eee6]"
-                  }`}
+                      ? "border-[#aab7a4] bg-[rgba(233,240,228,0.82)]"
+                      : "border-[#ddd4c8] bg-[rgba(247,242,235,0.74)] hover:bg-[rgba(244,238,230,0.84)]"
+                  } backdrop-blur-md`}
                 >
                   <p className="font-medium text-[#243328]">{option.label}</p>
                   <p className="mt-2 text-sm leading-6 text-[#5f675c]">
@@ -663,10 +663,10 @@ export default function RecipesPage() {
 
       <section
         ref={recipeSectionRef}
-        className="border-b border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12"
+        className="border-b border-[rgba(230,221,210,0.86)] px-4 py-10 sm:px-6 md:px-10 md:py-12"
       >
         <div className="mx-auto max-w-6xl">
-          <div className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 md:p-8">
+          <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-6 backdrop-blur-md md:p-8">
             <div className="max-w-3xl">
               <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
                 AI recipe suggestion
@@ -682,7 +682,7 @@ export default function RecipesPage() {
               </p>
             </div>
 
-            <div className="mt-6 rounded-[22px] border border-[#e1d8cc] bg-white/70 p-5">
+            <div className="mt-6 rounded-[22px] border border-[#e1d8cc] bg-[rgba(255,255,255,0.64)] p-5 backdrop-blur-sm">
               <div className="mt-0">
                 <label
                   htmlFor="custom-ingredients"
@@ -700,7 +700,7 @@ export default function RecipesPage() {
                   onChange={(e) => setCustomIngredients(e.target.value)}
                   placeholder="e.g. basil, tofu, rice"
                   rows={4}
-                  className="mt-3 w-full rounded-[20px] border border-[#d6cec2] bg-white px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
+                  className="mt-3 w-full rounded-[20px] border border-[#d6cec2] bg-[rgba(255,255,255,0.9)] px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
                 />
               </div>
 
@@ -724,8 +724,8 @@ export default function RecipesPage() {
                         onClick={() => togglePreference(preference)}
                         className={`rounded-full border px-4 py-2 text-sm transition ${
                           isSelected
-                            ? "border-[#aab7a4] bg-[#e9f0e4] text-[#243328]"
-                            : "border-[#d6cec2] bg-white text-[#4f5e52] hover:bg-[#faf7f2]"
+                            ? "border-[#aab7a4] bg-[rgba(233,240,228,0.82)] text-[#243328]"
+                            : "border-[#d6cec2] bg-[rgba(255,255,255,0.86)] text-[#4f5e52] hover:bg-white"
                         }`}
                       >
                         {preference}
@@ -735,7 +735,7 @@ export default function RecipesPage() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-[18px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+              <div className="mt-5 rounded-[18px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.78)] p-4">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -763,7 +763,7 @@ export default function RecipesPage() {
                         {basketIngredients.map((ingredient) => (
                           <span
                             key={ingredient}
-                            className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
+                            className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#4f5e52]"
                           >
                             {ingredient}
                           </span>
@@ -787,7 +787,7 @@ export default function RecipesPage() {
                     {allIngredients.map((ingredient) => (
                       <span
                         key={ingredient}
-                        className="rounded-full border border-[#d6cec2] bg-[#f9f6f1] px-3 py-1.5 text-sm text-[#4f5e52]"
+                        className="rounded-full border border-[#d6cec2] bg-[rgba(249,246,241,0.8)] px-3 py-1.5 text-sm text-[#4f5e52]"
                       >
                         {ingredient}
                       </span>
@@ -797,14 +797,14 @@ export default function RecipesPage() {
               )}
 
               {(selectedQuickStart || selectedPreferences.length > 0) && (
-                <div className="mt-6 rounded-[18px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                <div className="mt-6 rounded-[18px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.78)] p-4">
                   <p className="text-sm font-medium text-[#243328]">
                     This recipe will be shaped by
                   </p>
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     {selectedQuickStart && (
-                      <span className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]">
+                      <span className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#4f5e52]">
                         {
                           quickStartOptions.find(
                             (option) => option.id === selectedQuickStart,
@@ -816,7 +816,7 @@ export default function RecipesPage() {
                     {selectedPreferences.map((preference) => (
                       <span
                         key={preference}
-                        className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
+                        className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#4f5e52]"
                       >
                         {preference}
                       </span>
@@ -847,8 +847,8 @@ export default function RecipesPage() {
 
             <div ref={generatedRecipeRef} className="mt-6 scroll-mt-24">
               {isGenerating && (
-                <div className="overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-white">
-                  <div className="flex h-[220px] items-center justify-center border-b border-[#ece4d8] bg-[#f8f4ee]">
+                <div className="overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-[rgba(255,255,255,0.78)] backdrop-blur-md">
+                  <div className="flex h-[220px] items-center justify-center border-b border-[#ece4d8] bg-[rgba(248,244,238,0.78)]">
                     <div className="text-center">
                       <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#d6cec2] border-t-[#243328]" />
                       <p className="mt-4 font-medium text-[#243328]">
@@ -873,7 +873,7 @@ export default function RecipesPage() {
               )}
 
               {generatedRecipe && (
-                <div className="overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-white">
+                <div className="overflow-hidden rounded-[24px] border border-[#d8d0c4] bg-[rgba(255,255,255,0.8)] backdrop-blur-md">
                   {generatedImageUrl && (
                     <img
                       src={generatedImageUrl}
@@ -937,7 +937,7 @@ export default function RecipesPage() {
                       </div>
                     </div>
 
-                    <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-5">
+                    <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.76)] p-5 backdrop-blur-sm">
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div className="max-w-2xl">
                           <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
@@ -952,7 +952,7 @@ export default function RecipesPage() {
                           </p>
                         </div>
 
-                        <div className="rounded-[18px] border border-[#ddd4c8] bg-white px-4 py-3">
+                        <div className="rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-3">
                           <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
                             Estimated added cost
                           </p>
@@ -969,7 +969,7 @@ export default function RecipesPage() {
                               (item) => (
                                 <div
                                   key={item.productName}
-                                  className="rounded-[18px] border border-[#d6cec2] bg-white p-4"
+                                  className="rounded-[18px] border border-[#d6cec2] bg-[rgba(255,255,255,0.84)] p-4"
                                 >
                                   <p className="text-sm font-medium text-[#243328]">
                                     {item.productName}
@@ -996,14 +996,14 @@ export default function RecipesPage() {
 
                             <Link
                               href="/basket"
-                              className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea]"
+                              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#243328] transition hover:bg-white"
                             >
                               Review basket
                             </Link>
                           </div>
                         </>
                       ) : (
-                        <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-white p-4">
+                        <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] p-4">
                           <p className="text-sm leading-6 text-[#5f675c]">
                             We couldn’t find direct shop matches for this recipe
                             just yet, but you can still use the ingredient list
@@ -1014,7 +1014,7 @@ export default function RecipesPage() {
                     </div>
 
                     <div className="mt-6 grid gap-4 md:grid-cols-3">
-                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.8)] p-4">
                         <p className="text-sm font-medium text-[#243328]">
                           You already have
                         </p>
@@ -1024,7 +1024,7 @@ export default function RecipesPage() {
                             {ingredientBreakdown.alreadyHave.map((item) => (
                               <span
                                 key={item}
-                                className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
+                                className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-3 py-1.5 text-sm text-[#4f5e52]"
                               >
                                 {item}
                               </span>
@@ -1038,7 +1038,7 @@ export default function RecipesPage() {
                         )}
                       </div>
 
-                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.8)] p-4">
                         <p className="text-sm font-medium text-[#243328]">
                           Available from our shop
                         </p>
@@ -1049,7 +1049,7 @@ export default function RecipesPage() {
                               (item) => (
                                 <div
                                   key={item.productName}
-                                  className="rounded-[16px] border border-[#d6cec2] bg-white px-3 py-3"
+                                  className="rounded-[16px] border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-3 py-3"
                                 >
                                   <p className="text-sm font-medium text-[#243328]">
                                     {item.productName}
@@ -1072,7 +1072,7 @@ export default function RecipesPage() {
                         )}
                       </div>
 
-                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[#f9f6f1] p-4">
+                      <div className="rounded-[20px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.8)] p-4">
                         <p className="text-sm font-medium text-[#243328]">
                           Still need elsewhere
                         </p>
@@ -1083,7 +1083,7 @@ export default function RecipesPage() {
                               (item) => (
                                 <span
                                   key={item}
-                                  className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-sm text-[#4f5e52]"
+                                  className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-3 py-1.5 text-sm text-[#4f5e52]"
                                 >
                                   {item}
                                 </span>
@@ -1103,7 +1103,7 @@ export default function RecipesPage() {
                         type="button"
                         onClick={handleGenerateRecipe}
                         disabled={isGenerating}
-                        className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isGenerating ? "Creating..." : "Try another idea"}
                       </button>
@@ -1145,7 +1145,7 @@ export default function RecipesPage() {
         </div>
       </section>
 
-      <section className="border-b border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12">
+      <section className="border-b border-[rgba(230,221,210,0.86)] px-4 py-10 sm:px-6 md:px-10 md:py-12">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
@@ -1161,7 +1161,7 @@ export default function RecipesPage() {
           </div>
 
           {savedRecipes.length === 0 ? (
-            <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-[#f7f2eb] p-6">
+            <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.76)] p-6 backdrop-blur-md">
               <p className="text-sm leading-7 text-[#5f675c]">
                 You haven’t saved any recipes yet. Generate one you like and tap{" "}
                 <span className="font-medium text-[#243328]">
@@ -1175,7 +1175,7 @@ export default function RecipesPage() {
               {savedRecipes.map((recipe) => (
                 <div
                   key={recipe.id}
-                  className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white"
+                  className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.8)] backdrop-blur-md"
                 >
                   {recipe.imageUrl && (
                     <img
@@ -1204,7 +1204,7 @@ export default function RecipesPage() {
                         {recipe.ingredientsUsed.map((ingredient) => (
                           <span
                             key={ingredient}
-                            className="rounded-full border border-[#d6cec2] bg-[#f9f6f1] px-3 py-1.5 text-sm text-[#4f5e52]"
+                            className="rounded-full border border-[#d6cec2] bg-[rgba(249,246,241,0.8)] px-3 py-1.5 text-sm text-[#4f5e52]"
                           >
                             {ingredient}
                           </span>
@@ -1235,7 +1235,7 @@ export default function RecipesPage() {
                       <button
                         type="button"
                         onClick={() => handleRemoveFavourite(recipe.id)}
-                        className="rounded-full border border-[#d6cec2] bg-white px-5 py-2 text-sm text-[#243328] transition hover:bg-[#f5f1ea]"
+                        className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#243328] transition hover:bg-white"
                       >
                         Remove
                       </button>
@@ -1276,7 +1276,7 @@ export default function RecipesPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12">
+      <section className="border-t border-[rgba(230,221,210,0.86)] px-4 py-10 sm:px-6 md:px-10 md:py-12">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
@@ -1292,7 +1292,7 @@ export default function RecipesPage() {
                   <Link
                     key={recipe.slug}
                     href={`/recipes/${recipe.slug}`}
-                    className="block rounded-[20px] border border-[#ddd4c8] bg-[#f7f2eb] p-4 transition hover:shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
+                    className="block rounded-[20px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.74)] p-4 backdrop-blur-md transition hover:shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
                   >
                     <p className="text-sm font-medium text-[#243328]">
                       {recipe.title}
@@ -1318,7 +1318,7 @@ export default function RecipesPage() {
                   <Link
                     key={recipe.slug}
                     href={`/recipes/${recipe.slug}`}
-                    className="block rounded-[20px] border border-[#ddd4c8] bg-[#f7f2eb] p-4 transition hover:shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
+                    className="block rounded-[20px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.74)] p-4 backdrop-blur-md transition hover:shadow-[0_12px_30px_rgba(36,51,40,0.06)]"
                   >
                     <p className="text-sm font-medium text-[#243328]">
                       {recipe.title}
@@ -1334,7 +1334,7 @@ export default function RecipesPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12">
+      <section className="border-t border-[rgba(230,221,210,0.86)] px-4 py-10 sm:px-6 md:px-10 md:py-12">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
@@ -1352,7 +1352,7 @@ export default function RecipesPage() {
             {useItUpIdeas.map((idea) => (
               <div
                 key={idea.title}
-                className="rounded-[20px] border border-[#ddd4c8] bg-[#f7f2eb] p-5"
+                className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.74)] p-5 backdrop-blur-md"
               >
                 <h3 className="font-serif text-xl">{idea.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-[#5f675c]">
@@ -1364,7 +1364,7 @@ export default function RecipesPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#e6ddd2] px-4 py-10 sm:px-6 md:px-10 md:py-12">
+      <section className="border-t border-[rgba(230,221,210,0.86)] px-4 py-10 sm:px-6 md:px-10 md:py-12">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
@@ -1382,7 +1382,7 @@ export default function RecipesPage() {
             {prompts.map((prompt) => (
               <div
                 key={prompt.ingredient}
-                className="rounded-[20px] border border-[#ddd4c8] bg-[#f7f2eb] px-4 py-4 md:px-5"
+                className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.74)] px-4 py-4 backdrop-blur-md md:px-5"
               >
                 <p className="text-sm leading-6 text-[#243328] md:text-base">
                   <span className="font-medium">{prompt.ingredient}</span>
