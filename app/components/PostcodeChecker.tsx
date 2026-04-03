@@ -3,24 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-const DELIVERY_OUTWARD_CODES = [
-  "G1",
-  "G2",
-  "G3",
-  "G4",
-  "G11",
-  "G12",
-  "G13",
-  "G20",
-  "G31",
-  "G41",
-  "G42",
-  "G43",
-  "G44",
-  "G51",
-  "G52",
-  "G53",
-];
+const DELIVERY_OUTWARD_CODES = ["ML11"];
 
 type PostcodeStatus = "idle" | "available" | "unavailable" | "invalid";
 type RegisterInterestStatus = "idle" | "success" | "error";
@@ -138,9 +121,9 @@ Thank you.`);
         </h2>
 
         <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-          Planning works wherever you are. Ordering is available in Lanark and
-          nearby for now, with delivery areas expanding over time. Enter your
-          postcode to see whether delivery is available where you are.
+          Planning works wherever you are. Ordering is available across the
+          Lanark area for now, with delivery areas expanding over time. Enter
+          your postcode to see whether delivery is available where you are.
         </p>
 
         <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
@@ -148,7 +131,11 @@ Thank you.`);
             value={postcode}
             onChange={(e) => {
               setPostcode(e.target.value);
-              if (postcodeStatus !== "idle") setPostcodeStatus("idle");
+
+              if (postcodeStatus !== "idle") {
+                setPostcodeStatus("idle");
+              }
+
               if (interestStatus !== "idle") {
                 setInterestStatus("idle");
                 setInterestMessage("");
@@ -162,7 +149,9 @@ Thank you.`);
             placeholder="Enter postcode"
             className="flex-1 rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm uppercase tracking-[0.08em] text-[#243328] outline-none placeholder:normal-case placeholder:tracking-normal placeholder:text-[#8b8b7c]"
           />
+
           <button
+            type="button"
             onClick={checkPostcode}
             className="rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#243328]"
           >
@@ -177,8 +166,8 @@ Thank you.`);
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#4f6b55]">
-              You&apos;re within our current delivery area, so you can shop
-              produce boxes and pantry essentials.
+              You&apos;re within our delivery area, so you can now shop produce
+              boxes and pantry essentials.
             </p>
 
             <div className="mt-4 flex flex-wrap gap-3">
@@ -218,6 +207,7 @@ Thank you.`);
                 value={interestEmail}
                 onChange={(e) => {
                   setInterestEmail(e.target.value);
+
                   if (interestStatus !== "idle") {
                     setInterestStatus("idle");
                     setInterestMessage("");
@@ -228,6 +218,7 @@ Thank you.`);
               />
 
               <button
+                type="button"
                 onClick={registerInterest}
                 className="rounded-full border border-[#243328] bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f5f1ea]"
               >
@@ -263,7 +254,7 @@ Thank you.`);
 
         {postcodeStatus === "invalid" && (
           <div className="mt-6 inline-flex rounded-full border border-[#e6dccf] bg-[#fbf7f1] px-4 py-2 text-sm text-[#7a6753]">
-            Please enter a valid UK postcode, for example G12 8QQ.
+            Please enter a valid UK postcode, for example ML11 7AB.
           </div>
         )}
       </div>

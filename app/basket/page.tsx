@@ -305,12 +305,19 @@ Thanks!`,
           </div>
         </header>
 
-        <div className="mb-5">
+        <div className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2">
           <Link
             href="/shop"
             className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
           >
             ← Continue shopping
+          </Link>
+
+          <Link
+            href="/planner"
+            className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
+          >
+            Continue planning
           </Link>
         </div>
 
@@ -318,38 +325,27 @@ Thanks!`,
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Local delivery around Lanark
+                Local delivery across ML11
               </p>
               <h1 className="mt-2 font-serif text-[2.2rem] leading-tight md:text-[3.3rem]">
-                Review your basket and choose how this week should work.
+                Review your basket for the week ahead
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164] md:text-base">
-                Weekly keeps subscription-friendly items repeating and one-off
-                extras as one-offs. One-off treats everything as a one-time
-                order.
+                Choose whether this is a one-off order or a weekly rhythm.
+                Subscription-friendly items repeat only when you choose Weekly.
               </p>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[340px]">
-              <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.8)] px-4 py-3">
-                <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                  Basket
-                </p>
-                <p className="mt-1 font-serif text-2xl text-[#243328]">
-                  {totalItems} item{totalItems === 1 ? "" : "s"}
-                </p>
-                <p className="mt-1 text-sm text-[#5f675c]">
-                  £{orderTotal.toFixed(2)} today
-                </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#5f675c]">
+                {totalItems} item{totalItems === 1 ? "" : "s"} · £
+                {orderTotal.toFixed(2)} today
               </div>
 
-              <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.8)] px-4 py-3">
-                <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                  Delivery
-                </p>
-                <p className="mt-1 text-sm leading-6 text-[#5f675c]">
-                  £2.50 under £30, free at £30 and above.
-                </p>
+              <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#5f675c]">
+                {delivery === 0
+                  ? "Free delivery"
+                  : `£${DELIVERY_FEE.toFixed(2)} delivery under £${FREE_DELIVERY_THRESHOLD}`}
               </div>
             </div>
           </div>
@@ -368,7 +364,7 @@ Thanks!`,
 
               <p className="mx-auto mt-3 text-sm leading-6 text-[#667164] md:text-base">
                 Start with a produce box, then add pantry items or extras. You
-                can still use recipes and the planner wherever you are.
+                can plan meals from anywhere, and order locally across ML11.
               </p>
 
               <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -491,7 +487,7 @@ Thanks!`,
                     Order type
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
-                    How should this order work?
+                    Choose how this order should work
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-[#667164]">
                     Choose One-off for this week only, or Weekly if your
@@ -558,7 +554,7 @@ Thanks!`,
 
                   <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
                     <p className="text-sm leading-6 text-[#667164]">
-                      This helps keep your regular box simple while letting you
+                      This keeps your regular box simple while still letting you
                       add flexible extras when you need them.
                     </p>
                   </div>
@@ -651,10 +647,16 @@ Thanks!`,
                     Local delivery
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    We currently deliver locally around Lanark. If anything
+                    Delivery is currently available across ML11. If anything
                     about your order needs checked, we’ll confirm it with you
                     directly.
                   </p>
+                  <Link
+                    href="/#postcode-checker"
+                    className="mt-3 inline-flex text-sm text-[#243328] underline underline-offset-4 transition hover:text-[#4f5e52]"
+                  >
+                    Check your postcode
+                  </Link>
                 </div>
 
                 <div className="mt-5 space-y-3">
