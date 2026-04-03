@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "The Local Pantry",
   description: "Seasonal groceries from local farms",
   applicationName: "The Local Pantry",
+  themeColor: "#2f4635",
   icons: {
     icon: "/icon-512.png",
     apple: "/apple-icon.png",
@@ -27,13 +28,10 @@ export default function RootLayout({
     <html lang="en">
       <body className="text-[#243328] antialiased">
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-          {/* Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.28]"
             style={{ backgroundImage: "url('/hero.jpg')" }}
           />
-
-          {/* Single soft cream wash (no gradient) */}
           <div className="absolute inset-0 bg-[rgba(247,244,236,0.55)]" />
         </div>
 
