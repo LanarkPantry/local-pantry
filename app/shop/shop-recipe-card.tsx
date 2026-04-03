@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
+import { allShopItems } from "./shop-data";
 
 type GeneratedRecipe = {
   title: string;
@@ -24,10 +25,36 @@ type StarterBox = {
   weeklyIncludes?: string[];
 };
 
+type SavedRecipe = {
+  id: string;
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+  pantryStaples: string[];
+  steps: string[];
+  imageUrl: string | null;
+  savedAt: string;
+};
+
+type PlannerRecipe = {
+  id: string;
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+  pantryStaples: string[];
+  steps: string[];
+  imageUrl: string | null;
+  savedAt: string;
+  addedToPlannerAt: string;
+};
+
 type ShopRecipeCardProps = {
   starterBox?: StarterBox | null;
   onStartWeeklyBox?: () => void;
 };
+
+const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
+const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
 
 const DEFAULT_BOX_INGREDIENTS = [
   "carrots",
@@ -37,11 +64,26 @@ const DEFAULT_BOX_INGREDIENTS = [
   "onions",
 ];
 
+function normaliseIngredient(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[0-9]/g, "")
+    .replace(/[^\w\s]/g, " ")
+    .replace(
+      /\b(clove|cloves|tbsp|tsp|g|kg|ml|l|cup|cups|large|small|medium)\b/g,
+      "",
+    )
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/ies\b/g, "y")
+    .replace(/s\b/g, "");
+}
+
 export default function ShopRecipeCard({
   starterBox,
   onStartWeeklyBox,
 }: ShopRecipeCardProps) {
-  const { groupedCart } = useCart();
+  const { groupedCart, addToCart } = useCart();
 
   const basketItemNames = useMemo(
     () => groupedCart.map((entry) => entry.item.name),
@@ -70,6 +112,12 @@ export default function ShopRecipeCard({
   const [error, setError] = useState("");
   const [result, setResult] = useState<RecipeResponse | null>(null);
 
+  const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
+  const [plannerRecipes, setPlannerRecipes] = useState<PlannerRecipe[]>([]);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [plannerMessage, setPlannerMessage] = useState("");
+  const [basketMessage, setBasketMessage] = useState("");
+
   const parsedItems = useMemo(
     () =>
       input
@@ -80,14 +128,197 @@ export default function ShopRecipeCard({
   );
 
   useEffect(() => {
+    try {
+      const storedRecipes = localStorage.getItem(FAVOURITES_STORAGE_KEY);
+
+      if (!storedRecipes) {
+        setSavedRecipes([]);
+      } else {
+        const parsedRecipes = JSON.parse(storedRecipes) as SavedRecipe[];
+        setSavedRecipes(Array.isArray(parsedRecipes) ? parsedRecipes : []);
+      }
+    } catch {
+      setSavedRecipes([]);
+    }
+
+    try {
+      const storedPlannerRecipes = localStorage.getItem(
+        PLANNER_RECIPES_STORAGE_KEY,
+      );
+
+      if (!storedPlannerRecipes) {
+        setPlannerRecipes([]);
+      } else {
+        const parsedPlannerRecipes = JSON.parse(
+          storedPlannerRecipes,
+        ) as PlannerRecipe[];
+        setPlannerRecipes(
+          Array.isArray(parsedPlannerRecipes) ? parsedPlannerRecipes : [],
+        );
+      }
+    } catch {
+      setPlannerRecipes([]);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!starterBoxAlreadyInBasket) return;
     setUseBasketItems(true);
   }, [starterBoxAlreadyInBasket]);
+
+  useEffect(() => {
+    if (!saveMessage) return;
+    const timeout = window.setTimeout(() => setSaveMessage(""), 2500);
+    return () => window.clearTimeout(timeout);
+  }, [saveMessage]);
+
+  useEffect(() => {
+    if (!plannerMessage) return;
+    const timeout = window.setTimeout(() => setPlannerMessage(""), 2500);
+    return () => window.clearTimeout(timeout);
+  }, [plannerMessage]);
+
+  useEffect(() => {
+    if (!basketMessage) return;
+    const timeout = window.setTimeout(() => setBasketMessage(""), 2500);
+    return () => window.clearTimeout(timeout);
+  }, [basketMessage]);
+
+  const isCurrentRecipeSaved = useMemo(() => {
+    if (!result?.recipe) return false;
+
+    return savedRecipes.some(
+      (recipe) =>
+        recipe.title === result.recipe.title &&
+        recipe.description === result.recipe.description,
+    );
+  }, [result, savedRecipes]);
+
+  const currentRecipePlannerId = useMemo(() => {
+    if (!result?.recipe) return null;
+
+    const savedMatch = savedRecipes.find(
+      (recipe) =>
+        recipe.title === result.recipe.title &&
+        recipe.description === result.recipe.description,
+    );
+
+    if (savedMatch) return savedMatch.id;
+
+    return `${result.recipe.title}::${result.recipe.description}`;
+  }, [result, savedRecipes]);
+
+  const isCurrentRecipeInPlanner = useMemo(() => {
+    if (!currentRecipePlannerId) return false;
+
+    return plannerRecipes.some(
+      (recipe) => recipe.id === currentRecipePlannerId,
+    );
+  }, [plannerRecipes, currentRecipePlannerId]);
+
+  const basketNormalised = useMemo(() => {
+    return basketItemNames.map((item) => ({
+      original: item,
+      normalised: normaliseIngredient(item),
+    }));
+  }, [basketItemNames]);
+
+  const ingredientBreakdown = useMemo(() => {
+    if (!result?.recipe) {
+      return {
+        alreadyHave: [] as string[],
+        availableFromShop: [] as {
+          ingredient: string;
+          productName: string;
+          price: number;
+        }[],
+        stillNeedElsewhere: [] as string[],
+      };
+    }
+
+    const alreadyHave: string[] = [];
+    const availableFromShop: {
+      ingredient: string;
+      productName: string;
+      price: number;
+    }[] = [];
+    const stillNeedElsewhere: string[] = [];
+
+    result.recipe.ingredientsUsed.forEach((ingredient) => {
+      const normalisedRecipeIngredient = normaliseIngredient(ingredient);
+
+      const basketMatch = basketNormalised.some(
+        (basketItem) =>
+          basketItem.normalised &&
+          normalisedRecipeIngredient &&
+          (basketItem.normalised.includes(normalisedRecipeIngredient) ||
+            normalisedRecipeIngredient.includes(basketItem.normalised)),
+      );
+
+      if (basketMatch) {
+        alreadyHave.push(ingredient);
+        return;
+      }
+
+      const matchedShopItem = allShopItems.find((shopItem) => {
+        const searchableText = [
+          shopItem.name,
+          shopItem.description,
+          shopItem.details ?? "",
+          ...(shopItem.weeklyIncludes ?? []),
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const normalisedShopText = normaliseIngredient(searchableText);
+
+        return (
+          normalisedRecipeIngredient.length > 0 &&
+          (normalisedShopText.includes(normalisedRecipeIngredient) ||
+            normalisedRecipeIngredient.includes(
+              normaliseIngredient(shopItem.name),
+            ))
+        );
+      });
+
+      if (matchedShopItem) {
+        const alreadyListed = availableFromShop.some(
+          (entry) => entry.productName === matchedShopItem.name,
+        );
+
+        if (!alreadyListed) {
+          availableFromShop.push({
+            ingredient,
+            productName: matchedShopItem.name,
+            price: matchedShopItem.price,
+          });
+        }
+      } else {
+        stillNeedElsewhere.push(ingredient);
+      }
+    });
+
+    return {
+      alreadyHave,
+      availableFromShop,
+      stillNeedElsewhere,
+    };
+  }, [result, basketNormalised]);
+
+  const matchedShopTotal = useMemo(() => {
+    return ingredientBreakdown.availableFromShop.reduce(
+      (sum, item) => sum + item.price,
+      0,
+    );
+  }, [ingredientBreakdown.availableFromShop]);
 
   async function generateRecipeFromItems(itemsToUse: string[]) {
     setLoading(true);
     setError("");
     setResult(null);
+    setSaveMessage("");
+    setPlannerMessage("");
+    setBasketMessage("");
 
     const uniqueItems = Array.from(new Set(itemsToUse.filter(Boolean))).slice(
       0,
@@ -143,6 +374,105 @@ export default function ShopRecipeCard({
       ...starterBoxIngredients,
       ...basketItemNames,
     ]);
+  }
+
+  function handleSaveFavourite() {
+    if (!result?.recipe) return;
+
+    const alreadySaved = savedRecipes.some(
+      (recipe) =>
+        recipe.title === result.recipe.title &&
+        recipe.description === result.recipe.description,
+    );
+
+    if (alreadySaved) {
+      setSaveMessage("This recipe is already in your favourites.");
+      return;
+    }
+
+    const recipeToSave: SavedRecipe = {
+      id: `${result.recipe.title}-${Date.now()}`,
+      title: result.recipe.title,
+      description: result.recipe.description,
+      ingredientsUsed: result.recipe.ingredientsUsed,
+      pantryStaples: result.recipe.pantryStaples,
+      steps: result.recipe.steps,
+      imageUrl: result.imageUrl,
+      savedAt: new Date().toISOString(),
+    };
+
+    const updatedRecipes = [recipeToSave, ...savedRecipes];
+    setSavedRecipes(updatedRecipes);
+    localStorage.setItem(
+      FAVOURITES_STORAGE_KEY,
+      JSON.stringify(updatedRecipes),
+    );
+    setSaveMessage("Saved to favourites.");
+  }
+
+  function handleAddToPlanner() {
+    if (!result?.recipe) return;
+
+    const savedMatch = savedRecipes.find(
+      (recipe) =>
+        recipe.title === result.recipe.title &&
+        recipe.description === result.recipe.description,
+    );
+
+    const baseId =
+      savedMatch?.id ?? `${result.recipe.title}::${result.recipe.description}`;
+
+    const alreadyAdded = plannerRecipes.some((item) => item.id === baseId);
+
+    if (alreadyAdded) {
+      setPlannerMessage("That recipe is already ready in your planner.");
+      return;
+    }
+
+    const plannerRecipe: PlannerRecipe = {
+      id: baseId,
+      title: result.recipe.title,
+      description: result.recipe.description,
+      ingredientsUsed: result.recipe.ingredientsUsed,
+      pantryStaples: result.recipe.pantryStaples,
+      steps: result.recipe.steps,
+      imageUrl: result.imageUrl,
+      savedAt: savedMatch?.savedAt ?? new Date().toISOString(),
+      addedToPlannerAt: new Date().toISOString(),
+    };
+
+    const updatedPlannerRecipes = [plannerRecipe, ...plannerRecipes];
+    setPlannerRecipes(updatedPlannerRecipes);
+    localStorage.setItem(
+      PLANNER_RECIPES_STORAGE_KEY,
+      JSON.stringify(updatedPlannerRecipes),
+    );
+    setPlannerMessage("Added to planner.");
+  }
+
+  function handleAddAvailableItemsToBasket() {
+    const itemsToAdd = ingredientBreakdown.availableFromShop
+      .map((entry) =>
+        allShopItems.find((shopItem) => shopItem.name === entry.productName),
+      )
+      .filter(Boolean);
+
+    if (itemsToAdd.length === 0) {
+      setBasketMessage("There weren’t any matching shop items to add.");
+      return;
+    }
+
+    itemsToAdd.forEach((item) => {
+      addToCart({
+        name: item!.name,
+        price: item!.price,
+        image: item!.image,
+        category: item!.category,
+        checkoutType: item!.checkoutType,
+      });
+    });
+
+    setBasketMessage("Available ingredients have been added to your basket.");
   }
 
   const helperSummary =
@@ -317,34 +647,100 @@ export default function ShopRecipeCard({
                 </div>
               ) : null}
 
+              <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.76)] p-5">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div className="max-w-2xl">
+                    <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
+                      Shop this recipe
+                    </p>
+                    <h4 className="mt-2 font-serif text-xl md:text-2xl">
+                      Turn this idea into your next basket.
+                    </h4>
+                    <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                      We’ve matched the recipe to products already in your shop
+                      where we can.
+                    </p>
+                  </div>
+
+                  <div className="rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-3">
+                    <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                      Estimated added cost
+                    </p>
+                    <p className="mt-1 font-serif text-2xl text-[#243328]">
+                      £{matchedShopTotal.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+
+                {ingredientBreakdown.availableFromShop.length > 0 ? (
+                  <>
+                    <div className="mt-5 grid gap-3 md:grid-cols-2">
+                      {ingredientBreakdown.availableFromShop.map((item) => (
+                        <div
+                          key={item.productName}
+                          className="rounded-[18px] border border-[#d6cec2] bg-[rgba(255,255,255,0.84)] p-4"
+                        >
+                          <p className="text-sm font-medium text-[#243328]">
+                            {item.productName}
+                          </p>
+                          <p className="mt-1 text-sm text-[#5f675c]">
+                            Matches: {item.ingredient}
+                          </p>
+                          <p className="mt-2 text-sm text-[#5f675c]">
+                            £{item.price.toFixed(2)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={handleAddAvailableItemsToBasket}
+                        className="rounded-full bg-[#243328] px-5 py-2 text-sm text-white transition hover:opacity-90"
+                      >
+                        Add matched items
+                      </button>
+
+                      <Link
+                        href="/basket"
+                        className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#243328] transition hover:bg-white"
+                      >
+                        Review basket
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] p-4">
+                    <p className="text-sm leading-6 text-[#5f675c]">
+                      We couldn’t find direct shop matches for this recipe just
+                      yet, but you can still use the ingredient list as a guide
+                      for your next order.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button
                   type="button"
-                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  onClick={handleSaveFavourite}
+                  disabled={isCurrentRecipeSaved}
+                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Save to favourites
+                  {isCurrentRecipeSaved
+                    ? "Already saved"
+                    : "Save to favourites"}
                 </button>
 
                 <button
                   type="button"
-                  className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
+                  onClick={handleAddToPlanner}
+                  disabled={isCurrentRecipeInPlanner}
+                  className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Add to planner
+                  {isCurrentRecipeInPlanner ? "In planner" : "Add to planner"}
                 </button>
-
-                <button
-                  type="button"
-                  className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
-                >
-                  Add matched items
-                </button>
-
-                <Link
-                  href="/basket"
-                  className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
-                >
-                  Review basket
-                </Link>
 
                 <button
                   type="button"
@@ -355,6 +751,24 @@ export default function ShopRecipeCard({
                   Try another idea
                 </button>
               </div>
+
+              {saveMessage ? (
+                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                  {saveMessage}
+                </div>
+              ) : null}
+
+              {plannerMessage ? (
+                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                  {plannerMessage}
+                </div>
+              ) : null}
+
+              {basketMessage ? (
+                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                  {basketMessage}
+                </div>
+              ) : null}
             </div>
           </div>
         ) : null}
