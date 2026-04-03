@@ -314,16 +314,46 @@ Thanks!`,
           </Link>
         </div>
 
-        <div className="mb-6 max-w-2xl">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#6b776c]">
-            Your order
-          </p>
-          <h1 className="mt-2 font-serif text-4xl md:text-6xl">Basket</h1>
-          <p className="mt-3 text-sm leading-6 text-[#667164] md:text-base">
-            Review your items, choose one-off or weekly, and add any delivery
-            notes before checkout.
-          </p>
-        </div>
+        <section className="mb-6 rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                Local delivery around Lanark
+              </p>
+              <h1 className="mt-2 font-serif text-[2.2rem] leading-tight md:text-[3.3rem]">
+                Review your basket and choose how this week should work.
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164] md:text-base">
+                Weekly keeps subscription-friendly items repeating and one-off
+                extras as one-offs. One-off treats everything as a one-time
+                order.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[340px]">
+              <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.8)] px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                  Basket
+                </p>
+                <p className="mt-1 font-serif text-2xl text-[#243328]">
+                  {totalItems} item{totalItems === 1 ? "" : "s"}
+                </p>
+                <p className="mt-1 text-sm text-[#5f675c]">
+                  £{orderTotal.toFixed(2)} today
+                </p>
+              </div>
+
+              <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.8)] px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                  Delivery
+                </p>
+                <p className="mt-1 text-sm leading-6 text-[#5f675c]">
+                  £2.50 under £30, free at £30 and above.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {cart.length === 0 ? (
           <section className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-10">
@@ -337,7 +367,8 @@ Thanks!`,
               </h2>
 
               <p className="mx-auto mt-3 text-sm leading-6 text-[#667164] md:text-base">
-                Start with a produce box, then add pantry items or extras.
+                Start with a produce box, then add pantry items or extras. You
+                can still use recipes and the planner wherever you are.
               </p>
 
               <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -349,10 +380,10 @@ Thanks!`,
                 </Link>
 
                 <Link
-                  href="/recipes"
+                  href="/planner"
                   className="w-full rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-white sm:w-auto"
                 >
-                  View recipes
+                  Open planner
                 </Link>
               </div>
             </div>
@@ -384,7 +415,7 @@ Thanks!`,
                             Weekly items
                           </h3>
                           <p className="mt-1 text-sm text-[#667164]">
-                            Best suited to recurring delivery.
+                            These repeat only if you choose Weekly.
                           </p>
                         </div>
                         <span className="rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-xs text-[#5f675c]">
@@ -406,7 +437,7 @@ Thanks!`,
                             One-off add-ons
                           </h3>
                           <p className="mt-1 text-sm text-[#667164]">
-                            Flexible extras for this order.
+                            These stay one-off, even if you choose Weekly.
                           </p>
                         </div>
                         <span className="rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-xs text-[#5f675c]">
@@ -456,15 +487,15 @@ Thanks!`,
 
               <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
                 <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                     Order type
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
                     How should this order work?
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-[#667164]">
-                    Choose one-off for this week, or weekly if your produce box
-                    should repeat.
+                    Choose One-off for this week only, or Weekly if your
+                    subscription-friendly items should repeat.
                   </p>
 
                   <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -483,7 +514,8 @@ Thanks!`,
                             One-off
                           </div>
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
-                            Everything is for this week only.
+                            Everything in this basket is treated as a one-time
+                            order.
                           </p>
                         </div>
 
@@ -510,7 +542,8 @@ Thanks!`,
                             Weekly
                           </div>
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
-                            Your produce box repeats. Add-ons stay one-off.
+                            Subscription-friendly items repeat. One-off add-ons
+                            stay one-off.
                           </p>
                         </div>
 
@@ -521,6 +554,13 @@ Thanks!`,
                         )}
                       </div>
                     </button>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
+                    <p className="text-sm leading-6 text-[#667164]">
+                      This helps keep your regular box simple while letting you
+                      add flexible extras when you need them.
+                    </p>
                   </div>
 
                   {isSubscription && subscriptionItemCount === 0 && (
@@ -539,15 +579,15 @@ Thanks!`,
 
               <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
                 <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                     Delivery notes
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
                     Anything we should know?
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-[#667164]">
-                    Add any useful delivery details, like a safe place or gate
-                    code.
+                    Add any useful delivery details, like a safe place, gate
+                    code, or anything that helps us keep things straightforward.
                   </p>
 
                   <label htmlFor="delivery-notes" className="sr-only">
@@ -579,7 +619,7 @@ Thanks!`,
 
             <aside className="min-w-0 lg:sticky lg:top-8">
               <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
-                <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                   Order summary
                 </p>
 
@@ -607,9 +647,13 @@ Thanks!`,
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
-                  <p className="text-sm font-medium text-[#243328]">Delivery</p>
+                  <p className="text-sm font-medium text-[#243328]">
+                    Local delivery
+                  </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    £2.50 under £30, free at £30 and above.
+                    We currently deliver locally around Lanark. If anything
+                    about your order needs checked, we’ll confirm it with you
+                    directly.
                   </p>
                 </div>
 
@@ -635,7 +679,7 @@ Thanks!`,
                   </a>
 
                   <p className="text-center text-xs leading-5 text-[#7a8478]">
-                    We&apos;ll confirm delivery details with you directly.
+                    We’ll confirm delivery details with you directly.
                   </p>
                 </div>
 
@@ -675,7 +719,7 @@ Thanks!`,
               className="min-w-0 flex-1 truncate rounded-full bg-[#2f4635] px-4 py-2 text-center text-sm font-medium text-white transition hover:opacity-90"
             >
               {totalItems} item{totalItems === 1 ? "" : "s"} · £
-              {total.toFixed(2)}
+              {orderTotal.toFixed(2)}
             </Link>
           </div>
         </div>

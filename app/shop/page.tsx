@@ -114,7 +114,9 @@ export default function ShopPage() {
           </button>
         </div>
 
-        <span className="text-sm text-[#5f675c]">Added to basket</span>
+        <span className="text-sm text-[#5f675c]">
+          {quantity} added to basket
+        </span>
       </div>
     );
   };
@@ -277,13 +279,9 @@ export default function ShopPage() {
                     </p>
                   ) : null}
 
-                  <button
-                    type="button"
-                    onClick={() => addDisplayItemToCart(weeklyProduceBox)}
-                    className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                  >
-                    Add smaller box
-                  </button>
+                  <div className="mt-4">
+                    {renderAddControls(weeklyProduceBox)}
+                  </div>
                 </div>
               ) : null}
 
@@ -314,13 +312,9 @@ export default function ShopPage() {
                     </p>
                   ) : null}
 
-                  <button
-                    type="button"
-                    onClick={() => addDisplayItemToCart(familyProduceBox)}
-                    className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                  >
-                    Add larger box
-                  </button>
+                  <div className="mt-4">
+                    {renderAddControls(familyProduceBox)}
+                  </div>
                 </div>
               ) : null}
             </div>

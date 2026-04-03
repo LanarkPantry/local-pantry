@@ -205,8 +205,6 @@ export default function ShopRecipeCard({
     try {
       const normalisedPlannerRecipes = readPlannerRecipes();
       setPlannerRecipes(normalisedPlannerRecipes);
-
-      // Re-save in the lighter format so older heavier planner entries are slimmed down.
       writePlannerRecipes(normalisedPlannerRecipes);
     } catch {
       setPlannerRecipes([]);
@@ -414,7 +412,6 @@ export default function ShopRecipeCard({
 
   async function handleGenerate() {
     const items = [...parsedItems, ...(useBasketItems ? basketItemNames : [])];
-
     await generateRecipeFromItems(items);
   }
 
@@ -551,60 +548,73 @@ export default function ShopRecipeCard({
       id="shop-recipe-card"
       className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6"
     >
-      <div className="max-w-2xl">
-        <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-          Meals for the week
-        </p>
+      <div className="flex flex-col gap-4">
+        <div className="max-w-2xl">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+            Meal generator
+          </p>
 
-        <h2 className="mt-2 font-serif text-2xl leading-tight md:text-3xl">
-          Plan meals around your box
-        </h2>
+          <h2 className="mt-2 font-serif text-2xl leading-tight md:text-3xl">
+            Start with what you’ve got, then decide what to shop.
+          </h2>
 
-        <p className="mt-3 text-sm leading-7 text-[#667164]">
-          Start with your weekly veg box, or add a few ingredients and we’ll
-          suggest something simple and useful.
-        </p>
-      </div>
-
-      <div className="mt-5 rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.72)] p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <button
-            type="button"
-            onClick={onStartWeeklyBox}
-            className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-          >
-            {starterBoxAlreadyInBasket
-              ? "Weekly box added"
-              : "Start your weekly box"}
-          </button>
-
-          <button
-            type="button"
-            onClick={handlePlanMealsWithBox}
-            disabled={loading}
-            className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
-          >
-            Plan meals with this box
-          </button>
+          <p className="mt-3 text-sm leading-6 text-[#667164]">
+            This works as a planning tool wherever you are. And if you’re in our
+            delivery area, we can help turn the recipe into your next basket.
+          </p>
         </div>
 
-        <p className="mt-3 text-sm text-[#5f675c]">
-          We’ll use this week’s box contents as a starting point, then you can
-          top up with a few extras.
-        </p>
+        <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                Good place to start
+              </p>
+              <p className="mt-2 text-base font-medium text-[#243328]">
+                Use your weekly box as the base, or type a few ingredients
+                below.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                Check your postcode for delivery around Lanark before building a
+                full basket.
+              </p>
+            </div>
 
-        {starterBoxIngredients.length > 0 ? (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {starterBoxIngredients.map((item) => (
-              <span
-                key={item}
-                className="rounded-full border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] px-3 py-1 text-sm text-[#5f675c]"
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <button
+                type="button"
+                onClick={onStartWeeklyBox}
+                className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
               >
-                {item}
-              </span>
-            ))}
+                {starterBoxAlreadyInBasket
+                  ? "Weekly box added"
+                  : "Add weekly box"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePlanMealsWithBox}
+                disabled={loading}
+                className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+              >
+                Plan from this box
+              </button>
+            </div>
           </div>
-        ) : null}
+
+          {starterBoxIngredients.length > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {starterBoxIngredients.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] px-3 py-1 text-sm text-[#5f675c]"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-5 grid gap-4">
@@ -613,7 +623,7 @@ export default function ShopRecipeCard({
             htmlFor="shop-recipe-input"
             className="mb-2 block text-sm font-medium text-[#243328]"
           >
-            Or start with a few ingredients
+            Add a few ingredients
           </label>
 
           <input
@@ -655,7 +665,7 @@ export default function ShopRecipeCard({
             disabled={loading}
             className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
           >
-            {loading ? "Generating..." : "Generate recipe"}
+            {loading ? "Generating..." : "Generate meal idea"}
           </button>
 
           {helperSummary ? (
@@ -684,8 +694,8 @@ export default function ShopRecipeCard({
             ) : null}
 
             <div className="p-5">
-              <p className="text-sm uppercase tracking-[0.16em] text-[#6b776c]">
-                Recipe idea
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                Meal idea
               </p>
 
               <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
@@ -709,23 +719,67 @@ export default function ShopRecipeCard({
                 </div>
               ) : null}
 
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleAddToPlanner}
+                  disabled={isCurrentRecipeInPlanner}
+                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isCurrentRecipeInPlanner ? "In planner" : "Add to planner"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSaveFavourite}
+                  disabled={isCurrentRecipeSaved}
+                  className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isCurrentRecipeSaved
+                    ? "Already saved"
+                    : "Save to favourites"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={loading}
+                  className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328] disabled:opacity-60"
+                >
+                  Try another idea
+                </button>
+              </div>
+
+              {saveMessage ? (
+                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                  {saveMessage}
+                </div>
+              ) : null}
+
+              {plannerMessage ? (
+                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                  {plannerMessage}
+                </div>
+              ) : null}
+
               <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.76)] p-5">
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="max-w-2xl">
-                    <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
-                      Shop this recipe
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                      If you’re in our delivery area
                     </p>
                     <h4 className="mt-2 font-serif text-xl md:text-2xl">
-                      Turn this idea into your next basket.
+                      Turn this into your next basket.
                     </h4>
                     <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                      We’ve matched the recipe to products already in your shop
-                      where we can.
+                      We’ve matched the recipe to products already in the shop
+                      where we can. If you’re not local, you can still use this
+                      as a useful shopping guide.
                     </p>
                   </div>
 
                   <div className="rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-3">
-                    <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
                       Estimated added cost
                     </p>
                     <p className="mt-1 font-serif text-2xl text-[#243328]">
@@ -775,62 +829,19 @@ export default function ShopRecipeCard({
                 ) : (
                   <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] p-4">
                     <p className="text-sm leading-6 text-[#5f675c]">
-                      We couldn’t find direct shop matches for this recipe just
-                      yet, but you can still use the ingredient list as a guide
-                      for your next order.
+                      We couldn’t find direct shop matches for this one yet, but
+                      the ingredient list still gives you a useful plan for the
+                      week.
                     </p>
                   </div>
                 )}
+
+                {basketMessage ? (
+                  <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                    {basketMessage}
+                  </div>
+                ) : null}
               </div>
-
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <button
-                  type="button"
-                  onClick={handleSaveFavourite}
-                  disabled={isCurrentRecipeSaved}
-                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isCurrentRecipeSaved
-                    ? "Already saved"
-                    : "Save to favourites"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleAddToPlanner}
-                  disabled={isCurrentRecipeInPlanner}
-                  className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isCurrentRecipeInPlanner ? "In planner" : "Add to planner"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={loading}
-                  className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328] disabled:opacity-60"
-                >
-                  Try another idea
-                </button>
-              </div>
-
-              {saveMessage ? (
-                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                  {saveMessage}
-                </div>
-              ) : null}
-
-              {plannerMessage ? (
-                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                  {plannerMessage}
-                </div>
-              ) : null}
-
-              {basketMessage ? (
-                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                  {basketMessage}
-                </div>
-              ) : null}
             </div>
           </div>
         ) : null}
