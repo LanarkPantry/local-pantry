@@ -55,11 +55,47 @@ const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
 const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
 
 const DEFAULT_BOX_INGREDIENTS = [
-  "carrots",
   "potatoes",
-  "leeks",
-  "apples",
   "onions",
+  "garlic",
+  "carrots",
+  "celery",
+  "sweet potato",
+  "peppers",
+  "courgette",
+  "ginger",
+  "leeks",
+  "lettuce",
+  "cucumber",
+  "tomatoes",
+  "spinach",
+  "basil",
+  "rosemary",
+  "thyme",
+  "coriander",
+  "avocado",
+  "broccoli",
+  "bananas",
+  "apples",
+  "oranges",
+  "strawberries",
+  "grapes",
+  "melon",
+  "seasonal extras",
+  "occasional specials like lychees, dragon fruit, Jerusalem artichokes or pineapple",
+];
+
+const FRUIT_KEYWORDS = [
+  "apple",
+  "banana",
+  "orange",
+  "strawberry",
+  "grape",
+  "melon",
+  "pineapple",
+  "lychee",
+  "dragon fruit",
+  "avocado",
 ];
 
 function normaliseIngredient(value: string) {
@@ -75,6 +111,11 @@ function normaliseIngredient(value: string) {
     .trim()
     .replace(/ies\b/g, "y")
     .replace(/s\b/g, "");
+}
+
+function looksLikeFruit(value: string) {
+  const normalised = normaliseIngredient(value);
+  return FRUIT_KEYWORDS.some((keyword) => normalised.includes(keyword));
 }
 
 function normalisePlannerRecipe(value: unknown, index: number): PlannerRecipe {
@@ -166,6 +207,42 @@ export default function ShopRecipeCard({
     return DEFAULT_BOX_INGREDIENTS;
   }, [starterBox]);
 
+  const fruitIngredients = useMemo(() => {
+    return starterBoxIngredients.filter(looksLikeFruit);
+  }, [starterBoxIngredients]);
+
+  const vegIngredients = useMemo(() => {
+    return starterBoxIngredients.filter((item) => !looksLikeFruit(item));
+  }, [starterBoxIngredients]);
+
+  const boxPreviewIngredients = useMemo(() => {
+    const preferredPreview = [
+      "potatoes",
+      "onions",
+      "carrots",
+      "leeks",
+      "tomatoes",
+      "spinach",
+      "broccoli",
+      "apples",
+      "bananas",
+      "oranges",
+    ];
+
+    const available = preferredPreview.filter((item) =>
+      starterBoxIngredients.some(
+        (ingredient) =>
+          normaliseIngredient(ingredient) === normaliseIngredient(item),
+      ),
+    );
+
+    if (available.length >= 6) {
+      return available.slice(0, 6);
+    }
+
+    return starterBoxIngredients.slice(0, 6);
+  }, [starterBoxIngredients]);
+
   const [input, setInput] = useState("");
   const [useBasketItems, setUseBasketItems] = useState(true);
   const [quickStart, setQuickStart] = useState("quick-tonight");
@@ -178,6 +255,7 @@ export default function ShopRecipeCard({
   const [saveMessage, setSaveMessage] = useState("");
   const [plannerMessage, setPlannerMessage] = useState("");
   const [basketMessage, setBasketMessage] = useState("");
+  const [boxPlanMessage, setBoxPlanMessage] = useState("");
 
   const parsedItems = useMemo(
     () =>
@@ -233,6 +311,12 @@ export default function ShopRecipeCard({
     const timeout = window.setTimeout(() => setBasketMessage(""), 2500);
     return () => window.clearTimeout(timeout);
   }, [basketMessage]);
+
+  useEffect(() => {
+    if (!boxPlanMessage) return;
+    const timeout = window.setTimeout(() => setBoxPlanMessage(""), 2500);
+    return () => window.clearTimeout(timeout);
+  }, [boxPlanMessage]);
 
   const isCurrentRecipeSaved = useMemo(() => {
     if (!result?.recipe) return false;
@@ -415,14 +499,86 @@ export default function ShopRecipeCard({
     await generateRecipeFromItems(items);
   }
 
-  async function handlePlanMealsWithBox() {
-    setInput(starterBoxIngredients.join(", "));
-    setUseBasketItems(true);
+  async function handlePlanWithBoxIntent(intent: "veg" | "fruit" | "easy-box") {
+    let itemsToUse: string[] = [];
+    let quickStartValue = quickStart;
+    let message = "";
 
-    await generateRecipeFromItems([
-      ...starterBoxIngredients,
-      ...basketItemNames,
-    ]);
+    if (intent === "veg") {
+      itemsToUse =
+        vegIngredients.length > 0 ? vegIngredients : starterBoxIngredients;
+      quickStartValue = "use-what-ive-got";
+      message =
+        vegIngredients.length > 0
+          ? "Planning around the veg in this week’s box."
+          : "Planning around this week’s box.";
+    }
+
+    if (intent === "fruit") {
+      itemsToUse =
+        fruitIngredients.length > 0 ? fruitIngredients : starterBoxIngredients;
+      quickStartValue = "quick-tonight";
+      message =
+        fruitIngredients.length > 0
+          ? "Looking at ideas that make use of the fruit in this week’s box."
+          : "Using what’s in the box as a starting point.";
+    }
+
+    if (intent === "easy-box") {
+      itemsToUse = starterBoxIngredients;
+      quickStartValue = "quick-tonight";
+      message = "Building an easy meal around this week’s box.";
+    }
+
+    setQuickStart(quickStartValue);
+    setUseBasketItems(true);
+    setInput(itemsToUse.join(", "));
+    setBoxPlanMessage(message);
+
+    setLoading(true);
+    setError("");
+    setResult(null);
+    setSaveMessage("");
+    setPlannerMessage("");
+    setBasketMessage("");
+
+    const uniqueItems = Array.from(
+      new Set([...itemsToUse, ...basketItemNames].filter(Boolean)),
+    ).slice(0, 16);
+
+    if (uniqueItems.length === 0) {
+      setLoading(false);
+      setError("Add a few ingredients to get started.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/recipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: uniqueItems,
+          quickStart: quickStartValue,
+          preferences: [],
+        }),
+      });
+
+      const data = (await response.json()) as RecipeResponse;
+
+      if (!response.ok) {
+        setError(data.error || "Something went wrong.");
+        setLoading(false);
+        return;
+      }
+
+      setResult(data);
+    } catch {
+      setError("Something went wrong while generating the recipe.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleSaveFavourite() {
@@ -568,15 +724,15 @@ export default function ShopRecipeCard({
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
               <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                Good place to start
+                Plan from your box
               </p>
               <p className="mt-2 text-base font-medium text-[#243328]">
-                Use your weekly box as the base, or type a few ingredients
-                below.
+                Use the week’s fruit and veg as your starting point, then build
+                a meal around what arrives.
               </p>
               <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                Check your postcode for delivery around Lanark before building a
-                full basket.
+                The contents shift through the week, so think of this as a
+                useful guide rather than a fixed list.
               </p>
             </div>
 
@@ -590,30 +746,64 @@ export default function ShopRecipeCard({
                   ? "Weekly box added"
                   : "Add weekly box"}
               </button>
-
-              <button
-                type="button"
-                onClick={handlePlanMealsWithBox}
-                disabled={loading}
-                className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
-              >
-                Plan from this box
-              </button>
             </div>
           </div>
 
-          {starterBoxIngredients.length > 0 ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {starterBoxIngredients.map((item) => (
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => handlePlanWithBoxIntent("veg")}
+              disabled={loading}
+              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+            >
+              Use up the veg
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePlanWithBoxIntent("fruit")}
+              disabled={loading}
+              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+            >
+              Use up the fruit
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePlanWithBoxIntent("easy-box")}
+              disabled={loading}
+              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+            >
+              Easy box meal
+            </button>
+          </div>
+
+          {boxPlanMessage ? (
+            <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+              {boxPlanMessage}
+            </div>
+          ) : null}
+
+          <div className="mt-4 rounded-[18px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+              Usually includes things like
+            </p>
+
+            <div className="mt-2 flex flex-wrap gap-2">
+              {boxPreviewIngredients.map((item) => (
                 <span
                   key={item}
-                  className="rounded-full border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] px-3 py-1 text-sm text-[#5f675c]"
+                  className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-sm text-[#5f675c]"
                 >
                   {item}
                 </span>
               ))}
             </div>
-          ) : null}
+
+            <p className="mt-3 text-sm leading-6 text-[#5f675c]">
+              Alongside herbs, fruit, and changing seasonal extras.
+            </p>
+          </div>
         </div>
       </div>
 
