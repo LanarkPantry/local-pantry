@@ -10,6 +10,7 @@ html {
   max-width: 100%;
   overflow-x: clip;
   background: var(--background);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -43,4 +44,23 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+a,
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+summary,
+label[for],
+select {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
 }

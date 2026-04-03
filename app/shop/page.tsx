@@ -24,14 +24,23 @@ export default function ShopPage() {
     }, {});
   }, [groupedCart]);
 
-  const featuredProduceBox = useMemo(() => {
+  const weeklyProduceBox = useMemo(() => {
     return (
       produceBoxes.find((item) => item.name === "Weekly Produce Box") ??
-      produceBoxes.find((item) => item.checkoutType === "subscription") ??
       produceBoxes[0] ??
       null
     );
   }, []);
+
+  const familyProduceBox = useMemo(() => {
+    return (
+      produceBoxes.find((item) => item.name === "Family Produce Box") ??
+      produceBoxes.find((item) => item.name !== weeklyProduceBox?.name) ??
+      null
+    );
+  }, [weeklyProduceBox]);
+
+  const featuredProduceBox = weeklyProduceBox;
 
   const getQuantity = (itemName: string) => quantityByName[itemName] ?? 0;
 
@@ -74,7 +83,7 @@ export default function ShopPage() {
         <button
           type="button"
           onClick={() => addDisplayItemToCart(item)}
-          className="inline-flex w-full items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
         >
           {item.buttonLabel ?? "Add to basket"}
         </button>
@@ -87,7 +96,7 @@ export default function ShopPage() {
           <button
             type="button"
             onClick={() => removeOneFromCart(item.name)}
-            className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
+            className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
           >
             −
           </button>
@@ -99,7 +108,7 @@ export default function ShopPage() {
           <button
             type="button"
             onClick={() => addDisplayItemToCart(item)}
-            className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
+            className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
           >
             +
           </button>
@@ -189,7 +198,7 @@ export default function ShopPage() {
 
           <Link
             href="/basket"
-            className="hidden text-sm text-[#5f675c] underline md:block"
+            className="hidden cursor-pointer text-sm text-[#5f675c] underline md:block"
           >
             Review basket
           </Link>
@@ -206,11 +215,17 @@ export default function ShopPage() {
     <main className="min-h-screen px-4 py-5 text-[#243328] sm:px-5 md:px-10 md:py-8">
       <div className="mx-auto max-w-6xl pb-24 md:pb-10">
         <div className="mb-5 flex items-center justify-between border-b border-[rgba(221,212,200,0.9)] pb-4">
-          <Link href="/" className="text-sm tracking-[0.35em] text-[#60705f]">
+          <Link
+            href="/"
+            className="cursor-pointer text-sm tracking-[0.35em] text-[#60705f]"
+          >
             THE LOCAL PANTRY
           </Link>
 
-          <Link href="/basket" className="text-sm text-[#243328]">
+          <Link
+            href="/basket"
+            className="cursor-pointer text-sm text-[#243328]"
+          >
             Basket{totalItems > 0 ? ` (${totalItems})` : ""}
           </Link>
         </div>
@@ -226,98 +241,103 @@ export default function ShopPage() {
             </h1>
 
             <p className="mt-3 max-w-xl text-sm leading-7 text-[#667164]">
-              Then we’ll help you plan meals around it.
+              Choose the size that suits your week, then we’ll help you plan
+              meals around it.
             </p>
 
             <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
               Most people start here
             </div>
 
-            {featuredProduceBox ? (
-              <div className="mt-5 overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.72)]">
-                <div className="flex flex-col sm:flex-row">
-                  <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.62)] p-4 sm:w-[185px] sm:shrink-0 sm:border-b-0 sm:border-r">
-                    <div className="flex h-full items-center justify-center rounded-[18px] bg-[rgba(248,244,238,0.84)] p-4">
-                      <img
-                        src={featuredProduceBox.image}
-                        alt={featuredProduceBox.name}
-                        className="h-28 w-full object-contain sm:h-32"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-1 flex-col justify-between p-5">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
-                        Weekly starter
-                      </p>
-
-                      <h2 className="mt-2 font-serif text-[1.85rem] leading-tight text-[#243328]">
-                        {featuredProduceBox.name}
-                      </h2>
-
-                      <div className="mt-3 inline-flex rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm">
-                        £{featuredProduceBox.price.toFixed(2)}
-                      </div>
-
-                      <p className="mt-4 text-sm leading-7 text-[#667164]">
-                        {featuredProduceBox.description}
-                      </p>
-
-                      {featuredProduceBox.bestFor ? (
-                        <p className="mt-3 text-sm text-[#5f675c]">
-                          {featuredProduceBox.bestFor}
-                        </p>
-                      ) : null}
-
-                      <p className="mt-2 text-sm text-[#5f675c]">
-                        Skip or adjust anytime.
-                      </p>
-                    </div>
-
-                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                      <button
-                        type="button"
-                        onClick={handleStartWeeklyBox}
-                        className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                      >
-                        Start your weekly box
-                      </button>
-
-                      <a
-                        href="#shop-recipe-card"
-                        className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
-                      >
-                        Plan meals with this box
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
-                <p className="text-sm text-[#5f675c]">Your basket</p>
-                <p className="mt-2 text-2xl font-serif text-[#243328]">
-                  {totalItems > 0
-                    ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
-                    : "Empty"}
-                </p>
-                <Link
-                  href="/basket"
-                  className="mt-3 inline-block text-sm underline"
-                >
-                  Review basket
-                </Link>
-              </div>
+              {weeklyProduceBox ? (
+                <div className="rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                        Smaller box
+                      </p>
+                      <h2 className="mt-2 font-serif text-xl text-[#243328]">
+                        {weeklyProduceBox.name}
+                      </h2>
+                    </div>
 
-              <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
-                <p className="text-sm text-[#5f675c]">Built locally</p>
-                <p className="mt-2 text-base leading-7 text-[#243328]">
-                  Starting online, building something thoughtful for Lanark.
-                </p>
-              </div>
+                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
+                      £{weeklyProduceBox.price.toFixed(2)}
+                    </div>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-6 text-[#667164]">
+                    {weeklyProduceBox.description}
+                  </p>
+
+                  {weeklyProduceBox.bestFor ? (
+                    <p className="mt-3 text-sm text-[#5f675c]">
+                      {weeklyProduceBox.bestFor}
+                    </p>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => addDisplayItemToCart(weeklyProduceBox)}
+                    className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Add smaller box
+                  </button>
+                </div>
+              ) : null}
+
+              {familyProduceBox ? (
+                <div className="rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                        Larger box
+                      </p>
+                      <h2 className="mt-2 font-serif text-xl text-[#243328]">
+                        {familyProduceBox.name}
+                      </h2>
+                    </div>
+
+                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
+                      £{familyProduceBox.price.toFixed(2)}
+                    </div>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-6 text-[#667164]">
+                    {familyProduceBox.description}
+                  </p>
+
+                  {familyProduceBox.bestFor ? (
+                    <p className="mt-3 text-sm text-[#5f675c]">
+                      {familyProduceBox.bestFor}
+                    </p>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => addDisplayItemToCart(familyProduceBox)}
+                    className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Add larger box
+                  </button>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="mt-5 rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+              <p className="text-sm text-[#5f675c]">Your basket</p>
+              <p className="mt-2 text-2xl font-serif text-[#243328]">
+                {totalItems > 0
+                  ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
+                  : "Empty"}
+              </p>
+              <Link
+                href="/basket"
+                className="mt-3 inline-block cursor-pointer text-sm underline"
+              >
+                Review basket
+              </Link>
             </div>
           </div>
 
