@@ -31,8 +31,6 @@ type PlannerRecipe = {
   title: string;
   description: string;
   ingredientsUsed: string[];
-  pantryStaples: string[];
-  steps: string[];
   imageUrl: string | null;
   savedAt: string;
   addedToPlannerAt: string;
@@ -41,6 +39,9 @@ type PlannerRecipe = {
 const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
 const PREFERENCES_STORAGE_KEY = "tlp_recipe_preferences";
 const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
+const PLANNER_ACCESS_KEY = "tlp_planner_access";
+const FREE_RECIPE_USAGE_KEY = "tlp_free_recipe_usage";
+const FREE_RECIPE_LIMIT = 3;
 
 const quickStartOptions = [
   {
@@ -114,6 +115,9 @@ export default function RecipesPage() {
   const [selectedQuickStart, setSelectedQuickStart] = useState<string>("");
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
   const [basketMessage, setBasketMessage] = useState("");
+  const [hasPlannerAccess, setHasPlannerAccess] = useState(false);
+  const [freeRecipeUsage, setFreeRecipeUsage] = useState(0);
+  const [paywallMessage, setPaywallMessage] = useState("");
 
   const savouryRecipes = recipes.filter(
     (recipe) => recipe.category === "savoury",
@@ -136,7 +140,49 @@ export default function RecipesPage() {
     return Array.from(new Set(combined));
   }, [typedIngredients, basketIngredients, includeBasketIngredients]);
 
+  const remainingFreeRecipes = Math.max(0, FREE_RECIPE_LIMIT - freeRecipeUsage);
+
+  const hasFreeRecipeAccess = hasPlannerAccess || remainingFreeRecipes > 0;
+
+  function persistPlannerRecipes(updatedPlannerRecipes: PlannerRecipe[]) {
+    try {
+      localStorage.setItem(
+        PLANNER_RECIPES_STORAGE_KEY,
+        JSON.stringify(updatedPlannerRecipes),
+      );
+      return true;
+    } catch (error) {
+      console.error("Failed to save planner recipes:", error);
+      setPlannerMessage(
+        "We couldn’t save that to your planner right now because storage is full. Please remove a few older planner items or favourites and try again.",
+      );
+      return false;
+    }
+  }
+
   useEffect(() => {
+    try {
+      const storedAccess = localStorage.getItem(PLANNER_ACCESS_KEY);
+      setHasPlannerAccess(storedAccess === "true");
+    } catch (error) {
+      console.error("Failed to load planner access:", error);
+      setHasPlannerAccess(false);
+    }
+
+    try {
+      const storedUsage = localStorage.getItem(FREE_RECIPE_USAGE_KEY);
+
+      if (!storedUsage) {
+        setFreeRecipeUsage(0);
+      } else {
+        const parsedUsage = JSON.parse(storedUsage) as number;
+        setFreeRecipeUsage(typeof parsedUsage === "number" ? parsedUsage : 0);
+      }
+    } catch (error) {
+      console.error("Failed to load free recipe usage:", error);
+      setFreeRecipeUsage(0);
+    }
+
     try {
       const storedRecipes = localStorage.getItem(FAVOURITES_STORAGE_KEY);
 
@@ -226,7 +272,17 @@ export default function RecipesPage() {
   }, [basketMessage]);
 
   useEffect(() => {
-    if (!generatedRecipe && !aiError) return;
+    if (!paywallMessage) return;
+
+    const timeout = window.setTimeout(() => {
+      setPaywallMessage("");
+    }, 4000);
+
+    return () => window.clearTimeout(timeout);
+  }, [paywallMessage]);
+
+  useEffect(() => {
+    if (!generatedRecipe && !aiError && !paywallMessage) return;
 
     const timeout = window.setTimeout(() => {
       generatedRecipeRef.current?.scrollIntoView({
@@ -236,7 +292,7 @@ export default function RecipesPage() {
     }, 150);
 
     return () => window.clearTimeout(timeout);
-  }, [generatedRecipe, aiError]);
+  }, [generatedRecipe, aiError, paywallMessage]);
 
   const isCurrentRecipeSaved = useMemo(() => {
     if (!generatedRecipe) return false;
@@ -345,6 +401,16 @@ export default function RecipesPage() {
   }, [ingredientBreakdown.availableFromShop]);
 
   async function handleGenerateRecipe() {
+    if (!hasPlannerAccess && freeRecipeUsage >= FREE_RECIPE_LIMIT) {
+      setAiError("");
+      setGeneratedRecipe(null);
+      setGeneratedImageUrl(null);
+      setPaywallMessage(
+        "You’ve used your free recipe ideas. Unlock unlimited recipes and the full planner, or get it included with a weekly produce box.",
+      );
+      return;
+    }
+
     if (allIngredients.length === 0) {
       setAiError(
         "Type some ingredients, include your basket ingredients, or use both.",
@@ -365,6 +431,7 @@ export default function RecipesPage() {
       setSaveMessage("");
       setPlannerMessage("");
       setBasketMessage("");
+      setPaywallMessage("");
       setGeneratedRecipe(null);
       setGeneratedImageUrl(null);
 
@@ -388,6 +455,12 @@ export default function RecipesPage() {
 
       setGeneratedRecipe(data.recipe);
       setGeneratedImageUrl(data.imageUrl ?? null);
+
+      if (!hasPlannerAccess) {
+        const nextUsage = freeRecipeUsage + 1;
+        setFreeRecipeUsage(nextUsage);
+        localStorage.setItem(FREE_RECIPE_USAGE_KEY, JSON.stringify(nextUsage));
+      }
     } catch (error) {
       console.error(error);
       setAiError(
@@ -399,6 +472,13 @@ export default function RecipesPage() {
   }
 
   function handleSaveFavourite() {
+    if (!hasPlannerAccess) {
+      setSaveMessage(
+        "Saving favourites is included with the planner, or free with any weekly produce box.",
+      );
+      return;
+    }
+
     if (!generatedRecipe) return;
 
     const recipeToSave: SavedRecipe = {
@@ -446,10 +526,7 @@ export default function RecipesPage() {
       (recipe) => recipe.id !== recipeId,
     );
     setPlannerRecipes(updatedPlannerRecipes);
-    localStorage.setItem(
-      PLANNER_RECIPES_STORAGE_KEY,
-      JSON.stringify(updatedPlannerRecipes),
-    );
+    persistPlannerRecipes(updatedPlannerRecipes);
   }
 
   function handleOpenSavedRecipe(recipe: SavedRecipe) {
@@ -465,9 +542,17 @@ export default function RecipesPage() {
     setSaveMessage("");
     setPlannerMessage("");
     setBasketMessage("");
+    setPaywallMessage("");
   }
 
   function handleAddSavedRecipeToPlanner(recipe: SavedRecipe) {
+    if (!hasPlannerAccess) {
+      setPlannerMessage(
+        "The weekly planner is included with the planner subscription, or free with any weekly produce box.",
+      );
+      return;
+    }
+
     const alreadyAdded = plannerRecipes.some((item) => item.id === recipe.id);
 
     if (alreadyAdded) {
@@ -476,17 +561,23 @@ export default function RecipesPage() {
     }
 
     const plannerRecipe: PlannerRecipe = {
-      ...recipe,
+      id: recipe.id,
+      title: recipe.title,
+      description: recipe.description,
+      ingredientsUsed: recipe.ingredientsUsed,
+      imageUrl: recipe.imageUrl,
+      savedAt: recipe.savedAt,
       addedToPlannerAt: new Date().toISOString(),
     };
 
     const updatedPlannerRecipes = [plannerRecipe, ...plannerRecipes];
     setPlannerRecipes(updatedPlannerRecipes);
-    localStorage.setItem(
-      PLANNER_RECIPES_STORAGE_KEY,
-      JSON.stringify(updatedPlannerRecipes),
-    );
-    setPlannerMessage("Added to planner.");
+
+    if (persistPlannerRecipes(updatedPlannerRecipes)) {
+      setPlannerMessage("Added to planner.");
+    } else {
+      setPlannerRecipes(plannerRecipes);
+    }
   }
 
   function isRecipeInPlanner(recipeId: string) {
@@ -826,21 +917,66 @@ export default function RecipesPage() {
               )}
 
               <div className="mt-5">
+                {!hasPlannerAccess ? (
+                  <div className="mb-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(249,246,241,0.78)] p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      Free recipe ideas remaining: {remainingFreeRecipes}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#6b776c]">
+                      Upgrade for unlimited recipes and full planner access, or
+                      get it included with a weekly produce box.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mb-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      Planner access active
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#6b776c]">
+                      You have unlimited recipe ideas and full planner access.
+                    </p>
+                  </div>
+                )}
+
                 <button
                   type="button"
                   onClick={handleGenerateRecipe}
-                  disabled={isGenerating}
+                  disabled={isGenerating || !hasFreeRecipeAccess}
                   className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isGenerating
                     ? "Creating a fresh idea..."
-                    : "Generate recipe idea"}
+                    : hasFreeRecipeAccess
+                      ? "Generate recipe idea"
+                      : "Unlock unlimited recipes"}
                 </button>
               </div>
 
               {aiError && (
                 <div className="mt-4 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
                   {aiError}
+                </div>
+              )}
+
+              {paywallMessage && (
+                <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] px-4 py-4 text-sm text-[#5f675c]">
+                  <p>{paywallMessage}</p>
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <Link
+                      href="/pricing"
+                      className="rounded-full bg-[#243328] px-5 py-2 text-sm text-white transition hover:opacity-90"
+                    >
+                      Unlock the planner
+                    </Link>
+
+                    <Link
+                      href="/shop"
+                      className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#243328] transition hover:bg-white"
+                    >
+                      See weekly boxes
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -1102,21 +1238,27 @@ export default function RecipesPage() {
                       <button
                         type="button"
                         onClick={handleGenerateRecipe}
-                        disabled={isGenerating}
+                        disabled={isGenerating || !hasFreeRecipeAccess}
                         className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {isGenerating ? "Creating..." : "Try another idea"}
+                        {isGenerating
+                          ? "Creating..."
+                          : hasFreeRecipeAccess
+                            ? "Try another idea"
+                            : "Unlock unlimited recipes"}
                       </button>
 
                       <button
                         type="button"
                         onClick={handleSaveFavourite}
-                        disabled={isCurrentRecipeSaved}
+                        disabled={hasPlannerAccess && isCurrentRecipeSaved}
                         className="rounded-full bg-[#dde7d8] px-5 py-2 text-sm text-[#243328] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {isCurrentRecipeSaved
-                          ? "Already saved"
-                          : "Save to favourites"}
+                        {hasPlannerAccess
+                          ? isCurrentRecipeSaved
+                            ? "Already saved"
+                            : "Save to favourites"
+                          : "Save with planner"}
                       </button>
                     </div>
 
@@ -1224,12 +1366,16 @@ export default function RecipesPage() {
                       <button
                         type="button"
                         onClick={() => handleAddSavedRecipeToPlanner(recipe)}
-                        disabled={isRecipeInPlanner(recipe.id)}
+                        disabled={
+                          !hasPlannerAccess || isRecipeInPlanner(recipe.id)
+                        }
                         className="rounded-full bg-[#dde7d8] px-5 py-2 text-sm text-[#243328] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {isRecipeInPlanner(recipe.id)
-                          ? "In planner"
-                          : "Add to planner"}
+                        {!hasPlannerAccess
+                          ? "Planner only"
+                          : isRecipeInPlanner(recipe.id)
+                            ? "In planner"
+                            : "Add to planner"}
                       </button>
 
                       <button

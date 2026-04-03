@@ -41,8 +41,6 @@ type PlannerRecipe = {
   title: string;
   description: string;
   ingredientsUsed: string[];
-  pantryStaples: string[];
-  steps: string[];
   imageUrl: string | null;
   savedAt: string;
   addedToPlannerAt: string;
@@ -77,6 +75,69 @@ function normaliseIngredient(value: string) {
     .trim()
     .replace(/ies\b/g, "y")
     .replace(/s\b/g, "");
+}
+
+function normalisePlannerRecipe(value: unknown, index: number): PlannerRecipe {
+  const recipe = (value ?? {}) as Record<string, unknown>;
+
+  const title =
+    typeof recipe.title === "string" && recipe.title.trim()
+      ? recipe.title.trim()
+      : `Saved recipe ${index + 1}`;
+
+  const description =
+    typeof recipe.description === "string" ? recipe.description : "";
+
+  const ingredientsUsed = Array.isArray(recipe.ingredientsUsed)
+    ? recipe.ingredientsUsed.filter(
+        (item): item is string =>
+          typeof item === "string" && item.trim().length > 0,
+      )
+    : Array.isArray(recipe.ingredients)
+      ? recipe.ingredients.filter(
+          (item): item is string =>
+            typeof item === "string" && item.trim().length > 0,
+        )
+      : [];
+
+  return {
+    id:
+      typeof recipe.id === "string" && recipe.id.trim()
+        ? recipe.id
+        : `${title}-${index}`,
+    title,
+    description,
+    ingredientsUsed,
+    imageUrl: typeof recipe.imageUrl === "string" ? recipe.imageUrl : null,
+    savedAt:
+      typeof recipe.savedAt === "string"
+        ? recipe.savedAt
+        : new Date().toISOString(),
+    addedToPlannerAt:
+      typeof recipe.addedToPlannerAt === "string"
+        ? recipe.addedToPlannerAt
+        : new Date().toISOString(),
+  };
+}
+
+function readPlannerRecipes(): PlannerRecipe[] {
+  try {
+    const raw = localStorage.getItem(PLANNER_RECIPES_STORAGE_KEY);
+
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw) as unknown;
+
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.map((item, index) => normalisePlannerRecipe(item, index));
+  } catch {
+    return [];
+  }
+}
+
+function writePlannerRecipes(value: PlannerRecipe[]) {
+  localStorage.setItem(PLANNER_RECIPES_STORAGE_KEY, JSON.stringify(value));
 }
 
 export default function ShopRecipeCard({
@@ -142,20 +203,11 @@ export default function ShopRecipeCard({
     }
 
     try {
-      const storedPlannerRecipes = localStorage.getItem(
-        PLANNER_RECIPES_STORAGE_KEY,
-      );
+      const normalisedPlannerRecipes = readPlannerRecipes();
+      setPlannerRecipes(normalisedPlannerRecipes);
 
-      if (!storedPlannerRecipes) {
-        setPlannerRecipes([]);
-      } else {
-        const parsedPlannerRecipes = JSON.parse(
-          storedPlannerRecipes,
-        ) as PlannerRecipe[];
-        setPlannerRecipes(
-          Array.isArray(parsedPlannerRecipes) ? parsedPlannerRecipes : [],
-        );
-      }
+      // Re-save in the lighter format so older heavier planner entries are slimmed down.
+      writePlannerRecipes(normalisedPlannerRecipes);
     } catch {
       setPlannerRecipes([]);
     }
@@ -174,7 +226,7 @@ export default function ShopRecipeCard({
 
   useEffect(() => {
     if (!plannerMessage) return;
-    const timeout = window.setTimeout(() => setPlannerMessage(""), 2500);
+    const timeout = window.setTimeout(() => setPlannerMessage(""), 3000);
     return () => window.clearTimeout(timeout);
   }, [plannerMessage]);
 
@@ -403,11 +455,19 @@ export default function ShopRecipeCard({
 
     const updatedRecipes = [recipeToSave, ...savedRecipes];
     setSavedRecipes(updatedRecipes);
-    localStorage.setItem(
-      FAVOURITES_STORAGE_KEY,
-      JSON.stringify(updatedRecipes),
-    );
-    setSaveMessage("Saved to favourites.");
+
+    try {
+      localStorage.setItem(
+        FAVOURITES_STORAGE_KEY,
+        JSON.stringify(updatedRecipes),
+      );
+      setSaveMessage("Saved to favourites.");
+    } catch {
+      setSavedRecipes(savedRecipes);
+      setSaveMessage(
+        "We couldn’t save that just now because your browser storage is full.",
+      );
+    }
   }
 
   function handleAddToPlanner() {
@@ -434,20 +494,22 @@ export default function ShopRecipeCard({
       title: result.recipe.title,
       description: result.recipe.description,
       ingredientsUsed: result.recipe.ingredientsUsed,
-      pantryStaples: result.recipe.pantryStaples,
-      steps: result.recipe.steps,
       imageUrl: result.imageUrl,
       savedAt: savedMatch?.savedAt ?? new Date().toISOString(),
       addedToPlannerAt: new Date().toISOString(),
     };
 
     const updatedPlannerRecipes = [plannerRecipe, ...plannerRecipes];
-    setPlannerRecipes(updatedPlannerRecipes);
-    localStorage.setItem(
-      PLANNER_RECIPES_STORAGE_KEY,
-      JSON.stringify(updatedPlannerRecipes),
-    );
-    setPlannerMessage("Added to planner.");
+
+    try {
+      writePlannerRecipes(updatedPlannerRecipes);
+      setPlannerRecipes(updatedPlannerRecipes);
+      setPlannerMessage("Added to planner.");
+    } catch {
+      setPlannerMessage(
+        "Your planner is full in this browser. Remove a few older planner items and try again.",
+      );
+    }
   }
 
   function handleAddAvailableItemsToBasket() {
