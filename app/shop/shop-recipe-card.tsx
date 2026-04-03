@@ -520,7 +520,7 @@ export default function ShopRecipeCard({
       quickStartValue = "quick-tonight";
       message =
         fruitIngredients.length > 0
-          ? "Looking at ideas that make use of the fruit in this week’s box."
+          ? "Looking at a fruit-based idea from this week’s box."
           : "Using what’s in the box as a starting point.";
     }
 
@@ -765,7 +765,7 @@ export default function ShopRecipeCard({
               disabled={loading}
               className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
             >
-              Use up the fruit
+              Fruit-based idea
             </button>
 
             <button
