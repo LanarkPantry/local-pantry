@@ -124,7 +124,10 @@ Thank you.`);
   };
 
   return (
-    <section className="px-6 pb-16 md:px-10 md:pb-24">
+    <section
+      id="postcode-checker"
+      className="scroll-mt-24 px-6 pb-16 md:px-10 md:pb-24"
+    >
       <div className="mx-auto max-w-4xl rounded-[30px] border border-[#ddd4c8] bg-[#f7f2eb] p-6 text-center shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
         <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
           Delivery area
@@ -135,9 +138,9 @@ Thank you.`);
         </h2>
 
         <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-          We currently deliver to selected areas and are expanding gradually.
-          Enter your postcode to see whether delivery is available where you
-          are.
+          Planning works wherever you are. Ordering is available in Lanark and
+          nearby for now, with delivery areas expanding over time. Enter your
+          postcode to see whether delivery is available where you are.
         </p>
 
         <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
@@ -174,16 +177,23 @@ Thank you.`);
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#4f6b55]">
-              You&apos;re within our current delivery area, so you can now shop
+              You&apos;re within our current delivery area, so you can shop
               produce boxes and pantry essentials.
             </p>
 
-            <div className="mt-4">
+            <div className="mt-4 flex flex-wrap gap-3">
               <Link
                 href="/shop"
                 className="inline-flex rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
               >
                 Shop now
+              </Link>
+
+              <Link
+                href="/planner"
+                className="inline-flex rounded-full border border-[#c8d3c4] bg-white px-5 py-3 text-sm font-medium text-[#2f4635] transition hover:bg-[#f7fbf5]"
+              >
+                Continue planning
               </Link>
             </div>
           </div>
@@ -239,6 +249,15 @@ Thank you.`);
                 {interestMessage}
               </p>
             )}
+
+            <div className="mt-5">
+              <Link
+                href="/planner"
+                className="inline-flex rounded-full border border-[#d9d1c4] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f5f1ea]"
+              >
+                Continue planning your week
+              </Link>
+            </div>
           </div>
         )}
 

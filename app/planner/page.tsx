@@ -419,12 +419,19 @@ export default function PlannerPage() {
                   Weekly planner
                 </p>
                 <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-[#1f2b24] sm:text-4xl">
-                  Plan the week with less friction
+                  Plan meals for the week ahead
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d6b62] sm:text-base">
-                  Choose a day, add a meal, and build a week that already feels
-                  more manageable. Planning works for everyone. Ordering is for
-                  local delivery around Lanark.
+                  Planning works wherever you are. Ordering is available in
+                  Lanark and nearby for now, with delivery areas expanding over
+                  time.{" "}
+                  <Link
+                    href="/#postcode-checker"
+                    className="font-medium text-[#213128] underline decoration-[rgba(33,49,40,0.28)] underline-offset-4 transition hover:decoration-[rgba(33,49,40,0.58)]"
+                  >
+                    Check your postcode
+                  </Link>
+                  .
                 </p>
               </div>
 
@@ -444,40 +451,17 @@ export default function PlannerPage() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl bg-[rgba(246,248,243,0.84)] px-4 py-3 backdrop-blur-sm">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
-                  Planned
-                </p>
-                <p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#213128]">
-                  {plannedCount}/7
-                </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-sm text-[#58675e] backdrop-blur-sm">
+                {plannedCount} of 7 days planned
               </div>
 
-              <div className="rounded-2xl bg-[rgba(246,248,243,0.84)] px-4 py-3 backdrop-blur-sm">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
-                  Planner recipes
-                </p>
-                <p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#213128]">
-                  {plannerRecipes.length}
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-[rgba(246,248,243,0.84)] px-4 py-3 backdrop-blur-sm">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
-                  Saved favourites
-                </p>
-                <p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#213128]">
-                  {savedRecipes.length}
-                </p>
-              </div>
+              {statusMessage ? (
+                <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-xs text-[#58675e] backdrop-blur-sm">
+                  {statusMessage}
+                </div>
+              ) : null}
             </div>
-
-            {statusMessage ? (
-              <div className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-xs text-[#58675e] backdrop-blur-sm">
-                {statusMessage}
-              </div>
-            ) : null}
           </div>
         </section>
 
