@@ -1,228 +1,513 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { useCart } from "./cart-context";
+import { useCart } from "../cart-context";
+import ShopRecipeCard from "./shop-recipe-card";
+import {
+  type ShopDisplayItem,
+  cupboardItems,
+  extraItems,
+  pantryItems,
+  produceBoxes,
+} from "./shop-data";
 
-export default function HomePage() {
-  const { cart } = useCart();
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
+
+const INSTALL_PROMPT_DISMISSED_KEY = "tlp_home_screen_prompt_dismissed";
+
+export default function ShopPage() {
+  const { cart, groupedCart, addToCart, removeOneFromCart } = useCart();
+
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallCard, setShowInstallCard] = useState(false);
+  const [isIos, setIsIos] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const dismissed =
+      localStorage.getItem(INSTALL_PROMPT_DISMISSED_KEY) === "1";
+
+    const ios =
+      /iphone|ipad|ipod/i.test(window.navigator.userAgent) &&
+      !("MSStream" in window);
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      // @ts-expect-error iOS Safari standalone property
+      window.navigator.standalone === true;
+
+    setIsIos(ios);
+    setIsStandalone(standalone);
+
+    if (!dismissed && !standalone) {
+      setShowInstallCard(true);
+    }
+
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
+    };
+  }, []);
+
+  const dismissInstallCard = () => {
+    setShowInstallCard(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, "1");
+    }
+  };
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    await deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === "accepted") {
+      setShowInstallCard(false);
+      localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, "1");
+    }
+
+    setDeferredPrompt(null);
+  };
+
   const totalItems = useMemo(() => cart.length, [cart]);
 
-  const [postcode, setPostcode] = useState("");
-  const [message, setMessage] = useState("");
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const quantityByName = useMemo(() => {
+    return groupedCart.reduce<Record<string, number>>((acc, entry) => {
+      acc[entry.item.name] = entry.quantity;
+      return acc;
+    }, {});
+  }, [groupedCart]);
 
-  function handlePostcodeCheck(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  const weeklyProduceBox = useMemo(() => {
+    return (
+      produceBoxes.find((item) => item.name === "Weekly Produce Box") ??
+      produceBoxes[0] ??
+      null
+    );
+  }, []);
 
-    const cleaned = postcode.replace(/\s+/g, "").toUpperCase();
+  const familyProduceBox = useMemo(() => {
+    return (
+      produceBoxes.find((item) => item.name === "Family Produce Box") ??
+      produceBoxes.find((item) => item.name !== weeklyProduceBox?.name) ??
+      null
+    );
+  }, [weeklyProduceBox]);
 
-    if (!cleaned) {
-      setIsAvailable(false);
-      setMessage("Please enter your postcode.");
-      return;
+  const featuredProduceBox = weeklyProduceBox;
+
+  const getQuantity = (itemName: string) => quantityByName[itemName] ?? 0;
+
+  const addDisplayItemToCart = (item: ShopDisplayItem) => {
+    addToCart({
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      category: item.category,
+      checkoutType: item.checkoutType,
+    });
+  };
+
+  const handleStartWeeklyBox = () => {
+    if (!featuredProduceBox) return;
+    addDisplayItemToCart(featuredProduceBox);
+  };
+
+  const renderOrderBadge = (item: ShopDisplayItem) => {
+    if (item.checkoutType === "subscription") {
+      return (
+        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+          Weekly starter
+        </div>
+      );
     }
 
-    if (cleaned.startsWith("ML11")) {
-      setIsAvailable(true);
-      setMessage("Good news — we deliver to your area.");
-      return;
+    return (
+      <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+        One-off add-on
+      </div>
+    );
+  };
+
+  const renderAddControls = (item: ShopDisplayItem) => {
+    const quantity = getQuantity(item.name);
+
+    if (quantity === 0) {
+      return (
+        <button
+          type="button"
+          onClick={() => addDisplayItemToCart(item)}
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
+        >
+          {item.buttonLabel ?? "Add to basket"}
+        </button>
+      );
     }
 
-    setIsAvailable(false);
-    setMessage("We’re not delivering to your area just yet.");
-  }
+    return (
+      <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="inline-flex items-center self-start rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.88)]">
+          <button
+            type="button"
+            onClick={() => removeOneFromCart(item.name)}
+            className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
+          >
+            −
+          </button>
+
+          <span className="min-w-[2.2rem] text-center text-sm font-medium text-[#243328]">
+            {quantity}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => addDisplayItemToCart(item)}
+            className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
+          >
+            +
+          </button>
+        </div>
+
+        <span className="text-sm text-[#5f675c]">
+          {quantity} added to basket
+        </span>
+      </div>
+    );
+  };
+
+  const renderCompactCard = (
+    item: ShopDisplayItem,
+    label: string,
+    helperText?: string,
+  ) => {
+    return (
+      <article
+        key={item.name}
+        className="overflow-hidden rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md"
+      >
+        <div className="flex flex-col sm:flex-row">
+          <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.72)] p-4 sm:w-[190px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
+            <div className="flex h-full items-center justify-center rounded-[20px] bg-[rgba(248,244,238,0.82)] p-4">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="h-28 w-full object-contain sm:h-36"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-1 flex-col justify-between p-5 md:p-6">
+            <div>
+              <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
+                {label}
+              </p>
+
+              <h3 className="mt-2 font-serif text-[1.75rem] text-[#243328]">
+                {item.name}
+              </h3>
+
+              <div className="mt-3 rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm">
+                £{item.price.toFixed(2)}
+              </div>
+
+              <div className="mt-4">{renderOrderBadge(item)}</div>
+
+              <p className="mt-4 text-sm text-[#667164]">{item.description}</p>
+
+              {helperText ? (
+                <p className="mt-3 text-sm text-[#5f675c]">{helperText}</p>
+              ) : null}
+
+              {item.bestFor ? (
+                <p className="mt-3 text-sm text-[#5f675c]">{item.bestFor}</p>
+              ) : null}
+
+              {item.note ? (
+                <p className="mt-2 text-sm text-[#5f675c]">{item.note}</p>
+              ) : null}
+            </div>
+
+            <div className="mt-6">{renderAddControls(item)}</div>
+          </div>
+        </div>
+      </article>
+    );
+  };
+
+  const renderSection = (
+    title: string,
+    id: string,
+    items: ShopDisplayItem[],
+    label: string,
+  ) => {
+    if (items.length === 0) return null;
+
+    return (
+      <section id={id} className="mt-10">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-serif text-2xl text-[#243328]">{title}</h2>
+            <p className="mt-2 text-sm text-[#667164]">
+              Useful additions for the week ahead.
+            </p>
+          </div>
+
+          <Link
+            href="/basket"
+            className="hidden cursor-pointer text-sm text-[#5f675c] underline md:block"
+          >
+            Review basket
+          </Link>
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {items.map((item) => renderCompactCard(item, label))}
+        </div>
+      </section>
+    );
+  };
 
   return (
-    <main className="min-h-screen text-[#243328]">
-      <header className="sticky top-0 z-30 border-b border-[rgba(230,221,210,0.9)] bg-[rgba(244,239,233,0.72)] backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
+    <main className="min-h-screen px-4 py-5 text-[#243328] sm:px-5 md:px-10 md:py-8">
+      <div className="mx-auto max-w-6xl pb-24 md:pb-10">
+        <div className="mb-5 flex items-center justify-between border-b border-[rgba(221,212,200,0.9)] pb-4">
           <Link
             href="/"
-            className="text-sm tracking-[0.35em] text-[#60705f] hover:text-[#243328]"
+            className="cursor-pointer text-sm tracking-[0.35em] text-[#60705f]"
           >
             THE LOCAL PANTRY
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
-            <Link
-              href="/"
-              className="text-sm text-[#243328] underline underline-offset-4"
-            >
-              Home
-            </Link>
-
-            <Link
-              href="/shop"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Shop
-            </Link>
-
-            <Link
-              href="/recipes"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Recipes
-            </Link>
-
-            <Link
-              href="/planner"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Planner
-            </Link>
-
-            <Link
-              href="/basket"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Basket{totalItems > 0 ? ` (${totalItems})` : ""}
-            </Link>
-          </nav>
-
           <Link
             href="/basket"
-            className="hidden rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-white md:inline-flex"
+            className="cursor-pointer text-sm text-[#243328]"
           >
-            View basket{totalItems > 0 ? ` (${totalItems})` : ""}
+            Basket{totalItems > 0 ? ` (${totalItems})` : ""}
           </Link>
         </div>
-      </header>
 
-      <section className="relative min-h-[78vh] overflow-hidden">
-        <img
-          src="/hero.jpg"
-          alt="The Local Pantry interior"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
-
-        <div className="relative z-10 mx-auto flex min-h-[78vh] max-w-7xl items-end px-6 pb-14 pt-16 md:px-10 md:pb-20">
-          <div className="max-w-3xl text-white">
-            <p className="text-sm uppercase tracking-[0.25em] text-white/80">
-              Carefully chosen, week to week
+        <section className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+          <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-6">
+            <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
+              Shop
             </p>
 
-            <h1 className="mt-4 font-serif text-5xl leading-none tracking-tight text-white/95 md:text-7xl">
-              The fresh part of your weekly shop, done well.
+            <h1 className="mt-3 font-serif text-[2rem] leading-tight md:text-[2.5rem]">
+              Start with your weekly veg box
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
-              Fresh produce and a small selection of pantry essentials, chosen
-              carefully each week.
+            <p className="mt-3 max-w-xl text-sm leading-7 text-[#667164]">
+              Choose the size that suits your week, then we’ll help you plan
+              meals around it.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/shop"
-                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#f5f1ea]"
-              >
-                Shop the range
-              </Link>
-
-              <Link
-                href="/planner"
-                className="rounded-full border border-white/40 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-              >
-                Plan your week
-              </Link>
+            <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
+              Most people start here
             </div>
 
-            <p className="mt-5 text-sm text-white/75">
-              Weekly delivery across selected local areas.
-            </p>
-          </div>
-        </div>
-      </section>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {weeklyProduceBox ? (
+                <div className="rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                        Smaller box
+                      </p>
+                      <h2 className="mt-2 font-serif text-xl text-[#243328]">
+                        {weeklyProduceBox.name}
+                      </h2>
+                    </div>
 
-      <section className="px-6 pb-16 pt-16 md:px-10 md:pb-24 md:pt-20">
-        <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
-          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-6 backdrop-blur-md">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              Fresh produce
-            </p>
-            <h2 className="mt-3 font-serif text-3xl">Chosen each week</h2>
-            <p className="mt-3 leading-7 text-[#5f675c]">
-              Fruit and veg chosen for quality and how you actually cook.
-            </p>
-          </div>
+                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
+                      £{weeklyProduceBox.price.toFixed(2)}
+                    </div>
+                  </div>
 
-          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-6 backdrop-blur-md">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              Pantry essentials
-            </p>
-            <h2 className="mt-3 font-serif text-3xl">Simple additions</h2>
-            <p className="mt-3 leading-7 text-[#5f675c]">
-              A small selection of pantry essentials and useful extras, kept
-              simple and chosen well.
-            </p>
-          </div>
+                  <p className="mt-3 text-sm leading-6 text-[#667164]">
+                    {weeklyProduceBox.description}
+                  </p>
 
-          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-6 backdrop-blur-md">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              Easy each week
-            </p>
-            <h2 className="mt-3 font-serif text-3xl">Delivered simply</h2>
-            <p className="mt-3 leading-7 text-[#5f675c]">
-              Build your basket in a few minutes and keep the weekly shop
-              straightforward.
-            </p>
-          </div>
-        </div>
-      </section>
+                  {weeklyProduceBox.bestFor ? (
+                    <p className="mt-3 text-sm text-[#5f675c]">
+                      {weeklyProduceBox.bestFor}
+                    </p>
+                  ) : null}
 
-      <section className="px-6 pb-20 md:px-10 md:pb-24">
-        <div className="mx-auto max-w-4xl rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-6 backdrop-blur-md md:p-10">
-          <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
-              Delivery checker
-            </p>
+                  <div className="mt-4">
+                    {renderAddControls(weeklyProduceBox)}
+                  </div>
+                </div>
+              ) : null}
 
-            <h2 className="mt-3 font-serif text-3xl md:text-4xl">
-              Check if we deliver to your area
-            </h2>
+              {familyProduceBox ? (
+                <div className="rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                        Larger box
+                      </p>
+                      <h2 className="mt-2 font-serif text-xl text-[#243328]">
+                        {familyProduceBox.name}
+                      </h2>
+                    </div>
 
-            <p className="mt-4 leading-7 text-[#5f675c]">
-              Enter your postcode below to see if we’re currently delivering in
-              your area.
-            </p>
-          </div>
+                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
+                      £{familyProduceBox.price.toFixed(2)}
+                    </div>
+                  </div>
 
-          <form
-            onSubmit={handlePostcodeCheck}
-            className="mt-8 flex flex-col gap-3 sm:flex-row"
-          >
-            <input
-              type="text"
-              value={postcode}
-              onChange={(e) => setPostcode(e.target.value)}
-              placeholder="Enter your postcode"
-              className="w-full rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
-            />
+                  <p className="mt-3 text-sm leading-6 text-[#667164]">
+                    {familyProduceBox.description}
+                  </p>
 
-            <button
-              type="submit"
-              className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
-            >
-              Check postcode
-            </button>
-          </form>
+                  {familyProduceBox.bestFor ? (
+                    <p className="mt-3 text-sm text-[#5f675c]">
+                      {familyProduceBox.bestFor}
+                    </p>
+                  ) : null}
 
-          {message && (
-            <div
-              className={`mt-5 rounded-[20px] px-5 py-4 text-sm leading-6 ${
-                isAvailable
-                  ? "border border-[#bfd3bf] bg-[#edf6ed] text-[#243328]"
-                  : "border border-[#e4d8cb] bg-[#fbf6f0] text-[#6a5c4f]"
-              }`}
-            >
-              {message}
+                  <div className="mt-4">
+                    {renderAddControls(familyProduceBox)}
+                  </div>
+                </div>
+              ) : null}
             </div>
-          )}
-        </div>
-      </section>
+
+            <div className="mt-5 rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+              <p className="text-sm text-[#5f675c]">Your basket</p>
+              <p className="mt-2 text-2xl font-serif text-[#243328]">
+                {totalItems > 0
+                  ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
+                  : "Empty"}
+              </p>
+              <Link
+                href="/basket"
+                className="mt-3 inline-block cursor-pointer text-sm underline"
+              >
+                Review basket
+              </Link>
+            </div>
+          </div>
+
+          <ShopRecipeCard
+            starterBox={featuredProduceBox}
+            onStartWeeklyBox={handleStartWeeklyBox}
+          />
+        </section>
+
+        {showInstallCard && !isStandalone ? (
+          <section className="mt-4 rounded-[20px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.72)] px-4 py-3 shadow-[0_8px_20px_rgba(36,51,40,0.04)] backdrop-blur-md">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                  Quick access
+                </p>
+                <p className="mt-1 text-sm text-[#243328]">
+                  <span className="font-medium">
+                    Add The Local Pantry to your home screen
+                  </span>{" "}
+                  <span className="text-[#667164]">
+                    — makes planning and ordering through the week a bit easier.
+                  </span>
+                </p>
+
+                {isIos ? (
+                  <p className="mt-1 text-xs text-[#5f675c]">
+                    In Safari, tap the share icon, then choose Add to Home
+                    Screen.
+                  </p>
+                ) : deferredPrompt ? (
+                  <p className="mt-1 text-xs text-[#5f675c]">
+                    You can add it now and use it like an app.
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-[#5f675c]">
+                    In Chrome, open the browser menu and choose Add to Home
+                    screen or Install app.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex shrink-0 items-center gap-2">
+                {!isIos && deferredPrompt ? (
+                  <button
+                    type="button"
+                    onClick={handleInstallClick}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Add now
+                  </button>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={dismissInstallCard}
+                  className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.78)] px-4 py-2 text-sm text-[#243328] transition hover:bg-[#f4efe9]"
+                >
+                  Not now
+                </button>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        <section id="produce-boxes" className="mt-10">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="font-serif text-2xl text-[#243328]">
+                Produce boxes
+              </h2>
+              <p className="mt-2 text-sm text-[#667164]">
+                Start with a weekly box, then top up with a few extras.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {produceBoxes.map((item) =>
+              renderCompactCard(
+                item,
+                item.checkoutType === "subscription"
+                  ? "Weekly starter"
+                  : "Produce box",
+                item.checkoutType === "subscription"
+                  ? "A simple base for the week."
+                  : undefined,
+              ),
+            )}
+          </div>
+        </section>
+
+        {renderSection(
+          "Pantry additions",
+          "pantry-additions",
+          pantryItems,
+          "Pantry",
+        )}
+        {renderSection(
+          "Cupboard essentials",
+          "cupboard-essentials",
+          cupboardItems,
+          "Cupboard",
+        )}
+        {renderSection("Extras", "extras", extraItems, "Extra")}
+      </div>
     </main>
   );
 }
