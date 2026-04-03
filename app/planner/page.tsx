@@ -35,6 +35,8 @@ type GeneratedRecipe = {
   steps: string[];
 };
 
+type PlannerPanelMode = "idea" | "recipes" | null;
+
 const SAVED_FAVOURITES_KEY = "tlp_saved_favourite_recipes";
 const PLANNER_RECIPES_KEY = "tlp_planner_recipes";
 const WEEKLY_MEALS_KEY = "tlp_weekly_planner_meals";
@@ -56,17 +58,14 @@ const quickStartOptions = [
   {
     id: "quick-tonight",
     label: "Easy dinner",
-    description: "Fast, simple, and realistic for a busy day.",
   },
   {
     id: "comforting",
     label: "Comforting",
-    description: "Something warm, steady, and satisfying.",
   },
   {
     id: "use-what-ive-got",
     label: "Use up the veg",
-    description: "A practical way to make the most of what is around.",
   },
 ] as const;
 
@@ -219,7 +218,7 @@ function RecipeImage({
     return (
       <div
         className={`overflow-hidden rounded-2xl bg-[#e8eee5] ${
-          compact ? "h-14 w-14" : "h-28 w-full"
+          compact ? "h-12 w-12" : "h-24 w-full"
         }`}
       >
         <img
@@ -235,8 +234,8 @@ function RecipeImage({
     <div
       className={`flex items-center justify-center rounded-2xl bg-[#dde6d8] text-[#516254] ${
         compact
-          ? "h-14 w-14 text-sm font-semibold"
-          : "h-28 w-full text-lg font-semibold"
+          ? "h-12 w-12 text-xs font-semibold"
+          : "h-24 w-full text-base font-semibold"
       }`}
     >
       {recipe?.title ? getInitials(recipe.title) : "TLP"}
@@ -273,6 +272,10 @@ export default function PlannerPage() {
   const [hasPlannerAccess, setHasPlannerAccess] = useState(false);
   const [freeRecipeUsage, setFreeRecipeUsage] = useState(0);
   const [paywallMessage, setPaywallMessage] = useState("");
+
+  const [panelMode, setPanelMode] = useState<PlannerPanelMode>(null);
+  const [showPreferences, setShowPreferences] = useState(false);
+  const [showMethod, setShowMethod] = useState(false);
 
   useEffect(() => {
     const rawSaved = safeRead<any[]>(SAVED_FAVOURITES_KEY, []);
@@ -384,6 +387,10 @@ export default function PlannerPage() {
     ? recipesById.get(weeklyMeals[selectedDay] as string) || null
     : null;
 
+  useEffect(() => {
+    setPanelMode(activeRecipe ? null : "idea");
+  }, [selectedDay, activeRecipe]);
+
   const visibleRecipes = showSaved ? savedRecipes : plannerRecipes;
 
   const filteredRecipes = useMemo(() => {
@@ -459,7 +466,7 @@ export default function PlannerPage() {
         if (b.count !== a.count) return b.count - a.count;
         return a.label.localeCompare(b.label);
       })
-      .slice(0, 18);
+      .slice(0, 12);
   }, [weeklyMeals, recipesById]);
 
   const firstOpenDay = useMemo(() => {
@@ -550,7 +557,7 @@ export default function PlannerPage() {
     });
   }
 
-  async function handleGenerateRecipe() {
+  async function handleGetRecipeIdea() {
     if (!hasPlannerAccess && freeRecipeUsage >= FREE_RECIPE_LIMIT) {
       setGeneratorError("");
       setGeneratedRecipe(null);
@@ -578,6 +585,7 @@ export default function PlannerPage() {
       setPaywallMessage("");
       setGeneratedRecipe(null);
       setGeneratedImageUrl(null);
+      setShowMethod(false);
 
       const response = await fetch("/api/recipe", {
         method: "POST",
@@ -594,7 +602,7 @@ export default function PlannerPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate recipe.");
+        throw new Error(data.error || "Failed to get recipe idea.");
       }
 
       setGeneratedRecipe(data.recipe);
@@ -608,7 +616,7 @@ export default function PlannerPage() {
     } catch (error) {
       console.error(error);
       setGeneratorError(
-        "We couldn’t generate a recipe just now. Please try again in a moment.",
+        "We couldn’t get an idea just now. Please try again in a moment.",
       );
     } finally {
       setIsGenerating(false);
@@ -708,18 +716,18 @@ export default function PlannerPage() {
 
   return (
     <main className="min-h-screen overflow-x-clip text-[#213128]">
-      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-4 sm:px-6 sm:pt-8">
-        <section className="rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
-          <div className="flex flex-col gap-4">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-8 pt-3 sm:px-6 sm:pt-6">
+        <section className="rounded-[24px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_8px_24px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-5">
+          <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#758278]">
                   Weekly planner
                 </p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-[#1f2b24] sm:text-4xl">
+                <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24] sm:text-4xl">
                   Plan meals for the week ahead
                 </h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d6b62] sm:text-base">
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d6b62]">
                   Planning works wherever you are. Ordering is available across
                   the Lanark area for now, with delivery areas expanding over
                   time.{" "}
@@ -736,26 +744,26 @@ export default function PlannerPage() {
               <div className="flex flex-wrap gap-2">
                 <Link
                   href="/recipes"
-                  className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
+                  className="inline-flex min-h-[40px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
                 >
-                  Browse recipes
+                  Recipes
                 </Link>
                 <Link
                   href="/shop"
-                  className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                  className="inline-flex min-h-[40px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
                 >
-                  Go to shop
+                  Shop
                 </Link>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-sm text-[#58675e] backdrop-blur-sm">
-                {plannedCount} of 7 days planned
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-sm text-[#58675e]">
+                {plannedCount} of 7 planned
               </div>
 
               {statusMessage ? (
-                <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-xs text-[#58675e] backdrop-blur-sm">
+                <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-xs text-[#58675e]">
                   {statusMessage}
                 </div>
               ) : null}
@@ -763,13 +771,13 @@ export default function PlannerPage() {
           </div>
         </section>
 
-        <section className="mt-4 rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
+        <section className="mt-3 rounded-[24px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_8px_24px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#758278]">
                 This week
               </p>
-              <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
+              <h2 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
                 Choose a day
               </h2>
             </div>
@@ -779,7 +787,7 @@ export default function PlannerPage() {
                 type="button"
                 onClick={clearSelectedDay}
                 disabled={!activeRecipe}
-                className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-medium transition ${
+                className={`inline-flex min-h-[38px] items-center rounded-full px-4 text-sm font-medium transition ${
                   activeRecipe
                     ? "border border-[#d4dcd0] bg-[rgba(255,255,255,0.82)] text-[#59685f] hover:bg-white"
                     : "bg-[#eef2eb] text-[#8a968e]"
@@ -792,7 +800,7 @@ export default function PlannerPage() {
                 type="button"
                 onClick={clearWeek}
                 disabled={!canClearWeek}
-                className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-medium transition ${
+                className={`inline-flex min-h-[38px] items-center rounded-full px-4 text-sm font-medium transition ${
                   canClearWeek
                     ? "border border-[#d4dcd0] bg-[rgba(255,255,255,0.82)] text-[#59685f] hover:bg-white"
                     : "bg-[#eef2eb] text-[#8a968e]"
@@ -803,7 +811,7 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          <div className="mt-4 overflow-x-auto pb-1">
+          <div className="mt-3 overflow-x-auto pb-1">
             <div className="flex min-w-max gap-2">
               {DAYS.map((day) => {
                 const recipeId = weeklyMeals[day];
@@ -817,21 +825,21 @@ export default function PlannerPage() {
                     key={day}
                     type="button"
                     onClick={() => setSelectedDay(day)}
-                    className={`w-[124px] shrink-0 rounded-2xl border px-3 py-3 text-left transition ${
+                    className={`w-[106px] shrink-0 rounded-2xl border px-3 py-2.5 text-left transition ${
                       isActive
                         ? "border-[#213128] bg-[#213128] text-white"
                         : "border-[#dde4d8] bg-[rgba(251,252,250,0.8)] text-[#213128] hover:bg-[rgba(255,255,255,0.92)]"
                     }`}
                   >
                     <p
-                      className={`text-xs uppercase tracking-[0.16em] ${
+                      className={`text-[10px] uppercase tracking-[0.16em] ${
                         isActive ? "text-white/75" : "text-[#7b877d]"
                       }`}
                     >
                       {day.slice(0, 3)}
                     </p>
-                    <p className="mt-2 text-sm font-medium leading-5">
-                      {recipe ? truncate(recipe.title, 28) : "Open"}
+                    <p className="mt-1.5 text-sm font-medium leading-5">
+                      {recipe ? truncate(recipe.title, 22) : "Open"}
                     </p>
                   </button>
                 );
@@ -839,602 +847,576 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-[1.02fr_1.38fr]">
-            <div className="rounded-3xl bg-[rgba(246,248,243,0.84)] p-4 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
+          <div className="mt-3 grid gap-3 lg:grid-cols-[0.94fr_1.06fr]">
+            <div className="rounded-3xl bg-[rgba(246,248,243,0.84)] p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#78867c]">
                 Selected day
               </p>
-              <div className="mt-1 flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                    {selectedDay}
-                  </h3>
-                  {!activeRecipe && firstOpenDay === selectedDay ? (
-                    <p className="mt-1 text-sm text-[#6b786e]">
-                      A good place to start this week.
-                    </p>
-                  ) : null}
-                </div>
+
+              <div className="mt-1">
+                <h3 className="text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                  {selectedDay}
+                </h3>
+                {!activeRecipe && firstOpenDay === selectedDay ? (
+                  <p className="mt-1 text-sm text-[#6b786e]">
+                    A good place to start.
+                  </p>
+                ) : null}
               </div>
 
               {activeRecipe ? (
-                <div className="mt-4 space-y-3">
-                  <RecipeImage recipe={activeRecipe} />
-                  <div>
-                    <p className="text-lg font-medium text-[#213128]">
+                <div className="mt-3 flex items-start gap-3">
+                  <div className="w-20 shrink-0">
+                    <RecipeImage recipe={activeRecipe} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-base font-medium text-[#213128]">
                       {activeRecipe.title}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-[#617067]">
                       {activeRecipe.description
-                        ? truncate(activeRecipe.description, 130)
+                        ? truncate(activeRecipe.description, 95)
                         : "Placed into your week and ready when you are."}
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-6 backdrop-blur-sm">
-                  <p className="text-base font-medium text-[#213128]">
+                <div className="mt-3 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-4">
+                  <p className="text-sm font-medium text-[#213128]">
                     Nothing planned yet
                   </p>
                   <p className="mt-1 text-sm leading-6 text-[#617067]">
-                    Pick something below, or generate an idea for {selectedDay}{" "}
-                    right here.
+                    Add a recipe or get an idea.
                   </p>
                 </div>
               )}
 
-              <div className="mt-5 border-t border-[#e1e7dd] pt-5">
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
-                    Plan this day
-                  </p>
-                  <h4 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                    Start from what you have
-                  </h4>
-                  <p className="mt-1 text-sm leading-6 text-[#617067]">
-                    A calm way to figure out {selectedDay.toLowerCase()} without
-                    leaving the planner.
-                  </p>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {quickStartOptions.map((option) => {
-                    const isActive = selectedQuickStart === option.id;
-
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() =>
-                          setSelectedQuickStart((current) =>
-                            current === option.id ? "" : option.id,
-                          )
-                        }
-                        className={`rounded-full border px-4 py-2 text-sm transition ${
-                          isActive
-                            ? "border-[#b9c8b5] bg-[rgba(233,240,228,0.82)] text-[#213128]"
-                            : "border-[#d8dfd3] bg-[rgba(255,255,255,0.88)] text-[#5d6b62] hover:bg-white"
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-4">
-                  <label
-                    htmlFor="planner-generator-ingredients"
-                    className="text-sm font-medium text-[#213128]"
-                  >
-                    Ingredients for {selectedDay.toLowerCase()}
-                  </label>
-                  <p className="mt-1 text-sm leading-6 text-[#617067]">
-                    Type ingredients separated by commas.
-                  </p>
-                  <textarea
-                    id="planner-generator-ingredients"
-                    value={customIngredients}
-                    onChange={(event) =>
-                      setCustomIngredients(event.target.value)
-                    }
-                    placeholder="e.g. courgette, tomatoes, basil, pasta"
-                    rows={4}
-                    className="mt-3 w-full rounded-3xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.9)] px-4 py-3 text-sm text-[#213128] outline-none transition placeholder:text-[#839085] focus:border-[#b8c5b4] focus:bg-white"
-                  />
-                </div>
-
-                <div className="mt-4 rounded-3xl border border-[#e1e7dd] bg-[rgba(251,252,250,0.84)] p-4">
-                  <label className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      checked={includeBasketIngredients}
-                      onChange={(event) =>
-                        setIncludeBasketIngredients(event.target.checked)
-                      }
-                      className="mt-1 h-4 w-4 rounded border-[#cfd7cb] text-[#213128] focus:ring-[#b8c5b4]"
-                    />
-                    <div>
-                      <p className="text-sm font-medium text-[#213128]">
-                        Include basket ingredients
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-[#617067]">
-                        Useful if you want {selectedDay.toLowerCase()} to work
-                        around what is already in your basket.
-                      </p>
-                    </div>
-                  </label>
-
-                  {includeBasketIngredients ? (
-                    <div className="mt-4">
-                      {basketIngredients.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {basketIngredients.map((ingredient) => (
-                            <span
-                              key={ingredient}
-                              className="rounded-full border border-[#d8dfd3] bg-white px-3 py-1.5 text-sm text-[#58675e]"
-                            >
-                              {ingredient}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm leading-6 text-[#7a8478]">
-                          Your basket is empty at the moment.
-                        </p>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-
-                <div className="mt-4">
-                  <p className="text-sm font-medium text-[#213128]">
-                    Quiet preferences
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {preferenceOptions.map((preference) => {
-                      const isSelected =
-                        selectedPreferences.includes(preference);
-
-                      return (
-                        <button
-                          key={preference}
-                          type="button"
-                          onClick={() => togglePreference(preference)}
-                          className={`rounded-full border px-4 py-2 text-sm transition ${
-                            isSelected
-                              ? "border-[#b8c5b4] bg-[rgba(233,240,228,0.82)] text-[#213128]"
-                              : "border-[#d8dfd3] bg-[rgba(255,255,255,0.88)] text-[#5d6b62] hover:bg-white"
-                          }`}
-                        >
-                          {preference}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {allPlanningIngredients.length > 0 ? (
-                  <div className="mt-4 rounded-3xl border border-[#e1e7dd] bg-[rgba(251,252,250,0.84)] p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      Ingredients being used
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {allPlanningIngredients.map((ingredient) => (
-                        <span
-                          key={ingredient}
-                          className="rounded-full border border-[#d8dfd3] bg-white px-3 py-1.5 text-sm text-[#58675e]"
-                        >
-                          {ingredient}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                {!hasPlannerAccess ? (
-                  <div className="mt-4 rounded-3xl border border-[#d8dfd3] bg-[rgba(251,252,250,0.84)] p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      Free recipe ideas remaining: {remainingFreeRecipes}
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-[#617067]">
-                      Unlock unlimited recipes and full planner access, or get
-                      it included with a weekly produce box.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="mt-4 rounded-3xl border border-[#dbe4d5] bg-[#f4f8f1] p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      Planner access active
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-[#617067]">
-                      You have unlimited recipe ideas and full planner access.
-                    </p>
-                  </div>
-                )}
-
-                <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-4 border-t border-[#e1e7dd] pt-4">
+                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={handleGenerateRecipe}
-                    disabled={isGenerating || !hasFreeRecipeAccess}
-                    className="inline-flex min-h-[44px] items-center rounded-full bg-[#213128] px-5 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={() =>
+                      setPanelMode((current) =>
+                        current === "idea" ? null : "idea",
+                      )
+                    }
+                    className="inline-flex min-h-[40px] items-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)]"
                   >
-                    {isGenerating
-                      ? "Creating an idea..."
-                      : hasFreeRecipeAccess
-                        ? `Get an idea for ${selectedDay}`
-                        : "Unlock unlimited recipes"}
+                    {panelMode === "idea"
+                      ? `Hide ideas for ${selectedDay}`
+                      : `Get an idea for ${selectedDay}`}
                   </button>
 
-                  <Link
-                    href="/recipes"
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-5 text-sm font-medium text-[#213128] transition hover:bg-white"
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPanelMode((current) =>
+                        current === "recipes" ? null : "recipes",
+                      )
+                    }
+                    className="inline-flex min-h-[40px] items-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)]"
                   >
-                    Browse recipes instead
-                  </Link>
+                    {panelMode === "recipes"
+                      ? "Hide recipes"
+                      : `Choose a recipe for ${selectedDay}`}
+                  </button>
                 </div>
 
-                {generatorError ? (
-                  <div className="mt-4 rounded-3xl border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
-                    {generatorError}
-                  </div>
-                ) : null}
-
-                {paywallMessage ? (
-                  <div className="mt-4 rounded-3xl border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] px-4 py-4 text-sm text-[#5f675c]">
-                    <p>{paywallMessage}</p>
-
-                    <div className="mt-4 flex flex-wrap gap-3">
-                      <Link
-                        href="/pricing"
-                        className="rounded-full bg-[#213128] px-5 py-2 text-sm text-white transition hover:opacity-90"
-                      >
-                        Unlock the planner
-                      </Link>
-
-                      <Link
-                        href="/shop"
-                        className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#213128] transition hover:bg-white"
-                      >
-                        See weekly boxes
-                      </Link>
-                    </div>
-                  </div>
-                ) : null}
-
-                {isGenerating ? (
-                  <div className="mt-4 overflow-hidden rounded-3xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.86)]">
-                    <div className="p-6">
-                      <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#d6cec2] border-t-[#213128]" />
-                      <p className="mt-4 text-center font-medium text-[#213128]">
-                        Pulling together an idea for {selectedDay.toLowerCase()}
+                {panelMode === "idea" ? (
+                  <div className="mt-4 space-y-4 rounded-3xl border border-[#dbe2d7] bg-[rgba(255,255,255,0.78)] p-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#213128]">
+                        Get an idea for {selectedDay.toLowerCase()}
                       </p>
-                      <p className="mt-2 text-center text-sm text-[#66756b]">
-                        Just a moment.
+                      <p className="mt-1 text-sm leading-6 text-[#617067]">
+                        Start from what you have.
                       </p>
                     </div>
-                  </div>
-                ) : null}
 
-                {generatedRecipe ? (
-                  <div className="mt-4 overflow-hidden rounded-3xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.9)]">
-                    {generatedImageUrl ? (
-                      <img
-                        src={generatedImageUrl}
-                        alt={generatedRecipe.title}
-                        className="h-[220px] w-full object-cover"
+                    <div className="flex flex-wrap gap-2">
+                      {quickStartOptions.map((option) => {
+                        const isActive = selectedQuickStart === option.id;
+
+                        return (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() =>
+                              setSelectedQuickStart((current) =>
+                                current === option.id ? "" : option.id,
+                              )
+                            }
+                            className={`rounded-full border px-4 py-2 text-sm transition ${
+                              isActive
+                                ? "border-[#b9c8b5] bg-[rgba(233,240,228,0.82)] text-[#213128]"
+                                : "border-[#d8dfd3] bg-[rgba(255,255,255,0.88)] text-[#5d6b62] hover:bg-white"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="planner-generator-ingredients"
+                        className="text-sm font-medium text-[#213128]"
+                      >
+                        Ingredients
+                      </label>
+                      <textarea
+                        id="planner-generator-ingredients"
+                        value={customIngredients}
+                        onChange={(event) =>
+                          setCustomIngredients(event.target.value)
+                        }
+                        placeholder="e.g. courgette, tomatoes, basil, pasta"
+                        rows={3}
+                        className="mt-2 w-full rounded-3xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.9)] px-4 py-3 text-sm text-[#213128] outline-none transition placeholder:text-[#839085] focus:border-[#b8c5b4] focus:bg-white"
                       />
-                    ) : null}
+                    </div>
 
-                    <div className="p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[#78867c]">
-                        Fresh idea for {selectedDay.toLowerCase()}
-                      </p>
-                      <h4 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                        {generatedRecipe.title}
-                      </h4>
-                      <p className="mt-2 text-sm leading-6 text-[#617067]">
-                        {generatedRecipe.description}
-                      </p>
-
-                      <div className="mt-4 grid gap-4 md:grid-cols-2">
-                        <div>
-                          <p className="text-[11px] uppercase tracking-[0.18em] text-[#78867c]">
-                            Ingredients used
-                          </p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {generatedRecipe.ingredientsUsed.map((item) => (
+                    <label className="flex items-start gap-3 rounded-3xl border border-[#e1e7dd] bg-[rgba(251,252,250,0.84)] p-3">
+                      <input
+                        type="checkbox"
+                        checked={includeBasketIngredients}
+                        onChange={(event) =>
+                          setIncludeBasketIngredients(event.target.checked)
+                        }
+                        className="mt-1 h-4 w-4 rounded border-[#cfd7cb] text-[#213128] focus:ring-[#b8c5b4]"
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-[#213128]">
+                          Include basket ingredients
+                        </p>
+                        {includeBasketIngredients &&
+                        basketIngredients.length > 0 ? (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {basketIngredients.slice(0, 8).map((ingredient) => (
                               <span
-                                key={item}
-                                className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-sm text-[#58675e]"
+                                key={ingredient}
+                                className="rounded-full border border-[#d8dfd3] bg-white px-3 py-1 text-xs text-[#58675e]"
                               >
-                                {item}
+                                {ingredient}
                               </span>
                             ))}
                           </div>
-                        </div>
+                        ) : null}
+                      </div>
+                    </label>
 
-                        <div>
-                          <p className="text-[11px] uppercase tracking-[0.18em] text-[#78867c]">
-                            Pantry staples
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowPreferences((current) => !current)
+                        }
+                        className="text-sm font-medium text-[#213128] underline decoration-[rgba(33,49,40,0.2)] underline-offset-4"
+                      >
+                        {showPreferences
+                          ? "Hide preferences"
+                          : "Add preferences"}
+                      </button>
+
+                      {showPreferences ? (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {preferenceOptions.map((preference) => {
+                            const isSelected =
+                              selectedPreferences.includes(preference);
+
+                            return (
+                              <button
+                                key={preference}
+                                type="button"
+                                onClick={() => togglePreference(preference)}
+                                className={`rounded-full border px-4 py-2 text-sm transition ${
+                                  isSelected
+                                    ? "border-[#b8c5b4] bg-[rgba(233,240,228,0.82)] text-[#213128]"
+                                    : "border-[#d8dfd3] bg-[rgba(255,255,255,0.88)] text-[#5d6b62] hover:bg-white"
+                                }`}
+                              >
+                                {preference}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {!hasPlannerAccess ? (
+                      <div className="rounded-3xl border border-[#d8dfd3] bg-[rgba(251,252,250,0.84)] p-3">
+                        <p className="text-sm text-[#617067]">
+                          Free ideas remaining: {remainingFreeRecipes}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={handleGetRecipeIdea}
+                        disabled={isGenerating || !hasFreeRecipeAccess}
+                        className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-5 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isGenerating
+                          ? "Pulling an idea together..."
+                          : hasFreeRecipeAccess
+                            ? `Get an idea for ${selectedDay}`
+                            : "Unlock unlimited recipes"}
+                      </button>
+
+                      <Link
+                        href="/recipes"
+                        className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-5 text-sm font-medium text-[#213128] transition hover:bg-white"
+                      >
+                        Full recipes page
+                      </Link>
+                    </div>
+
+                    {generatorError ? (
+                      <div className="rounded-3xl border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
+                        {generatorError}
+                      </div>
+                    ) : null}
+
+                    {paywallMessage ? (
+                      <div className="rounded-3xl border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] px-4 py-4 text-sm text-[#5f675c]">
+                        <p>{paywallMessage}</p>
+
+                        <div className="mt-3 flex flex-wrap gap-3">
+                          <Link
+                            href="/pricing"
+                            className="rounded-full bg-[#213128] px-5 py-2 text-sm text-white transition hover:opacity-90"
+                          >
+                            Unlock the planner
+                          </Link>
+
+                          <Link
+                            href="/shop"
+                            className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-2 text-sm text-[#213128] transition hover:bg-white"
+                          >
+                            See weekly boxes
+                          </Link>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {isGenerating ? (
+                      <div className="rounded-3xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.86)] p-4">
+                        <p className="text-sm font-medium text-[#213128]">
+                          Pulling together an idea for{" "}
+                          {selectedDay.toLowerCase()}
+                        </p>
+                        <p className="mt-1 text-sm text-[#66756b]">
+                          Just a moment.
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {generatedRecipe ? (
+                      <div className="overflow-hidden rounded-3xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.9)]">
+                        {generatedImageUrl ? (
+                          <img
+                            src={generatedImageUrl}
+                            alt={generatedRecipe.title}
+                            className="h-[170px] w-full object-cover"
+                          />
+                        ) : null}
+
+                        <div className="p-4">
+                          <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                            Fresh idea
                           </p>
-                          {generatedRecipe.pantryStaples.length > 0 ? (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {generatedRecipe.pantryStaples.map((item) => (
+                          <h4 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                            {generatedRecipe.title}
+                          </h4>
+                          <p className="mt-2 text-sm leading-6 text-[#617067]">
+                            {truncate(generatedRecipe.description, 130)}
+                          </p>
+
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {generatedRecipe.ingredientsUsed
+                              .slice(0, 8)
+                              .map((item) => (
                                 <span
                                   key={item}
-                                  className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-sm text-[#58675e]"
+                                  className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-3 py-1 text-xs text-[#58675e]"
                                 >
                                   {item}
                                 </span>
                               ))}
+                          </div>
+
+                          {generatedRecipe.steps.length > 0 ? (
+                            <div className="mt-3">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setShowMethod((current) => !current)
+                                }
+                                className="text-sm font-medium text-[#213128] underline decoration-[rgba(33,49,40,0.2)] underline-offset-4"
+                              >
+                                {showMethod ? "Hide method" : "Show method"}
+                              </button>
+
+                              {showMethod ? (
+                                <ol className="mt-3 space-y-2 text-sm leading-6 text-[#213128]">
+                                  {generatedRecipe.steps.map((step, index) => (
+                                    <li
+                                      key={`${index}-${step}`}
+                                      className="flex gap-3"
+                                    >
+                                      <span className="mt-[2px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
+                                        {index + 1}
+                                      </span>
+                                      <span>{step}</span>
+                                    </li>
+                                  ))}
+                                </ol>
+                              ) : null}
                             </div>
-                          ) : (
-                            <p className="mt-3 text-sm leading-6 text-[#617067]">
-                              No extra staples needed beyond the basics.
-                            </p>
-                          )}
+                          ) : null}
+
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={handleAddGeneratedToDay}
+                              className="inline-flex min-h-[40px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                            >
+                              Add to {selectedDay}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleKeepGeneratedInPlanner}
+                              className="inline-flex min-h-[40px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
+                            >
+                              Keep
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleSaveGeneratedToFavourites}
+                              className="inline-flex min-h-[40px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
+                            >
+                              Save
+                            </button>
+                          </div>
+
+                          {generatorMessage ? (
+                            <div className="mt-3 rounded-3xl border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                              {generatorMessage}
+                            </div>
+                          ) : null}
+
+                          {saveMessage ? (
+                            <div className="mt-3 rounded-3xl border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                              {saveMessage}
+                            </div>
+                          ) : null}
                         </div>
                       </div>
-
-                      <div className="mt-4">
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-[#78867c]">
-                          Method
-                        </p>
-                        <ol className="mt-3 space-y-3 text-sm leading-6 text-[#213128]">
-                          {generatedRecipe.steps.map((step, index) => (
-                            <li key={`${index}-${step}`} className="flex gap-3">
-                              <span className="mt-[2px] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-xs">
-                                {index + 1}
-                              </span>
-                              <span>{step}</span>
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-
-                      <div className="mt-5 flex flex-wrap gap-3">
-                        <button
-                          type="button"
-                          onClick={handleAddGeneratedToDay}
-                          className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
-                        >
-                          Add to {selectedDay}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={handleKeepGeneratedInPlanner}
-                          className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
-                        >
-                          Keep in planner
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={handleSaveGeneratedToFavourites}
-                          className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
-                        >
-                          Save to favourites
-                        </button>
-                      </div>
-
-                      {generatorMessage ? (
-                        <div className="mt-4 rounded-3xl border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                          {generatorMessage}
-                        </div>
-                      ) : null}
-
-                      {saveMessage ? (
-                        <div className="mt-4 rounded-3xl border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                          {saveMessage}
-                        </div>
-                      ) : null}
-                    </div>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
             </div>
 
-            <div className="rounded-3xl bg-[rgba(252,252,250,0.82)] p-4 backdrop-blur-sm">
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.2em] text-[#78867c]">
-                      Add into {selectedDay}
-                    </p>
-                    <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                      Choose from your recipes
-                    </h3>
-                  </div>
-
-                  <div className="flex rounded-full bg-[rgba(238,242,235,0.9)] p-1">
-                    <button
-                      type="button"
-                      onClick={() => setShowSaved(false)}
-                      className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
-                        !showSaved
-                          ? "bg-white text-[#213128] shadow-sm"
-                          : "text-[#68776d]"
-                      }`}
-                    >
-                      Planner
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowSaved(true)}
-                      className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
-                        showSaved
-                          ? "bg-white text-[#213128] shadow-sm"
-                          : "text-[#68776d]"
-                      }`}
-                    >
-                      Saved
-                    </button>
-                  </div>
+            <div className="rounded-3xl bg-[rgba(252,252,250,0.82)] p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#78867c]">
+                    Recipe library
+                  </p>
+                  <h3 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                    Add into {selectedDay}
+                  </h3>
                 </div>
 
-                {(visibleRecipes.length > 0 || showSaved) && (
-                  <div>
-                    <label htmlFor="planner-search" className="sr-only">
-                      Search recipes
-                    </label>
-                    <input
-                      id="planner-search"
-                      type="text"
-                      value={searchQuery}
-                      onChange={(event) => setSearchQuery(event.target.value)}
-                      placeholder={
-                        showSaved
-                          ? "Search saved recipes"
-                          : "Search planner recipes"
-                      }
-                      className="w-full rounded-2xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.84)] px-4 py-3 text-sm text-[#213128] outline-none transition placeholder:text-[#839085] focus:border-[#b8c5b4] focus:bg-white"
-                    />
-                  </div>
-                )}
+                <div className="flex rounded-full bg-[rgba(238,242,235,0.9)] p-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowSaved(false)}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
+                      !showSaved
+                        ? "bg-white text-[#213128] shadow-sm"
+                        : "text-[#68776d]"
+                    }`}
+                  >
+                    Planner
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowSaved(true)}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
+                      showSaved
+                        ? "bg-white text-[#213128] shadow-sm"
+                        : "text-[#68776d]"
+                    }`}
+                  >
+                    Saved
+                  </button>
+                </div>
               </div>
 
-              {visibleRecipes.length === 0 ? (
-                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-6 backdrop-blur-sm">
-                  <p className="text-base font-medium text-[#213128]">
-                    {showSaved
-                      ? "No saved favourites yet"
-                      : "No planner recipes yet"}
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-[#617067]">
-                    {showSaved
-                      ? "Save a few recipes first, then they will appear here."
-                      : "Use your saved recipes to build a small weekly collection you can come back to."}
-                  </p>
+              {panelMode === "recipes" ? (
+                <>
+                  {(visibleRecipes.length > 0 || showSaved) && (
+                    <div className="mt-3">
+                      <label htmlFor="planner-search" className="sr-only">
+                        Search recipes
+                      </label>
+                      <input
+                        id="planner-search"
+                        type="text"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder={
+                          showSaved
+                            ? "Search saved recipes"
+                            : "Search planner recipes"
+                        }
+                        className="w-full rounded-2xl border border-[#d8dfd3] bg-[rgba(255,255,255,0.84)] px-4 py-3 text-sm text-[#213128] outline-none transition placeholder:text-[#839085] focus:border-[#b8c5b4] focus:bg-white"
+                      />
+                    </div>
+                  )}
 
-                  <div className="mt-4">
-                    <Link
-                      href="/recipes"
-                      className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
-                    >
-                      Go to recipes
-                    </Link>
-                  </div>
-                </div>
-              ) : filteredRecipes.length === 0 ? (
-                <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-6 backdrop-blur-sm">
-                  <p className="text-base font-medium text-[#213128]">
-                    No matching recipes
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-[#617067]">
-                    Try a different search, or switch between planner and saved
-                    recipes.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {filteredRecipes.map((recipe) => {
-                    const inPlanner = plannerRecipeIds.has(recipe.id);
-                    const image = getRecipeImage(recipe);
-                    const isAssignedToSelectedDay =
-                      weeklyMeals[selectedDay] === recipe.id;
+                  {visibleRecipes.length === 0 ? (
+                    <div className="mt-3 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-5">
+                      <p className="text-sm font-medium text-[#213128]">
+                        {showSaved
+                          ? "No saved favourites yet"
+                          : "No planner recipes yet"}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-[#617067]">
+                        {showSaved
+                          ? "Save a few recipes first."
+                          : "Use saved recipes or get a few ideas here."}
+                      </p>
+                    </div>
+                  ) : filteredRecipes.length === 0 ? (
+                    <div className="mt-3 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-5">
+                      <p className="text-sm font-medium text-[#213128]">
+                        No matching recipes
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-3 grid grid-cols-1 gap-3">
+                      {filteredRecipes.map((recipe) => {
+                        const inPlanner = plannerRecipeIds.has(recipe.id);
+                        const image = getRecipeImage(recipe);
+                        const isAssignedToSelectedDay =
+                          weeklyMeals[selectedDay] === recipe.id;
 
-                    return (
-                      <article
-                        key={recipe.id}
-                        className="overflow-hidden rounded-3xl border border-[#e2e8de] bg-[rgba(255,255,255,0.86)] backdrop-blur-sm"
-                      >
-                        <div className="relative">
-                          {image ? (
-                            <img
-                              src={image}
-                              alt={recipe.title}
-                              className="h-36 w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-36 w-full items-center justify-center bg-[#dde6d8] text-lg font-semibold text-[#536458]">
-                              {getInitials(recipe.title)}
+                        return (
+                          <article
+                            key={recipe.id}
+                            className="overflow-hidden rounded-3xl border border-[#e2e8de] bg-[rgba(255,255,255,0.86)]"
+                          >
+                            <div className="flex gap-3 p-3">
+                              <div className="w-16 shrink-0">
+                                {image ? (
+                                  <img
+                                    src={image}
+                                    alt={recipe.title}
+                                    className="h-16 w-16 rounded-2xl object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#dde6d8] text-sm font-semibold text-[#536458]">
+                                    {getInitials(recipe.title)}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold text-[#213128]">
+                                  {recipe.title}
+                                </p>
+                                <p className="mt-1 text-sm leading-6 text-[#617067]">
+                                  {recipe.description
+                                    ? truncate(recipe.description, 70)
+                                    : "A calm, useful meal idea ready for the week."}
+                                </p>
+
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      assignRecipeToSelectedDay(recipe)
+                                    }
+                                    className="inline-flex min-h-[38px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                                  >
+                                    {isAssignedToSelectedDay
+                                      ? `In ${selectedDay}`
+                                      : `Add to ${selectedDay}`}
+                                  </button>
+
+                                  {showSaved ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => addRecipeToPlanner(recipe)}
+                                      disabled={inPlanner}
+                                      className={`inline-flex min-h-[38px] items-center rounded-full px-4 text-sm font-medium transition ${
+                                        inPlanner
+                                          ? "bg-[#eef2eb] text-[#7d897f]"
+                                          : "border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] text-[#213128] hover:bg-white"
+                                      }`}
+                                    >
+                                      {inPlanner ? "In planner" : "Keep"}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        removeRecipeFromPlanner(recipe.id)
+                                      }
+                                      className="inline-flex min-h-[38px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
+                                    >
+                                      Remove
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          )}
-
-                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(31,43,36,0.35)] to-transparent" />
-                          <div className="absolute bottom-3 left-3 right-3">
-                            <p className="text-base font-semibold text-white">
-                              {recipe.title}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-3 p-4">
-                          <p className="text-sm leading-6 text-[#617067]">
-                            {recipe.description
-                              ? truncate(recipe.description, 86)
-                              : "A calm, useful meal idea ready for the week."}
-                          </p>
-
-                          <div className="flex flex-wrap gap-2">
-                            <button
-                              type="button"
-                              onClick={() => assignRecipeToSelectedDay(recipe)}
-                              className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
-                            >
-                              {isAssignedToSelectedDay
-                                ? `In ${selectedDay}`
-                                : `Add to ${selectedDay}`}
-                            </button>
-
-                            {showSaved ? (
-                              <button
-                                type="button"
-                                onClick={() => addRecipeToPlanner(recipe)}
-                                disabled={inPlanner}
-                                className={`inline-flex min-h-[42px] items-center rounded-full px-4 text-sm font-medium transition ${
-                                  inPlanner
-                                    ? "bg-[#eef2eb] text-[#7d897f]"
-                                    : "border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] text-[#213128] hover:bg-white"
-                                }`}
-                              >
-                                {inPlanner ? "In planner" : "Keep in planner"}
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  removeRecipeFromPlanner(recipe.id)
-                                }
-                                className="inline-flex min-h-[42px] items-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
-                              >
-                                Remove
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </article>
-                    );
-                  })}
+                          </article>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="mt-3 rounded-3xl border border-[#e1e7dd] bg-[rgba(255,255,255,0.72)] px-4 py-4">
+                  <p className="text-sm text-[#617067]">
+                    Open this when you want to pull in something you already
+                    saved.
+                  </p>
                 </div>
               )}
             </div>
           </div>
         </section>
 
-        <section className="mt-4 rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
+        <section className="mt-3 rounded-[24px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_8px_24px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#758278]">
                 Week view
               </p>
-              <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                Your meals at a glance
+              <h2 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
+                Meals at a glance
               </h2>
             </div>
 
             <Link
               href="/shop"
-              className="inline-flex min-h-[42px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+              className="inline-flex min-h-[40px] items-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
             >
               Build the weekly shop
             </Link>
           </div>
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             {DAYS.map((day) => {
               const recipeId = weeklyMeals[day];
               const recipe = recipeId
@@ -1454,7 +1436,7 @@ export default function PlannerPage() {
                 >
                   <RecipeImage recipe={recipe} compact />
                   <div className="min-w-0">
-                    <p className="text-xs uppercase tracking-[0.16em] text-[#7c887e]">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#7c887e]">
                       {day}
                     </p>
                     <p className="mt-1 truncate text-sm font-medium text-[#213128]">
@@ -1467,53 +1449,42 @@ export default function PlannerPage() {
           </div>
         </section>
 
-        <section className="mt-4 rounded-[28px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_10px_30px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#758278]">
-                Weekly basket guide
-              </p>
-              <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-[#1f2b24]">
-                Ingredients showing up this week
-              </h2>
-            </div>
+        <section className="mt-3 rounded-[24px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_8px_24px_rgba(31,43,36,0.05)] backdrop-blur-md sm:p-5">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#758278]">
+              Weekly basket guide
+            </p>
+            <h2 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
+              Ingredients showing up this week
+            </h2>
           </div>
 
           {weekSummary.length === 0 ? (
-            <div className="mt-4 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-6 backdrop-blur-sm">
-              <p className="text-base font-medium text-[#213128]">
+            <div className="mt-3 rounded-3xl border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-4 py-5">
+              <p className="text-sm font-medium text-[#213128]">
                 Nothing to summarise yet
               </p>
               <p className="mt-1 text-sm leading-6 text-[#617067]">
-                Once you add a few meals, this becomes a simple prompt for what
-                you may want to buy this week.
+                Add a few meals and this becomes a quick buying guide.
               </p>
             </div>
           ) : (
-            <>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#617067]">
-                A quick view of ingredients appearing across your planned meals.
-                Useful whether you are building a local order or just shopping
-                more deliberately.
-              </p>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {weekSummary.map((item) => (
-                  <div
-                    key={`${item.label}-${item.days.join("-")}`}
-                    className="rounded-2xl border border-[#e1e7dd] bg-[rgba(252,252,250,0.82)] px-3 py-2"
-                  >
-                    <p className="text-sm font-medium text-[#213128]">
-                      {item.label}
-                    </p>
-                    <p className="mt-1 text-xs text-[#718076]">
-                      {item.count > 1 ? `${item.count} matches` : "1 match"} ·{" "}
-                      {item.days.map((day) => day.slice(0, 3)).join(", ")}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {weekSummary.map((item) => (
+                <div
+                  key={`${item.label}-${item.days.join("-")}`}
+                  className="rounded-2xl border border-[#e1e7dd] bg-[rgba(252,252,250,0.82)] px-3 py-2"
+                >
+                  <p className="text-sm font-medium text-[#213128]">
+                    {item.label}
+                  </p>
+                  <p className="mt-1 text-[11px] text-[#718076]">
+                    {item.count > 1 ? `${item.count} matches` : "1 match"} ·{" "}
+                    {item.days.map((day) => day.slice(0, 3)).join(", ")}
+                  </p>
+                </div>
+              ))}
+            </div>
           )}
         </section>
 
