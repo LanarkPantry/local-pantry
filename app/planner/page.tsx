@@ -622,7 +622,7 @@ export default function PlannerPage() {
       id: `${generatedRecipe.title}-${Date.now()}`,
       title: generatedRecipe.title,
       description: generatedRecipe.description,
-      imageUrl: generatedImageUrl,
+      imageUrl: generatedImageUrl ?? undefined,
       ingredients: generatedRecipe.ingredientsUsed,
       ingredientsUsed: generatedRecipe.ingredientsUsed,
       pantryStaples: generatedRecipe.pantryStaples,
