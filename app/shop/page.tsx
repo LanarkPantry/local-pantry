@@ -550,24 +550,15 @@ export default function ShopPage() {
               make with it, then add the rest of the week around that idea.
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-                Small curated range
-              </div>
-              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-                Recipe-led add-ons
-              </div>
-            </div>
-
             {plannerBridgeMessage ? (
               <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1.5 text-xs font-medium text-[#5f675c]">
                 {plannerBridgeMessage}
               </div>
             ) : null}
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {weeklyProduceBox ? (
-                <div className="rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
@@ -600,7 +591,7 @@ export default function ShopPage() {
               ) : null}
 
               {familyProduceBox ? (
-                <div className="rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
@@ -633,7 +624,7 @@ export default function ShopPage() {
               ) : null}
             </div>
 
-            <div className="mt-5 rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+            <div className="mt-4 rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
               <p className="text-sm text-[#5f675c]">Your basket</p>
               <p className="mt-2 text-2xl font-serif text-[#243328]">
                 {totalItems > 0
