@@ -51,6 +51,12 @@ type ShopRecipeCardProps = {
   onStartWeeklyBox?: () => void;
 };
 
+type ProductGroup = {
+  key: string;
+  title: string;
+  items: ShopDisplayItem[];
+};
+
 const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
 const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
 
@@ -184,8 +190,17 @@ function writePlannerRecipes(value: PlannerRecipe[]) {
 function getProductTypeLabel(item: ShopDisplayItem) {
   if (item.category === "boxes") return "Produce box";
   if (item.category === "pantry") return "Gourmet jar";
-  if (item.category === "cupboard") return "Cupboard staple";
+  if (item.category === "cupboard") return "Pantry staple";
+  if (item.category === "nuts") return "Nuts";
   return "Extra";
+}
+
+function getProductGroupTitle(item: ShopDisplayItem) {
+  if (item.category === "boxes") return "Weekly Fruit & Veg Boxes";
+  if (item.category === "pantry") return "Gourmet Jars";
+  if (item.category === "cupboard") return "Pantry Staples";
+  if (item.category === "nuts") return "Nuts";
+  return "Extras";
 }
 
 function truncate(text: string, limit: number) {
@@ -221,6 +236,38 @@ export default function ShopRecipeCard({
 
     return oneOffItems;
   }, [starterBoxFromShop]);
+
+  const productGroups = useMemo<ProductGroup[]>(() => {
+    const orderedGroups = [
+      "Weekly Fruit & Veg Boxes",
+      "Gourmet Jars",
+      "Pantry Staples",
+      "Nuts",
+      "Extras",
+    ];
+
+    const grouped = spotlightProducts.reduce<Record<string, ShopDisplayItem[]>>(
+      (acc, item) => {
+        const title = getProductGroupTitle(item);
+
+        if (!acc[title]) {
+          acc[title] = [];
+        }
+
+        acc[title].push(item);
+        return acc;
+      },
+      {},
+    );
+
+    return orderedGroups
+      .filter((title) => grouped[title]?.length)
+      .map((title) => ({
+        key: title.toLowerCase().replace(/[^\w]+/g, "-"),
+        title,
+        items: grouped[title],
+      }));
+  }, [spotlightProducts]);
 
   const defaultSelectedProduct = useMemo(() => {
     const pantryFirst =
@@ -776,133 +823,136 @@ export default function ShopRecipeCard({
   return (
     <section
       id="shop-recipe-card"
-      className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6"
+      className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md md:rounded-[28px] md:p-5"
     >
       <div className="max-w-2xl">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+        <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
           Shop ideas
         </p>
 
-        <h2 className="mt-2 font-serif text-2xl leading-tight md:text-3xl">
+        <h2 className="mt-2 font-serif text-xl leading-tight md:text-3xl">
           Pick a product, then see what you could make with it.
         </h2>
 
-        <p className="mt-3 text-sm leading-6 text-[#667164]">
+        <p className="mt-2 text-sm leading-6 text-[#667164]">
           Start with one thing you want to highlight, show a useful recipe idea,
           then let people try another without losing the product.
         </p>
       </div>
 
-      <div className="mt-5 rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+      <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
         <div className="flex flex-col gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
               Choose a product
             </p>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {spotlightProducts.map((item) => {
-                const isActive = selectedProduct?.name === item.name;
+            <div className="mt-3 space-y-3">
+              {productGroups.map((group) => (
+                <div key={group.key}>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7a8478]">
+                    {group.title}
+                  </p>
 
-                return (
-                  <button
-                    key={item.name}
-                    type="button"
-                    onClick={() => setSelectedProductName(item.name)}
-                    className={`rounded-full border px-3 py-1.5 text-[13px] font-medium transition sm:px-4 sm:py-2 sm:text-sm ${
-                      isActive
-                        ? "border-[#243328] bg-[#243328] text-white"
-                        : "border-[#d6cec2] bg-[rgba(255,255,255,0.92)] text-[#243328] hover:bg-white"
-                    }`}
-                  >
-                    {item.name}
-                  </button>
-                );
-              })}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {group.items.map((item) => {
+                      const isActive = selectedProduct?.name === item.name;
+
+                      return (
+                        <button
+                          key={item.name}
+                          type="button"
+                          onClick={() => setSelectedProductName(item.name)}
+                          className={`rounded-full border px-3 py-1.5 text-[12px] font-medium leading-5 transition sm:px-3.5 sm:py-2 sm:text-[13px] ${
+                            isActive
+                              ? "border-[#243328] bg-[#243328] text-white"
+                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.92)] text-[#243328] hover:bg-white"
+                          }`}
+                        >
+                          {item.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
           {selectedProduct ? (
-            <div className="overflow-hidden rounded-[20px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)]">
-              <div className="flex flex-col sm:flex-row">
-                <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.62)] p-4 sm:w-[180px] sm:shrink-0 sm:border-b-0 sm:border-r">
-                  <div className="flex h-full items-center justify-center rounded-[18px] bg-[rgba(255,255,255,0.72)] p-3">
-                    <img
-                      src={selectedProduct.image}
-                      alt={selectedProduct.name}
-                      className="h-28 w-full object-contain"
-                    />
-                  </div>
+            <div className="overflow-hidden rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] md:rounded-[20px]">
+              <div className="flex items-center gap-3 p-3 md:p-4">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[14px] border border-[#e9dfd2] bg-[rgba(255,255,255,0.78)] p-2 md:h-20 md:w-20 md:rounded-[16px]">
+                  <img
+                    src={selectedProduct.image}
+                    alt={selectedProduct.name}
+                    className="h-full w-full object-contain"
+                  />
                 </div>
 
-                <div className="flex-1 p-4">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                        {getProductTypeLabel(selectedProduct)}
-                      </p>
-                      <h3 className="mt-1 font-serif text-2xl leading-tight text-[#243328]">
-                        {selectedProduct.name}
-                      </h3>
-                      <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                        {selectedProduct.description}
-                      </p>
-                      {selectedProduct.details ? (
-                        <p className="mt-2 text-sm leading-6 text-[#667164]">
-                          {truncate(selectedProduct.details, 140)}
-                        </p>
-                      ) : null}
-                    </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
+                    {getProductTypeLabel(selectedProduct)}
+                  </p>
 
-                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm text-[#243328]">
-                      £{selectedProduct.price.toFixed(2)}
-                    </div>
-                  </div>
+                  <h3 className="mt-1 font-serif text-lg leading-tight text-[#243328] md:text-xl">
+                    {selectedProduct.name}
+                  </h3>
 
                   {selectedProduct.category === "boxes" ? (
-                    <div className="mt-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-                          Usually includes things like
-                        </p>
-                        <p className="text-[10px] text-[#7a8478]">
-                          {boxPreviewIngredients.length} shown
-                        </p>
-                      </div>
+                    <p className="mt-1 text-xs leading-5 text-[#7a8478]">
+                      Box ingredients stay locked in for recipe ideas.
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-xs leading-5 text-[#7a8478]">
+                      This stays at the centre of each idea you try.
+                    </p>
+                  )}
+                </div>
+              </div>
 
-                      <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                        {boxPreviewIngredients.map((item) => (
-                          <div
-                            key={item}
-                            className="flex h-8 items-center rounded-[12px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-2.5 text-[11px] text-[#5f675c] sm:h-9 sm:px-3 sm:text-xs"
-                            title={item}
-                          >
-                            <span className="block truncate">{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={handleGenerate}
-                      disabled={loading}
-                      className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
-                    >
-                      {loading
-                        ? "Getting an idea..."
-                        : "What could I make with this?"}
-                    </button>
+              {selectedProduct.category === "boxes" ? (
+                <div className="border-t border-[#e9dfd2] px-3 py-3 md:px-4 md:py-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
+                      Usually includes things like
+                    </p>
+                    <p className="text-[10px] text-[#7a8478]">
+                      {boxPreviewIngredients.length} shown
+                    </p>
                   </div>
 
-                  {productMessage ? (
-                    <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-                      {productMessage}
-                    </div>
-                  ) : null}
+                  <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                    {boxPreviewIngredients.map((item) => (
+                      <div
+                        key={item}
+                        className="flex h-7 items-center rounded-[10px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-2.5 text-[10px] text-[#5f675c] sm:h-8 sm:text-[11px]"
+                        title={item}
+                      >
+                        <span className="block truncate">{item}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              ) : null}
+
+              <div className="border-t border-[#e9dfd2] px-3 py-3 md:px-4 md:py-4">
+                <button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={loading}
+                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+                >
+                  {loading
+                    ? "Getting an idea..."
+                    : "What could I make with this?"}
+                </button>
+
+                {productMessage ? (
+                  <div className="mt-3 rounded-[16px] border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-2.5 text-sm text-[#425142]">
+                    {productMessage}
+                  </div>
+                ) : null}
               </div>
             </div>
           ) : null}
@@ -910,24 +960,24 @@ export default function ShopRecipeCard({
       </div>
 
       {selectedProduct?.category === "boxes" ? (
-        <div className="mt-4 rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+        <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
                 Quick box starts
               </p>
-              <p className="mt-2 text-base font-medium text-[#243328]">
+              <p className="mt-2 text-sm font-medium text-[#243328] md:text-base">
                 Start from the box and nudge the idea in a useful direction.
               </p>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => handlePlanWithBoxIntent("veg")}
               disabled={loading}
-              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-3.5 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
             >
               Use up the veg
             </button>
@@ -936,7 +986,7 @@ export default function ShopRecipeCard({
               type="button"
               onClick={() => handlePlanWithBoxIntent("fruit")}
               disabled={loading}
-              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-3.5 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
             >
               Fruit-based idea
             </button>
@@ -945,7 +995,7 @@ export default function ShopRecipeCard({
               type="button"
               onClick={() => handlePlanWithBoxIntent("easy-box")}
               disabled={loading}
-              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-3.5 py-2 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
             >
               Easy box meal
             </button>
@@ -953,8 +1003,8 @@ export default function ShopRecipeCard({
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-4">
-        <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+      <div className="mt-4 grid gap-4">
+        <div className="rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
           <label
             htmlFor="shop-recipe-input"
             className="block text-sm font-medium text-[#243328]"
@@ -972,7 +1022,7 @@ export default function ShopRecipeCard({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Tomatoes, chickpeas, pasta, spinach"
-            className="mt-3 w-full rounded-[20px] border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
+            className="mt-3 w-full rounded-[18px] border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
           />
 
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -1019,32 +1069,32 @@ export default function ShopRecipeCard({
           </div>
 
           {error ? (
-            <div className="mt-4 rounded-[20px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
+            <div className="mt-4 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
               {error}
             </div>
           ) : null}
         </div>
 
         {result?.recipe ? (
-          <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)]">
+          <div className="overflow-hidden rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] md:rounded-[24px]">
             {result.imageUrl ? (
-              <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.64)] p-4">
-                <div className="overflow-hidden rounded-[20px] bg-[rgba(248,244,238,0.82)]">
+              <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.64)] p-3 md:p-4">
+                <div className="overflow-hidden rounded-[18px] bg-[rgba(248,244,238,0.82)] md:rounded-[20px]">
                   <img
                     src={result.imageUrl}
                     alt={result.recipe.title}
-                    className="h-52 w-full object-cover"
+                    className="h-44 w-full object-cover md:h-52"
                   />
                 </div>
               </div>
             ) : null}
 
-            <div className="p-5">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+            <div className="p-4 md:p-5">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-[#6b776c]">
                 What you could make with this
               </p>
 
-              <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
+              <h3 className="mt-2 font-serif text-xl leading-tight text-[#243328] md:text-2xl">
                 {result.recipe.title}
               </h3>
 
@@ -1120,13 +1170,13 @@ export default function ShopRecipeCard({
               ) : null}
 
               {saveMessage ? (
-                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                <div className="mt-4 rounded-[16px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
                   {saveMessage}
                 </div>
               ) : null}
 
               {plannerMessage ? (
-                <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                <div className="mt-4 rounded-[16px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
                   {plannerMessage}
                 </div>
               ) : null}
@@ -1151,13 +1201,13 @@ export default function ShopRecipeCard({
                 ) : null}
               </div>
 
-              <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.76)] p-5">
+              <div className="mt-6 rounded-[18px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.76)] p-4 md:rounded-[22px] md:p-5">
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="max-w-2xl">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#6b776c]">
                       Build the basket around it
                     </p>
-                    <h4 className="mt-2 font-serif text-xl md:text-2xl">
+                    <h4 className="mt-2 font-serif text-lg md:text-2xl">
                       Turn this into your next order.
                     </h4>
                     <p className="mt-2 text-sm leading-6 text-[#5f675c]">
@@ -1167,11 +1217,11 @@ export default function ShopRecipeCard({
                     </p>
                   </div>
 
-                  <div className="rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-3">
-                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                  <div className="rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-3">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
                       Matched extras
                     </p>
-                    <p className="mt-1 font-serif text-2xl text-[#243328]">
+                    <p className="mt-1 font-serif text-xl text-[#243328] md:text-2xl">
                       £{matchedShopTotal.toFixed(2)}
                     </p>
                   </div>
@@ -1183,7 +1233,7 @@ export default function ShopRecipeCard({
                       {ingredientBreakdown.availableFromShop.map((item) => (
                         <div
                           key={item.productName}
-                          className="rounded-[18px] border border-[#d6cec2] bg-[rgba(255,255,255,0.84)] p-4"
+                          className="rounded-[16px] border border-[#d6cec2] bg-[rgba(255,255,255,0.84)] p-4"
                         >
                           <p className="text-sm font-medium text-[#243328]">
                             {item.productName}
@@ -1216,7 +1266,7 @@ export default function ShopRecipeCard({
                     </div>
                   </>
                 ) : (
-                  <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] p-4">
+                  <div className="mt-5 rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] p-4">
                     <p className="text-sm leading-6 text-[#5f675c]">
                       We couldn’t find direct shop matches for this one yet, but
                       the idea still gives you a useful way to build around{" "}
@@ -1226,7 +1276,7 @@ export default function ShopRecipeCard({
                 )}
 
                 {basketMessage ? (
-                  <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                  <div className="mt-4 rounded-[16px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
                     {basketMessage}
                   </div>
                 ) : null}
