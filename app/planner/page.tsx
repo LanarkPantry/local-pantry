@@ -743,13 +743,6 @@ export default function PlannerPage() {
   }
 
   function handleSaveGeneratedToFavourites() {
-    if (!hasPlannerAccess) {
-      setSaveMessage(
-        "Saving favourites is included with the planner, or free with any weekly produce box.",
-      );
-      return;
-    }
-
     const recipe = buildGeneratedRecipeLike();
     if (!recipe) return;
 
@@ -805,7 +798,7 @@ export default function PlannerPage() {
               </div>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-2 sm:grid-cols-3">
               <div className="rounded-[18px] border border-[#dbe2d7] bg-[rgba(251,252,250,0.9)] px-3 py-2.5">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
                   Planned
@@ -815,43 +808,23 @@ export default function PlannerPage() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={chooseNextOpenDay}
-                disabled={!firstOpenDay}
-                className={`rounded-[18px] border px-3 py-2.5 text-left transition ${
-                  firstOpenDay
-                    ? "border-[#dbe2d7] bg-[rgba(251,252,250,0.9)] hover:bg-white"
-                    : "border-[#e5e9e2] bg-[#f3f5f1]"
-                }`}
-              >
+              <div className="rounded-[18px] border border-[#dbe2d7] bg-[rgba(251,252,250,0.9)] px-3 py-2.5">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
                   Next open day
                 </p>
                 <p className="mt-1 text-sm font-semibold text-[#213128] sm:text-base">
                   {firstOpenDay || "Week filled"}
                 </p>
-              </button>
-
-              <div className="rounded-[18px] border border-[#dbe2d7] bg-[rgba(251,252,250,0.9)] px-3 py-2.5">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                  Planner access
-                </p>
-                <p className="mt-1 text-sm font-semibold text-[#213128] sm:text-base">
-                  {hasPlannerAccess
-                    ? "Unlimited recipe ideas"
-                    : `${remainingFreeRecipes} free ideas left`}
-                </p>
               </div>
 
               <div className="rounded-[18px] border border-[#dbe2d7] bg-[rgba(251,252,250,0.9)] px-3 py-2.5">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                  Best next move
+                  Recipe ideas
                 </p>
                 <p className="mt-1 text-sm font-semibold text-[#213128] sm:text-base">
-                  {activeRecipe
-                    ? "Keep filling the week"
-                    : `Choose ${selectedDay.toLowerCase()}`}
+                  {hasPlannerAccess
+                    ? "Unlimited"
+                    : `${remainingFreeRecipes} free ideas left`}
                 </p>
               </div>
             </div>
@@ -992,6 +965,7 @@ export default function PlannerPage() {
                     >
                       Get an idea
                     </button>
+
                     <button
                       type="button"
                       onClick={() => {
@@ -1002,6 +976,16 @@ export default function PlannerPage() {
                     >
                       Use a favourite
                     </button>
+
+                    {firstOpenDay && firstOpenDay !== selectedDay ? (
+                      <button
+                        type="button"
+                        onClick={chooseNextOpenDay}
+                        className="inline-flex h-8.5 items-center rounded-full border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
+                      >
+                        Go to {firstOpenDay}
+                      </button>
+                    ) : null}
                   </>
                 ) : (
                   <>
@@ -1011,19 +995,28 @@ export default function PlannerPage() {
                     >
                       Shop for the week
                     </Link>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const nextDay =
-                          DAYS[selectedDayIndex + 1] ||
-                          firstOpenDay ||
-                          "Monday";
-                        setSelectedDay(nextDay);
-                      }}
-                      className="inline-flex h-8.5 items-center rounded-full border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
-                    >
-                      Keep planning
-                    </button>
+
+                    {firstOpenDay ? (
+                      <button
+                        type="button"
+                        onClick={chooseNextOpenDay}
+                        className="inline-flex h-8.5 items-center rounded-full border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
+                      >
+                        Choose {firstOpenDay}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextDay =
+                            DAYS[selectedDayIndex + 1] || "Monday";
+                          setSelectedDay(nextDay);
+                        }}
+                        className="inline-flex h-8.5 items-center rounded-full border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
+                      >
+                        Look through the week
+                      </button>
+                    )}
                   </>
                 )}
               </div>
@@ -1580,7 +1573,7 @@ export default function PlannerPage() {
                       </p>
                       <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
                         {showSaved
-                          ? "Save a few meals you’d use again."
+                          ? "Save a meal you’d use again and it will show here."
                           : "Get a few ideas here, then place them into the week."}
                       </p>
                     </div>
