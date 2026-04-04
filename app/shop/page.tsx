@@ -432,26 +432,26 @@ export default function ShopPage() {
     return (
       <article
         key={item.name}
-        className="overflow-hidden rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md"
+        className="overflow-hidden rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md sm:rounded-[24px]"
       >
         <div className="flex flex-col sm:flex-row">
-          <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.72)] p-4 sm:w-[190px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
-            <div className="flex h-full items-center justify-center rounded-[20px] bg-[rgba(248,244,238,0.82)] p-4">
+          <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.72)] p-4 sm:w-[170px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
+            <div className="flex h-full items-center justify-center rounded-[18px] bg-[rgba(248,244,238,0.82)] p-4 sm:rounded-[20px]">
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-28 w-full object-contain sm:h-36"
+                className="h-24 w-full object-contain sm:h-32 md:h-36"
               />
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col justify-between p-5 md:p-6">
+          <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 md:p-6">
             <div>
-              <p className="text-sm uppercase tracking-[0.14em] text-[#6b776c]">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-sm">
                 {label}
               </p>
 
-              <h3 className="mt-2 font-serif text-[1.75rem] text-[#243328]">
+              <h3 className="mt-2 font-serif text-[1.45rem] leading-tight text-[#243328] sm:text-[1.6rem] md:text-[1.75rem]">
                 {item.name}
               </h3>
 
@@ -459,24 +459,32 @@ export default function ShopPage() {
                 £{item.price.toFixed(2)}
               </div>
 
-              <div className="mt-4">{renderOrderBadge(item)}</div>
+              <div className="mt-3">{renderOrderBadge(item)}</div>
 
-              <p className="mt-4 text-sm text-[#667164]">{item.description}</p>
+              <p className="mt-3 text-sm leading-6 text-[#667164]">
+                {item.description}
+              </p>
 
               {helperText ? (
-                <p className="mt-3 text-sm text-[#5f675c]">{helperText}</p>
+                <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
+                  {helperText}
+                </p>
               ) : null}
 
               {item.bestFor ? (
-                <p className="mt-3 text-sm text-[#5f675c]">{item.bestFor}</p>
+                <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
+                  {item.bestFor}
+                </p>
               ) : null}
 
               {item.note ? (
-                <p className="mt-2 text-sm text-[#5f675c]">{item.note}</p>
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  {item.note}
+                </p>
               ) : null}
             </div>
 
-            <div className="mt-6">{renderAddControls(item)}</div>
+            <div className="mt-5">{renderAddControls(item)}</div>
           </div>
         </div>
       </article>
@@ -488,16 +496,19 @@ export default function ShopPage() {
     id: string,
     items: ShopDisplayItem[],
     label: string,
+    description = "Useful additions for the week ahead.",
   ) => {
     if (items.length === 0) return null;
 
     return (
-      <section id={id} className="mt-10">
+      <section id={id} className="mt-8 sm:mt-10">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-serif text-2xl text-[#243328]">{title}</h2>
-            <p className="mt-2 text-sm text-[#667164]">
-              Useful additions for the week ahead.
+            <h2 className="font-serif text-[1.7rem] text-[#243328] sm:text-2xl">
+              {title}
+            </h2>
+            <p className="mt-1.5 text-sm leading-6 text-[#667164]">
+              {description}
             </p>
           </div>
 
@@ -509,7 +520,7 @@ export default function ShopPage() {
           </Link>
         </div>
 
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="mt-3 grid gap-4 md:grid-cols-2">
           {items.map((item) => renderCompactCard(item, label))}
         </div>
       </section>
@@ -517,9 +528,9 @@ export default function ShopPage() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-5 text-[#243328] sm:px-5 md:px-10 md:py-8">
+    <main className="min-h-screen px-4 py-4 text-[#243328] sm:px-5 md:px-10 md:py-8">
       <div className="mx-auto max-w-6xl pb-32 md:pb-12">
-        <div className="mb-5 flex items-center justify-between border-b border-[rgba(221,212,200,0.9)] pb-4">
+        <div className="mb-4 flex items-center justify-between border-b border-[rgba(221,212,200,0.9)] pb-4">
           <Link
             href="/"
             className="cursor-pointer text-sm tracking-[0.35em] text-[#60705f]"
@@ -536,18 +547,18 @@ export default function ShopPage() {
         </div>
 
         <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
+          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md sm:rounded-[28px] sm:p-5 md:p-6">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[#6b776c] sm:text-sm">
               Shop
             </p>
 
-            <h1 className="mt-3 font-serif text-[2rem] leading-tight md:text-[2.5rem]">
+            <h1 className="mt-2.5 font-serif text-[1.85rem] leading-tight md:text-[2.5rem]">
               Start with something good, then build the basket around it
             </h1>
 
-            <p className="mt-3 max-w-xl text-sm leading-7 text-[#667164]">
+            <p className="mt-3 max-w-xl text-sm leading-6 text-[#667164]">
               Choose your weekly box or a standout add-on, see what you could
-              make with it, then add the rest of the week around that idea.
+              make with it, then build the rest of the week around that idea.
             </p>
 
             {plannerBridgeMessage ? (
@@ -558,13 +569,13 @@ export default function ShopPage() {
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {weeklyProduceBox ? (
-                <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                <div className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4 sm:rounded-[22px]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
                         Smaller box
                       </p>
-                      <h2 className="mt-2 font-serif text-xl text-[#243328]">
+                      <h2 className="mt-2 font-serif text-lg leading-tight text-[#243328] sm:text-xl">
                         {weeklyProduceBox.name}
                       </h2>
                     </div>
@@ -579,7 +590,7 @@ export default function ShopPage() {
                   </p>
 
                   {weeklyProduceBox.bestFor ? (
-                    <p className="mt-3 text-sm text-[#5f675c]">
+                    <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
                       {weeklyProduceBox.bestFor}
                     </p>
                   ) : null}
@@ -591,13 +602,13 @@ export default function ShopPage() {
               ) : null}
 
               {familyProduceBox ? (
-                <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4">
+                <div className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4 sm:rounded-[22px]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
                         Larger box
                       </p>
-                      <h2 className="mt-2 font-serif text-xl text-[#243328]">
+                      <h2 className="mt-2 font-serif text-lg leading-tight text-[#243328] sm:text-xl">
                         {familyProduceBox.name}
                       </h2>
                     </div>
@@ -612,7 +623,7 @@ export default function ShopPage() {
                   </p>
 
                   {familyProduceBox.bestFor ? (
-                    <p className="mt-3 text-sm text-[#5f675c]">
+                    <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
                       {familyProduceBox.bestFor}
                     </p>
                   ) : null}
@@ -624,9 +635,9 @@ export default function ShopPage() {
               ) : null}
             </div>
 
-            <div className="mt-4 rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+            <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4 sm:rounded-[20px]">
               <p className="text-sm text-[#5f675c]">Your basket</p>
-              <p className="mt-2 text-2xl font-serif text-[#243328]">
+              <p className="mt-1.5 text-[1.65rem] font-serif leading-tight text-[#243328] sm:text-2xl">
                 {totalItems > 0
                   ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
                   : "Empty"}
@@ -650,19 +661,18 @@ export default function ShopPage() {
           />
         </section>
 
-        <section className="mt-8 rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-6">
+        <section className="mt-6 rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md sm:mt-8 sm:rounded-[28px] sm:p-5 md:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c] sm:text-sm">
                 Build from your plan
               </p>
-              <h2 className="mt-2 font-serif text-[1.8rem] leading-tight text-[#243328] md:text-[2.2rem]">
+              <h2 className="mt-2 font-serif text-[1.65rem] leading-tight text-[#243328] md:text-[2.2rem]">
                 Use your planned meals to shape the weekly shop
               </h2>
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-[#667164]">
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
                 We’ve picked out items that match the meals you’ve already added
-                to your planner. Review them here, add what you need, then carry
-                on shopping as usual.
+                to your planner.
               </p>
             </div>
 
@@ -677,7 +687,7 @@ export default function ShopPage() {
             ) : null}
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
               {plannedMealsCount} planned meal
               {plannedMealsCount === 1 ? "" : "s"}
@@ -690,7 +700,7 @@ export default function ShopPage() {
           </div>
 
           {plannedSuggestionsCount === 0 ? (
-            <div className="mt-5 rounded-[24px] border border-dashed border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-5">
+            <div className="mt-4 rounded-[20px] border border-dashed border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4 sm:rounded-[24px] sm:p-5">
               <p className="text-base font-medium text-[#243328]">
                 No suggested items yet
               </p>
@@ -709,18 +719,18 @@ export default function ShopPage() {
               </div>
             </div>
           ) : (
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {plannedSuggestions.map((suggestion) => {
                 const quantityInCart = getQuantity(suggestion.item.name);
 
                 return (
                   <article
                     key={suggestion.item.name}
-                    className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)]"
+                    className="overflow-hidden rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] sm:rounded-[24px]"
                   >
                     <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.62)] p-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[18px] bg-[rgba(248,244,238,0.82)] p-3">
+                      <div className="flex items-center gap-3.5">
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-[rgba(248,244,238,0.82)] p-3 sm:h-20 sm:w-20 sm:rounded-[18px]">
                           <img
                             src={suggestion.item.image}
                             alt={suggestion.item.name}
@@ -729,13 +739,13 @@ export default function ShopPage() {
                         </div>
 
                         <div className="min-w-0">
-                          <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                          <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
                             Suggested from planner
                           </p>
-                          <h3 className="mt-1 font-serif text-xl text-[#243328]">
+                          <h3 className="mt-1 font-serif text-lg leading-tight text-[#243328] sm:text-xl">
                             {suggestion.item.name}
                           </h3>
-                          <p className="mt-2 text-sm text-[#5f675c]">
+                          <p className="mt-1.5 text-sm text-[#5f675c]">
                             £{suggestion.item.price.toFixed(2)} each
                           </p>
                         </div>
@@ -784,19 +794,20 @@ export default function ShopPage() {
           )}
         </section>
 
-        <section id="produce-boxes" className="mt-10">
+        <section id="weekly-fruit-and-veg-boxes" className="mt-8 sm:mt-10">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                Produce boxes
+              <h2 className="font-serif text-[1.7rem] text-[#243328] sm:text-2xl">
+                Weekly Fruit and Veg Boxes
               </h2>
-              <p className="mt-2 text-sm text-[#667164]">
-                Start with a weekly box, then top up with a few extras.
+              <p className="mt-1.5 text-sm leading-6 text-[#667164]">
+                Start with your weekly base, then add a few useful extras around
+                it.
               </p>
             </div>
           </div>
 
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="mt-3 grid gap-4 md:grid-cols-2">
             {produceBoxes.map((item) =>
               renderCompactCard(
                 item,
@@ -812,40 +823,28 @@ export default function ShopPage() {
         </section>
 
         {renderSection(
-          "Pantry additions",
-          "pantry-additions",
-          pantryItems,
-          "Pantry",
-        )}
-        {renderSection(
-          "Cupboard essentials",
-          "cupboard-essentials",
+          "Pantry Staples",
+          "pantry-staples",
           cupboardItems,
-          "Cupboard",
+          "Pantry staple",
+          "Flexible cupboard basics for easy weekly cooking.",
         )}
-        {renderSection("Extras", "extras", extraItems, "Extra")}
 
-        <div className="mt-10 rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.7)] p-5">
-          <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-            Planning loop
-          </p>
-          <h2 className="mt-2 font-serif text-2xl text-[#243328]">
-            See the product, get the idea, then build the order
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#667164]">
-            The shop now works best when you start with one thing you want to
-            cook with, use that to spark a recipe, then turn the idea into a
-            practical local order.
-          </p>
-          <div className="mt-4">
-            <Link
-              href="/planner"
-              className="inline-flex rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
-            >
-              Go to planner
-            </Link>
-          </div>
-        </div>
+        {renderSection(
+          "Gourmet Jars",
+          "gourmet-jars",
+          pantryItems,
+          "Gourmet jar",
+          "Small flavour-led additions to build meals around.",
+        )}
+
+        {renderSection(
+          "Nuts",
+          "nuts",
+          extraItems,
+          "Nut",
+          "A few useful extras to keep on hand through the week.",
+        )}
       </div>
 
       {showInstallCard && !isStandalone && totalItems > 0 ? (
