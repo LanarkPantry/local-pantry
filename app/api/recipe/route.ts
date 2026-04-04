@@ -109,25 +109,32 @@ const PRODUCE_BOX_REFERENCE = {
   ],
 };
 
-const COMMON_NON_PANTRY_SUPPORT_INGREDIENTS = [
-  "lemon",
-  "lime",
-  "herbs",
-  "parsley",
-  "chilli",
-  "cheese",
-  "yoghurt",
-  "cream",
-  "stock",
+const COMMON_SUPPORT_INGREDIENTS = [
+  "salt",
+  "pepper",
+  "oil",
+  "butter",
+  "water",
+  "flour",
   "bread",
+  "toast",
   "pasta",
   "rice",
   "orzo",
   "couscous",
   "lentils",
   "beans",
+  "stock",
+  "yoghurt",
+  "cream",
+  "cheese",
   "eggs",
+  "lemon",
+  "lime",
+  "herbs",
 ];
+
+const OVERUSED_BOX_DEFAULTS = ["apple", "carrot", "leek", "leeks", "onion"];
 
 function normaliseList(value: unknown, maxItems: number) {
   if (!Array.isArray(value)) return [];
@@ -256,8 +263,7 @@ function pickMealDirection(
     seed += char.charCodeAt(0);
   }
 
-  const selected = pool[seed % pool.length];
-  return selected;
+  return pool[seed % pool.length];
 }
 
 function buildProduceBoxInstruction(items: string[]) {
@@ -300,11 +306,12 @@ ${PRODUCE_BOX_REFERENCE.staples.join(", ")}.
 Seasonal produce may also appear, such as:
 ${PRODUCE_BOX_REFERENCE.seasonal.join(", ")}.
 
-Use that wider produce context quietly in the recipe logic, without mentioning any "box logic" or long ingredient lists in the output.
+Use that wider produce context quietly in the recipe logic, without mentioning any box logic or long ingredient lists in the output.
 
 Important:
-- Do not over-default to leek, apple, and onion-led recipes.
+- Do not over-default to apple, carrot, leek, or onion-led recipes.
 - Onion and garlic can support a dish, but they should not keep becoming the main idea unless clearly warranted.
+- Apple, carrot, and leek should usually be supporting players unless the user clearly selected them.
 - Vary the hero ingredients across recipes.
 - Sometimes let greens, roots, broccoli, peppers, herbs, cucumber, lettuce, or fruit shape the direction.
 - Seasonal produce should feel normal when relevant, not token or novelty-led.
@@ -314,52 +321,106 @@ Important:
 }
 
 function buildIngredientPriorityInstruction(items: string[], isRetry: boolean) {
-  const joinedItems = items.join(", ");
+  const lowerItems = items.map((item) => item.toLowerCase());
+  const userIncludedOverusedDefaults = OVERUSED_BOX_DEFAULTS.filter(
+    (ingredient) => lowerItems.some((item) => item.includes(ingredient)),
+  );
+
+  const guardedDefaults =
+    userIncludedOverusedDefaults.length > 0
+      ? ""
+      : `
+Very important:
+- Do not introduce apple, carrot, leek, or onion as the lead idea when they were not provided.
+- Do not let apple, carrot, or leek hijack the recipe just because they are common in a produce box.
+`;
 
   return `
-The provided ingredients are the anchor for this recipe: ${joinedItems}.
+The provided ingredients are the anchor for this recipe: ${items.join(", ")}.
 
 Very important:
 - Centre the recipe on the ingredients the user actually provided.
 - The main idea must come from those provided ingredients, not from substitute produce.
 - Do not swap in unrelated fruit or vegetables just because they are common in a weekly box.
-- If the user gives fruit, nuts, dairy, herbs, or dessert-leaning ingredients, follow that lead rather than forcing a savoury veg-box idea.
-- Onion, leek, carrot, and apple are not default hero ingredients unless the user actually provided them or they are truly essential.
+- If the user gives fruit, nuts, dairy, herbs, or sweeter ingredients, follow that lead rather than forcing a savoury veg-box idea.
 - Ingredients used should mostly come directly from the provided items, with only a small number of sensible supporting additions if needed.
-- Never replace obvious hero ingredients such as raspberry, banana, cream, or walnut with unrelated produce.
-
+- Never replace obvious hero ingredients with unrelated produce.
+- The title and description should reflect the actual ingredients given.
+${guardedDefaults}
 ${
   isRetry
-    ? `Your previous attempt drifted away from the provided ingredients. This retry must stay much closer to them and must not introduce a different produce-led idea.`
+    ? `Your previous attempt drifted away from the provided ingredients or overused common veg-box defaults. This retry must stay much closer to the supplied ingredients and avoid falling back to apple, carrot, leek, or onion unless they were explicitly provided and truly central.`
     : ""
 }
 `.trim();
 }
 
+function isIngredientMatch(usedIngredient: string, providedItems: string[]) {
+  const used = usedIngredient.toLowerCase().trim();
+
+  return providedItems.some((item) => {
+    const provided = item.toLowerCase().trim();
+    return provided.includes(used) || used.includes(provided);
+  });
+}
+
+function isCommonSupportIngredient(usedIngredient: string) {
+  const used = usedIngredient.toLowerCase().trim();
+
+  return COMMON_SUPPORT_INGREDIENTS.some(
+    (support) => support.includes(used) || used.includes(support),
+  );
+}
+
+function recipeOverusesDefaults(recipe: GeneratedRecipe, items: string[]) {
+  const providedItems = items.map((item) => item.toLowerCase());
+  const overusedNotProvided = recipe.ingredientsUsed.filter((ingredient) => {
+    const lowerIngredient = ingredient.toLowerCase();
+
+    const isOverusedDefault = OVERUSED_BOX_DEFAULTS.some(
+      (defaultItem) =>
+        lowerIngredient.includes(defaultItem) ||
+        defaultItem.includes(lowerIngredient),
+    );
+
+    if (!isOverusedDefault) {
+      return false;
+    }
+
+    const wasProvided = providedItems.some(
+      (item) =>
+        item.includes(lowerIngredient) || lowerIngredient.includes(item),
+    );
+
+    return !wasProvided;
+  });
+
+  const titleAndDescription =
+    `${recipe.title} ${recipe.description}`.toLowerCase();
+
+  const titleLeadsWithDefault = OVERUSED_BOX_DEFAULTS.some((ingredient) =>
+    titleAndDescription.includes(ingredient),
+  );
+
+  return overusedNotProvided.length >= 2 || titleLeadsWithDefault;
+}
+
 function isRecipeGroundedInItems(recipe: GeneratedRecipe, items: string[]) {
-  const normalisedItems = items.map((item) => item.toLowerCase());
-  const normalisedUsed = recipe.ingredientsUsed.map((item) =>
+  const providedItems = items.map((item) => item.toLowerCase());
+  const recipeIngredients = recipe.ingredientsUsed.map((item) =>
     item.toLowerCase(),
   );
 
   let directMatches = 0;
   let unsupportedIngredients = 0;
 
-  for (const used of normalisedUsed) {
-    const matchesProvided = normalisedItems.some(
-      (item) => item.includes(used) || used.includes(item),
-    );
-
-    if (matchesProvided) {
+  for (const usedIngredient of recipeIngredients) {
+    if (isIngredientMatch(usedIngredient, providedItems)) {
       directMatches += 1;
       continue;
     }
 
-    const isCommonSupport = COMMON_NON_PANTRY_SUPPORT_INGREDIENTS.some(
-      (support) => used.includes(support) || support.includes(used),
-    );
-
-    if (!isCommonSupport) {
+    if (!isCommonSupportIngredient(usedIngredient)) {
       unsupportedIngredients += 1;
     }
   }
@@ -367,13 +428,19 @@ function isRecipeGroundedInItems(recipe: GeneratedRecipe, items: string[]) {
   const titleAndDescription =
     `${recipe.title} ${recipe.description}`.toLowerCase();
 
-  const mentionsProvidedHero = normalisedItems.some(
+  const mentionsProvidedIngredient = providedItems.some(
     (item) => item.length > 2 && titleAndDescription.includes(item),
   );
 
-  if (normalisedItems.length <= 4) {
+  if (recipeOverusesDefaults(recipe, items)) {
+    return false;
+  }
+
+  if (providedItems.length <= 4) {
     return (
-      directMatches >= 2 && unsupportedIngredients <= 1 && mentionsProvidedHero
+      directMatches >= 2 &&
+      unsupportedIngredients <= 1 &&
+      mentionsProvidedIngredient
     );
   }
 
@@ -515,7 +582,7 @@ async function generateRecipe(
     return firstRecipe;
   }
 
-  return requestRecipe(
+  const retryRecipe = await requestRecipe(
     client,
     items,
     quickStart,
@@ -523,6 +590,12 @@ async function generateRecipe(
     previousRecipe,
     true,
   );
+
+  if (isRecipeGroundedInItems(retryRecipe, items)) {
+    return retryRecipe;
+  }
+
+  return retryRecipe;
 }
 
 async function generateRecipeImage(client: OpenAI, recipeTitle: string) {

@@ -220,14 +220,6 @@ function writePlannerRecipes(value: PlannerRecipe[]) {
   localStorage.setItem(PLANNER_RECIPES_STORAGE_KEY, JSON.stringify(value));
 }
 
-function getProductTypeLabel(item: ShopDisplayItem) {
-  if (item.category === "boxes") return "Produce box";
-  if (item.category === "pantry") return "Gourmet jar";
-  if (item.category === "cupboard") return "Pantry staple";
-  if (looksLikeNutItem(item)) return "Nuts";
-  return "Extra";
-}
-
 function getProductGroupTitle(item: ShopDisplayItem) {
   if (item.category === "boxes") return "Weekly Fruit & Veg Boxes";
   if (item.category === "pantry") return "Gourmet Jars";
@@ -268,6 +260,10 @@ function dedupeStrings(values: string[]) {
   }
 
   return result;
+}
+
+function createPlannerRecipeId(title: string) {
+  return `${title}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export default function ShopRecipeCard(props: ShopRecipeCardProps) {
@@ -525,28 +521,6 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         recipe.description === result.recipe.description,
     );
   }, [result, savedRecipes]);
-
-  const currentRecipePlannerId = useMemo(() => {
-    if (!result?.recipe) return null;
-
-    const savedMatch = savedRecipes.find(
-      (recipe) =>
-        recipe.title === result.recipe.title &&
-        recipe.description === result.recipe.description,
-    );
-
-    if (savedMatch) return savedMatch.id;
-
-    return `${result.recipe.title}::${result.recipe.description}`;
-  }, [result, savedRecipes]);
-
-  const isCurrentRecipeInPlanner = useMemo(() => {
-    if (!currentRecipePlannerId) return false;
-
-    return plannerRecipes.some(
-      (recipe) => recipe.id === currentRecipePlannerId,
-    );
-  }, [plannerRecipes, currentRecipePlannerId]);
 
   const basketNormalised = useMemo(() => {
     return basketItemNames.map((item) => ({
@@ -869,18 +843,8 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         recipe.description === result.recipe.description,
     );
 
-    const baseId =
-      savedMatch?.id ?? `${result.recipe.title}::${result.recipe.description}`;
-
-    const alreadyAdded = plannerRecipes.some((item) => item.id === baseId);
-
-    if (alreadyAdded) {
-      setPlannerMessage("That recipe is already ready in your planner.");
-      return;
-    }
-
     const plannerRecipe: PlannerRecipe = {
-      id: baseId,
+      id: createPlannerRecipeId(result.recipe.title),
       title: result.recipe.title,
       description: result.recipe.description,
       ingredientsUsed: result.recipe.ingredientsUsed,
@@ -894,7 +858,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     try {
       writePlannerRecipes(updatedPlannerRecipes);
       setPlannerRecipes(updatedPlannerRecipes);
-      setPlannerMessage("Planned for later.");
+      setPlannerMessage("Added to planner.");
     } catch {
       setPlannerMessage(
         "Your planner is full in this browser. Remove a few older planner items and try again.",
@@ -1325,10 +1289,9 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                 <button
                   type="button"
                   onClick={handleAddToPlanner}
-                  disabled={isCurrentRecipeInPlanner}
-                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  {isCurrentRecipeInPlanner ? "Already planned" : "Plan this"}
+                  Plan this
                 </button>
 
                 <button
