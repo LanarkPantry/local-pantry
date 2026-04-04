@@ -769,6 +769,10 @@ export default function PlannerPage() {
     return DAYS.filter((day) => !weeklyMeals[day]);
   }, [weeklyMeals]);
 
+  const filledDays = useMemo(() => {
+    return DAYS.filter((day) => Boolean(weeklyMeals[day]));
+  }, [weeklyMeals]);
+
   const canClearWeek = plannedCount > 0;
   const shouldShowBasketGuide = plannedCount >= 2;
   const shouldPromoteShop = plannedCount >= 3;
@@ -796,9 +800,14 @@ export default function PlannerPage() {
 
     return getBasketSuggestionsFromRecipes(
       previewRecipes,
-      previewRecipes.length,
+      plannedCount + previewRecipes.length,
     );
-  }, [weekPlanPreview]);
+  }, [weekPlanPreview, plannedCount]);
+
+  const plannedNowCount = weekPlanPreview?.length ?? 0;
+  const totalIfApplied = plannedCount + plannedNowCount;
+  const recommendedBoxName =
+    totalIfApplied >= 4 ? "Family Produce Box" : "Weekly Produce Box";
 
   function persistPlannerRecipes(next: RecipeLike[]) {
     setPlannerRecipes(next);
@@ -966,15 +975,6 @@ export default function PlannerPage() {
   }
 
   async function handlePlanWeekPreview() {
-    if (!hasPlannerAccess) {
-      setWeekPlanError("");
-      setWeekPlanPreview(null);
-      setPaywallMessage(
-        "Plan my week is part of the full planner. Unlock it, or get it included with a weekly produce box.",
-      );
-      return;
-    }
-
     if (emptyDays.length === 0) {
       setWeekPlanError("Your week is already full.");
       return;
@@ -1064,6 +1064,11 @@ export default function PlannerPage() {
       }
 
       setWeekPlanPreview(previewItems);
+      setWeekPlanMessage(
+        `${previewItems.length} ${
+          previewItems.length === 1 ? "meal" : "meals"
+        } planned for the week`,
+      );
     } catch (error) {
       console.error(error);
       setWeekPlanError(
@@ -1233,8 +1238,8 @@ export default function PlannerPage() {
                 Work out what to cook this week
               </h1>
               <p className="mt-1 max-w-2xl text-[11px] leading-5 text-[#5d6b62] sm:text-sm sm:leading-6">
-                Pick a day, choose the next meal, then build the basket around
-                it.
+                Pick a day, get an idea, then build the basket around the meals
+                you’ll actually cook.
               </p>
             </div>
 
@@ -1254,245 +1259,35 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
-                {weekProgressLabel}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <span className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
+              {weekProgressLabel}
+            </span>
+
+            {firstOpenDay ? (
+              <span className="inline-flex w-fit rounded-full border border-[#e1e7dd] bg-[rgba(246,248,243,0.9)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
+                Next up: {firstOpenDay}
               </span>
+            ) : null}
 
-              {firstOpenDay ? (
-                <span className="inline-flex w-fit rounded-full border border-[#e1e7dd] bg-[rgba(246,248,243,0.9)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
-                  Next up: {firstOpenDay}
-                </span>
-              ) : null}
+            {veganSelected ? (
+              <span className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(233,240,228,0.82)] px-3 py-1.5 text-[11px] text-[#213128] sm:text-sm">
+                Vegan
+              </span>
+            ) : null}
 
-              {veganSelected ? (
-                <span className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(233,240,228,0.82)] px-3 py-1.5 text-[11px] text-[#213128] sm:text-sm">
-                  Vegan
-                </span>
-              ) : null}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {firstOpenDay ? (
-                <button
-                  type="button"
-                  onClick={handlePlanWeekPreview}
-                  disabled={isPlanningWeek}
-                  className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isPlanningWeek
-                    ? "Planning your week..."
-                    : weekPlanningButtonLabel}
-                </button>
-              ) : null}
-
-              {shouldPromoteShop ? (
-                <Link
-                  href="/shop"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
-                >
-                  Build your basket for the week
-                </Link>
-              ) : null}
-            </div>
+            <span className="inline-flex w-fit rounded-full border border-[#e1e7dd] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
+              ML11 weekly delivery
+            </span>
           </div>
 
           <p className="mt-2 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
             {weekProgressText}
           </p>
 
-          {firstOpenDay ? (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => setIncludeMeatIdeas((current) => !current)}
-                disabled={veganSelected}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
-                  includeMeatIdeas && !veganSelected
-                    ? "border-[#213128] bg-[#213128] text-white"
-                    : veganSelected
-                      ? "border-[#dde4d8] bg-[#eef2eb] text-[#8a968e]"
-                      : "border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] text-[#213128] hover:bg-white"
-                }`}
-              >
-                {veganSelected
-                  ? "Vegan week"
-                  : includeMeatIdeas
-                    ? "Including meat ideas"
-                    : "Include meat ideas"}
-              </button>
-
-              <span className="inline-flex items-center rounded-full border border-[#e1e7dd] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
-                Veg boxes first, grains and jars in support
-              </span>
-            </div>
-          ) : null}
-
           {statusMessage ? (
             <div className="mt-2 inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
               {statusMessage}
-            </div>
-          ) : null}
-
-          {weekPlanMessage ? (
-            <div className="mt-2 inline-flex w-fit rounded-full border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-1.5 text-[11px] text-[#425142] sm:text-sm">
-              {weekPlanMessage}
-            </div>
-          ) : null}
-
-          {weekPlanError ? (
-            <div className="mt-2 rounded-[16px] border border-[#e4d8cb] bg-[#fbf6f0] px-3 py-2 text-sm text-[#6a5c4f]">
-              {weekPlanError}
-            </div>
-          ) : null}
-
-          {weekPlanPreview ? (
-            <div
-              ref={weekPlanPreviewRef}
-              className="mt-3 rounded-[18px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-3 sm:rounded-[20px] sm:p-4"
-            >
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                    A simple week to get you started
-                  </p>
-                  <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
-                    Here’s a week you could cook
-                  </h2>
-                  <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
-                    Veg-first ideas, with grains and useful extras where they
-                    help.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={handleAddWeekPreviewToPlanner}
-                    className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
-                  >
-                    Add this week to my planner
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handlePlanWeekPreview}
-                    disabled={isPlanningWeek}
-                    className="inline-flex h-9 items-center justify-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Try another week
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {weekPlanPreview.map((item) => (
-                  <article
-                    key={`${item.day}-${item.recipe.id}`}
-                    className="rounded-[16px] border border-[#dbe2d7] bg-white p-2.5"
-                  >
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                      {item.day}
-                    </p>
-                    <div className="mt-2 flex items-start gap-2.5">
-                      <div className="w-12 shrink-0">
-                        <RecipeImage recipe={item.recipe} compact />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-[#213128]">
-                          {item.recipe.title}
-                        </p>
-                        <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067]">
-                          {item.recipe.description
-                            ? truncate(item.recipe.description, 84)
-                            : "A meal idea for the week."}
-                        </p>
-                      </div>
-                    </div>
-
-                    {item.recipe.ingredientsUsed &&
-                    item.recipe.ingredientsUsed.length > 0 ? (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {item.recipe.ingredientsUsed.slice(0, 4).map((chip) => (
-                          <span
-                            key={`${item.day}-${chip}`}
-                            className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e]"
-                          >
-                            {chip}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-
-              {basketSuggestions.length > 0 ? (
-                <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.88)] p-3">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                        Build your basket from this week
-                      </p>
-                      <p className="mt-1 text-sm font-medium text-[#213128]">
-                        Start with a box, then add a few useful extras
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleAddSuggestedBasket}
-                      className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
-                    >
-                      Add these to basket
-                    </button>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                    {basketSuggestions.map((item) => (
-                      <div
-                        key={item.name}
-                        className="rounded-[14px] border border-[#e1e7dd] bg-[rgba(252,252,250,0.82)] p-2.5"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-[#213128]">
-                              {item.name}
-                            </p>
-                            <p className="mt-0.5 text-[11px] text-[#617067]">
-                              £{item.price.toFixed(2)}
-                            </p>
-                          </div>
-
-                          <span
-                            className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] ${
-                              item.category === "boxes"
-                                ? "border border-[#dbe2d7] bg-[rgba(233,240,228,0.82)] text-[#213128]"
-                                : "border border-[#e1e7dd] bg-white text-[#58675e]"
-                            }`}
-                          >
-                            {item.category === "boxes"
-                              ? "Recommended box"
-                              : "Add-on"}
-                          </span>
-                        </div>
-
-                        <p className="mt-1.5 text-[11px] leading-5 text-[#617067]">
-                          {item.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {basketSuggestionMessage ? (
-                    <div className="mt-3 rounded-[14px] border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-2 text-sm text-[#425142]">
-                      {basketSuggestionMessage}
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
             </div>
           ) : null}
         </section>
@@ -1590,6 +1385,369 @@ export default function PlannerPage() {
               })}
             </div>
           </div>
+
+          {firstOpenDay ? (
+            <div className="mt-2.5 rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-3 sm:mt-3 sm:rounded-[22px] sm:p-4">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <div className="max-w-2xl">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                    Plan my week
+                  </p>
+                  <h3 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
+                    Here’s a simple week you could cook
+                  </h3>
+                  <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+                    Fill the rest of the week with veg-first meals, practical
+                    pantry support, and a clear basket path.
+                  </p>
+
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <span className="inline-flex rounded-full border border-[#d8dfd3] bg-white px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
+                      {plannedCount} sorted
+                    </span>
+                    <span className="inline-flex rounded-full border border-[#d8dfd3] bg-white px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
+                      {emptyDays.length} to fill
+                    </span>
+                    <span className="inline-flex rounded-full border border-[#d8dfd3] bg-white px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
+                      Box first
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex w-full flex-col gap-2 lg:w-auto lg:min-w-[260px]">
+                  <button
+                    type="button"
+                    onClick={handlePlanWeekPreview}
+                    disabled={isPlanningWeek}
+                    className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isPlanningWeek
+                      ? "Planning your week..."
+                      : weekPlanningButtonLabel}
+                  </button>
+
+                  {shouldPromoteShop ? (
+                    <Link
+                      href="/shop"
+                      className="inline-flex h-10 w-full items-center justify-center rounded-xl border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)]"
+                    >
+                      Shop for the week
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setIncludeMeatIdeas((current) => !current)}
+                  disabled={veganSelected}
+                  className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
+                    includeMeatIdeas && !veganSelected
+                      ? "border-[#213128] bg-[#213128] text-white"
+                      : veganSelected
+                        ? "border-[#dde4d8] bg-[#eef2eb] text-[#8a968e]"
+                        : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
+                  }`}
+                >
+                  {veganSelected
+                    ? "Vegan week"
+                    : includeMeatIdeas
+                      ? "Including meat ideas"
+                      : "Include meat ideas"}
+                </button>
+
+                {hasBasketIngredients ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIncludeBasketIngredients((current) => !current)
+                    }
+                    className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
+                      includeBasketIngredients
+                        ? "border-[#213128] bg-[rgba(233,240,228,0.92)] text-[#213128]"
+                        : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
+                    }`}
+                  >
+                    {includeBasketIngredients
+                      ? "Using what's in your basket"
+                      : "Use what's in your basket"}
+                  </button>
+                ) : null}
+
+                <span className="inline-flex items-center rounded-full border border-[#e1e7dd] bg-white px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
+                  Veg boxes first, grains and jars in support
+                </span>
+              </div>
+
+              {includeBasketIngredients && hasBasketIngredients ? (
+                <div className="mt-2 rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2">
+                  <p className="text-[11px] text-[#617067] sm:text-xs">
+                    Using {basketIngredients.length} basket
+                    {basketIngredients.length === 1
+                      ? " ingredient"
+                      : " ingredients"}
+                  </p>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {basketIngredients.slice(0, 5).map((ingredient) => (
+                      <span
+                        key={ingredient}
+                        className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e] sm:text-[11px]"
+                      >
+                        {ingredient}
+                      </span>
+                    ))}
+                    {basketIngredients.length > 5 ? (
+                      <span className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e] sm:text-[11px]">
+                        +{basketIngredients.length - 5} more
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              {weekPlanMessage ? (
+                <div className="mt-3 inline-flex w-fit rounded-full border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-1.5 text-[11px] text-[#425142] sm:text-sm">
+                  {weekPlanMessage}
+                </div>
+              ) : null}
+
+              {weekPlanError ? (
+                <div className="mt-3 rounded-[16px] border border-[#e4d8cb] bg-[#fbf6f0] px-3 py-2 text-sm text-[#6a5c4f]">
+                  {weekPlanError}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {weekPlanPreview ? (
+            <div
+              ref={weekPlanPreviewRef}
+              className="mt-2.5 rounded-[18px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-3 sm:mt-3 sm:rounded-[20px] sm:p-4"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                    Week preview
+                  </p>
+                  <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
+                    Here’s a week you could cook
+                  </h2>
+                  <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+                    {filledDays.length > 0
+                      ? `${filledDays.length} day${
+                          filledDays.length === 1 ? "" : "s"
+                        } already sorted · ${plannedNowCount} planned now`
+                      : `${plannedNowCount} meals planned for the week`}{" "}
+                    · Built around a {recommendedBoxName}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAddWeekPreviewToPlanner}
+                    className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                  >
+                    Add this week to my planner
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handlePlanWeekPreview}
+                    disabled={isPlanningWeek}
+                    className="inline-flex h-9 items-center justify-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Try another week
+                  </button>
+                </div>
+              </div>
+
+              {(filledDays.length > 0 || weekPlanPreview.length > 0) && (
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Already sorted
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[#213128]">
+                      {filledDays.length}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Planned now
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[#213128]">
+                      {plannedNowCount}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Week total
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[#213128]">
+                      {totalIfApplied}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Box to start with
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-[#213128]">
+                      {recommendedBoxName}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {filledDays.length > 0 ? (
+                <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-white p-3">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                    Already in your week
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {filledDays.map((day) => {
+                      const recipeId = weeklyMeals[day];
+                      const recipe = recipeId
+                        ? recipesById.get(recipeId)
+                        : null;
+
+                      return (
+                        <div
+                          key={`planned-${day}`}
+                          className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm"
+                        >
+                          {day}:{" "}
+                          {recipe ? truncate(recipe.title, 24) : "Sorted"}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {weekPlanPreview.map((item) => (
+                  <article
+                    key={`${item.day}-${item.recipe.id}`}
+                    className="rounded-[16px] border border-[#dbe2d7] bg-white p-2.5"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                        {item.day}
+                      </p>
+                      <span className="inline-flex rounded-full border border-[#d8dfd3] bg-[rgba(233,240,228,0.82)] px-2 py-0.5 text-[10px] text-[#213128]">
+                        Planned now
+                      </span>
+                    </div>
+
+                    <div className="mt-2 flex items-start gap-2.5">
+                      <div className="w-12 shrink-0">
+                        <RecipeImage recipe={item.recipe} compact />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-[#213128]">
+                          {item.recipe.title}
+                        </p>
+                        <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067]">
+                          {item.recipe.description
+                            ? truncate(item.recipe.description, 84)
+                            : "A meal idea for the week."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {item.recipe.ingredientsUsed &&
+                    item.recipe.ingredientsUsed.length > 0 ? (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {item.recipe.ingredientsUsed.slice(0, 4).map((chip) => (
+                          <span
+                            key={`${item.day}-${chip}`}
+                            className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e]"
+                          >
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+
+              {basketSuggestions.length > 0 ? (
+                <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.88)] p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                        Build your basket from this week
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#213128]">
+                        Start with a box, then add a few useful extras
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleAddSuggestedBasket}
+                      className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                    >
+                      Add these to basket
+                    </button>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {basketSuggestions.map((item, index) => (
+                      <div
+                        key={item.name}
+                        className={`rounded-[14px] border p-2.5 ${
+                          index === 0
+                            ? "border-[#cbd8c5] bg-[rgba(233,240,228,0.7)]"
+                            : "border-[#e1e7dd] bg-[rgba(252,252,250,0.82)]"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[#213128]">
+                              {item.name}
+                            </p>
+                            <p className="mt-0.5 text-[11px] text-[#617067]">
+                              £{item.price.toFixed(2)}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] ${
+                              item.category === "boxes"
+                                ? "border border-[#dbe2d7] bg-white text-[#213128]"
+                                : "border border-[#e1e7dd] bg-white text-[#58675e]"
+                            }`}
+                          >
+                            {item.category === "boxes"
+                              ? "Recommended box"
+                              : "Add-on"}
+                          </span>
+                        </div>
+
+                        <p className="mt-1.5 text-[11px] leading-5 text-[#617067]">
+                          {item.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {basketSuggestionMessage ? (
+                    <div className="mt-3 rounded-[14px] border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-2 text-sm text-[#425142]">
+                      {basketSuggestionMessage}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="mt-2.5 grid gap-2.5 sm:mt-3 sm:gap-3 lg:grid-cols-[1.04fr_0.96fr]">
             <div className="rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.9)] p-2.5 sm:rounded-[22px] sm:p-4">
