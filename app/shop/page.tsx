@@ -553,12 +553,12 @@ export default function ShopPage() {
             </p>
 
             <h1 className="mt-2.5 font-serif text-[1.85rem] leading-tight md:text-[2.5rem]">
-              Start with something good, then build the basket around it
+              Local weekly food for ML11, built around what you want to cook
             </h1>
 
             <p className="mt-3 max-w-xl text-sm leading-6 text-[#667164]">
-              Choose your weekly box or a standout add-on, see what you could
-              make with it, then build the rest of the week around that idea.
+              Start with the veg box or a few good things, get an idea for what
+              to make, then build the rest of the basket around the week.
             </p>
 
             {plannerBridgeMessage ? (
@@ -567,11 +567,20 @@ export default function ShopPage() {
               </div>
             ) : null}
 
+            <div className="mt-4 flex flex-wrap gap-2">
+              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
+                Weekly delivery across ML11
+              </div>
+              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
+                Built from a real local kitchen
+              </div>
+            </div>
+
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {weeklyProduceBox ? (
                 <div className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4 sm:rounded-[22px]">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
                         Smaller box
                       </p>
@@ -585,15 +594,27 @@ export default function ShopPage() {
                     </div>
                   </div>
 
-                  <p className="mt-3 text-sm leading-6 text-[#667164]">
-                    {weeklyProduceBox.description}
-                  </p>
+                  <div className="mt-3 flex items-start gap-3">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-[rgba(247,242,235,0.9)] p-2">
+                      <img
+                        src={weeklyProduceBox.image}
+                        alt={weeklyProduceBox.name}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
 
-                  {weeklyProduceBox.bestFor ? (
-                    <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
-                      {weeklyProduceBox.bestFor}
-                    </p>
-                  ) : null}
+                    <div className="min-w-0">
+                      <p className="text-sm leading-6 text-[#667164]">
+                        {weeklyProduceBox.description}
+                      </p>
+
+                      {weeklyProduceBox.bestFor ? (
+                        <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                          {weeklyProduceBox.bestFor}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
 
                   <div className="mt-4">
                     {renderAddControls(weeklyProduceBox)}
@@ -604,7 +625,7 @@ export default function ShopPage() {
               {familyProduceBox ? (
                 <div className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4 sm:rounded-[22px]">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
                         Larger box
                       </p>
@@ -618,15 +639,27 @@ export default function ShopPage() {
                     </div>
                   </div>
 
-                  <p className="mt-3 text-sm leading-6 text-[#667164]">
-                    {familyProduceBox.description}
-                  </p>
+                  <div className="mt-3 flex items-start gap-3">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-[rgba(247,242,235,0.9)] p-2">
+                      <img
+                        src={familyProduceBox.image}
+                        alt={familyProduceBox.name}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
 
-                  {familyProduceBox.bestFor ? (
-                    <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
-                      {familyProduceBox.bestFor}
-                    </p>
-                  ) : null}
+                    <div className="min-w-0">
+                      <p className="text-sm leading-6 text-[#667164]">
+                        {familyProduceBox.description}
+                      </p>
+
+                      {familyProduceBox.bestFor ? (
+                        <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                          {familyProduceBox.bestFor}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
 
                   <div className="mt-4">
                     {renderAddControls(familyProduceBox)}
@@ -636,12 +669,25 @@ export default function ShopPage() {
             </div>
 
             <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4 sm:rounded-[20px]">
-              <p className="text-sm text-[#5f675c]">Your basket</p>
-              <p className="mt-1.5 text-[1.65rem] font-serif leading-tight text-[#243328] sm:text-2xl">
-                {totalItems > 0
-                  ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
-                  : "Empty"}
-              </p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm text-[#5f675c]">Your basket</p>
+                  <p className="mt-1.5 text-[1.65rem] font-serif leading-tight text-[#243328] sm:text-2xl">
+                    {totalItems > 0
+                      ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
+                      : "Empty"}
+                  </p>
+                </div>
+
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-[rgba(247,242,235,0.9)] p-2">
+                  <img
+                    src="/weekly-harvest-box.png"
+                    alt="Basket"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              </div>
+
               <p className="mt-2 text-sm leading-6 text-[#667164]">
                 Start with a box, add a few useful extras, then review the whole
                 week.

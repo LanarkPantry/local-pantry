@@ -57,12 +57,6 @@ type ProductGroup = {
   items: ShopDisplayItem[];
 };
 
-type PreviousRecipePayload = {
-  title: string;
-  description: string;
-  ingredientsUsed: string[];
-};
-
 const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
 const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
 
@@ -151,8 +145,6 @@ function looksLikeFruit(value: string) {
 }
 
 function looksLikeNutItem(item: ShopDisplayItem) {
-  if (item.category !== "extras") return false;
-
   const searchableText = [
     item.name,
     item.description,
@@ -239,8 +231,8 @@ function getProductTypeLabel(item: ShopDisplayItem) {
 function getProductGroupTitle(item: ShopDisplayItem) {
   if (item.category === "boxes") return "Weekly Fruit & Veg Boxes";
   if (item.category === "pantry") return "Gourmet Jars";
-  if (item.category === "cupboard") return "Pantry Staples";
   if (looksLikeNutItem(item)) return "Nuts";
+  if (item.category === "cupboard") return "Pantry Staples";
   return "Extras";
 }
 
@@ -258,17 +250,6 @@ function getWorksWellWith(item: ShopDisplayItem) {
   }
 
   return ["simple meals", "weekly planning", "easy top-ups"];
-}
-
-function getCompactProductName(item: ShopDisplayItem) {
-  const compactNames: Record<string, string> = {
-    "Weekly Produce Box": "Weekly Box",
-    "Family Produce Box": "Family Box",
-    "Salted Caramel Sauce": "Salted Caramel",
-    "Dark Chocolate & Hazelnut Spread": "Dark Choc Spread",
-  };
-
-  return compactNames[item.name] ?? item.name;
 }
 
 function dedupeStrings(values: string[]) {
@@ -432,34 +413,6 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     return starterBoxIngredients.filter((item) => !looksLikeFruit(item));
   }, [starterBoxIngredients]);
 
-  const boxPreviewIngredients = useMemo(() => {
-    const preferredPreview = [
-      "potatoes",
-      "onions",
-      "carrots",
-      "leeks",
-      "tomatoes",
-      "spinach",
-      "broccoli",
-      "apples",
-      "bananas",
-      "oranges",
-    ];
-
-    const available = preferredPreview.filter((item) =>
-      starterBoxIngredients.some(
-        (ingredient) =>
-          normaliseIngredient(ingredient) === normaliseIngredient(item),
-      ),
-    );
-
-    if (available.length >= 6) {
-      return available.slice(0, 6);
-    }
-
-    return starterBoxIngredients.slice(0, 6);
-  }, [starterBoxIngredients]);
-
   const parsedItems = useMemo(
     () =>
       input
@@ -558,6 +511,28 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         recipe.description === result.recipe.description,
     );
   }, [result, savedRecipes]);
+
+  const currentRecipePlannerId = useMemo(() => {
+    if (!result?.recipe) return null;
+
+    const savedMatch = savedRecipes.find(
+      (recipe) =>
+        recipe.title === result.recipe.title &&
+        recipe.description === result.recipe.description,
+    );
+
+    if (savedMatch) return savedMatch.id;
+
+    return `${result.recipe.title}::${result.recipe.description}`;
+  }, [result, savedRecipes]);
+
+  const isCurrentRecipeInPlanner = useMemo(() => {
+    if (!currentRecipePlannerId) return false;
+
+    return plannerRecipes.some(
+      (recipe) => recipe.id === currentRecipePlannerId,
+    );
+  }, [plannerRecipes, currentRecipePlannerId]);
 
   const basketNormalised = useMemo(() => {
     return basketItemNames.map((item) => ({
@@ -666,9 +641,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         ? `${selectedProducts[0].name} locked in`
         : `${selectedProductCount} selected products locked in`;
 
-    const boxPart = hasSelectedBox
-      ? ` + ${starterBoxIngredients.slice(0, 8).length} likely box ingredients`
-      : "";
+    const boxPart = hasSelectedBox ? ` + veg box ingredients` : "";
 
     const extraPart =
       typedCount > 0
@@ -687,7 +660,6 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     parsedItems.length,
     selectedProductCount,
     selectedProducts,
-    starterBoxIngredients,
     useBasketItems,
   ]);
 
@@ -704,10 +676,16 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     });
   }
 
-  async function generateRecipeFromItems(
-    itemsToUse: string[],
-    previousRecipe?: PreviousRecipePayload,
-  ) {
+  function handleUseVegBoxOnly() {
+    const boxName =
+      starterBoxFromShop?.name ?? starterBox?.name ?? "Weekly Produce Box";
+    setSelectedProductNames([boxName]);
+    setInput("");
+    setUseBasketItems(true);
+    setQuickStart("use-what-ive-got");
+  }
+
+  async function generateRecipeFromItems(itemsToUse: string[]) {
     setLoading(true);
     setError("");
     setResult(null);
@@ -736,7 +714,6 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
           items: uniqueItems,
           quickStart,
           preferences: [],
-          previousRecipe,
         }),
       });
 
@@ -771,18 +748,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   }
 
   async function handleTryAnother() {
-    const previousRecipe = result?.recipe
-      ? {
-          title: result.recipe.title,
-          description: result.recipe.description,
-          ingredientsUsed: result.recipe.ingredientsUsed,
-        }
-      : undefined;
-
-    await generateRecipeFromItems(
-      buildAnchoredItems(parsedItems),
-      previousRecipe,
-    );
+    await generateRecipeFromItems(buildAnchoredItems(parsedItems));
   }
 
   async function handlePlanWithBoxIntent(intent: "veg" | "fruit" | "easy-box") {
@@ -806,6 +772,10 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
       quickStartValue = "comforting";
     }
 
+    const boxName =
+      starterBoxFromShop?.name ?? starterBox?.name ?? "Weekly Produce Box";
+
+    setSelectedProductNames([boxName]);
     setQuickStart(quickStartValue);
     setUseBasketItems(true);
     setInput(itemsToUse.join(", "));
@@ -813,6 +783,23 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     await generateRecipeFromItems([
       ...selectedProductAnchorItems,
       ...itemsToUse,
+      ...basketItemNames,
+      boxName,
+    ]);
+  }
+
+  async function handleVegBoxInspiration() {
+    const boxName =
+      starterBoxFromShop?.name ?? starterBox?.name ?? "Weekly Produce Box";
+
+    setSelectedProductNames([boxName]);
+    setInput("");
+    setUseBasketItems(true);
+    setQuickStart("use-what-ive-got");
+
+    await generateRecipeFromItems([
+      boxName,
+      ...starterBoxIngredients,
       ...basketItemNames,
     ]);
   }
@@ -862,13 +849,29 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   function handleAddToPlanner() {
     if (!result?.recipe) return;
 
+    const savedMatch = savedRecipes.find(
+      (recipe) =>
+        recipe.title === result.recipe.title &&
+        recipe.description === result.recipe.description,
+    );
+
+    const baseId =
+      savedMatch?.id ?? `${result.recipe.title}::${result.recipe.description}`;
+
+    const alreadyAdded = plannerRecipes.some((item) => item.id === baseId);
+
+    if (alreadyAdded) {
+      setPlannerMessage("That recipe is already ready in your planner.");
+      return;
+    }
+
     const plannerRecipe: PlannerRecipe = {
-      id: `${result.recipe.title}-${Date.now()}`,
+      id: baseId,
       title: result.recipe.title,
       description: result.recipe.description,
       ingredientsUsed: result.recipe.ingredientsUsed,
       imageUrl: result.imageUrl,
-      savedAt: new Date().toISOString(),
+      savedAt: savedMatch?.savedAt ?? new Date().toISOString(),
       addedToPlannerAt: new Date().toISOString(),
     };
 
@@ -953,23 +956,120 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         </p>
 
         <h2 className="mt-2 font-serif text-xl leading-tight md:text-3xl">
-          Pick a few products, then get an idea.
+          Start from the veg box or build from a few products.
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-[#667164]">
-          Choose what you want to cook around, then get a meal idea from there.
+          Get a quick idea from the veg box alone, or pick a few things and see
+          what they could become together.
         </p>
       </div>
 
       <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
         <div className="flex flex-col gap-3">
+          <div className="rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] p-3 md:rounded-[20px]">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
+              Veg box inspiration
+            </p>
+
+            <div className="mt-2 flex items-start gap-3">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[#e9dfd2] bg-[rgba(255,255,255,0.9)] p-2">
+                <img
+                  src={starterBoxFromShop?.image ?? "/weekly-harvest-box.png"}
+                  alt={starterBoxFromShop?.name ?? "Weekly Produce Box"}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <h3 className="font-serif text-base leading-tight text-[#243328] md:text-lg">
+                  Use the veg box as your base
+                </h3>
+                <p className="mt-1 text-sm leading-6 text-[#667164]">
+                  Fastest way to test what you could make from the box this
+                  week.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <button
+                type="button"
+                onClick={handleVegBoxInspiration}
+                disabled={loading}
+                className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
+              >
+                {loading ? "Getting an idea..." : "Veg box inspiration"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleUseVegBoxOnly}
+                disabled={loading}
+                className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+              >
+                Use veg box only
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
+              Choose products
+            </p>
+
+            <div className="mt-2.5 space-y-2">
+              {productGroups.map((group) => (
+                <div key={group.key}>
+                  <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#7a8478]">
+                    {group.title}
+                  </p>
+
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {group.items.map((item) => {
+                      const isActive = selectedProductNames.includes(item.name);
+
+                      return (
+                        <button
+                          key={item.name}
+                          type="button"
+                          onClick={() => toggleProductSelection(item.name)}
+                          className={`inline-flex items-center gap-2 rounded-full border pl-1.5 pr-3 py-1.5 text-[11px] leading-4 transition sm:text-[12px] ${
+                            isActive
+                              ? "border-[#243328] bg-[#243328] font-semibold text-white shadow-[0_3px_8px_rgba(36,51,40,0.12)]"
+                              : "border-[#ddd4c8] bg-[rgba(255,255,255,0.92)] font-medium text-[#4f5c50] hover:border-[#cfc4b6] hover:bg-white hover:text-[#243328]"
+                          }`}
+                        >
+                          <span
+                            className={`flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border ${
+                              isActive
+                                ? "border-white/25 bg-white/10"
+                                : "border-[#e6ddd0] bg-[rgba(247,242,235,0.9)]"
+                            }`}
+                          >
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-contain"
+                            />
+                          </span>
+                          <span>{item.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {selectedProductCount > 0 ? (
-            <div className="overflow-hidden rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.92)] md:rounded-[20px]">
+            <div className="overflow-hidden rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] md:rounded-[20px]">
               <div className="p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Selected products
+                      Building from
                     </p>
 
                     <h3 className="mt-1 font-serif text-base leading-tight text-[#243328] md:text-lg">
@@ -984,7 +1084,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                         {selectedProductWorksWellWith.map((item) => (
                           <span
                             key={item}
-                            className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-2 py-0.5 text-[10px] text-[#5f675c]"
+                            className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.8)] px-2 py-0.5 text-[10px] text-[#5f675c]"
                           >
                             {item}
                           </span>
@@ -993,62 +1093,31 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                     ) : null}
                   </div>
 
-                  <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.92)] px-3 py-1.5 text-sm text-[#243328]">
+                  <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
                     {selectedProductCount}
                   </div>
                 </div>
 
-                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {selectedProducts.map((product) => (
                     <div
                       key={product.name}
-                      className="flex items-center justify-between gap-2 rounded-[14px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.9)] px-3 py-2"
+                      className="inline-flex items-center gap-2 rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.88)] pl-1.5 pr-3 py-1.5"
                     >
-                      <div className="min-w-0">
-                        <p className="text-[10px] uppercase tracking-[0.12em] text-[#7a8478]">
-                          {getProductTypeLabel(product)}
-                        </p>
-                        <p className="mt-0.5 truncate text-sm text-[#243328]">
-                          {product.name}
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => toggleProductSelection(product.name)}
-                        className="shrink-0 rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.92)] px-2.5 py-1 text-[11px] text-[#5f675c] transition hover:bg-white hover:text-[#243328]"
-                      >
-                        Remove
-                      </button>
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e6ddd0] bg-[rgba(247,242,235,0.9)]">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-contain"
+                        />
+                      </span>
+                      <span className="text-sm text-[#243328]">
+                        {product.name}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
-
-              {hasSelectedBox ? (
-                <div className="border-t border-[#e9dfd2] px-3 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Box ingredients included
-                    </p>
-                    <p className="text-[10px] text-[#7a8478]">
-                      {boxPreviewIngredients.length} shown
-                    </p>
-                  </div>
-
-                  <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                    {boxPreviewIngredients.map((item) => (
-                      <div
-                        key={item}
-                        className="flex h-7 items-center rounded-[10px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-2.5 text-[10px] text-[#5f675c] sm:h-8 sm:text-[11px]"
-                        title={item}
-                      >
-                        <span className="block truncate">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
 
               <div className="border-t border-[#e9dfd2] px-3 py-3">
                 <button
@@ -1070,66 +1139,6 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
               </div>
             </div>
           ) : null}
-
-          <div>
-            <div className="flex items-end justify-between gap-3">
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-                Choose products
-              </p>
-
-              <p className="text-[11px] text-[#7a8478]">
-                Tap a few to shape the meal
-              </p>
-            </div>
-
-            <div className="mt-2.5 space-y-2.5">
-              {productGroups.map((group) => (
-                <div
-                  key={group.key}
-                  className="rounded-[14px] border border-[#ece3d7] bg-[rgba(250,247,242,0.7)] p-2.5"
-                >
-                  <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#7a8478]">
-                    {group.title}
-                  </p>
-
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {group.items.map((item) => {
-                      const isActive = selectedProductNames.includes(item.name);
-
-                      return (
-                        <button
-                          key={item.name}
-                          type="button"
-                          onClick={() => toggleProductSelection(item.name)}
-                          title={item.name}
-                          aria-pressed={isActive}
-                          className={`flex min-h-[62px] items-center justify-center rounded-[14px] border px-2.5 py-2 text-center transition ${
-                            isActive
-                              ? "border-[#243328] bg-[#243328] text-white shadow-[0_3px_8px_rgba(36,51,40,0.12)]"
-                              : "border-[#ddd4c8] bg-[rgba(255,255,255,0.94)] text-[#4f5c50] hover:border-[#cfc4b6] hover:bg-white hover:text-[#243328]"
-                          }`}
-                        >
-                          <span
-                            className={`block text-[11px] leading-[1.1rem] sm:text-[12px] ${
-                              isActive ? "font-semibold" : "font-medium"
-                            }`}
-                            style={{
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden",
-                            }}
-                          >
-                            {getCompactProductName(item)}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1299,9 +1308,10 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                 <button
                   type="button"
                   onClick={handleAddToPlanner}
-                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  disabled={isCurrentRecipeInPlanner}
+                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Plan this
+                  {isCurrentRecipeInPlanner ? "Already planned" : "Plan this"}
                 </button>
 
                 <button
@@ -1411,22 +1421,42 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                 {ingredientBreakdown.availableFromShop.length > 0 ? (
                   <>
                     <div className="mt-5 grid gap-3 md:grid-cols-2">
-                      {ingredientBreakdown.availableFromShop.map((item) => (
-                        <div
-                          key={item.productName}
-                          className="rounded-[16px] border border-[#d6cec2] bg-[rgba(255,255,255,0.84)] p-4"
-                        >
-                          <p className="text-sm font-medium text-[#243328]">
-                            {item.productName}
-                          </p>
-                          <p className="mt-1 text-sm text-[#5f675c]">
-                            Matches: {item.ingredient}
-                          </p>
-                          <p className="mt-2 text-sm text-[#5f675c]">
-                            £{item.price.toFixed(2)}
-                          </p>
-                        </div>
-                      ))}
+                      {ingredientBreakdown.availableFromShop.map((item) => {
+                        const matchedItem = allShopItems.find(
+                          (shopItem) => shopItem.name === item.productName,
+                        );
+
+                        return (
+                          <div
+                            key={item.productName}
+                            className="rounded-[16px] border border-[#d6cec2] bg-[rgba(255,255,255,0.84)] p-4"
+                          >
+                            <div className="flex items-start gap-3">
+                              {matchedItem ? (
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[12px] border border-[#e6ddd0] bg-[rgba(247,242,235,0.9)] p-1.5">
+                                  <img
+                                    src={matchedItem.image}
+                                    alt={matchedItem.name}
+                                    className="h-full w-full object-contain"
+                                  />
+                                </div>
+                              ) : null}
+
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-[#243328]">
+                                  {item.productName}
+                                </p>
+                                <p className="mt-1 text-sm text-[#5f675c]">
+                                  Matches: {item.ingredient}
+                                </p>
+                                <p className="mt-2 text-sm text-[#5f675c]">
+                                  £{item.price.toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     <div className="mt-5 flex flex-wrap gap-3">
