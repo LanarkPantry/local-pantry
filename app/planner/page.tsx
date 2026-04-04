@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "../cart-context";
+import {
+  allShopItems,
+  produceBoxes,
+  type ShopDisplayItem,
+} from "../shop/shop-data";
 
 type RecipeLike = {
   id: string;
@@ -231,6 +236,10 @@ function normaliseLabel(value: string) {
   return value.trim().toLowerCase();
 }
 
+function dedupeList(items: string[]) {
+  return Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
+}
+
 function RecipeImage({
   recipe,
   compact = false,
@@ -267,10 +276,6 @@ function RecipeImage({
       {recipe?.title ? getInitials(recipe.title) : "TLP"}
     </div>
   );
-}
-
-function dedupeList(items: string[]) {
-  return Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
 }
 
 function buildWeekPlanSeedIngredients({
@@ -341,8 +346,99 @@ function buildWeekPlanSeedIngredients({
   return dedupeList(selectedSet).slice(0, 6);
 }
 
+function ingredientSignalsFromRecipes(recipes: RecipeLike[]) {
+  return recipes.flatMap((recipe) => [
+    ...(recipe.ingredientsUsed || []),
+    ...(recipe.ingredients || []),
+  ]);
+}
+
+function includesAny(text: string, matches: string[]) {
+  return matches.some((match) => text.includes(match));
+}
+
+function getBasketSuggestionsFromRecipes(
+  recipes: RecipeLike[],
+  plannedCount: number,
+) {
+  const ingredientText = ingredientSignalsFromRecipes(recipes)
+    .map((item) => item.toLowerCase())
+    .join(" ");
+
+  const suggestions: ShopDisplayItem[] = [];
+
+  const recommendedBox = plannedCount >= 4 ? produceBoxes[1] : produceBoxes[0];
+
+  if (recommendedBox) {
+    suggestions.push(recommendedBox);
+  }
+
+  const cupboardMatchers: Array<{ itemName: string; matches: string[] }> = [
+    { itemName: "Casarecce Pasta", matches: ["casarecce", "pasta"] },
+    { itemName: "Orzo Pasta", matches: ["orzo"] },
+    {
+      itemName: "Giant Couscous",
+      matches: ["giant couscous", "couscous"],
+    },
+    { itemName: "Polenta", matches: ["polenta"] },
+    {
+      itemName: "Puy Lentils",
+      matches: ["puy lentils", "lentils", "lentil"],
+    },
+    {
+      itemName: "Short Grain Rice",
+      matches: ["short grain rice", "rice", "risotto"],
+    },
+    { itemName: "Farro", matches: ["farro"] },
+  ];
+
+  const pantryMatchers: Array<{ itemName: string; matches: string[] }> = [
+    {
+      itemName: "Sorrel & Walnut Pesto",
+      matches: ["pesto", "walnut pesto", "sorrel pesto"],
+    },
+    {
+      itemName: "Rose Harissa",
+      matches: ["harissa", "rose harissa"],
+    },
+    {
+      itemName: "Salted Caramel Sauce",
+      matches: ["salted caramel", "caramel sauce", "caramel"],
+    },
+    {
+      itemName: "Dark Chocolate & Hazelnut Spread",
+      matches: ["chocolate spread", "hazelnut spread", "cocoa spread"],
+    },
+  ];
+
+  const extraMatchers: Array<{ itemName: string; matches: string[] }> = [
+    { itemName: "Almonds", matches: ["almond", "almonds"] },
+    { itemName: "Walnuts", matches: ["walnut", "walnuts"] },
+    { itemName: "Hazelnuts", matches: ["hazelnut", "hazelnuts"] },
+    { itemName: "Cashews", matches: ["cashew", "cashews"] },
+  ];
+
+  for (const group of [cupboardMatchers, pantryMatchers, extraMatchers]) {
+    for (const matcher of group) {
+      if (!includesAny(ingredientText, matcher.matches)) continue;
+
+      const product = allShopItems.find(
+        (item) => item.name === matcher.itemName,
+      );
+      if (product) {
+        suggestions.push(product);
+      }
+    }
+  }
+
+  return suggestions.filter(
+    (item, index, array) =>
+      array.findIndex((candidate) => candidate.name === item.name) === index,
+  );
+}
+
 export default function PlannerPage() {
-  const { cart } = useCart();
+  const { cart, addManyToCart } = useCart();
 
   const [savedRecipes, setSavedRecipes] = useState<RecipeLike[]>([]);
   const [plannerRecipes, setPlannerRecipes] = useState<RecipeLike[]>([]);
@@ -382,6 +478,7 @@ export default function PlannerPage() {
   const [weekPlanPreview, setWeekPlanPreview] = useState<
     WeekPlanPreviewItem[] | null
   >(null);
+  const [basketSuggestionMessage, setBasketSuggestionMessage] = useState("");
 
   const ideaPanelRef = useRef<HTMLDivElement | null>(null);
   const recipeLibraryRef = useRef<HTMLDivElement | null>(null);
@@ -459,6 +556,12 @@ export default function PlannerPage() {
     const timer = window.setTimeout(() => setWeekPlanMessage(""), 2800);
     return () => window.clearTimeout(timer);
   }, [weekPlanMessage]);
+
+  useEffect(() => {
+    if (!basketSuggestionMessage) return;
+    const timer = window.setTimeout(() => setBasketSuggestionMessage(""), 2400);
+    return () => window.clearTimeout(timer);
+  }, [basketSuggestionMessage]);
 
   useEffect(() => {
     if (selectedPreferences.includes("Vegan")) {
@@ -685,6 +788,17 @@ export default function PlannerPage() {
   const veganSelected = selectedPreferences.includes("Vegan");
   const weekPlanningButtonLabel =
     plannedCount <= 1 ? "Plan my week for me" : "Plan the rest of my week";
+
+  const basketSuggestions = useMemo(() => {
+    const previewRecipes = weekPlanPreview
+      ? weekPlanPreview.map((item) => item.recipe)
+      : [];
+
+    return getBasketSuggestionsFromRecipes(
+      previewRecipes,
+      previewRecipes.length,
+    );
+  }, [weekPlanPreview]);
 
   function persistPlannerRecipes(next: RecipeLike[]) {
     setPlannerRecipes(next);
@@ -960,6 +1074,20 @@ export default function PlannerPage() {
     }
   }
 
+  function handleAddSuggestedBasket() {
+    if (basketSuggestions.length === 0) return;
+    addManyToCart(
+      basketSuggestions.map((item) => ({
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        category: item.category,
+        checkoutType: item.checkoutType,
+      })),
+    );
+    setBasketSuggestionMessage("Added to basket");
+  }
+
   function handleAddWeekPreviewToPlanner() {
     if (!weekPlanPreview || weekPlanPreview.length === 0) return;
 
@@ -989,7 +1117,11 @@ export default function PlannerPage() {
     setWeekPlanPreview(null);
     setPanelMode(null);
     setWeekPlanMessage("Week planned");
-    setSelectedDay(firstOpenDay || "Monday");
+
+    const nextOpenDay = DAYS.find((day) => !nextMeals[day]);
+    if (nextOpenDay) {
+      setSelectedDay(nextOpenDay);
+    }
   }
 
   function buildGeneratedRecipeLike(): RecipeLike | null {
@@ -1297,12 +1429,70 @@ export default function PlannerPage() {
                 ))}
               </div>
 
-              <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.84)] px-3 py-2.5">
-                <p className="text-sm font-medium text-[#213128]">
-                  This week should lead naturally into a veg box plus a few
-                  useful extras.
-                </p>
-              </div>
+              {basketSuggestions.length > 0 ? (
+                <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.88)] p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                        Build your basket from this week
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#213128]">
+                        Start with a box, then add a few useful extras
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleAddSuggestedBasket}
+                      className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                    >
+                      Add these to basket
+                    </button>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {basketSuggestions.map((item) => (
+                      <div
+                        key={item.name}
+                        className="rounded-[14px] border border-[#e1e7dd] bg-[rgba(252,252,250,0.82)] p-2.5"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[#213128]">
+                              {item.name}
+                            </p>
+                            <p className="mt-0.5 text-[11px] text-[#617067]">
+                              £{item.price.toFixed(2)}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] ${
+                              item.category === "boxes"
+                                ? "border border-[#dbe2d7] bg-[rgba(233,240,228,0.82)] text-[#213128]"
+                                : "border border-[#e1e7dd] bg-white text-[#58675e]"
+                            }`}
+                          >
+                            {item.category === "boxes"
+                              ? "Recommended box"
+                              : "Add-on"}
+                          </span>
+                        </div>
+
+                        <p className="mt-1.5 text-[11px] leading-5 text-[#617067]">
+                          {item.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {basketSuggestionMessage ? (
+                    <div className="mt-3 rounded-[14px] border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-2 text-sm text-[#425142]">
+                      {basketSuggestionMessage}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           ) : null}
         </section>
