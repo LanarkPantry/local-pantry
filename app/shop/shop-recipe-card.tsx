@@ -145,6 +145,8 @@ function looksLikeFruit(value: string) {
 }
 
 function looksLikeNutItem(item: ShopDisplayItem) {
+  if (item.category !== "extras") return false;
+
   const searchableText = [
     item.name,
     item.description,
@@ -231,8 +233,8 @@ function getProductTypeLabel(item: ShopDisplayItem) {
 function getProductGroupTitle(item: ShopDisplayItem) {
   if (item.category === "boxes") return "Weekly Fruit & Veg Boxes";
   if (item.category === "pantry") return "Gourmet Jars";
-  if (looksLikeNutItem(item)) return "Nuts";
   if (item.category === "cupboard") return "Pantry Staples";
+  if (looksLikeNutItem(item)) return "Nuts";
   return "Extras";
 }
 
@@ -250,6 +252,17 @@ function getWorksWellWith(item: ShopDisplayItem) {
   }
 
   return ["simple meals", "weekly planning", "easy top-ups"];
+}
+
+function getCompactProductName(item: ShopDisplayItem) {
+  const compactNames: Record<string, string> = {
+    "Weekly Produce Box": "Weekly Box",
+    "Family Produce Box": "Family Box",
+    "Salted Caramel Sauce": "Salted Caramel",
+    "Dark Chocolate & Hazelnut Spread": "Dark Choc Spread",
+  };
+
+  return compactNames[item.name] ?? item.name;
 }
 
 function dedupeStrings(values: string[]) {
@@ -961,52 +974,14 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-[#667164]">
-          Choose one or more things to cook from, then shape the idea around
-          them.
+          Choose what you want to cook around, then get a meal idea from there.
         </p>
       </div>
 
       <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
         <div className="flex flex-col gap-3">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-              Choose products
-            </p>
-
-            <div className="mt-2.5 space-y-2">
-              {productGroups.map((group) => (
-                <div key={group.key}>
-                  <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#7a8478]">
-                    {group.title}
-                  </p>
-
-                  <div className="mt-1 flex flex-wrap gap-1.5">
-                    {group.items.map((item) => {
-                      const isActive = selectedProductNames.includes(item.name);
-
-                      return (
-                        <button
-                          key={item.name}
-                          type="button"
-                          onClick={() => toggleProductSelection(item.name)}
-                          className={`rounded-full border px-2.5 py-1 text-[11px] leading-4 transition sm:px-3 sm:py-1.5 sm:text-[12px] ${
-                            isActive
-                              ? "border-[#243328] bg-[#243328] font-semibold text-white shadow-[0_3px_8px_rgba(36,51,40,0.12)]"
-                              : "border-[#ddd4c8] bg-[rgba(255,255,255,0.92)] font-medium text-[#4f5c50] hover:border-[#cfc4b6] hover:bg-white hover:text-[#243328]"
-                          }`}
-                        >
-                          {item.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {selectedProductCount > 0 ? (
-            <div className="overflow-hidden rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] md:rounded-[20px]">
+            <div className="overflow-hidden rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.92)] md:rounded-[20px]">
               <div className="p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
@@ -1026,7 +1001,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                         {selectedProductWorksWellWith.map((item) => (
                           <span
                             key={item}
-                            className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.8)] px-2 py-0.5 text-[10px] text-[#5f675c]"
+                            className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-2 py-0.5 text-[10px] text-[#5f675c]"
                           >
                             {item}
                           </span>
@@ -1035,23 +1010,33 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                     ) : null}
                   </div>
 
-                  <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
+                  <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.92)] px-3 py-1.5 text-sm text-[#243328]">
                     {selectedProductCount}
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {selectedProducts.map((product) => (
                     <div
                       key={product.name}
-                      className="inline-flex items-center gap-2 rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.88)] px-3 py-1.5"
+                      className="flex items-center justify-between gap-2 rounded-[14px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.9)] px-3 py-2"
                     >
-                      <span className="text-[11px] text-[#5f675c]">
-                        {getProductTypeLabel(product)}
-                      </span>
-                      <span className="text-sm text-[#243328]">
-                        {product.name}
-                      </span>
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase tracking-[0.12em] text-[#7a8478]">
+                          {getProductTypeLabel(product)}
+                        </p>
+                        <p className="mt-0.5 truncate text-sm text-[#243328]">
+                          {product.name}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => toggleProductSelection(product.name)}
+                        className="shrink-0 rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.92)] px-2.5 py-1 text-[11px] text-[#5f675c] transition hover:bg-white hover:text-[#243328]"
+                      >
+                        Remove
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -1102,6 +1087,66 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
               </div>
             </div>
           ) : null}
+
+          <div>
+            <div className="flex items-end justify-between gap-3">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
+                Choose products
+              </p>
+
+              <p className="text-[11px] text-[#7a8478]">
+                Tap a few to shape the meal
+              </p>
+            </div>
+
+            <div className="mt-2.5 space-y-2.5">
+              {productGroups.map((group) => (
+                <div
+                  key={group.key}
+                  className="rounded-[14px] border border-[#ece3d7] bg-[rgba(250,247,242,0.7)] p-2.5"
+                >
+                  <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#7a8478]">
+                    {group.title}
+                  </p>
+
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {group.items.map((item) => {
+                      const isActive = selectedProductNames.includes(item.name);
+
+                      return (
+                        <button
+                          key={item.name}
+                          type="button"
+                          onClick={() => toggleProductSelection(item.name)}
+                          title={item.name}
+                          aria-pressed={isActive}
+                          className={`flex min-h-[62px] items-center justify-center rounded-[14px] border px-2.5 py-2 text-center transition ${
+                            isActive
+                              ? "border-[#243328] bg-[#243328] text-white shadow-[0_3px_8px_rgba(36,51,40,0.12)]"
+                              : "border-[#ddd4c8] bg-[rgba(255,255,255,0.94)] text-[#4f5c50] hover:border-[#cfc4b6] hover:bg-white hover:text-[#243328]"
+                          }`}
+                        >
+                          <span
+                            className={`block text-[11px] leading-[1.1rem] sm:text-[12px] ${
+                              isActive ? "font-semibold" : "font-medium"
+                            }`}
+                            style={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {getCompactProductName(item)}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
