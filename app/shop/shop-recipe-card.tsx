@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
-import { allShopItems } from "./shop-data";
+import { allShopItems, type ShopDisplayItem } from "./shop-data";
 
 type GeneratedRecipe = {
   title: string;
@@ -181,6 +181,19 @@ function writePlannerRecipes(value: PlannerRecipe[]) {
   localStorage.setItem(PLANNER_RECIPES_STORAGE_KEY, JSON.stringify(value));
 }
 
+function getProductTypeLabel(item: ShopDisplayItem) {
+  if (item.category === "boxes") return "Produce box";
+  if (item.category === "pantry") return "Gourmet jar";
+  if (item.category === "cupboard") return "Cupboard staple";
+  return "Extra";
+}
+
+function truncate(text: string, limit: number) {
+  if (!text) return "";
+  if (text.length <= limit) return text;
+  return `${text.slice(0, limit).trim()}…`;
+}
+
 export default function ShopRecipeCard({
   starterBox,
   onStartWeeklyBox,
@@ -191,6 +204,67 @@ export default function ShopRecipeCard({
     () => groupedCart.map((entry) => entry.item.name),
     [groupedCart],
   );
+
+  const starterBoxFromShop = useMemo(() => {
+    if (!starterBox) return null;
+    return allShopItems.find((item) => item.name === starterBox.name) ?? null;
+  }, [starterBox]);
+
+  const spotlightProducts = useMemo(() => {
+    const oneOffItems = allShopItems.filter(
+      (item) => item.checkoutType === "one-off",
+    );
+
+    if (starterBoxFromShop) {
+      return [starterBoxFromShop, ...oneOffItems];
+    }
+
+    return oneOffItems;
+  }, [starterBoxFromShop]);
+
+  const defaultSelectedProduct = useMemo(() => {
+    const pantryFirst =
+      spotlightProducts.find((item) => item.category === "pantry") ??
+      spotlightProducts.find((item) => item.category === "cupboard") ??
+      spotlightProducts[0] ??
+      null;
+
+    return pantryFirst;
+  }, [spotlightProducts]);
+
+  const [selectedProductName, setSelectedProductName] = useState("");
+  const [input, setInput] = useState("");
+  const [useBasketItems, setUseBasketItems] = useState(true);
+  const [quickStart, setQuickStart] = useState("quick-tonight");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<RecipeResponse | null>(null);
+
+  const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
+  const [plannerRecipes, setPlannerRecipes] = useState<PlannerRecipe[]>([]);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [plannerMessage, setPlannerMessage] = useState("");
+  const [basketMessage, setBasketMessage] = useState("");
+  const [productMessage, setProductMessage] = useState("");
+  const [showMethod, setShowMethod] = useState(false);
+
+  useEffect(() => {
+    if (!selectedProductName && defaultSelectedProduct) {
+      setSelectedProductName(defaultSelectedProduct.name);
+    }
+  }, [defaultSelectedProduct, selectedProductName]);
+
+  const selectedProduct = useMemo(() => {
+    return (
+      spotlightProducts.find((item) => item.name === selectedProductName) ??
+      defaultSelectedProduct
+    );
+  }, [spotlightProducts, selectedProductName, defaultSelectedProduct]);
+
+  const selectedProductInBasket = useMemo(() => {
+    if (!selectedProduct) return false;
+    return basketItemNames.includes(selectedProduct.name);
+  }, [basketItemNames, selectedProduct]);
 
   const starterBoxAlreadyInBasket = useMemo(() => {
     if (!starterBox) return false;
@@ -243,20 +317,6 @@ export default function ShopRecipeCard({
     return starterBoxIngredients.slice(0, 6);
   }, [starterBoxIngredients]);
 
-  const [input, setInput] = useState("");
-  const [useBasketItems, setUseBasketItems] = useState(true);
-  const [quickStart, setQuickStart] = useState("quick-tonight");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [result, setResult] = useState<RecipeResponse | null>(null);
-
-  const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
-  const [plannerRecipes, setPlannerRecipes] = useState<PlannerRecipe[]>([]);
-  const [saveMessage, setSaveMessage] = useState("");
-  const [plannerMessage, setPlannerMessage] = useState("");
-  const [basketMessage, setBasketMessage] = useState("");
-  const [boxPlanMessage, setBoxPlanMessage] = useState("");
-
   const parsedItems = useMemo(
     () =>
       input
@@ -265,6 +325,16 @@ export default function ShopRecipeCard({
         .filter(Boolean),
     [input],
   );
+
+  const selectedProductAnchorItems = useMemo(() => {
+    if (!selectedProduct) return [];
+
+    if (selectedProduct.category === "boxes") {
+      return starterBoxIngredients.slice(0, 10);
+    }
+
+    return [selectedProduct.name];
+  }, [selectedProduct, starterBoxIngredients]);
 
   useEffect(() => {
     try {
@@ -290,11 +360,6 @@ export default function ShopRecipeCard({
   }, []);
 
   useEffect(() => {
-    if (!starterBoxAlreadyInBasket) return;
-    setUseBasketItems(true);
-  }, [starterBoxAlreadyInBasket]);
-
-  useEffect(() => {
     if (!saveMessage) return;
     const timeout = window.setTimeout(() => setSaveMessage(""), 2500);
     return () => window.clearTimeout(timeout);
@@ -313,10 +378,19 @@ export default function ShopRecipeCard({
   }, [basketMessage]);
 
   useEffect(() => {
-    if (!boxPlanMessage) return;
-    const timeout = window.setTimeout(() => setBoxPlanMessage(""), 2500);
+    if (!productMessage) return;
+    const timeout = window.setTimeout(() => setProductMessage(""), 2500);
     return () => window.clearTimeout(timeout);
-  }, [boxPlanMessage]);
+  }, [productMessage]);
+
+  useEffect(() => {
+    setResult(null);
+    setError("");
+    setSaveMessage("");
+    setPlannerMessage("");
+    setBasketMessage("");
+    setShowMethod(false);
+  }, [selectedProductName]);
 
   const isCurrentRecipeSaved = useMemo(() => {
     if (!result?.recipe) return false;
@@ -446,6 +520,33 @@ export default function ShopRecipeCard({
     );
   }, [ingredientBreakdown.availableFromShop]);
 
+  const helperSummary = useMemo(() => {
+    if (!selectedProduct) return "";
+
+    const typedCount = parsedItems.length;
+    const basketCount = useBasketItems ? basketItemNames.length : 0;
+
+    if (selectedProduct.category === "boxes") {
+      return `${starterBoxIngredients.slice(0, 8).length} likely box ingredients locked in${
+        typedCount > 0
+          ? ` + ${typedCount} extra item${typedCount === 1 ? "" : "s"}`
+          : ""
+      }${basketCount > 0 ? ` + ${basketCount} basket item${basketCount === 1 ? "" : "s"}` : ""}`;
+    }
+
+    return `${selectedProduct.name} locked in${
+      typedCount > 0
+        ? ` + ${typedCount} extra item${typedCount === 1 ? "" : "s"}`
+        : ""
+    }${basketCount > 0 ? ` + ${basketCount} basket item${basketCount === 1 ? "" : "s"}` : ""}`;
+  }, [
+    basketItemNames.length,
+    parsedItems.length,
+    selectedProduct,
+    starterBoxIngredients,
+    useBasketItems,
+  ]);
+
   async function generateRecipeFromItems(itemsToUse: string[]) {
     setLoading(true);
     setError("");
@@ -453,6 +554,7 @@ export default function ShopRecipeCard({
     setSaveMessage("");
     setPlannerMessage("");
     setBasketMessage("");
+    setShowMethod(false);
 
     const uniqueItems = Array.from(new Set(itemsToUse.filter(Boolean))).slice(
       0,
@@ -461,7 +563,7 @@ export default function ShopRecipeCard({
 
     if (uniqueItems.length === 0) {
       setLoading(false);
-      setError("Add a few ingredients to get started.");
+      setError("Choose a product or add a few ingredients to get started.");
       return;
     }
 
@@ -494,91 +596,52 @@ export default function ShopRecipeCard({
     }
   }
 
+  function buildAnchoredItems(extraItems: string[] = []) {
+    return [
+      ...selectedProductAnchorItems,
+      ...extraItems,
+      ...(useBasketItems ? basketItemNames : []),
+    ];
+  }
+
   async function handleGenerate() {
-    const items = [...parsedItems, ...(useBasketItems ? basketItemNames : [])];
-    await generateRecipeFromItems(items);
+    await generateRecipeFromItems(buildAnchoredItems(parsedItems));
+  }
+
+  async function handleTryAnother() {
+    await generateRecipeFromItems(buildAnchoredItems(parsedItems));
   }
 
   async function handlePlanWithBoxIntent(intent: "veg" | "fruit" | "easy-box") {
     let itemsToUse: string[] = [];
     let quickStartValue = quickStart;
-    let message = "";
 
     if (intent === "veg") {
       itemsToUse =
         vegIngredients.length > 0 ? vegIngredients : starterBoxIngredients;
       quickStartValue = "use-what-ive-got";
-      message =
-        vegIngredients.length > 0
-          ? "Planning around the veg in this week’s box."
-          : "Planning around this week’s box.";
     }
 
     if (intent === "fruit") {
       itemsToUse =
         fruitIngredients.length > 0 ? fruitIngredients : starterBoxIngredients;
       quickStartValue = "quick-tonight";
-      message =
-        fruitIngredients.length > 0
-          ? "Looking at a fruit-based idea from this week’s box."
-          : "Using what’s in the box as a starting point.";
     }
 
     if (intent === "easy-box") {
       itemsToUse = starterBoxIngredients;
-      quickStartValue = "quick-tonight";
-      message = "Building an easy meal around this week’s box.";
+      quickStartValue = "comforting";
     }
 
     setQuickStart(quickStartValue);
     setUseBasketItems(true);
     setInput(itemsToUse.join(", "));
-    setBoxPlanMessage(message);
 
-    setLoading(true);
-    setError("");
-    setResult(null);
-    setSaveMessage("");
-    setPlannerMessage("");
-    setBasketMessage("");
-
-    const uniqueItems = Array.from(
-      new Set([...itemsToUse, ...basketItemNames].filter(Boolean)),
-    ).slice(0, 16);
-
-    if (uniqueItems.length === 0) {
-      setLoading(false);
-      setError("Add a few ingredients to get started.");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/recipe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: uniqueItems,
-          quickStart: quickStartValue,
-          preferences: [],
-        }),
-      });
-
-      const data = (await response.json()) as RecipeResponse;
-
-      if (!response.ok) {
-        setError(data.error || "Something went wrong.");
-        setLoading(false);
-        return;
-      }
-
-      setResult(data);
-    } catch {
-      setError("Something went wrong while generating the recipe.");
-    } finally {
-      setLoading(false);
-    }
+    await generateRecipeFromItems([
+      ...itemsToUse,
+      ...basketItemNames,
+      ...selectedProductAnchorItems,
+    ]);
   }
 
   function handleSaveFavourite() {
@@ -657,7 +720,7 @@ export default function ShopRecipeCard({
     try {
       writePlannerRecipes(updatedPlannerRecipes);
       setPlannerRecipes(updatedPlannerRecipes);
-      setPlannerMessage("Added to planner.");
+      setPlannerMessage("Planned for later.");
     } catch {
       setPlannerMessage(
         "Your planner is full in this browser. Remove a few older planner items and try again.",
@@ -687,69 +750,187 @@ export default function ShopRecipeCard({
       });
     });
 
-    setBasketMessage("Available ingredients have been added to your basket.");
+    setBasketMessage("Matched items added to your basket.");
   }
 
-  const helperSummary =
-    parsedItems.length > 0 || basketItemNames.length > 0
-      ? `${parsedItems.length > 0 ? `Using ${parsedItems.length} typed item${parsedItems.length === 1 ? "" : "s"}` : "No typed ingredients yet"}${
-          useBasketItems && basketItemNames.length > 0
-            ? ` + ${basketItemNames.length} basket item${basketItemNames.length === 1 ? "" : "s"}`
-            : ""
-        }`
-      : "";
+  function handleAddSelectedProduct() {
+    if (!selectedProduct) return;
+
+    if (selectedProduct.category === "boxes" && onStartWeeklyBox) {
+      onStartWeeklyBox();
+      setProductMessage(`${selectedProduct.name} added to your basket.`);
+      return;
+    }
+
+    addToCart({
+      name: selectedProduct.name,
+      price: selectedProduct.price,
+      image: selectedProduct.image,
+      category: selectedProduct.category,
+      checkoutType: selectedProduct.checkoutType,
+    });
+
+    setProductMessage(`${selectedProduct.name} added to your basket.`);
+  }
 
   return (
     <section
       id="shop-recipe-card"
       className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6"
     >
-      <div className="flex flex-col gap-4">
-        <div className="max-w-2xl">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-            Meal generator
-          </p>
+      <div className="max-w-2xl">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+          Shop ideas
+        </p>
 
-          <h2 className="mt-2 font-serif text-2xl leading-tight md:text-3xl">
-            Start with what you’ve got, then decide what to shop.
-          </h2>
+        <h2 className="mt-2 font-serif text-2xl leading-tight md:text-3xl">
+          Pick a product, then see what you could make with it.
+        </h2>
 
-          <p className="mt-3 text-sm leading-6 text-[#667164]">
-            This works as a planning tool wherever you are. And if you’re in our
-            delivery area, we can help turn the recipe into your next basket.
-          </p>
-        </div>
+        <p className="mt-3 text-sm leading-6 text-[#667164]">
+          Start with one thing you want to highlight, show a useful recipe idea,
+          then let people try another without losing the product.
+        </p>
+      </div>
 
-        <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                Plan from your box
-              </p>
-              <p className="mt-2 text-base font-medium text-[#243328]">
-                Use the week’s fruit and veg as your starting point, then build
-                a meal around what arrives.
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                The contents shift through the week, so think of this as a
-                useful guide rather than a fixed list.
-              </p>
-            </div>
+      <div className="mt-5 rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+        <div className="flex flex-col gap-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+              Choose a product
+            </p>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <button
-                type="button"
-                onClick={onStartWeeklyBox}
-                className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                {starterBoxAlreadyInBasket
-                  ? "Weekly box added"
-                  : "Add weekly box"}
-              </button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {spotlightProducts.map((item) => {
+                const isActive = selectedProduct?.name === item.name;
+
+                return (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() => setSelectedProductName(item.name)}
+                    className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                      isActive
+                        ? "border-[#243328] bg-[#243328] text-white"
+                        : "border-[#d6cec2] bg-[rgba(255,255,255,0.92)] text-[#243328] hover:bg-white"
+                    }`}
+                  >
+                    {item.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2">
+          {selectedProduct ? (
+            <div className="overflow-hidden rounded-[20px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)]">
+              <div className="flex flex-col sm:flex-row">
+                <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.62)] p-4 sm:w-[180px] sm:shrink-0 sm:border-b-0 sm:border-r">
+                  <div className="flex h-full items-center justify-center rounded-[18px] bg-[rgba(255,255,255,0.72)] p-3">
+                    <img
+                      src={selectedProduct.image}
+                      alt={selectedProduct.name}
+                      className="h-28 w-full object-contain"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex-1 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                        {getProductTypeLabel(selectedProduct)}
+                      </p>
+                      <h3 className="mt-1 font-serif text-2xl leading-tight text-[#243328]">
+                        {selectedProduct.name}
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                        {selectedProduct.description}
+                      </p>
+                      {selectedProduct.details ? (
+                        <p className="mt-2 text-sm leading-6 text-[#667164]">
+                          {truncate(selectedProduct.details, 140)}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm text-[#243328]">
+                      £{selectedProduct.price.toFixed(2)}
+                    </div>
+                  </div>
+
+                  {selectedProduct.category === "boxes" ? (
+                    <div className="mt-4">
+                      <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                        Usually includes things like
+                      </p>
+
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {boxPreviewIngredients.map((item) => (
+                          <span
+                            key={item}
+                            className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-sm text-[#5f675c]"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                    <button
+                      type="button"
+                      onClick={handleAddSelectedProduct}
+                      className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                    >
+                      {selectedProduct.category === "boxes"
+                        ? starterBoxAlreadyInBasket
+                          ? "Box in basket"
+                          : "Add weekly box"
+                        : selectedProductInBasket
+                          ? "Add another"
+                          : "Add to basket"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleGenerate}
+                      disabled={loading}
+                      className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:opacity-60"
+                    >
+                      {loading
+                        ? "Getting an idea..."
+                        : `What could I make with this?`}
+                    </button>
+                  </div>
+
+                  {productMessage ? (
+                    <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
+                      {productMessage}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {selectedProduct?.category === "boxes" ? (
+        <div className="mt-4 rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                Quick box starts
+              </p>
+              <p className="mt-2 text-base font-medium text-[#243328]">
+                Start from the box and nudge the idea in a useful direction.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => handlePlanWithBoxIntent("veg")}
@@ -777,44 +958,21 @@ export default function ShopRecipeCard({
               Easy box meal
             </button>
           </div>
-
-          {boxPlanMessage ? (
-            <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
-              {boxPlanMessage}
-            </div>
-          ) : null}
-
-          <div className="mt-4 rounded-[18px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
-              Usually includes things like
-            </p>
-
-            <div className="mt-2 flex flex-wrap gap-2">
-              {boxPreviewIngredients.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-sm text-[#5f675c]"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <p className="mt-3 text-sm leading-6 text-[#5f675c]">
-              Alongside herbs, fruit, and changing seasonal extras.
-            </p>
-          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="mt-5 grid gap-4">
-        <div>
+        <div className="rounded-[22px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4">
           <label
             htmlFor="shop-recipe-input"
-            className="mb-2 block text-sm font-medium text-[#243328]"
+            className="block text-sm font-medium text-[#243328]"
           >
-            Add a few ingredients
+            Add a few extras if you like
           </label>
+
+          <p className="mt-1 text-sm leading-6 text-[#667164]">
+            The product stays locked in. These just help shape the idea.
+          </p>
 
           <input
             id="shop-recipe-input"
@@ -822,62 +980,68 @@ export default function ShopRecipeCard({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Tomatoes, chickpeas, pasta, spinach"
-            className="w-full rounded-[20px] border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
+            className="mt-3 w-full rounded-[20px] border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
           />
-        </div>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <label className="inline-flex items-center gap-3 text-sm text-[#243328]">
-            <input
-              type="checkbox"
-              checked={useBasketItems}
-              onChange={(e) => setUseBasketItems(e.target.checked)}
-              className="h-4 w-4 rounded border-[#cfc6b9]"
-            />
-            Use basket items too
-          </label>
+          <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <label className="inline-flex items-center gap-3 text-sm text-[#243328]">
+              <input
+                type="checkbox"
+                checked={useBasketItems}
+                onChange={(e) => setUseBasketItems(e.target.checked)}
+                className="h-4 w-4 rounded border-[#cfc6b9]"
+              />
+              Use basket items too
+            </label>
 
-          <select
-            value={quickStart}
-            onChange={(e) => setQuickStart(e.target.value)}
-            className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm text-[#243328] outline-none"
-          >
-            <option value="quick-tonight">Quick tonight</option>
-            <option value="comforting">Comforting</option>
-            <option value="use-what-ive-got">Use what I’ve got</option>
-          </select>
-        </div>
+            <select
+              value={quickStart}
+              onChange={(e) => setQuickStart(e.target.value)}
+              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm text-[#243328] outline-none"
+            >
+              <option value="quick-tonight">Quick tonight</option>
+              <option value="comforting">Comforting</option>
+              <option value="use-what-ive-got">Use what I’ve got</option>
+            </select>
+          </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-          <button
-            type="button"
-            onClick={handleGenerate}
-            disabled={loading}
-            className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
-          >
-            {loading ? "Generating..." : "Generate meal idea"}
-          </button>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={loading || !selectedProduct}
+              className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
+            >
+              {loading
+                ? "Getting an idea..."
+                : selectedProduct
+                  ? `Get an idea with ${selectedProduct.name}`
+                  : "Get an idea"}
+            </button>
 
-          {helperSummary ? (
-            <p className="text-xs leading-6 text-[#7a8478]">{helperSummary}</p>
+            {helperSummary ? (
+              <p className="text-xs leading-6 text-[#7a8478]">
+                {helperSummary}
+              </p>
+            ) : null}
+          </div>
+
+          {error ? (
+            <div className="mt-4 rounded-[20px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
+              {error}
+            </div>
           ) : null}
         </div>
 
-        {error ? (
-          <div className="rounded-[20px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
-            {error}
-          </div>
-        ) : null}
-
         {result?.recipe ? (
-          <div className="mt-2 overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)]">
+          <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)]">
             {result.imageUrl ? (
               <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.64)] p-4">
                 <div className="overflow-hidden rounded-[20px] bg-[rgba(248,244,238,0.82)]">
                   <img
                     src={result.imageUrl}
                     alt={result.recipe.title}
-                    className="h-56 w-full object-cover"
+                    className="h-52 w-full object-cover"
                   />
                 </div>
               </div>
@@ -885,7 +1049,7 @@ export default function ShopRecipeCard({
 
             <div className="p-5">
               <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                Meal idea
+                What you could make with this
               </p>
 
               <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
@@ -898,7 +1062,7 @@ export default function ShopRecipeCard({
 
               {result.recipe.ingredientsUsed.length > 0 ? (
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {result.recipe.ingredientsUsed.map((item) => (
+                  {result.recipe.ingredientsUsed.slice(0, 10).map((item) => (
                     <span
                       key={item}
                       className="rounded-full border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] px-3 py-1 text-sm text-[#5f675c]"
@@ -916,7 +1080,7 @@ export default function ShopRecipeCard({
                   disabled={isCurrentRecipeInPlanner}
                   className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isCurrentRecipeInPlanner ? "In planner" : "Add to planner"}
+                  {isCurrentRecipeInPlanner ? "Already planned" : "Plan this"}
                 </button>
 
                 <button
@@ -925,20 +1089,43 @@ export default function ShopRecipeCard({
                   disabled={isCurrentRecipeSaved}
                   className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isCurrentRecipeSaved
-                    ? "Already saved"
-                    : "Save to favourites"}
+                  {isCurrentRecipeSaved ? "Already saved" : "Save"}
                 </button>
 
                 <button
                   type="button"
-                  onClick={handleGenerate}
+                  onClick={handleTryAnother}
                   disabled={loading}
                   className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328] disabled:opacity-60"
                 >
-                  Try another idea
+                  Try another
                 </button>
               </div>
+
+              {result.recipe.steps.length > 0 ? (
+                <div className="mt-5">
+                  <button
+                    type="button"
+                    onClick={() => setShowMethod((current) => !current)}
+                    className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
+                  >
+                    {showMethod ? "Hide method" : "Show method"}
+                  </button>
+
+                  {showMethod ? (
+                    <ol className="mt-4 space-y-3 text-sm leading-6 text-[#243328]">
+                      {result.recipe.steps.map((step, index) => (
+                        <li key={`${index}-${step}`} className="flex gap-3">
+                          <span className="mt-[2px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
+                            {index + 1}
+                          </span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : null}
+                </div>
+              ) : null}
 
               {saveMessage ? (
                 <div className="mt-4 rounded-[18px] border border-[#dbe4d5] bg-[#f4f8f1] px-4 py-3 text-sm text-[#425142]">
@@ -956,21 +1143,21 @@ export default function ShopRecipeCard({
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="max-w-2xl">
                     <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                      If you’re in our delivery area
+                      Build the basket around it
                     </p>
                     <h4 className="mt-2 font-serif text-xl md:text-2xl">
-                      Turn this into your next basket.
+                      Turn this into your next order.
                     </h4>
                     <p className="mt-2 text-sm leading-6 text-[#5f675c]">
                       We’ve matched the recipe to products already in the shop
-                      where we can. If you’re not local, you can still use this
-                      as a useful shopping guide.
+                      where we can. The highlighted product stays at the centre,
+                      then you can top up around it.
                     </p>
                   </div>
 
                   <div className="rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] px-4 py-3">
                     <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Estimated added cost
+                      Matched extras
                     </p>
                     <p className="mt-1 font-serif text-2xl text-[#243328]">
                       £{matchedShopTotal.toFixed(2)}
@@ -1020,8 +1207,8 @@ export default function ShopRecipeCard({
                   <div className="mt-5 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] p-4">
                     <p className="text-sm leading-6 text-[#5f675c]">
                       We couldn’t find direct shop matches for this one yet, but
-                      the ingredient list still gives you a useful plan for the
-                      week.
+                      the idea still gives you a useful way to build around{" "}
+                      {selectedProduct?.name}.
                     </p>
                   </div>
                 )}

@@ -535,23 +535,28 @@ export default function ShopPage() {
           </Link>
         </div>
 
-        <section className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+        <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-6">
             <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
               Shop
             </p>
 
             <h1 className="mt-3 font-serif text-[2rem] leading-tight md:text-[2.5rem]">
-              Start with your weekly veg box
+              Start with something good, then build the basket around it
             </h1>
 
             <p className="mt-3 max-w-xl text-sm leading-7 text-[#667164]">
-              Choose the size that suits your week, then build around it with a
-              few useful extras.
+              Choose your weekly box or a standout add-on, see what you could
+              make with it, then add the rest of the week around that idea.
             </p>
 
-            <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-              Most people start here
+            <div className="mt-4 flex flex-wrap gap-2">
+              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
+                Small curated range
+              </div>
+              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
+                Recipe-led add-ons
+              </div>
             </div>
 
             {plannerBridgeMessage ? (
@@ -634,6 +639,10 @@ export default function ShopPage() {
                 {totalItems > 0
                   ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
                   : "Empty"}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                Start with a box, add a few useful extras, then review the whole
+                week.
               </p>
               <Link
                 href="/basket"
@@ -830,11 +839,12 @@ export default function ShopPage() {
             Planning loop
           </p>
           <h2 className="mt-2 font-serif text-2xl text-[#243328]">
-            Plan meals, then build the basket around them
+            See the product, get the idea, then build the order
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[#667164]">
-            Use the planner to shape the week ahead, then come back here to turn
-            those meals into a practical local order.
+            The shop now works best when you start with one thing you want to
+            cook with, use that to spark a recipe, then turn the idea into a
+            practical local order.
           </p>
           <div className="mt-4">
             <Link
