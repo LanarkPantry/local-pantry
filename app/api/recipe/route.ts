@@ -35,7 +35,7 @@ const quickStartPromptMap: Record<string, string> = {
     "Prioritise making the most of the provided ingredients. Keep it flexible, forgiving, and practical, with as little waste and as few extra additions as possible.",
 };
 
-const MEAL_DIRECTIONS: MealDirection[] = [
+const SAVOURY_MEAL_DIRECTIONS: MealDirection[] = [
   {
     key: "roast-plate",
     label: "roast plate",
@@ -71,6 +71,27 @@ const MEAL_DIRECTIONS: MealDirection[] = [
     label: "bake or gratin",
     instruction:
       "Take it in the direction of a simple bake, gratin, or oven-finished dish that feels a little special but still realistic.",
+  },
+];
+
+const SWEET_MEAL_DIRECTIONS: MealDirection[] = [
+  {
+    key: "sweet-toast",
+    label: "sweet toast or simple assembly",
+    instruction:
+      "Take it in the direction of a simple, everyday sweet idea such as toast, flatbread, crumpets, or another quick assembled option with clear contrast and no unnecessary fuss.",
+  },
+  {
+    key: "fruit-bowl",
+    label: "fruit and yoghurt bowl",
+    instruction:
+      "Take it in the direction of a fruit-led bowl, yoghurt bowl, or spoonable breakfast or snack with a clear base and a simple topping or swirl.",
+  },
+  {
+    key: "pancake-crepe",
+    label: "pancake or crepe style idea",
+    instruction:
+      "Take it in the direction of pancakes, crepes, or another very simple pan-cooked sweet idea that feels realistic and everyday rather than like a baking project.",
   },
 ];
 
@@ -136,6 +157,38 @@ const COMMON_SUPPORT_INGREDIENTS = [
 
 const OVERUSED_BOX_DEFAULTS = ["apple", "carrot", "leek", "leeks", "onion"];
 
+const SWEET_SIGNAL_INGREDIENTS = [
+  "chocolate spread",
+  "cocoa spread",
+  "hazelnut spread",
+  "jam",
+  "marmalade",
+  "honey",
+  "fruit curd",
+  "lemon curd",
+  "sweet jar",
+  "sweet jars",
+  "banana",
+  "berries",
+  "strawberry",
+  "strawberries",
+  "raspberry",
+  "raspberries",
+  "blueberry",
+  "blueberries",
+  "grapes",
+  "melon",
+  "pineapple",
+  "pear",
+  "kiwi",
+  "orange",
+  "oranges",
+  "apple",
+  "apples",
+  "yoghurt",
+  "yogurt",
+];
+
 function normaliseList(value: unknown, maxItems: number) {
   if (!Array.isArray(value)) return [];
 
@@ -176,6 +229,47 @@ function safeParseRecipe(outputText: string): GeneratedRecipe | null {
   }
 }
 
+function isSweetLedSelection(items: string[]) {
+  const lowerItems = items.map((item) => item.toLowerCase());
+
+  const sweetSignalMatches = lowerItems.filter((item) =>
+    SWEET_SIGNAL_INGREDIENTS.some(
+      (signal) => item.includes(signal) || signal.includes(item),
+    ),
+  ).length;
+
+  const hasExplicitSweetSpread = lowerItems.some(
+    (item) =>
+      item.includes("chocolate spread") ||
+      item.includes("hazelnut spread") ||
+      item.includes("cocoa spread") ||
+      item.includes("jam") ||
+      item.includes("marmalade") ||
+      item.includes("honey") ||
+      item.includes("curd"),
+  );
+
+  const hasFruitLedMix =
+    sweetSignalMatches >= 2 &&
+    lowerItems.some(
+      (item) =>
+        item.includes("banana") ||
+        item.includes("berry") ||
+        item.includes("straw") ||
+        item.includes("rasp") ||
+        item.includes("blueb") ||
+        item.includes("melon") ||
+        item.includes("pineapple") ||
+        item.includes("orange") ||
+        item.includes("pear") ||
+        item.includes("kiwi") ||
+        item.includes("apple") ||
+        item.includes("grape"),
+    );
+
+  return hasExplicitSweetSpread || hasFruitLedMix;
+}
+
 function inferPreviousDirection(previousRecipe?: PreviousRecipe | null) {
   if (!previousRecipe) return null;
 
@@ -186,6 +280,32 @@ function inferPreviousDirection(previousRecipe?: PreviousRecipe | null) {
   ]
     .join(" ")
     .toLowerCase();
+
+  if (
+    text.includes("toast") ||
+    text.includes("crumpet") ||
+    text.includes("flatbread") ||
+    text.includes("chocolate spread")
+  ) {
+    return "sweet-toast";
+  }
+
+  if (
+    text.includes("yoghurt") ||
+    text.includes("yogurt bowl") ||
+    text.includes("fruit bowl") ||
+    text.includes("granola")
+  ) {
+    return "fruit-bowl";
+  }
+
+  if (
+    text.includes("pancake") ||
+    text.includes("crepe") ||
+    text.includes("drop scone")
+  ) {
+    return "pancake-crepe";
+  }
 
   if (
     text.includes("soup") ||
@@ -224,7 +344,6 @@ function inferPreviousDirection(previousRecipe?: PreviousRecipe | null) {
 
   if (
     text.includes("bowl") ||
-    text.includes("yoghurt") ||
     text.includes("beans") ||
     text.includes("warm salad")
   ) {
@@ -248,13 +367,16 @@ function pickMealDirection(
   previousRecipe?: PreviousRecipe | null,
 ) {
   const previousDirection = inferPreviousDirection(previousRecipe);
+  const directionPool = isSweetLedSelection(items)
+    ? SWEET_MEAL_DIRECTIONS
+    : SAVOURY_MEAL_DIRECTIONS;
 
-  const availableDirections = MEAL_DIRECTIONS.filter(
+  const availableDirections = directionPool.filter(
     (direction) => direction.key !== previousDirection,
   );
 
   const pool =
-    availableDirections.length > 0 ? availableDirections : MEAL_DIRECTIONS;
+    availableDirections.length > 0 ? availableDirections : directionPool;
 
   const seedSource = `${items.join("|")}::${quickStart}::${Date.now()}`;
   let seed = 0;
@@ -352,6 +474,24 @@ ${
     ? `Your previous attempt drifted away from the provided ingredients or overused common veg-box defaults. This retry must stay much closer to the supplied ingredients and avoid falling back to apple, carrot, leek, or onion unless they were explicitly provided and truly central.`
     : ""
 }
+`.trim();
+}
+
+function buildSweetIngredientInstruction(items: string[]) {
+  if (!isSweetLedSelection(items)) {
+    return "";
+  }
+
+  return `
+The provided ingredients suggest a sweeter or fruit-led direction.
+
+Very important:
+- Return a simple, believable everyday idea, not a baking project and not a formal dessert.
+- Good directions include toast, crumpets, flatbreads, yoghurt bowls, fruit bowls, pancakes, crepes, or other quick snack and breakfast ideas.
+- Avoid cakes, brownies, cookies, pastries, celebration desserts, or anything that feels over-engineered.
+- Keep it practical, quick, and realistic for normal home use.
+- If chocolate spread, jam, honey, fruit, or yoghurt are present, let those ingredients genuinely shape the recipe.
+- The result should still feel like something this shop would sensibly suggest to help someone use what they picked.
 `.trim();
 }
 
@@ -467,6 +607,7 @@ async function requestRecipe(
     items,
     isRetry,
   );
+  const sweetIngredientInstruction = buildSweetIngredientInstruction(items);
 
   const previousRecipeInstruction = previousRecipe
     ? `
@@ -507,6 +648,7 @@ ${quickStartInstruction}
 ${preferencesInstruction}
 ${produceBoxInstruction}
 ${ingredientPriorityInstruction}
+${sweetIngredientInstruction}
 ${previousRecipeInstruction}
 
 Return valid JSON only.
