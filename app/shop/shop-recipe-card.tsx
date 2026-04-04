@@ -57,6 +57,12 @@ type ProductGroup = {
   items: ShopDisplayItem[];
 };
 
+type PreviousRecipePayload = {
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+};
+
 const FAVOURITES_STORAGE_KEY = "tlp_saved_favourite_recipes";
 const PLANNER_RECIPES_STORAGE_KEY = "tlp_planner_recipes";
 
@@ -553,28 +559,6 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     );
   }, [result, savedRecipes]);
 
-  const currentRecipePlannerId = useMemo(() => {
-    if (!result?.recipe) return null;
-
-    const savedMatch = savedRecipes.find(
-      (recipe) =>
-        recipe.title === result.recipe.title &&
-        recipe.description === result.recipe.description,
-    );
-
-    if (savedMatch) return savedMatch.id;
-
-    return `${result.recipe.title}::${result.recipe.description}`;
-  }, [result, savedRecipes]);
-
-  const isCurrentRecipeInPlanner = useMemo(() => {
-    if (!currentRecipePlannerId) return false;
-
-    return plannerRecipes.some(
-      (recipe) => recipe.id === currentRecipePlannerId,
-    );
-  }, [plannerRecipes, currentRecipePlannerId]);
-
   const basketNormalised = useMemo(() => {
     return basketItemNames.map((item) => ({
       original: item,
@@ -720,7 +704,10 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     });
   }
 
-  async function generateRecipeFromItems(itemsToUse: string[]) {
+  async function generateRecipeFromItems(
+    itemsToUse: string[],
+    previousRecipe?: PreviousRecipePayload,
+  ) {
     setLoading(true);
     setError("");
     setResult(null);
@@ -749,6 +736,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
           items: uniqueItems,
           quickStart,
           preferences: [],
+          previousRecipe,
         }),
       });
 
@@ -783,7 +771,18 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   }
 
   async function handleTryAnother() {
-    await generateRecipeFromItems(buildAnchoredItems(parsedItems));
+    const previousRecipe = result?.recipe
+      ? {
+          title: result.recipe.title,
+          description: result.recipe.description,
+          ingredientsUsed: result.recipe.ingredientsUsed,
+        }
+      : undefined;
+
+    await generateRecipeFromItems(
+      buildAnchoredItems(parsedItems),
+      previousRecipe,
+    );
   }
 
   async function handlePlanWithBoxIntent(intent: "veg" | "fruit" | "easy-box") {
@@ -863,29 +862,13 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   function handleAddToPlanner() {
     if (!result?.recipe) return;
 
-    const savedMatch = savedRecipes.find(
-      (recipe) =>
-        recipe.title === result.recipe.title &&
-        recipe.description === result.recipe.description,
-    );
-
-    const baseId =
-      savedMatch?.id ?? `${result.recipe.title}::${result.recipe.description}`;
-
-    const alreadyAdded = plannerRecipes.some((item) => item.id === baseId);
-
-    if (alreadyAdded) {
-      setPlannerMessage("That recipe is already ready in your planner.");
-      return;
-    }
-
     const plannerRecipe: PlannerRecipe = {
-      id: baseId,
+      id: `${result.recipe.title}-${Date.now()}`,
       title: result.recipe.title,
       description: result.recipe.description,
       ingredientsUsed: result.recipe.ingredientsUsed,
       imageUrl: result.imageUrl,
-      savedAt: savedMatch?.savedAt ?? new Date().toISOString(),
+      savedAt: new Date().toISOString(),
       addedToPlannerAt: new Date().toISOString(),
     };
 
@@ -1316,10 +1299,9 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                 <button
                   type="button"
                   onClick={handleAddToPlanner}
-                  disabled={isCurrentRecipeInPlanner}
-                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  {isCurrentRecipeInPlanner ? "Already planned" : "Plan this"}
+                  Plan this
                 </button>
 
                 <button

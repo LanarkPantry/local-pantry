@@ -14,14 +14,65 @@ type RecipeApiSuccess = {
   imageUrl: string | null;
 };
 
+type PreviousRecipe = {
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+};
+
+type MealDirection = {
+  key: string;
+  label: string;
+  instruction: string;
+};
+
 const quickStartPromptMap: Record<string, string> = {
   "quick-tonight":
-    "Keep it especially quick and straightforward, ideally something that feels realistic for a weeknight and avoids unnecessary steps.",
+    "Keep it especially quick and straightforward. Aim for something realistic for a weeknight, with minimal prep, a short ingredient list, and no unnecessary steps. Favour one-pan, one-pot, quick roast, quick boil, or quick assembly approaches.",
   comforting:
-    "Lean into something warm, cosy, satisfying, and comforting, while still feeling elegant and believable.",
+    "Lean into something warm, satisfying, and comforting. Favour softer textures, deeper warmth, and meals that feel generous and cooked through rather than sharp or austere.",
   "use-what-ive-got":
-    "Prioritise making the most of the provided ingredients and minimise extra additions or waste.",
+    "Prioritise making the most of the provided ingredients. Keep it flexible, forgiving, and practical, with as little waste and as few extra additions as possible.",
 };
+
+const MEAL_DIRECTIONS: MealDirection[] = [
+  {
+    key: "roast-plate",
+    label: "roast plate",
+    instruction:
+      "Take it in the direction of a roasted plate or tray-led supper with strong contrast and a clear finishing touch.",
+  },
+  {
+    key: "warm-bowl",
+    label: "warm bowl",
+    instruction:
+      "Take it in the direction of a warm bowl with a clear base, a topping, and a spoonable or dolloped finish.",
+  },
+  {
+    key: "soup-stew",
+    label: "soup or brothy pot",
+    instruction:
+      "Take it in the direction of a soup, brothy pot, or light stew that still feels substantial enough for a meal.",
+  },
+  {
+    key: "pasta-grain",
+    label: "pasta or grain-led meal",
+    instruction:
+      "Take it in the direction of a pasta, orzo, couscous, rice, farro, or lentil-led meal with a strong sense of structure.",
+  },
+  {
+    key: "toast-tartine",
+    label: "toast or tartine supper",
+    instruction:
+      "Take it in the direction of a toast, tartine, or open-faced supper with something piled on top and a good contrast in texture.",
+  },
+  {
+    key: "bake-gratin",
+    label: "bake or gratin",
+    instruction:
+      "Take it in the direction of a simple bake, gratin, or oven-finished dish that feels a little special but still realistic.",
+  },
+];
 
 function normaliseList(value: unknown, maxItems: number) {
   if (!Array.isArray(value)) return [];
@@ -63,17 +114,125 @@ function safeParseRecipe(outputText: string): GeneratedRecipe | null {
   }
 }
 
+function inferPreviousDirection(previousRecipe?: PreviousRecipe | null) {
+  if (!previousRecipe) return null;
+
+  const text = [
+    previousRecipe.title,
+    previousRecipe.description,
+    ...(previousRecipe.ingredientsUsed ?? []),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  if (
+    text.includes("soup") ||
+    text.includes("broth") ||
+    text.includes("stew")
+  ) {
+    return "soup-stew";
+  }
+
+  if (
+    text.includes("toast") ||
+    text.includes("tartine") ||
+    text.includes("open sandwich")
+  ) {
+    return "toast-tartine";
+  }
+
+  if (
+    text.includes("bake") ||
+    text.includes("gratin") ||
+    text.includes("crumb")
+  ) {
+    return "bake-gratin";
+  }
+
+  if (
+    text.includes("pasta") ||
+    text.includes("orzo") ||
+    text.includes("rice") ||
+    text.includes("farro") ||
+    text.includes("couscous") ||
+    text.includes("lentil")
+  ) {
+    return "pasta-grain";
+  }
+
+  if (
+    text.includes("bowl") ||
+    text.includes("yoghurt") ||
+    text.includes("beans") ||
+    text.includes("warm salad")
+  ) {
+    return "warm-bowl";
+  }
+
+  if (
+    text.includes("roast") ||
+    text.includes("tray") ||
+    text.includes("crispy")
+  ) {
+    return "roast-plate";
+  }
+
+  return null;
+}
+
+function pickMealDirection(
+  items: string[],
+  quickStart: string,
+  previousRecipe?: PreviousRecipe | null,
+) {
+  const previousDirection = inferPreviousDirection(previousRecipe);
+
+  const availableDirections = MEAL_DIRECTIONS.filter(
+    (direction) => direction.key !== previousDirection,
+  );
+
+  const pool =
+    availableDirections.length > 0 ? availableDirections : MEAL_DIRECTIONS;
+
+  const seedSource = `${items.join("|")}::${quickStart}::${Date.now()}`;
+  let seed = 0;
+
+  for (const char of seedSource) {
+    seed += char.charCodeAt(0);
+  }
+
+  const selected = pool[seed % pool.length];
+  return selected;
+}
+
 async function generateRecipe(
   client: OpenAI,
   items: string[],
   quickStart: string,
   preferences: string[],
+  previousRecipe?: PreviousRecipe | null,
 ) {
   const quickStartInstruction = quickStartPromptMap[quickStart] ?? "";
   const preferencesInstruction =
     preferences.length > 0
       ? `Respect these user preferences where reasonably possible: ${preferences.join(", ")}.`
       : "";
+
+  const mealDirection = pickMealDirection(items, quickStart, previousRecipe);
+
+  const previousRecipeInstruction = previousRecipe
+    ? `
+The user has already seen a previous idea.
+Previous idea title: ${previousRecipe.title}
+Previous idea description: ${previousRecipe.description}
+Previous idea ingredients: ${previousRecipe.ingredientsUsed.join(", ")}
+
+This new idea must feel clearly different from that previous one.
+Do not return a near-match.
+Change the format, structure, and cooking method.
+Avoid repeating the same meal shape, title pattern, or main finishing idea.
+`
+    : "";
 
   const response = await client.responses.create({
     model: "gpt-5.4-mini",
@@ -82,17 +241,31 @@ You are a warm, practical recipe writer for a premium local grocery shop.
 
 Create one simple, realistic recipe based mainly on the provided ingredients.
 You may include up to 3 common pantry staples such as salt, pepper, oil, butter, flour, or water if needed.
-Keep the tone elegant, calm, and helpful.
-Make the recipe feel useful for a real customer, not like a chef demo.
+Keep the tone grounded, useful, and quietly confident.
+Make the recipe feel like a genuinely good local food idea, not a chef demo and not an AI gimmick.
 Avoid overly complicated techniques or niche ingredients.
 Prefer ideas that make sense from a few shop products being combined together, not only one ingredient.
+
+Aim for a little surprise and contrast in the idea while keeping it fully cookable on a normal weeknight.
+The title should feel specific and appetising, not generic.
+The description should explain what makes the meal good and why the combination works.
+
+Use this meal direction:
+${mealDirection.instruction}
+
+Avoid defaulting to generic fallback ideas unless they are truly the best fit.
+Do not drift into the same obvious pasta, traybake, or bowl every time.
 ${quickStartInstruction}
 ${preferencesInstruction}
+${previousRecipeInstruction}
+
+Return valid JSON only.
     `.trim(),
     input: `
 Ingredients: ${items.join(", ")}
 Quick start style: ${quickStart || "none"}
 Preferences: ${preferences.length > 0 ? preferences.join(", ") : "none"}
+Meal direction: ${mealDirection.label}
     `.trim(),
     text: {
       format: {
@@ -187,6 +360,21 @@ export async function POST(request: Request) {
 
     const preferences = normaliseList(body.preferences, 8);
 
+    const previousRecipe =
+      body.previousRecipe &&
+      typeof body.previousRecipe === "object" &&
+      typeof body.previousRecipe.title === "string" &&
+      typeof body.previousRecipe.description === "string"
+        ? {
+            title: body.previousRecipe.title.trim(),
+            description: body.previousRecipe.description.trim(),
+            ingredientsUsed: normaliseList(
+              body.previousRecipe.ingredientsUsed,
+              12,
+            ),
+          }
+        : null;
+
     if (cleanedItems.length === 0) {
       return NextResponse.json(
         { error: "No ingredients were provided." },
@@ -199,6 +387,7 @@ export async function POST(request: Request) {
       cleanedItems,
       quickStart,
       preferences,
+      previousRecipe,
     );
 
     const imageUrl = await generateRecipeImage(client, recipe.title);
