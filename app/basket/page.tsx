@@ -20,6 +20,9 @@ export default function BasketPage() {
   } = useCart();
 
   const [isSubscription, setIsSubscription] = useState(true);
+  const [subscriptionFrequency, setSubscriptionFrequency] = useState<
+    "weekly" | "fortnightly"
+  >("weekly");
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
@@ -66,8 +69,16 @@ export default function BasketPage() {
       .join(", ");
   }, [groupedCart]);
 
+  const orderTypeLabel = isSubscription
+    ? subscriptionFrequency === "weekly"
+      ? "Weekly box delivery"
+      : "Every two weeks"
+    : "One-off order";
+
   const whatsappOrderTypeText = isSubscription
-    ? "Weekly subscription with one-off add-ons"
+    ? subscriptionFrequency === "weekly"
+      ? "Weekly box delivery with one-off add-ons"
+      : "Box delivery every two weeks with one-off add-ons"
     : "One-off order";
 
   const whatsappLink = `https://wa.me/447576613770?text=${encodeURIComponent(
@@ -79,7 +90,7 @@ ${basketSummaryText}
 
 Order type: ${whatsappOrderTypeText}
 
-Subscription-friendly items: ${subscriptionItemCount}
+Boxes that can repeat: ${subscriptionItemCount}
 One-off items: ${oneOffItemCount}
 
 Subtotal: £${subtotal.toFixed(2)}
@@ -103,6 +114,7 @@ Thanks!`,
         body: JSON.stringify({
           cart,
           isSubscription,
+          subscriptionFrequency,
           deliveryNotes,
           subtotal,
           delivery,
@@ -170,7 +182,7 @@ Thanks!`,
 
                   <span className="max-w-full rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-[11px] leading-5 text-[#5f675c]">
                     {sectionType === "subscription"
-                      ? "Weekly item"
+                      ? "Can repeat"
                       : "One-off add-on"}
                   </span>
                 </div>
@@ -331,8 +343,8 @@ Thanks!`,
                 Review your basket for the week ahead
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164] md:text-base">
-                Choose whether this is a one-off order or a weekly rhythm.
-                Subscription-friendly items repeat only when you choose Weekly.
+                Boxes can be one-off, weekly, or every two weeks. Everything
+                else stays easy to add whenever you like.
               </p>
             </div>
 
@@ -389,7 +401,18 @@ Thanks!`,
             <section className="min-w-0 space-y-6">
               <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
                 <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
-                  <div className="flex flex-col gap-2 border-b border-[#ece4d8] pb-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div className="rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      Boxes are the only items that can repeat
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      You can keep the whole order one-off, or choose to repeat
+                      just your box. Everything else stays one-off and easy to
+                      add any time.
+                    </p>
+                  </div>
+
+                  <div className="mt-5 flex flex-col gap-2 border-b border-[#ece4d8] pb-4 sm:flex-row sm:items-end sm:justify-between">
                     <div className="min-w-0">
                       <h2 className="font-serif text-3xl">Your basket</h2>
                       <p className="mt-1 text-sm text-[#697166]">
@@ -408,10 +431,11 @@ Thanks!`,
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <div>
                           <h3 className="text-sm font-medium text-[#243328]">
-                            Weekly items
+                            Boxes that can repeat
                           </h3>
                           <p className="mt-1 text-sm text-[#667164]">
-                            These repeat only if you choose Weekly.
+                            These only repeat if you choose weekly or every two
+                            weeks below.
                           </p>
                         </div>
                         <span className="rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-xs text-[#5f675c]">
@@ -421,7 +445,7 @@ Thanks!`,
 
                       {renderGroupedItems(
                         groupedSubscriptionItems,
-                        "You have no weekly items in your basket yet.",
+                        "You have no repeatable box items in your basket yet.",
                         "subscription",
                       )}
                     </div>
@@ -433,7 +457,8 @@ Thanks!`,
                             One-off add-ons
                           </h3>
                           <p className="mt-1 text-sm text-[#667164]">
-                            These stay one-off, even if you choose Weekly.
+                            These stay one-off, whatever you choose for your
+                            box.
                           </p>
                         </div>
                         <span className="rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-xs text-[#5f675c]">
@@ -490,8 +515,8 @@ Thanks!`,
                     Choose how this order should work
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-[#667164]">
-                    Choose One-off for this week only, or Weekly if your
-                    subscription-friendly items should repeat.
+                    Keep this as a one-off order, or repeat just your box.
+                    Everything else stays flexible.
                   </p>
 
                   <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -510,8 +535,7 @@ Thanks!`,
                             One-off
                           </div>
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
-                            Everything in this basket is treated as a one-time
-                            order.
+                            Nothing repeats. This is just this delivery.
                           </p>
                         </div>
 
@@ -535,11 +559,10 @@ Thanks!`,
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="font-serif text-2xl text-[#243328]">
-                            Weekly
+                            Repeat my box
                           </div>
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
-                            Subscription-friendly items repeat. One-off add-ons
-                            stay one-off.
+                            Only your box repeats. One-off add-ons stay one-off.
                           </p>
                         </div>
 
@@ -552,20 +575,92 @@ Thanks!`,
                     </button>
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
-                    <p className="text-sm leading-6 text-[#667164]">
-                      This keeps your regular box simple while still letting you
-                      add flexible extras when you need them.
-                    </p>
-                  </div>
+                  {isSubscription && (
+                    <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
+                      <p className="text-sm font-medium text-[#243328]">
+                        How often should your box repeat?
+                      </p>
+
+                      <div className="mt-4 grid gap-3 md:grid-cols-2">
+                        <button
+                          type="button"
+                          onClick={() => setSubscriptionFrequency("weekly")}
+                          className={`rounded-2xl border p-4 text-left transition ${
+                            subscriptionFrequency === "weekly"
+                              ? "border-[#314534] bg-[rgba(255,255,255,0.9)] shadow-[0_10px_25px_rgba(36,51,40,0.06)]"
+                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.82)] hover:bg-white"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="font-serif text-2xl text-[#243328]">
+                                Every week
+                              </div>
+                              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                                Best if you want your regular weekly box.
+                              </p>
+                            </div>
+
+                            {subscriptionFrequency === "weekly" && (
+                              <span className="shrink-0 rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSubscriptionFrequency("fortnightly")
+                          }
+                          className={`rounded-2xl border p-4 text-left transition ${
+                            subscriptionFrequency === "fortnightly"
+                              ? "border-[#314534] bg-[rgba(255,255,255,0.9)] shadow-[0_10px_25px_rgba(36,51,40,0.06)]"
+                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.82)] hover:bg-white"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="font-serif text-2xl text-[#243328]">
+                                Every two weeks
+                              </div>
+                              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                                A lighter rhythm if weekly feels too much.
+                              </p>
+                            </div>
+
+                            {subscriptionFrequency === "fortnightly" && (
+                              <span className="shrink-0 rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      </div>
+
+                      <p className="mt-4 text-sm leading-6 text-[#667164]">
+                        You can still add one-off extras whenever you like.
+                      </p>
+                    </div>
+                  )}
+
+                  {!isSubscription && (
+                    <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
+                      <p className="text-sm leading-6 text-[#667164]">
+                        Your whole basket will be treated as a one-off order
+                        this time.
+                      </p>
+                    </div>
+                  )}
 
                   {isSubscription && subscriptionItemCount === 0 && (
                     <div className="mt-4 rounded-2xl border border-[#e4d8cb] bg-[#fbf6f0] p-4">
                       <p className="text-sm font-medium text-[#243328]">
-                        No weekly item yet
+                        No box in yet
                       </p>
                       <p className="mt-2 text-sm leading-6 text-[#667164]">
-                        Add a produce box if you want the weekly option to make
+                        Add a box if you want weekly or every two weeks to make
                         sense.
                       </p>
                     </div>
@@ -621,14 +716,14 @@ Thanks!`,
 
                 <div className="mt-4 rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-5">
                   {summaryRow("Items", `${totalItems}`)}
-                  {summaryRow("Weekly items", `${subscriptionItemCount}`)}
-                  {summaryRow("One-off add-ons", `${oneOffItemCount}`)}
                   {summaryRow(
-                    "Order type",
-                    isSubscription ? "Weekly" : "One-off",
+                    "Boxes that can repeat",
+                    `${subscriptionItemCount}`,
                   )}
+                  {summaryRow("One-off add-ons", `${oneOffItemCount}`)}
+                  {summaryRow("Order type", orderTypeLabel)}
                   {summaryRow(
-                    "Weekly items total",
+                    "Boxes total",
                     `£${subscriptionSubtotal.toFixed(2)}`,
                   )}
                   {summaryRow(
