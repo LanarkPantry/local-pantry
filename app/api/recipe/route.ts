@@ -26,6 +26,14 @@ type MealDirection = {
   instruction: string;
 };
 
+type WeekPlanContext = {
+  mode: "plan-week";
+  mealIndex: number;
+  totalMeals: number;
+  includeMeatIdeas?: boolean;
+  previousRecipes?: PreviousRecipe[];
+};
+
 const quickStartPromptMap: Record<string, string> = {
   "quick-tonight":
     "Keep it especially quick and straightforward. Aim for something realistic for a weeknight, with minimal prep, a short ingredient list, and no unnecessary steps. Favour one-pan, one-pot, quick roast, quick boil, or quick assembly approaches.",
@@ -365,6 +373,7 @@ function pickMealDirection(
   items: string[],
   quickStart: string,
   previousRecipe?: PreviousRecipe | null,
+  weekPlanContext?: WeekPlanContext | null,
 ) {
   const previousDirection = inferPreviousDirection(previousRecipe);
   const directionPool = isSweetLedSelection(items)
@@ -378,7 +387,12 @@ function pickMealDirection(
   const pool =
     availableDirections.length > 0 ? availableDirections : directionPool;
 
-  const seedSource = `${items.join("|")}::${quickStart}::${Date.now()}`;
+  const weekSeed =
+    weekPlanContext?.mode === "plan-week"
+      ? `${weekPlanContext.mealIndex}-${weekPlanContext.totalMeals}`
+      : "single";
+
+  const seedSource = `${items.join("|")}::${quickStart}::${weekSeed}::${Date.now()}`;
   let seed = 0;
 
   for (const char of seedSource) {
@@ -495,6 +509,114 @@ Very important:
 `.trim();
 }
 
+function buildDietaryInstruction(preferences: string[]) {
+  const lowerPreferences = preferences.map((item) => item.trim().toLowerCase());
+  const isVegan = lowerPreferences.includes("vegan");
+  const isNoDairy = lowerPreferences.includes("no dairy");
+
+  if (!isVegan && !isNoDairy) {
+    return "";
+  }
+
+  const veganInstruction = isVegan
+    ? `
+Vegan is selected.
+
+Very important:
+- The recipe must be fully vegan.
+- Do not use meat, fish, eggs, butter, cheese, cream, yoghurt, or honey.
+- Build flavour and substance with vegetables, pulses, grains, nuts, seeds, herbs, and other plant-based ingredients.
+- Keep it appealing and varied, not repetitive or restrictive.
+`
+    : "";
+
+  const noDairyInstruction =
+    !isVegan && isNoDairy
+      ? `
+No dairy is selected.
+
+Very important:
+- Do not use milk, cheese, cream, butter, or yoghurt.
+- Eggs are acceptable unless another preference rules them out.
+- Keep the result practical and fully believable without dairy.
+`
+      : "";
+
+  return `${veganInstruction}${noDairyInstruction}`.trim();
+}
+
+function buildWeekPlanInstruction(
+  weekPlanContext: WeekPlanContext | null | undefined,
+) {
+  if (!weekPlanContext || weekPlanContext.mode !== "plan-week") {
+    return "";
+  }
+
+  const allowMeatInstruction = weekPlanContext.includeMeatIdeas
+    ? `
+Meat ideas are allowed, but keep them restrained.
+
+Important:
+- The week should still feel veg-first.
+- Meat should only appear occasionally and as a supporting addition, not as the whole point of the meal.
+- Do not let the week drift into meat-led planning.
+`
+    : `
+Keep this meal veg-first.
+
+Important:
+- Do not introduce meat or fish.
+- Let vegetables, grains, pulses, herbs, and pantry staples carry the week.
+`;
+
+  return `
+You are helping plan a whole week of meals.
+
+This recipe is meal ${weekPlanContext.mealIndex + 1} of ${weekPlanContext.totalMeals} in that week.
+
+Very important:
+- Most of the week should be led by simple vegetables.
+- The veg box should feel like the foundation of the week.
+- Let grains, pulses, beans, lentils, rice, pasta, couscous, or similar pantry supports help the week feel complete.
+- Use jars, strong sauces, or special flavour products only occasionally.
+- Do not make everything pesto, harissa, or another strong jar-led flavour.
+- The week should feel varied across meal shape, vegetables, texture, and cooking method.
+- Keep the recipes practical, believable, and cookable for a normal week.
+- The result should help shape a basket from a veg box plus a few useful extras.
+
+${allowMeatInstruction}
+`.trim();
+}
+
+function buildPreviousRecipesInstruction(previousRecipes: PreviousRecipe[]) {
+  if (previousRecipes.length === 0) {
+    return "";
+  }
+
+  const formatted = previousRecipes
+    .map((recipe, index) =>
+      `
+Previous meal ${index + 1}:
+Title: ${recipe.title}
+Description: ${recipe.description}
+Ingredients: ${recipe.ingredientsUsed.join(", ")}
+`.trim(),
+    )
+    .join("\n\n");
+
+  return `
+The user has already seen these other ideas in the same week.
+
+${formatted}
+
+Very important:
+- This new idea must feel clearly different from the meals above.
+- Change the meal shape, structure, and main ingredients where sensible.
+- Do not repeat the same title pattern, same finishing flourish, or same basic dish with tiny variations.
+- Keep variety natural and week-friendly.
+`.trim();
+}
+
 function isIngredientMatch(usedIngredient: string, providedItems: string[]) {
   const used = usedIngredient.toLowerCase().trim();
 
@@ -594,6 +716,7 @@ async function requestRecipe(
   preferences: string[],
   previousRecipe: PreviousRecipe | null | undefined,
   isRetry: boolean,
+  weekPlanContext?: WeekPlanContext | null,
 ) {
   const quickStartInstruction = quickStartPromptMap[quickStart] ?? "";
   const preferencesInstruction =
@@ -601,13 +724,23 @@ async function requestRecipe(
       ? `Respect these user preferences where reasonably possible: ${preferences.join(", ")}.`
       : "";
 
-  const mealDirection = pickMealDirection(items, quickStart, previousRecipe);
+  const mealDirection = pickMealDirection(
+    items,
+    quickStart,
+    previousRecipe,
+    weekPlanContext,
+  );
   const produceBoxInstruction = buildProduceBoxInstruction(items);
   const ingredientPriorityInstruction = buildIngredientPriorityInstruction(
     items,
     isRetry,
   );
   const sweetIngredientInstruction = buildSweetIngredientInstruction(items);
+  const dietaryInstruction = buildDietaryInstruction(preferences);
+  const weekPlanInstruction = buildWeekPlanInstruction(weekPlanContext);
+  const previousRecipesInstruction = buildPreviousRecipesInstruction(
+    weekPlanContext?.previousRecipes ?? [],
+  );
 
   const previousRecipeInstruction = previousRecipe
     ? `
@@ -646,10 +779,13 @@ Avoid defaulting to generic fallback ideas unless they are truly the best fit.
 Do not drift into the same obvious pasta, traybake, or bowl every time.
 ${quickStartInstruction}
 ${preferencesInstruction}
+${dietaryInstruction}
 ${produceBoxInstruction}
 ${ingredientPriorityInstruction}
 ${sweetIngredientInstruction}
+${weekPlanInstruction}
 ${previousRecipeInstruction}
+${previousRecipesInstruction}
 
 Return valid JSON only.
     `.trim(),
@@ -710,6 +846,7 @@ async function generateRecipe(
   quickStart: string,
   preferences: string[],
   previousRecipe?: PreviousRecipe | null,
+  weekPlanContext?: WeekPlanContext | null,
 ) {
   const firstRecipe = await requestRecipe(
     client,
@@ -718,6 +855,7 @@ async function generateRecipe(
     preferences,
     previousRecipe,
     false,
+    weekPlanContext,
   );
 
   if (isRecipeGroundedInItems(firstRecipe, items)) {
@@ -731,6 +869,7 @@ async function generateRecipe(
     preferences,
     previousRecipe,
     true,
+    weekPlanContext,
   );
 
   if (isRecipeGroundedInItems(retryRecipe, items)) {
@@ -803,6 +942,42 @@ export async function POST(request: Request) {
           }
         : null;
 
+    const previousRecipes =
+      Array.isArray(body.previousRecipes) && body.previousRecipes.length > 0
+        ? body.previousRecipes
+            .filter(
+              (item: unknown) =>
+                item &&
+                typeof item === "object" &&
+                typeof (item as PreviousRecipe).title === "string" &&
+                typeof (item as PreviousRecipe).description === "string",
+            )
+            .map((item) => ({
+              title: String((item as PreviousRecipe).title).trim(),
+              description: String((item as PreviousRecipe).description).trim(),
+              ingredientsUsed: normaliseList(
+                (item as PreviousRecipe).ingredientsUsed,
+                12,
+              ),
+            }))
+            .slice(0, 8)
+        : [];
+
+    const weekPlanContext =
+      body.weekPlanContext &&
+      typeof body.weekPlanContext === "object" &&
+      body.weekPlanContext.mode === "plan-week" &&
+      typeof body.weekPlanContext.mealIndex === "number" &&
+      typeof body.weekPlanContext.totalMeals === "number"
+        ? {
+            mode: "plan-week" as const,
+            mealIndex: body.weekPlanContext.mealIndex,
+            totalMeals: body.weekPlanContext.totalMeals,
+            includeMeatIdeas: Boolean(body.weekPlanContext.includeMeatIdeas),
+            previousRecipes,
+          }
+        : null;
+
     if (cleanedItems.length === 0) {
       return NextResponse.json(
         { error: "No ingredients were provided." },
@@ -816,6 +991,7 @@ export async function POST(request: Request) {
       quickStart,
       preferences,
       previousRecipe,
+      weekPlanContext,
     );
 
     const imageUrl = await generateRecipeImage(client, recipe.title);

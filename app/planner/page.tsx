@@ -37,6 +37,11 @@ type GeneratedRecipe = {
 
 type PlannerPanelMode = "idea" | "recipes" | null;
 
+type WeekPlanPreviewItem = {
+  day: string;
+  recipe: RecipeLike;
+};
+
 const SAVED_FAVOURITES_KEY = "tlp_saved_favourite_recipes";
 const PLANNER_RECIPES_KEY = "tlp_planner_recipes";
 const WEEKLY_MEALS_KEY = "tlp_weekly_planner_meals";
@@ -71,7 +76,6 @@ const quickStartOptions = [
 
 const preferenceOptions = [
   "Quick meals",
-  "Vegetarian",
   "Vegan",
   "High protein",
   "Family-friendly",
@@ -79,6 +83,27 @@ const preferenceOptions = [
   "No dairy",
   "No nuts",
 ] as const;
+
+const WEEK_PLAN_SEED_SETS = [
+  ["potatoes", "broccoli", "garlic", "lentils"],
+  ["courgette", "tomatoes", "basil", "pasta"],
+  ["carrots", "spinach", "couscous", "chickpeas"],
+  ["peppers", "rice", "beans", "coriander"],
+  ["cauliflower", "orzo", "lemon", "thyme"],
+  ["sweet potato", "kale", "lentils", "lime"],
+  ["mushrooms", "spinach", "rice", "garlic"],
+  ["broccoli", "potatoes", "rosemary", "beans"],
+  ["aubergine", "tomatoes", "couscous", "mint"],
+  ["carrots", "red onion", "farro", "parsley"],
+];
+
+const WEEK_PLAN_UPGRADE_SETS = [
+  ["harissa"],
+  ["pesto"],
+  ["walnuts"],
+  ["almonds"],
+  ["pumpkin seeds"],
+];
 
 function safeRead<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -244,6 +269,78 @@ function RecipeImage({
   );
 }
 
+function dedupeList(items: string[]) {
+  return Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
+}
+
+function buildWeekPlanSeedIngredients({
+  mealIndex,
+  totalMeals,
+  basketIngredients,
+  typedIngredients,
+  includeBasketIngredients,
+  selectedPreferences,
+}: {
+  mealIndex: number;
+  totalMeals: number;
+  basketIngredients: string[];
+  typedIngredients: string[];
+  includeBasketIngredients: boolean;
+  selectedPreferences: string[];
+}) {
+  const base = WEEK_PLAN_SEED_SETS[mealIndex % WEEK_PLAN_SEED_SETS.length] ?? [
+    "potatoes",
+    "greens",
+    "beans",
+    "garlic",
+  ];
+
+  const selectedSet = [...base];
+
+  const shouldAddUpgrade =
+    totalMeals >= 4 &&
+    (mealIndex === Math.max(1, totalMeals - 2) || mealIndex === totalMeals - 1);
+
+  if (shouldAddUpgrade) {
+    const veganSelected = selectedPreferences.includes("Vegan");
+    const noNutsSelected = selectedPreferences.includes("No nuts");
+
+    const upgradePool = WEEK_PLAN_UPGRADE_SETS.filter((set) => {
+      if (noNutsSelected) {
+        return !set.includes("walnuts") && !set.includes("almonds");
+      }
+
+      return true;
+    });
+
+    if (upgradePool.length > 0) {
+      const upgrade =
+        upgradePool[mealIndex % upgradePool.length] ?? upgradePool[0];
+
+      if (veganSelected && upgrade.includes("pesto")) {
+        selectedSet.push("herbs");
+      } else {
+        selectedSet.push(...upgrade);
+      }
+    }
+  }
+
+  if (typedIngredients.length > 0) {
+    const start = mealIndex % typedIngredients.length;
+    selectedSet.push(typedIngredients[start]);
+
+    if (typedIngredients.length > 1) {
+      selectedSet.push(typedIngredients[(start + 1) % typedIngredients.length]);
+    }
+  }
+
+  if (includeBasketIngredients && basketIngredients.length > 0) {
+    selectedSet.push(basketIngredients[mealIndex % basketIngredients.length]);
+  }
+
+  return dedupeList(selectedSet).slice(0, 6);
+}
+
 export default function PlannerPage() {
   const { cart } = useCart();
 
@@ -259,6 +356,7 @@ export default function PlannerPage() {
   const [customIngredients, setCustomIngredients] = useState("");
   const [includeBasketIngredients, setIncludeBasketIngredients] =
     useState(false);
+  const [includeMeatIdeas, setIncludeMeatIdeas] = useState(false);
   const [selectedQuickStart, setSelectedQuickStart] = useState<string>("");
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
   const [generatedRecipe, setGeneratedRecipe] =
@@ -278,9 +376,17 @@ export default function PlannerPage() {
   const [showPreferences, setShowPreferences] = useState(false);
   const [showMethod, setShowMethod] = useState(false);
 
+  const [isPlanningWeek, setIsPlanningWeek] = useState(false);
+  const [weekPlanError, setWeekPlanError] = useState("");
+  const [weekPlanMessage, setWeekPlanMessage] = useState("");
+  const [weekPlanPreview, setWeekPlanPreview] = useState<
+    WeekPlanPreviewItem[] | null
+  >(null);
+
   const ideaPanelRef = useRef<HTMLDivElement | null>(null);
   const recipeLibraryRef = useRef<HTMLDivElement | null>(null);
   const generatedRecipeRef = useRef<HTMLDivElement | null>(null);
+  const weekPlanPreviewRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     try {
@@ -347,6 +453,18 @@ export default function PlannerPage() {
     const timer = window.setTimeout(() => setPaywallMessage(""), 4000);
     return () => window.clearTimeout(timer);
   }, [paywallMessage]);
+
+  useEffect(() => {
+    if (!weekPlanMessage) return;
+    const timer = window.setTimeout(() => setWeekPlanMessage(""), 2800);
+    return () => window.clearTimeout(timer);
+  }, [weekPlanMessage]);
+
+  useEffect(() => {
+    if (selectedPreferences.includes("Vegan")) {
+      setIncludeMeatIdeas(false);
+    }
+  }, [selectedPreferences]);
 
   const basketIngredients = useMemo(() => {
     return Array.from(new Set(cart.map((item) => item.name)));
@@ -416,6 +534,22 @@ export default function PlannerPage() {
       return () => window.clearTimeout(timer);
     }
   }, [generatedRecipe]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.innerWidth >= 768) return;
+
+    if (weekPlanPreview && weekPlanPreviewRef.current) {
+      const timer = window.setTimeout(() => {
+        weekPlanPreviewRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 120);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [weekPlanPreview]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -528,6 +662,10 @@ export default function PlannerPage() {
     return DAYS.find((day) => !weeklyMeals[day]) || null;
   }, [weeklyMeals]);
 
+  const emptyDays = useMemo(() => {
+    return DAYS.filter((day) => !weeklyMeals[day]);
+  }, [weeklyMeals]);
+
   const canClearWeek = plannedCount > 0;
   const shouldShowBasketGuide = plannedCount >= 2;
   const shouldPromoteShop = plannedCount >= 3;
@@ -544,6 +682,9 @@ export default function PlannerPage() {
       : plannedCount >= 2
         ? "Your week is starting to take shape."
         : "Start with one day, then keep going.";
+  const veganSelected = selectedPreferences.includes("Vegan");
+  const weekPlanningButtonLabel =
+    plannedCount <= 1 ? "Plan my week for me" : "Plan the rest of my week";
 
   function persistPlannerRecipes(next: RecipeLike[]) {
     setPlannerRecipes(next);
@@ -606,6 +747,7 @@ export default function PlannerPage() {
     setSelectedDay("Monday");
     setGeneratedRecipe(null);
     setGeneratedImageUrl(null);
+    setWeekPlanPreview(null);
     setStatusMessage("Week cleared");
   }
 
@@ -707,6 +849,147 @@ export default function PlannerPage() {
     } finally {
       setIsGenerating(false);
     }
+  }
+
+  async function handlePlanWeekPreview() {
+    if (!hasPlannerAccess) {
+      setWeekPlanError("");
+      setWeekPlanPreview(null);
+      setPaywallMessage(
+        "Plan my week is part of the full planner. Unlock it, or get it included with a weekly produce box.",
+      );
+      return;
+    }
+
+    if (emptyDays.length === 0) {
+      setWeekPlanError("Your week is already full.");
+      return;
+    }
+
+    try {
+      setIsPlanningWeek(true);
+      setWeekPlanError("");
+      setWeekPlanMessage("");
+      setPaywallMessage("");
+      setWeekPlanPreview(null);
+
+      const previewItems: WeekPlanPreviewItem[] = [];
+      const previousRecipesForWeek: Array<{
+        title: string;
+        description: string;
+        ingredientsUsed: string[];
+      }> = [];
+
+      for (let index = 0; index < emptyDays.length; index += 1) {
+        const day = emptyDays[index];
+        const items = buildWeekPlanSeedIngredients({
+          mealIndex: index,
+          totalMeals: emptyDays.length,
+          basketIngredients,
+          typedIngredients,
+          includeBasketIngredients,
+          selectedPreferences,
+        });
+
+        const response = await fetch("/api/recipe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            items,
+            quickStart: selectedQuickStart,
+            preferences: selectedPreferences,
+            previousRecipe:
+              previousRecipesForWeek.length > 0
+                ? previousRecipesForWeek[previousRecipesForWeek.length - 1]
+                : null,
+            previousRecipes: previousRecipesForWeek,
+            weekPlanContext: {
+              mode: "plan-week",
+              mealIndex: index,
+              totalMeals: emptyDays.length,
+              includeMeatIdeas,
+            },
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not plan the week.");
+        }
+
+        const recipeLike: RecipeLike = {
+          id: `${data.recipe.title}-${day}-${Date.now()}-${index}`,
+          title: data.recipe.title,
+          description: data.recipe.description,
+          imageUrl: data.imageUrl ?? undefined,
+          ingredients: data.recipe.ingredientsUsed,
+          ingredientsUsed: data.recipe.ingredientsUsed,
+          pantryStaples: data.recipe.pantryStaples,
+          steps: data.recipe.steps,
+          basketMatches: data.recipe.ingredientsUsed.map((item: string) => ({
+            title: item,
+            quantity: 1,
+          })),
+          savedAt: new Date().toISOString(),
+          addedToPlannerAt: new Date().toISOString(),
+        };
+
+        previewItems.push({
+          day,
+          recipe: recipeLike,
+        });
+
+        previousRecipesForWeek.push({
+          title: data.recipe.title,
+          description: data.recipe.description,
+          ingredientsUsed: data.recipe.ingredientsUsed,
+        });
+      }
+
+      setWeekPlanPreview(previewItems);
+    } catch (error) {
+      console.error(error);
+      setWeekPlanError(
+        "We couldn’t plan the week just now. Please try again in a moment.",
+      );
+    } finally {
+      setIsPlanningWeek(false);
+    }
+  }
+
+  function handleAddWeekPreviewToPlanner() {
+    if (!weekPlanPreview || weekPlanPreview.length === 0) return;
+
+    const nextMeals = { ...weeklyMeals };
+    const recipesToAdd: RecipeLike[] = [];
+
+    for (const item of weekPlanPreview) {
+      const existing = plannerRecipes.find(
+        (recipe) =>
+          recipe.title === item.recipe.title &&
+          recipe.description === item.recipe.description,
+      );
+
+      const recipeToUse = existing || item.recipe;
+      nextMeals[item.day] = recipeToUse.id;
+
+      if (!existing) {
+        recipesToAdd.push(recipeToUse);
+      }
+    }
+
+    if (recipesToAdd.length > 0) {
+      persistPlannerRecipes([...recipesToAdd, ...plannerRecipes]);
+    }
+
+    persistWeeklyMeals(nextMeals);
+    setWeekPlanPreview(null);
+    setPanelMode(null);
+    setWeekPlanMessage("Week planned");
+    setSelectedDay(firstOpenDay || "Monday");
   }
 
   function buildGeneratedRecipeLike(): RecipeLike | null {
@@ -850,25 +1133,176 @@ export default function PlannerPage() {
                   Next up: {firstOpenDay}
                 </span>
               ) : null}
+
+              {veganSelected ? (
+                <span className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(233,240,228,0.82)] px-3 py-1.5 text-[11px] text-[#213128] sm:text-sm">
+                  Vegan
+                </span>
+              ) : null}
             </div>
 
-            {shouldPromoteShop ? (
-              <Link
-                href="/shop"
-                className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
-              >
-                Build your basket for the week
-              </Link>
-            ) : null}
+            <div className="flex flex-wrap gap-2">
+              {firstOpenDay ? (
+                <button
+                  type="button"
+                  onClick={handlePlanWeekPreview}
+                  disabled={isPlanningWeek}
+                  className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isPlanningWeek
+                    ? "Planning your week..."
+                    : weekPlanningButtonLabel}
+                </button>
+              ) : null}
+
+              {shouldPromoteShop ? (
+                <Link
+                  href="/shop"
+                  className="inline-flex h-9 items-center justify-center rounded-full border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-4 text-sm font-medium text-[#213128] transition hover:bg-white"
+                >
+                  Build your basket for the week
+                </Link>
+              ) : null}
+            </div>
           </div>
 
           <p className="mt-2 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
             {weekProgressText}
           </p>
 
+          {firstOpenDay ? (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setIncludeMeatIdeas((current) => !current)}
+                disabled={veganSelected}
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
+                  includeMeatIdeas && !veganSelected
+                    ? "border-[#213128] bg-[#213128] text-white"
+                    : veganSelected
+                      ? "border-[#dde4d8] bg-[#eef2eb] text-[#8a968e]"
+                      : "border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] text-[#213128] hover:bg-white"
+                }`}
+              >
+                {veganSelected
+                  ? "Vegan week"
+                  : includeMeatIdeas
+                    ? "Including meat ideas"
+                    : "Include meat ideas"}
+              </button>
+
+              <span className="inline-flex items-center rounded-full border border-[#e1e7dd] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
+                Veg boxes first, grains and jars in support
+              </span>
+            </div>
+          ) : null}
+
           {statusMessage ? (
             <div className="mt-2 inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
               {statusMessage}
+            </div>
+          ) : null}
+
+          {weekPlanMessage ? (
+            <div className="mt-2 inline-flex w-fit rounded-full border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-1.5 text-[11px] text-[#425142] sm:text-sm">
+              {weekPlanMessage}
+            </div>
+          ) : null}
+
+          {weekPlanError ? (
+            <div className="mt-2 rounded-[16px] border border-[#e4d8cb] bg-[#fbf6f0] px-3 py-2 text-sm text-[#6a5c4f]">
+              {weekPlanError}
+            </div>
+          ) : null}
+
+          {weekPlanPreview ? (
+            <div
+              ref={weekPlanPreviewRef}
+              className="mt-3 rounded-[18px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-3 sm:rounded-[20px] sm:p-4"
+            >
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                    A simple week to get you started
+                  </p>
+                  <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
+                    Here’s a week you could cook
+                  </h2>
+                  <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+                    Veg-first ideas, with grains and useful extras where they
+                    help.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAddWeekPreviewToPlanner}
+                    className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                  >
+                    Add this week to my planner
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handlePlanWeekPreview}
+                    disabled={isPlanningWeek}
+                    className="inline-flex h-9 items-center justify-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Try another week
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {weekPlanPreview.map((item) => (
+                  <article
+                    key={`${item.day}-${item.recipe.id}`}
+                    className="rounded-[16px] border border-[#dbe2d7] bg-white p-2.5"
+                  >
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                      {item.day}
+                    </p>
+                    <div className="mt-2 flex items-start gap-2.5">
+                      <div className="w-12 shrink-0">
+                        <RecipeImage recipe={item.recipe} compact />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-[#213128]">
+                          {item.recipe.title}
+                        </p>
+                        <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067]">
+                          {item.recipe.description
+                            ? truncate(item.recipe.description, 84)
+                            : "A meal idea for the week."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {item.recipe.ingredientsUsed &&
+                    item.recipe.ingredientsUsed.length > 0 ? (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {item.recipe.ingredientsUsed.slice(0, 4).map((chip) => (
+                          <span
+                            key={`${item.day}-${chip}`}
+                            className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e]"
+                          >
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+
+              <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.84)] px-3 py-2.5">
+                <p className="text-sm font-medium text-[#213128]">
+                  This week should lead naturally into a veg box plus a few
+                  useful extras.
+                </p>
+              </div>
             </div>
           ) : null}
         </section>
