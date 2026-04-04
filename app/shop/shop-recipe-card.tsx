@@ -104,6 +104,26 @@ const FRUIT_KEYWORDS = [
   "avocado",
 ];
 
+const NUT_KEYWORDS = [
+  "nut",
+  "nuts",
+  "almond",
+  "almonds",
+  "cashew",
+  "cashews",
+  "walnut",
+  "walnuts",
+  "pecan",
+  "pecans",
+  "hazelnut",
+  "hazelnuts",
+  "pistachio",
+  "pistachios",
+  "peanut",
+  "peanuts",
+  "mixed nuts",
+];
+
 function normaliseIngredient(value: string) {
   return value
     .toLowerCase()
@@ -122,6 +142,19 @@ function normaliseIngredient(value: string) {
 function looksLikeFruit(value: string) {
   const normalised = normaliseIngredient(value);
   return FRUIT_KEYWORDS.some((keyword) => normalised.includes(keyword));
+}
+
+function looksLikeNutItem(item: ShopDisplayItem) {
+  const searchableText = [
+    item.name,
+    item.description,
+    item.details ?? "",
+    ...(item.weeklyIncludes ?? []),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return NUT_KEYWORDS.some((keyword) => searchableText.includes(keyword));
 }
 
 function normalisePlannerRecipe(value: unknown, index: number): PlannerRecipe {
@@ -191,22 +224,16 @@ function getProductTypeLabel(item: ShopDisplayItem) {
   if (item.category === "boxes") return "Produce box";
   if (item.category === "pantry") return "Gourmet jar";
   if (item.category === "cupboard") return "Pantry staple";
-  if (item.category === "nuts") return "Nuts";
+  if (looksLikeNutItem(item)) return "Nuts";
   return "Extra";
 }
 
 function getProductGroupTitle(item: ShopDisplayItem) {
   if (item.category === "boxes") return "Weekly Fruit & Veg Boxes";
   if (item.category === "pantry") return "Gourmet Jars";
+  if (looksLikeNutItem(item)) return "Nuts";
   if (item.category === "cupboard") return "Pantry Staples";
-  if (item.category === "nuts") return "Nuts";
   return "Extras";
-}
-
-function truncate(text: string, limit: number) {
-  if (!text) return "";
-  if (text.length <= limit) return text;
-  return `${text.slice(0, limit).trim()}…`;
 }
 
 export default function ShopRecipeCard({
