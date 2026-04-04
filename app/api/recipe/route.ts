@@ -74,6 +74,41 @@ const MEAL_DIRECTIONS: MealDirection[] = [
   },
 ];
 
+const PRODUCE_BOX_REFERENCE = {
+  staples: [
+    "potatoes",
+    "carrots",
+    "garlic",
+    "onion",
+    "broccoli",
+    "peppers",
+    "cucumber",
+    "lettuce",
+    "spinach",
+    "banana",
+    "grapes",
+    "apple",
+    "oranges",
+    "kale",
+    "pineapple",
+    "melon",
+    "strawberry",
+    "raspberry",
+    "basil",
+    "coriander",
+    "thyme",
+    "rosemary",
+  ],
+  seasonal: [
+    "jerusalem artichoke",
+    "dragon fruit",
+    "pear",
+    "kiwi",
+    "lemons",
+    "lime",
+  ],
+};
+
 function normaliseList(value: unknown, maxItems: number) {
   if (!Array.isArray(value)) return [];
 
@@ -205,6 +240,59 @@ function pickMealDirection(
   return selected;
 }
 
+function buildProduceBoxInstruction(items: string[]) {
+  const lowerItems = items.map((item) => item.toLowerCase());
+
+  const produceBoxSignals = [
+    "veg box",
+    "vegetable box",
+    "produce box",
+    "fruit and veg box",
+    "fruit box",
+    "weekly box",
+    "mixed box",
+    "local box",
+  ];
+
+  const matchedKnownProduceCount = PRODUCE_BOX_REFERENCE.staples
+    .concat(PRODUCE_BOX_REFERENCE.seasonal)
+    .filter((ingredient) =>
+      lowerItems.some((item) => item.includes(ingredient.toLowerCase())),
+    ).length;
+
+  const mentionsProduceBox = lowerItems.some((item) =>
+    produceBoxSignals.some((signal) => item.includes(signal)),
+  );
+
+  const looksLikeMixedProduceSelection =
+    matchedKnownProduceCount >= 4 || lowerItems.length >= 6;
+
+  if (!mentionsProduceBox && !looksLikeMixedProduceSelection) {
+    return "";
+  }
+
+  return `
+If the ingredients suggest a weekly veg box, produce box, or mixed fruit and veg selection, treat it as a varied local weekly box rather than a narrow set of just a few defaults.
+
+In the background, assume that a typical box can include a broad rotating mix such as:
+${PRODUCE_BOX_REFERENCE.staples.join(", ")}.
+
+Seasonal produce may also appear, such as:
+${PRODUCE_BOX_REFERENCE.seasonal.join(", ")}.
+
+Use that wider produce context quietly in the recipe logic, without mentioning any "box logic" or long ingredient lists in the output.
+
+Important:
+- Do not over-default to leek, apple, and onion-led recipes.
+- Onion and garlic can support a dish, but they should not keep becoming the main idea unless clearly warranted.
+- Vary the hero ingredients across recipes.
+- Sometimes let greens, roots, broccoli, peppers, herbs, cucumber, lettuce, or fruit shape the direction.
+- Seasonal produce should feel normal when relevant, not token or novelty-led.
+- If the box size is larger, think in terms of more quantity, not a different style of ingredients.
+- Keep recipes practical, appealing, and realistic for a normal week.
+`.trim();
+}
+
 async function generateRecipe(
   client: OpenAI,
   items: string[],
@@ -219,6 +307,7 @@ async function generateRecipe(
       : "";
 
   const mealDirection = pickMealDirection(items, quickStart, previousRecipe);
+  const produceBoxInstruction = buildProduceBoxInstruction(items);
 
   const previousRecipeInstruction = previousRecipe
     ? `
@@ -257,6 +346,7 @@ Avoid defaulting to generic fallback ideas unless they are truly the best fit.
 Do not drift into the same obvious pasta, traybake, or bowl every time.
 ${quickStartInstruction}
 ${preferencesInstruction}
+${produceBoxInstruction}
 ${previousRecipeInstruction}
 
 Return valid JSON only.
