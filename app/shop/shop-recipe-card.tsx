@@ -252,6 +252,24 @@ function getWorksWellWith(item: ShopDisplayItem) {
   return ["simple meals", "weekly planning", "easy top-ups"];
 }
 
+function dedupeStrings(values: string[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value.trim();
+    if (!trimmed) continue;
+
+    const key = normaliseIngredient(trimmed);
+    if (!key || seen.has(key)) continue;
+
+    seen.add(key);
+    result.push(trimmed);
+  }
+
+  return result;
+}
+
 export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   const { starterBox, onStartWeeklyBox } = props;
   const { groupedCart, addToCart } = useCart();
@@ -310,17 +328,19 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
       }));
   }, [spotlightProducts]);
 
-  const defaultSelectedProduct = useMemo(() => {
+  const defaultSelectedProducts = useMemo(() => {
     const pantryFirst =
       spotlightProducts.find((item) => item.category === "pantry") ??
       spotlightProducts.find((item) => item.category === "cupboard") ??
       spotlightProducts[0] ??
       null;
 
-    return pantryFirst;
+    return pantryFirst ? [pantryFirst.name] : [];
   }, [spotlightProducts]);
 
-  const [selectedProductName, setSelectedProductName] = useState("");
+  const [selectedProductNames, setSelectedProductNames] = useState<string[]>(
+    [],
+  );
   const [input, setInput] = useState("");
   const [useBasketItems, setUseBasketItems] = useState(true);
   const [quickStart, setQuickStart] = useState("quick-tonight");
@@ -337,22 +357,28 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   const [showMethod, setShowMethod] = useState(false);
 
   useEffect(() => {
-    if (!selectedProductName && defaultSelectedProduct) {
-      setSelectedProductName(defaultSelectedProduct.name);
+    if (
+      selectedProductNames.length === 0 &&
+      defaultSelectedProducts.length > 0
+    ) {
+      setSelectedProductNames(defaultSelectedProducts);
     }
-  }, [defaultSelectedProduct, selectedProductName]);
+  }, [defaultSelectedProducts, selectedProductNames.length]);
 
-  const selectedProduct = useMemo(() => {
-    return (
-      spotlightProducts.find((item) => item.name === selectedProductName) ??
-      defaultSelectedProduct
-    );
-  }, [spotlightProducts, selectedProductName, defaultSelectedProduct]);
+  const selectedProducts = useMemo(() => {
+    const map = new Map(spotlightProducts.map((item) => [item.name, item]));
+    return selectedProductNames
+      .map((name) => map.get(name))
+      .filter((item): item is ShopDisplayItem => Boolean(item));
+  }, [spotlightProducts, selectedProductNames]);
 
-  const selectedProductInBasket = useMemo(() => {
-    if (!selectedProduct) return false;
-    return basketItemNames.includes(selectedProduct.name);
-  }, [basketItemNames, selectedProduct]);
+  const selectedProductCount = selectedProducts.length;
+  const selectedPrimaryProduct = selectedProducts[0] ?? null;
+
+  const selectedProductsInBasket = useMemo(() => {
+    const basketSet = new Set(basketItemNames);
+    return selectedProducts.filter((item) => basketSet.has(item.name));
+  }, [basketItemNames, selectedProducts]);
 
   const starterBoxAlreadyInBasket = useMemo(() => {
     if (!starterBox) return false;
@@ -360,6 +386,16 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   }, [basketItemNames, starterBox]);
 
   const starterBoxIngredients = useMemo(() => {
+    const selectedBox = selectedProducts.find(
+      (item) => item.category === "boxes",
+    );
+
+    if (selectedBox?.weeklyIncludes && selectedBox.weeklyIncludes.length > 0) {
+      return selectedBox.weeklyIncludes
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
     if (starterBox?.weeklyIncludes && starterBox.weeklyIncludes.length > 0) {
       return starterBox.weeklyIncludes
         .map((item) => item.trim())
@@ -367,7 +403,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     }
 
     return DEFAULT_BOX_INGREDIENTS;
-  }, [starterBox]);
+  }, [selectedProducts, starterBox]);
 
   const fruitIngredients = useMemo(() => {
     return starterBoxIngredients.filter(looksLikeFruit);
@@ -415,19 +451,28 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   );
 
   const selectedProductAnchorItems = useMemo(() => {
-    if (!selectedProduct) return [];
+    const anchorItems = selectedProducts.flatMap((item) => {
+      if (item.category === "boxes") {
+        return starterBoxIngredients.slice(0, 10);
+      }
 
-    if (selectedProduct.category === "boxes") {
-      return starterBoxIngredients.slice(0, 10);
-    }
+      return [item.name];
+    });
 
-    return [selectedProduct.name];
-  }, [selectedProduct, starterBoxIngredients]);
+    return dedupeStrings(anchorItems);
+  }, [selectedProducts, starterBoxIngredients]);
 
   const selectedProductWorksWellWith = useMemo(() => {
-    if (!selectedProduct || selectedProduct.category === "boxes") return [];
-    return getWorksWellWith(selectedProduct);
-  }, [selectedProduct]);
+    return dedupeStrings(
+      selectedProducts
+        .filter((item) => item.category !== "boxes")
+        .flatMap((item) => getWorksWellWith(item)),
+    ).slice(0, 6);
+  }, [selectedProducts]);
+
+  const hasSelectedBox = useMemo(() => {
+    return selectedProducts.some((item) => item.category === "boxes");
+  }, [selectedProducts]);
 
   useEffect(() => {
     try {
@@ -483,7 +528,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     setPlannerMessage("");
     setBasketMessage("");
     setShowMethod(false);
-  }, [selectedProductName]);
+  }, [selectedProductNames]);
 
   const isCurrentRecipeSaved = useMemo(() => {
     if (!result?.recipe) return false;
@@ -614,31 +659,53 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   }, [ingredientBreakdown.availableFromShop]);
 
   const helperSummary = useMemo(() => {
-    if (!selectedProduct) return "";
-
     const typedCount = parsedItems.length;
     const basketCount = useBasketItems ? basketItemNames.length : 0;
 
-    if (selectedProduct.category === "boxes") {
-      return `${starterBoxIngredients.slice(0, 8).length} likely box ingredients locked in${
-        typedCount > 0
-          ? ` + ${typedCount} extra item${typedCount === 1 ? "" : "s"}`
-          : ""
-      }${basketCount > 0 ? ` + ${basketCount} basket item${basketCount === 1 ? "" : "s"}` : ""}`;
-    }
+    if (selectedProductCount === 0) return "";
 
-    return `${selectedProduct.name} locked in${
+    const productPart =
+      selectedProductCount === 1
+        ? `${selectedProducts[0].name} locked in`
+        : `${selectedProductCount} selected products locked in`;
+
+    const boxPart = hasSelectedBox
+      ? ` + ${starterBoxIngredients.slice(0, 8).length} likely box ingredients`
+      : "";
+
+    const extraPart =
       typedCount > 0
         ? ` + ${typedCount} extra item${typedCount === 1 ? "" : "s"}`
-        : ""
-    }${basketCount > 0 ? ` + ${basketCount} basket item${basketCount === 1 ? "" : "s"}` : ""}`;
+        : "";
+
+    const basketPart =
+      basketCount > 0
+        ? ` + ${basketCount} basket item${basketCount === 1 ? "" : "s"}`
+        : "";
+
+    return `${productPart}${boxPart}${extraPart}${basketPart}`;
   }, [
     basketItemNames.length,
+    hasSelectedBox,
     parsedItems.length,
-    selectedProduct,
+    selectedProductCount,
+    selectedProducts,
     starterBoxIngredients,
     useBasketItems,
   ]);
+
+  function toggleProductSelection(productName: string) {
+    setSelectedProductNames((current) => {
+      const exists = current.includes(productName);
+
+      if (exists) {
+        const next = current.filter((name) => name !== productName);
+        return next.length > 0 ? next : current;
+      }
+
+      return [...current, productName];
+    });
+  }
 
   async function generateRecipeFromItems(itemsToUse: string[]) {
     setLoading(true);
@@ -649,14 +716,13 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     setBasketMessage("");
     setShowMethod(false);
 
-    const uniqueItems = Array.from(new Set(itemsToUse.filter(Boolean))).slice(
-      0,
-      16,
-    );
+    const uniqueItems = dedupeStrings(itemsToUse).slice(0, 20);
 
     if (uniqueItems.length === 0) {
       setLoading(false);
-      setError("Choose a product or add a few ingredients to get started.");
+      setError(
+        "Choose at least one product or add a few ingredients to start.",
+      );
       return;
     }
 
@@ -676,7 +742,9 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
       const data = (await response.json()) as RecipeResponse;
 
       if (!response.ok) {
-        setError(data.error || "Something went wrong.");
+        setError(
+          data.error || "Something went wrong while generating the recipe.",
+        );
         setLoading(false);
         return;
       }
@@ -690,11 +758,11 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   }
 
   function buildAnchoredItems(extraItems: string[] = []) {
-    return [
+    return dedupeStrings([
       ...selectedProductAnchorItems,
       ...extraItems,
       ...(useBasketItems ? basketItemNames : []),
-    ];
+    ]);
   }
 
   async function handleGenerate() {
@@ -731,9 +799,9 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     setInput(itemsToUse.join(", "));
 
     await generateRecipeFromItems([
+      ...selectedProductAnchorItems,
       ...itemsToUse,
       ...basketItemNames,
-      ...selectedProductAnchorItems,
     ]);
   }
 
@@ -846,24 +914,36 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     setBasketMessage("Matched items added to your basket.");
   }
 
-  function handleAddSelectedProduct() {
-    if (!selectedProduct) return;
+  function handleAddSelectedProducts() {
+    if (selectedProducts.length === 0) return;
 
-    if (selectedProduct.category === "boxes" && onStartWeeklyBox) {
-      onStartWeeklyBox();
-      setProductMessage(`${selectedProduct.name} added to your basket.`);
+    let addedCount = 0;
+    let addedBox = false;
+
+    selectedProducts.forEach((product) => {
+      if (product.category === "boxes" && onStartWeeklyBox && !addedBox) {
+        onStartWeeklyBox();
+        addedCount += 1;
+        addedBox = true;
+        return;
+      }
+
+      addToCart({
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category,
+        checkoutType: product.checkoutType,
+      });
+      addedCount += 1;
+    });
+
+    if (addedCount === 1 && selectedProducts[0]) {
+      setProductMessage(`${selectedProducts[0].name} added to your basket.`);
       return;
     }
 
-    addToCart({
-      name: selectedProduct.name,
-      price: selectedProduct.price,
-      image: selectedProduct.image,
-      category: selectedProduct.category,
-      checkoutType: selectedProduct.checkoutType,
-    });
-
-    setProductMessage(`${selectedProduct.name} added to your basket.`);
+    setProductMessage(`${addedCount} selected products added to your basket.`);
   }
 
   return (
@@ -877,11 +957,12 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         </p>
 
         <h2 className="mt-2 font-serif text-xl leading-tight md:text-3xl">
-          Pick a product, then get an idea.
+          Pick a few products, then get an idea.
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-[#667164]">
-          Choose one thing to anchor the meal, then shape the idea around it.
+          Choose one or more things to cook from, then shape the idea around
+          them.
         </p>
       </div>
 
@@ -889,7 +970,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         <div className="flex flex-col gap-3">
           <div>
             <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-              Choose a product
+              Choose products
             </p>
 
             <div className="mt-2.5 space-y-2">
@@ -901,13 +982,13 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
 
                   <div className="mt-1 flex flex-wrap gap-1.5">
                     {group.items.map((item) => {
-                      const isActive = selectedProduct?.name === item.name;
+                      const isActive = selectedProductNames.includes(item.name);
 
                       return (
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => setSelectedProductName(item.name)}
+                          onClick={() => toggleProductSelection(item.name)}
                           className={`rounded-full border px-2.5 py-1 text-[11px] leading-4 transition sm:px-3 sm:py-1.5 sm:text-[12px] ${
                             isActive
                               ? "border-[#243328] bg-[#243328] font-semibold text-white shadow-[0_3px_8px_rgba(36,51,40,0.12)]"
@@ -924,51 +1005,63 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
             </div>
           </div>
 
-          {selectedProduct ? (
+          {selectedProductCount > 0 ? (
             <div className="overflow-hidden rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] md:rounded-[20px]">
-              <div className="flex items-center gap-3 p-3">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[#e9dfd2] bg-[rgba(255,255,255,0.78)] p-2 md:h-16 md:w-16">
-                  <img
-                    src={selectedProduct.image}
-                    alt={selectedProduct.name}
-                    className="h-full w-full object-contain"
-                  />
+              <div className="p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
+                      Selected products
+                    </p>
+
+                    <h3 className="mt-1 font-serif text-base leading-tight text-[#243328] md:text-lg">
+                      {selectedProductCount === 1
+                        ? selectedProducts[0].name
+                        : `${selectedProductCount} products selected`}
+                    </h3>
+
+                    {selectedProductWorksWellWith.length > 0 ? (
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] leading-5 text-[#7a8478]">
+                        <span>Works well with</span>
+                        {selectedProductWorksWellWith.map((item) => (
+                          <span
+                            key={item}
+                            className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.8)] px-2 py-0.5 text-[10px] text-[#5f675c]"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
+                    {selectedProductCount}
+                  </div>
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-                    {getProductTypeLabel(selectedProduct)}
-                  </p>
-
-                  <h3 className="mt-1 font-serif text-base leading-tight text-[#243328] md:text-lg">
-                    {selectedProduct.name}
-                  </h3>
-
-                  {selectedProduct.category === "boxes" ? (
-                    <p className="mt-1 text-[11px] leading-5 text-[#7a8478]">
-                      Box ingredients stay locked in.
-                    </p>
-                  ) : selectedProductWorksWellWith.length > 0 ? (
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] leading-5 text-[#7a8478]">
-                      <span>Works well with</span>
-                      {selectedProductWorksWellWith.map((item) => (
-                        <span
-                          key={item}
-                          className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.8)] px-2 py-0.5 text-[10px] text-[#5f675c]"
-                        >
-                          {item}
-                        </span>
-                      ))}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {selectedProducts.map((product) => (
+                    <div
+                      key={product.name}
+                      className="inline-flex items-center gap-2 rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.88)] px-3 py-1.5"
+                    >
+                      <span className="text-[11px] text-[#5f675c]">
+                        {getProductTypeLabel(product)}
+                      </span>
+                      <span className="text-sm text-[#243328]">
+                        {product.name}
+                      </span>
                     </div>
-                  ) : null}
+                  ))}
                 </div>
               </div>
 
-              {selectedProduct.category === "boxes" ? (
+              {hasSelectedBox ? (
                 <div className="border-t border-[#e9dfd2] px-3 py-3">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Usually includes
+                      Box ingredients included
                     </p>
                     <p className="text-[10px] text-[#7a8478]">
                       {boxPreviewIngredients.length} shown
@@ -998,7 +1091,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                 >
                   {loading
                     ? "Getting an idea..."
-                    : "What could I make with this?"}
+                    : "What could I make with these?"}
                 </button>
 
                 {productMessage ? (
@@ -1012,7 +1105,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         </div>
       </div>
 
-      {selectedProduct?.category === "boxes" ? (
+      {hasSelectedBox ? (
         <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
@@ -1066,11 +1159,11 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
               Add a few extras if you like
             </label>
 
-            <div className="hidden md:block h-px flex-1 bg-[#ece3d7]" />
+            <div className="hidden h-px flex-1 bg-[#ece3d7] md:block" />
           </div>
 
           <p className="mt-1 text-sm leading-6 text-[#667164]">
-            The product stays fixed. These just shape the idea.
+            Your selected products stay fixed. These just help shape the idea.
           </p>
 
           <input
@@ -1108,13 +1201,15 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
             <button
               type="button"
               onClick={handleGenerate}
-              disabled={loading || !selectedProduct}
+              disabled={loading || selectedProductCount === 0}
               className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
             >
               {loading
                 ? "Getting an idea..."
-                : selectedProduct
-                  ? `Get an idea with ${selectedProduct.name}`
+                : selectedProductCount > 0
+                  ? `Get an idea with ${selectedProductCount} product${
+                      selectedProductCount === 1 ? "" : "s"
+                    }`
                   : "Get an idea"}
             </button>
 
@@ -1241,16 +1336,18 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <button
                   type="button"
-                  onClick={handleAddSelectedProduct}
+                  onClick={handleAddSelectedProducts}
                   className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  {selectedProduct?.category === "boxes"
-                    ? starterBoxAlreadyInBasket
-                      ? "Add weekly box again"
-                      : "Add weekly box"
-                    : selectedProductInBasket
-                      ? `Add another ${selectedProduct?.name}`
-                      : `Add ${selectedProduct?.name} to basket`}
+                  {selectedProductCount === 1
+                    ? selectedPrimaryProduct?.category === "boxes"
+                      ? starterBoxAlreadyInBasket
+                        ? "Add weekly box again"
+                        : "Add weekly box"
+                      : selectedProductsInBasket.length > 0
+                        ? `Add another ${selectedPrimaryProduct?.name}`
+                        : `Add ${selectedPrimaryProduct?.name} to basket`
+                    : `Add selected products to basket`}
                 </button>
 
                 {productMessage ? (
@@ -1269,8 +1366,8 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                     </h4>
                     <p className="mt-2 text-sm leading-6 text-[#5f675c]">
                       We’ve matched the recipe to products already in the shop
-                      where we can. The highlighted product stays at the centre,
-                      then you can top up around it.
+                      where we can. Your selected products stay at the centre,
+                      then you can top up around them.
                     </p>
                   </div>
 
@@ -1326,8 +1423,8 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                   <div className="mt-5 rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.82)] p-4">
                     <p className="text-sm leading-6 text-[#5f675c]">
                       We couldn’t find direct shop matches for this one yet, but
-                      the idea still gives you a useful way to build around{" "}
-                      {selectedProduct?.name}.
+                      the idea still gives you a useful way to build around your
+                      selected products.
                     </p>
                   </div>
                 )}
