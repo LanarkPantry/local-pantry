@@ -72,6 +72,7 @@ const quickStartOptions = [
 const preferenceOptions = [
   "Quick meals",
   "Vegetarian",
+  "Vegan",
   "High protein",
   "Family-friendly",
   "Low waste",
