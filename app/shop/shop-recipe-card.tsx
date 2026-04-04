@@ -252,10 +252,8 @@ function getWorksWellWith(item: ShopDisplayItem) {
   return ["simple meals", "weekly planning", "easy top-ups"];
 }
 
-export default function ShopRecipeCard({
-  starterBox,
-  onStartWeeklyBox,
-}: ShopRecipeCardProps) {
+export default function ShopRecipeCard(props: ShopRecipeCardProps) {
+  const { starterBox, onStartWeeklyBox } = props;
   const { groupedCart, addToCart } = useCart();
 
   const basketItemNames = useMemo(

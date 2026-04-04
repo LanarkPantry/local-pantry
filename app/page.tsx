@@ -9,12 +9,12 @@ export default function HomePage() {
   const totalItems = useMemo(() => cart.length, [cart]);
 
   return (
-    <main className="min-h-screen text-[#243328]">
-      <header className="sticky top-0 z-30 border-b border-[rgba(230,221,210,0.9)] bg-[rgba(244,239,233,0.72)] backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
+    <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
+      <header className="sticky top-0 z-30 border-b border-[rgba(230,221,210,0.92)] bg-[rgba(244,239,233,0.86)] backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 md:px-10">
           <Link
             href="/"
-            className="text-sm tracking-[0.35em] text-[#60705f] hover:text-[#243328]"
+            className="text-[11px] tracking-[0.28em] text-[#60705f] hover:text-[#243328] sm:text-sm"
           >
             THE LOCAL PANTRY
           </Link>
@@ -56,272 +56,228 @@ export default function HomePage() {
             </Link>
           </nav>
 
-          <Link
-            href="/basket"
-            className="hidden rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-white md:inline-flex"
-          >
-            View basket{totalItems > 0 ? ` (${totalItems})` : ""}
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/planner"
+              className="hidden rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 md:inline-flex"
+            >
+              Plan this week
+            </Link>
+
+            <Link
+              href="/basket"
+              className="inline-flex rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm text-[#243328] shadow-sm transition hover:bg-white"
+            >
+              Basket{totalItems > 0 ? ` (${totalItems})` : ""}
+            </Link>
+          </div>
         </div>
       </header>
 
-      <section className="relative min-h-[78vh] overflow-hidden">
+      <section className="relative overflow-hidden">
         <img
           src="/hero.jpg"
           alt="The Local Pantry interior"
           className="absolute inset-0 h-full w-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.34)_38%,rgba(0,0,0,0.56)_100%)]" />
 
-        <div className="relative z-10 mx-auto flex min-h-[78vh] max-w-7xl items-end px-6 pb-14 pt-16 md:px-10 md:pb-20">
-          <div className="max-w-3xl text-white">
-            <p className="text-sm uppercase tracking-[0.25em] text-white/80">
-              Local delivery, week to week
+        <div className="relative z-10 mx-auto flex min-h-[72vh] max-w-7xl items-end px-4 pb-8 pt-10 sm:px-6 md:min-h-[78vh] md:px-10 md:pb-16 md:pt-16">
+          <div className="w-full max-w-3xl text-white">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-white/80 sm:text-sm">
+              Weekly delivery in ML11
             </p>
 
-            <h1 className="mt-4 font-serif text-5xl leading-none tracking-tight text-white/95 md:text-7xl">
+            <h1 className="mt-3 max-w-2xl font-serif text-[2.35rem] leading-[0.95] tracking-tight text-white/95 sm:text-5xl md:mt-4 md:text-7xl">
               A local pantry that helps you plan what to cook.
             </h1>
 
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
-              Weekly produce, a small range of good things, and recipe ideas
-              that help turn what you pick into real meals.
+            <p className="mt-4 max-w-xl text-base leading-7 text-white/90 md:mt-5 md:text-xl md:leading-8">
+              Weekly produce, useful extras, and meal ideas that help you work
+              out the week and build your basket from real food.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
+                href="/planner"
+                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#f5f1ea]"
+              >
+                Plan this week
+              </Link>
+
+              <Link
                 href="/shop"
-                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] shadow-sm transition hover:bg-[#f5f1ea]"
+                className="inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-white/16"
+              >
+                Browse this week&apos;s food
+              </Link>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-white/78">
+              <span>Built from a real local kitchen and delivery service</span>
+              <span className="hidden sm:inline">•</span>
+              <span>Delivery only</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 sm:px-6 md:px-10 md:py-14">
+        <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 backdrop-blur-md md:p-7">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c] sm:text-sm">
+              Start here
+            </p>
+
+            <h2 className="mt-2 max-w-2xl font-serif text-3xl leading-tight md:mt-3 md:text-4xl">
+              Start with the week, then build the basket around it.
+            </h2>
+
+            <p className="mt-3 max-w-2xl leading-7 text-[#5f675c]">
+              The quickest way in is to choose the next meal, add it to a day,
+              then keep shaping the week from there.
+            </p>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
+                <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b776c]">
+                  1
+                </p>
+                <h3 className="mt-2 font-serif text-xl">Choose a day</h3>
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  Start where you need a meal first.
+                </p>
+              </div>
+
+              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
+                <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b776c]">
+                  2
+                </p>
+                <h3 className="mt-2 font-serif text-xl">Get an idea</h3>
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  Use what looks good this week to work out what to cook.
+                </p>
+              </div>
+
+              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
+                <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b776c]">
+                  3
+                </p>
+                <h3 className="mt-2 font-serif text-xl">Add what you need</h3>
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  Build the basket from the meals taking shape.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/planner"
+                className="inline-flex items-center justify-center rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Open the planner
+              </Link>
+
+              <Link
+                href="/recipes"
+                className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+              >
+                Get a meal idea
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 backdrop-blur-md md:p-7">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c] sm:text-sm">
+              Good to know
+            </p>
+
+            <h2 className="mt-2 font-serif text-3xl leading-tight md:mt-3">
+              Local, weekly, and built around real cooking.
+            </h2>
+
+            <div className="mt-5 space-y-3">
+              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
+                <p className="text-sm font-medium text-[#243328]">
+                  ML11 delivery
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  Everything is prepared for local weekly delivery.
+                </p>
+              </div>
+
+              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
+                <p className="text-sm font-medium text-[#243328]">
+                  A smaller, curated shop
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  Weekly produce and a restrained range of useful extras.
+                </p>
+              </div>
+
+              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
+                <p className="text-sm font-medium text-[#243328]">
+                  Planner-only is still there
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  Not local? You can still use the planner on its own.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/shop"
+                className="inline-flex items-center justify-center rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
               >
                 Shop the pantry
               </Link>
 
               <Link
                 href="/planner"
-                className="rounded-full border border-white/40 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
               >
                 Plan your week
               </Link>
             </div>
-
-            <p className="mt-5 text-sm text-white/75">
-              Built from a real local kitchen and delivery service.
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/78">
-              <span>ML11 delivery</span>
-              <span>•</span>
-              <span>Delivery only</span>
-              <span>•</span>
-              <span>Weekly produce and useful extras</span>
-            </div>
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-14 md:px-10 md:py-18">
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              How it works
-            </p>
-
-            <h2 className="mt-3 font-serif text-3xl leading-tight md:text-4xl">
-              Start with the week. Build from there.
-            </h2>
-
-            <p className="mt-4 max-w-2xl leading-7 text-[#5f675c]">
-              Choose a box or a few useful things, get ideas for what to make,
-              then save meals for later or build the basket around them.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-5 backdrop-blur-md">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                1. Pick well
+      <section className="px-4 pb-14 sm:px-6 md:px-10 md:pb-18">
+        <div className="mx-auto max-w-7xl rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 backdrop-blur-md md:p-7">
+          <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+            <div className="max-w-2xl">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c] sm:text-sm">
+                This week
               </p>
-              <h3 className="mt-2 font-serif text-2xl">
-                Pick something to start from
-              </h3>
+
+              <h2 className="mt-2 font-serif text-3xl leading-tight md:mt-3 md:text-4xl">
+                Less browsing. A clearer way to work out dinner.
+              </h2>
+
               <p className="mt-3 leading-7 text-[#5f675c]">
-                Start with a weekly fruit and veg box or a few carefully chosen
-                pantry items.
+                Start with the planner if you want to shape the week. Start with
+                the shop if you already know what you need.
               </p>
             </div>
 
-            <div className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-5 backdrop-blur-md">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                2. Get an idea
-              </p>
-              <h3 className="mt-2 font-serif text-2xl">
-                Work out what to cook
-              </h3>
-              <p className="mt-3 leading-7 text-[#5f675c]">
-                Use recipe ideas and the planner to turn what you have picked
-                into meals you will actually want to make.
-              </p>
-            </div>
-
-            <div className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] p-5 backdrop-blur-md">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                3. Keep it moving
-              </p>
-              <h3 className="mt-2 font-serif text-2xl">Add what you need</h3>
-              <p className="mt-3 leading-7 text-[#5f675c]">
-                Save what you want to cook, top up around it, and keep the
-                week’s food connected to the shop.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-6 pb-14 md:px-10 md:pb-18">
-        <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-[26px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-6 backdrop-blur-md md:p-8">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              What makes it work
-            </p>
-
-            <h2 className="mt-3 max-w-2xl font-serif text-3xl leading-tight md:text-4xl">
-              A local shop that connects properly to what you cook.
-            </h2>
-
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div className="rounded-[20px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.72)] p-5">
-                <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b776c]">
-                  Local-first
-                </p>
-                <p className="mt-2 leading-7 text-[#5f675c]">
-                  A smaller, more thoughtful range — built around real local
-                  delivery.
-                </p>
-              </div>
-
-              <div className="rounded-[20px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.72)] p-5">
-                <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b776c]">
-                  Useful week to week
-                </p>
-                <p className="mt-2 leading-7 text-[#5f675c]">
-                  It helps you plan what to cook without turning food into
-                  admin.
-                </p>
-              </div>
-
-              <div className="rounded-[20px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.72)] p-5">
-                <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b776c]">
-                  Ideas built in
-                </p>
-                <p className="mt-2 leading-7 text-[#5f675c]">
-                  Recipe ideas start from what you have picked, so the shop and
-                  the week stay connected.
-                </p>
-              </div>
-
-              <div className="rounded-[20px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.72)] p-5">
-                <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b776c]">
-                  Curated on purpose
-                </p>
-                <p className="mt-2 leading-7 text-[#5f675c]">
-                  A restrained range keeps things practical, easier to browse,
-                  and easier to come back to each week.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-[26px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-6 backdrop-blur-md md:p-8">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#6b776c]">
-              Getting started
-            </p>
-
-            <h2 className="mt-3 font-serif text-3xl leading-tight">
-              A straightforward way in
-            </h2>
-
-            <div className="mt-5 space-y-4">
-              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.72)] p-4">
-                <p className="text-sm font-medium text-[#243328]">
-                  Weekly box members
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  The weekly box makes it easier to plan meals and build your
-                  shop around them.
-                </p>
-              </div>
-
-              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.72)] p-4">
-                <p className="text-sm font-medium text-[#243328]">
-                  Planner-only path
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  Not local? You can still use the meal planner on its own.
-                </p>
-              </div>
-
-              <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.72)] p-4">
-                <p className="text-sm font-medium text-[#243328]">
-                  Try a few ideas first
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  You can try a few recipe ideas before deciding how you want to
-                  use it regularly.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/planner"
-                className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                className="inline-flex items-center justify-center rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
               >
-                Explore the planner
+                Plan this week
               </Link>
 
               <Link
                 href="/shop"
-                className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+                className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
               >
                 Browse the shop
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-6 pb-16 md:px-10 md:pb-20">
-        <div className="mx-auto max-w-4xl rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-6 backdrop-blur-md md:p-10">
-          <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.2em] text-[#6b776c]">
-              Delivery
-            </p>
-
-            <h2 className="mt-3 font-serif text-3xl md:text-4xl">
-              Local delivery across ML11
-            </h2>
-
-            <p className="mt-4 leading-7 text-[#5f675c]">
-              We deliver weekly across ML11. Everything is prepared for local
-              delivery and ordered through the site.
-            </p>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link
-              href="/shop"
-              className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-            >
-              Shop the pantry
-            </Link>
-
-            <Link
-              href="/planner"
-              className="rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
-            >
-              Plan your week
-            </Link>
           </div>
         </div>
       </section>

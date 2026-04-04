@@ -279,40 +279,45 @@ export default function PlannerPage() {
   const [showMethod, setShowMethod] = useState(false);
 
   useEffect(() => {
-    const rawSaved = safeRead<any[]>(SAVED_FAVOURITES_KEY, []);
-    const rawPlanner = safeRead<any[]>(PLANNER_RECIPES_KEY, []);
-    const rawWeekly = safeRead<WeeklyMeals>(WEEKLY_MEALS_KEY, buildEmptyWeek());
+    try {
+      const rawSaved = safeRead<any[]>(SAVED_FAVOURITES_KEY, []);
+      const rawPlanner = safeRead<any[]>(PLANNER_RECIPES_KEY, []);
+      const rawWeekly = safeRead<WeeklyMeals>(
+        WEEKLY_MEALS_KEY,
+        buildEmptyWeek(),
+      );
 
-    const normalisedSaved = Array.isArray(rawSaved)
-      ? rawSaved.map((item, index) => normalizeRecipe(item, index))
-      : [];
+      const normalisedSaved = Array.isArray(rawSaved)
+        ? rawSaved.map((item, index) => normalizeRecipe(item, index))
+        : [];
 
-    const normalisedPlanner = Array.isArray(rawPlanner)
-      ? rawPlanner.map((item, index) => normalizeRecipe(item, index))
-      : [];
+      const normalisedPlanner = Array.isArray(rawPlanner)
+        ? rawPlanner.map((item, index) => normalizeRecipe(item, index))
+        : [];
 
-    const cleanedWeek = buildEmptyWeek();
-    for (const day of DAYS) {
-      cleanedWeek[day] =
-        typeof rawWeekly?.[day] === "string" ? rawWeekly[day] : null;
+      const cleanedWeek = buildEmptyWeek();
+      for (const day of DAYS) {
+        cleanedWeek[day] =
+          typeof rawWeekly?.[day] === "string" ? rawWeekly[day] : null;
+      }
+
+      setSavedRecipes(normalisedSaved);
+      setPlannerRecipes(normalisedPlanner);
+      setWeeklyMeals(cleanedWeek);
+
+      const firstUnplanned = DAYS.find((day) => !cleanedWeek[day]);
+      if (firstUnplanned) {
+        setSelectedDay(firstUnplanned);
+      }
+
+      const storedAccess = safeRead<string | null>(PLANNER_ACCESS_KEY, null);
+      setHasPlannerAccess(storedAccess === "true");
+
+      const storedUsage = safeRead<number>(FREE_RECIPE_USAGE_KEY, 0);
+      setFreeRecipeUsage(typeof storedUsage === "number" ? storedUsage : 0);
+    } finally {
+      setHasLoaded(true);
     }
-
-    setSavedRecipes(normalisedSaved);
-    setPlannerRecipes(normalisedPlanner);
-    setWeeklyMeals(cleanedWeek);
-
-    const firstUnplanned = DAYS.find((day) => !cleanedWeek[day]);
-    if (firstUnplanned) {
-      setSelectedDay(firstUnplanned);
-    }
-
-    const storedAccess = safeRead<string | null>(PLANNER_ACCESS_KEY, null);
-    setHasPlannerAccess(storedAccess === "true");
-
-    const storedUsage = safeRead<number>(FREE_RECIPE_USAGE_KEY, 0);
-    setFreeRecipeUsage(typeof storedUsage === "number" ? storedUsage : 0);
-
-    setHasLoaded(true);
   }, []);
 
   useEffect(() => {
