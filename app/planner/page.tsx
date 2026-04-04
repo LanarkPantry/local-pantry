@@ -482,6 +482,7 @@ export default function PlannerPage() {
   const canClearWeek = plannedCount > 0;
   const shouldShowBasketGuide = plannedCount >= 2;
   const shouldPromoteShop = plannedCount >= 3;
+  const hasBasketIngredients = basketIngredients.length > 0;
 
   function persistPlannerRecipes(next: RecipeLike[]) {
     setPlannerRecipes(next);
@@ -747,7 +748,7 @@ export default function PlannerPage() {
     <main className="min-h-screen overflow-x-clip text-[#213128]">
       <div className="mx-auto w-full max-w-6xl px-3 pb-5 pt-2 sm:px-6 sm:pb-8 sm:pt-6">
         <section className="rounded-[20px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-3 shadow-[0_8px_24px_rgba(31,43,36,0.05)] backdrop-blur-md sm:rounded-[22px] sm:p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-3xl">
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#758278]">
                 Weekly planner
@@ -756,7 +757,8 @@ export default function PlannerPage() {
                 Work out what to cook this week
               </h1>
               <p className="mt-1 max-w-2xl text-[11px] leading-5 text-[#5d6b62] sm:mt-1.5 sm:text-sm sm:leading-6">
-                Pick a day, choose a meal, then shop what the week needs.
+                Pick a day, choose the next meal, then build the basket around
+                it.
               </p>
             </div>
 
@@ -784,7 +786,7 @@ export default function PlannerPage() {
         </section>
 
         <section className="mt-2.5 rounded-[20px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-3 shadow-[0_8px_24px_rgba(31,43,36,0.05)] backdrop-blur-md sm:mt-3 sm:rounded-[22px] sm:p-5">
-          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
             <div>
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#758278]">
                 This week
@@ -840,7 +842,7 @@ export default function PlannerPage() {
                     onClick={() => setSelectedDay(day)}
                     className={`w-[98px] shrink-0 rounded-[18px] border px-2.5 py-2 text-left transition sm:w-[122px] sm:rounded-2xl sm:px-3 sm:py-2.5 ${
                       isActive
-                        ? "border-[#213128] bg-[#213128] text-white"
+                        ? "border-[#213128] bg-[#213128] text-white shadow-[0_8px_20px_rgba(33,49,40,0.16)]"
                         : isComplete
                           ? "border-[#d5ddd1] bg-[rgba(244,248,241,0.95)] text-[#213128] hover:bg-[rgba(255,255,255,0.92)]"
                           : "border-[#dde4d8] bg-[rgba(251,252,250,0.8)] text-[#213128] hover:bg-[rgba(255,255,255,0.92)]"
@@ -877,21 +879,20 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          <div className="mt-2.5 grid gap-2.5 sm:mt-3 sm:gap-3 lg:grid-cols-[1.02fr_0.98fr]">
-            <div className="rounded-[20px] bg-[rgba(246,248,243,0.84)] p-2.5 sm:rounded-[22px] sm:p-4">
+          <div className="mt-2.5 grid gap-2.5 sm:mt-3 sm:gap-3 lg:grid-cols-[1.04fr_0.96fr]">
+            <div className="rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.9)] p-2.5 sm:rounded-[22px] sm:p-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h3 className="text-[15px] font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                    Working on
+                  </p>
+                  <h3 className="mt-1 text-[16px] font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
                     {selectedDay}
                   </h3>
 
-                  {!activeRecipe && firstOpenDay === selectedDay ? (
+                  {!activeRecipe ? (
                     <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
-                      What are you making?
-                    </p>
-                  ) : !activeRecipe ? (
-                    <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
-                      Nothing in yet.
+                      No meal in yet.
                     </p>
                   ) : (
                     <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
@@ -917,7 +918,7 @@ export default function PlannerPage() {
                     <div className="w-14 shrink-0 sm:w-20">
                       <RecipeImage recipe={activeRecipe} />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-[#213128] sm:text-base">
                         {activeRecipe.title}
                       </p>
@@ -952,7 +953,7 @@ export default function PlannerPage() {
                         setPanelMode("recipes");
                         setShowSaved(false);
                       }}
-                      className="inline-flex h-8.5 items-center justify-center rounded-xl border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
+                      className="inline-flex h-9 w-full items-center justify-center rounded-xl border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9 sm:w-auto"
                     >
                       Change meal
                     </button>
@@ -960,7 +961,7 @@ export default function PlannerPage() {
                     {shouldPromoteShop ? (
                       <Link
                         href="/shop"
-                        className="inline-flex h-8.5 items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 sm:h-9"
+                        className="inline-flex h-9 w-full items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 sm:h-9 sm:w-auto"
                       >
                         Build your basket
                       </Link>
@@ -968,28 +969,30 @@ export default function PlannerPage() {
                   </div>
                 </div>
               ) : (
-                <div className="mt-2 rounded-[18px] border border-[#dbe2d7] bg-white p-3 sm:mt-3 sm:p-3.5">
-                  <p className="text-sm font-medium text-[#213128]">
-                    What are you making?
-                  </p>
-                  <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
-                    Start with an idea or use a favourite.
-                  </p>
+                <div className="mt-2 space-y-2 rounded-[18px] border border-[#dbe2d7] bg-white p-3 sm:mt-3 sm:space-y-2.5 sm:p-3.5">
+                  <div>
+                    <p className="text-sm font-medium text-[#213128]">
+                      Choose the next meal
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
+                      Start with an idea, or use a favourite.
+                    </p>
+                  </div>
 
-                  <div className="mt-2.5 grid grid-cols-2 gap-1.5 sm:gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <button
                       type="button"
                       onClick={() => {
                         setPanelMode("idea");
                         setShowSaved(false);
                       }}
-                      className={`inline-flex h-9 items-center justify-center rounded-xl border px-2 text-[12px] font-medium leading-none transition sm:px-3 sm:text-sm ${
+                      className={`inline-flex h-10 w-full items-center justify-center rounded-xl border px-3 text-sm font-medium leading-none transition ${
                         panelMode === "idea"
                           ? "border-[#213128] bg-[#213128] text-white"
                           : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
                       }`}
                     >
-                      Get an idea
+                      Choose the next meal
                     </button>
 
                     <button
@@ -998,7 +1001,7 @@ export default function PlannerPage() {
                         setPanelMode("recipes");
                         setShowSaved(true);
                       }}
-                      className={`inline-flex h-9 items-center justify-center rounded-xl border px-2 text-[12px] font-medium leading-none transition sm:px-3 sm:text-sm ${
+                      className={`inline-flex h-10 w-full items-center justify-center rounded-xl border px-3 text-sm font-medium leading-none transition ${
                         panelMode === "recipes" && showSaved
                           ? "border-[#213128] bg-[#213128] text-white"
                           : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
@@ -1007,17 +1010,32 @@ export default function PlannerPage() {
                       Use a favourite
                     </button>
                   </div>
+
+                  {hasBasketIngredients ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPanelMode("idea");
+                        setShowSaved(false);
+                        setIncludeBasketIngredients(true);
+                      }}
+                      className="inline-flex h-10 w-full items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(251,252,250,0.92)] px-3 text-sm font-medium text-[#213128] transition hover:bg-white"
+                    >
+                      Use what&apos;s in your basket
+                    </button>
+                  ) : null}
                 </div>
               )}
 
               {!activeRecipe && panelMode === "idea" ? (
-                <div className="mt-2 space-y-2 rounded-[18px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.78)] p-2.5 sm:mt-2.5 sm:space-y-2.5 sm:rounded-[20px] sm:p-3">
+                <div className="mt-2 space-y-2 rounded-[18px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.82)] p-2.5 sm:mt-2.5 sm:space-y-2.5 sm:rounded-[20px] sm:p-3">
                   <div>
                     <p className="text-sm font-medium text-[#213128]">
                       Get an idea for {selectedDay.toLowerCase()}
                     </p>
                     <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-xs sm:leading-5">
-                      Add what you&rsquo;ve got, or pull in your basket.
+                      Add a few ingredients, or pull in what&apos;s already in
+                      your basket.
                     </p>
                   </div>
 
@@ -1076,10 +1094,10 @@ export default function PlannerPage() {
                     />
                     <div className="min-w-0">
                       <p className="text-[13px] font-medium text-[#213128] sm:text-sm">
-                        Use what&rsquo;s already in your basket
+                        Use what&apos;s already in your basket
                       </p>
                       <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:text-xs">
-                        Pull in what&rsquo;s already there and build from it.
+                        Pull in what&apos;s already there and build from it.
                       </p>
                       {includeBasketIngredients &&
                       basketIngredients.length > 0 ? (
@@ -1156,7 +1174,7 @@ export default function PlannerPage() {
                       type="button"
                       onClick={handleGetRecipeIdea}
                       disabled={isGenerating || !hasFreeRecipeAccess}
-                      className="inline-flex h-8.5 items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:h-9"
+                      className="inline-flex h-10 w-full items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:h-9"
                     >
                       {isGenerating
                         ? "Getting an idea..."
@@ -1167,7 +1185,7 @@ export default function PlannerPage() {
 
                     <Link
                       href="/recipes"
-                      className="inline-flex h-8 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3 text-[13px] font-medium text-[#213128] transition hover:bg-white sm:h-9 sm:px-3.5 sm:text-sm"
+                      className="inline-flex h-9 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3 text-[13px] font-medium text-[#213128] transition hover:bg-white sm:h-9 sm:px-3.5 sm:text-sm"
                     >
                       Browse recipes
                     </Link>
@@ -1250,15 +1268,15 @@ export default function PlannerPage() {
                           <button
                             type="button"
                             onClick={handleAddGeneratedToDay}
-                            className="inline-flex h-8.5 items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 sm:h-9"
+                            className="inline-flex h-10 w-full items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 sm:h-9 sm:w-auto"
                           >
-                            Cook this on {selectedDay}
+                            Add to {selectedDay}
                           </button>
 
                           <button
                             type="button"
                             onClick={handleKeepGeneratedInPlanner}
-                            className="inline-flex h-8.5 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3.5 text-sm font-medium text-[#213128] transition hover:bg-white sm:h-9"
+                            className="inline-flex h-9 w-full items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3.5 text-sm font-medium text-[#213128] transition hover:bg-white sm:h-9 sm:w-auto"
                           >
                             Keep for later
                           </button>
@@ -1266,7 +1284,7 @@ export default function PlannerPage() {
                           <button
                             type="button"
                             onClick={handleSaveGeneratedToFavourites}
-                            className="inline-flex h-8.5 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3.5 text-sm font-medium text-[#213128] transition hover:bg-white sm:h-9"
+                            className="inline-flex h-9 w-full items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3.5 text-sm font-medium text-[#213128] transition hover:bg-white sm:h-9 sm:w-auto"
                           >
                             Save to favourites
                           </button>
@@ -1450,7 +1468,7 @@ export default function PlannerPage() {
                         return (
                           <article
                             key={recipe.id}
-                            className="overflow-hidden rounded-[16px] border border-[#e2e8de] bg-[rgba(255,255,255,0.86)] sm:rounded-[18px]"
+                            className="overflow-hidden rounded-[16px] border border-[#e2e8de] bg-[rgba(255,255,255,0.86)] transition hover:bg-white sm:rounded-[18px]"
                           >
                             <div className="flex gap-2 p-2 sm:gap-2.5 sm:p-2.5">
                               <div className="w-10 shrink-0 sm:w-12">
@@ -1496,17 +1514,17 @@ export default function PlannerPage() {
                                   </div>
                                 ) : null}
 
-                                <div className="mt-1.5 flex flex-wrap gap-1.5 sm:mt-2">
+                                <div className="mt-1.5 grid grid-cols-1 gap-1.5 sm:mt-2 sm:flex sm:flex-wrap">
                                   <button
                                     type="button"
                                     onClick={() =>
                                       assignRecipeToSelectedDay(recipe)
                                     }
-                                    className="inline-flex h-8 items-center rounded-xl bg-[#213128] px-3 text-[11px] font-medium text-white transition hover:opacity-95 sm:h-8.5 sm:text-sm"
+                                    className="inline-flex h-9 w-full items-center justify-center rounded-xl bg-[#213128] px-3 text-[11px] font-medium text-white transition hover:opacity-95 sm:h-8.5 sm:w-auto sm:text-sm"
                                   >
                                     {isAssignedToSelectedDay
                                       ? `${selectedDay} sorted`
-                                      : `Cook this on ${selectedDay}`}
+                                      : `Add to ${selectedDay}`}
                                   </button>
 
                                   {showSaved ? (
@@ -1514,7 +1532,7 @@ export default function PlannerPage() {
                                       type="button"
                                       onClick={() => addRecipeToPlanner(recipe)}
                                       disabled={inPlanner}
-                                      className={`inline-flex h-8 items-center rounded-xl px-3 text-[11px] font-medium transition sm:h-8.5 sm:text-sm ${
+                                      className={`inline-flex h-9 w-full items-center justify-center rounded-xl px-3 text-[11px] font-medium transition sm:h-8.5 sm:w-auto sm:text-sm ${
                                         inPlanner
                                           ? "bg-[#eef2eb] text-[#7d897f]"
                                           : "border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] text-[#213128] hover:bg-white"
@@ -1530,7 +1548,7 @@ export default function PlannerPage() {
                                       onClick={() =>
                                         removeRecipeFromPlanner(recipe.id)
                                       }
-                                      className="inline-flex h-8 items-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3 text-[11px] font-medium text-[#213128] transition hover:bg-white sm:h-8.5 sm:text-sm"
+                                      className="inline-flex h-9 w-full items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3 text-[11px] font-medium text-[#213128] transition hover:bg-white sm:h-8.5 sm:w-auto sm:text-sm"
                                     >
                                       Remove
                                     </button>
