@@ -532,6 +532,18 @@ export default function PlannerPage() {
   const shouldShowBasketGuide = plannedCount >= 2;
   const shouldPromoteShop = plannedCount >= 3;
   const hasBasketIngredients = basketIngredients.length > 0;
+  const weekProgressLabel =
+    plannedCount === 0
+      ? "Nothing planned yet"
+      : plannedCount === 1
+        ? "1 meal sorted"
+        : `${plannedCount} meals sorted`;
+  const weekProgressText =
+    plannedCount >= 3
+      ? "Your week is taking shape. Build the basket around what you’re actually cooking."
+      : plannedCount >= 2
+        ? "Your week is starting to take shape."
+        : "Start with one day, then keep going.";
 
   function persistPlannerRecipes(next: RecipeLike[]) {
     setPlannerRecipes(next);
@@ -827,6 +839,33 @@ export default function PlannerPage() {
             </div>
           </div>
 
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
+                {weekProgressLabel}
+              </span>
+
+              {firstOpenDay ? (
+                <span className="inline-flex w-fit rounded-full border border-[#e1e7dd] bg-[rgba(246,248,243,0.9)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
+                  Next up: {firstOpenDay}
+                </span>
+              ) : null}
+            </div>
+
+            {shouldPromoteShop ? (
+              <Link
+                href="/shop"
+                className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+              >
+                Build your basket for the week
+              </Link>
+            ) : null}
+          </div>
+
+          <p className="mt-2 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+            {weekProgressText}
+          </p>
+
           {statusMessage ? (
             <div className="mt-2 inline-flex w-fit rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm">
               {statusMessage}
@@ -960,6 +999,36 @@ export default function PlannerPage() {
                   </button>
                 ) : null}
               </div>
+
+              {plannedCount >= 2 ? (
+                <div className="mt-2 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.8)] px-3 py-2.5">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                        Week taking shape
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#213128]">
+                        {weekProgressLabel}
+                      </p>
+                    </div>
+
+                    {shouldPromoteShop ? (
+                      <Link
+                        href="/shop"
+                        className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95"
+                      >
+                        Build your basket
+                      </Link>
+                    ) : null}
+                  </div>
+
+                  <p className="mt-1.5 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+                    {shouldPromoteShop
+                      ? "You’ve got enough shape to start building the basket around your meals."
+                      : "Keep going day by day and the basket guide will start to help."}
+                  </p>
+                </div>
+              ) : null}
 
               {activeRecipe ? (
                 <div className="mt-2 rounded-[18px] border border-[#dbe2d7] bg-white p-2.5 sm:mt-3 sm:p-3">
