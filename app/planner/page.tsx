@@ -56,12 +56,12 @@ const DAYS = [
 
 const quickStartOptions = [
   {
-    id: "quick-tonight",
+    id: "easy-dinner",
     label: "Easy dinner",
   },
   {
-    id: "comforting",
-    label: "Comforting",
+    id: "hearty",
+    label: "Hearty",
   },
   {
     id: "use-what-ive-got",
@@ -496,7 +496,7 @@ export default function PlannerPage() {
     if (!activeRecipe) {
       return {
         title: `${selectedDay} is still open`,
-        body: "Start with an idea, or pick something you've already saved.",
+        body: "Start with an idea, or use something you've already saved.",
       };
     }
 
@@ -871,11 +871,11 @@ export default function PlannerPage() {
                 This week
               </p>
               <h2 className="mt-1 text-sm font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-lg">
-                Pick your next meal
+                Choose the next meal
               </h2>
               <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm">
-                The simplest flow is: get an idea, add it to a day, then shop
-                what the week needs.
+                Start with an idea, add it to a day, then shop what the week
+                needs.
               </p>
             </div>
 
@@ -1000,7 +1000,7 @@ export default function PlannerPage() {
                       }}
                       className="inline-flex h-8.5 items-center rounded-full border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
                     >
-                      Pick from favourites
+                      Use a favourite
                     </button>
                   </>
                 ) : (
@@ -1046,11 +1046,11 @@ export default function PlannerPage() {
                   </p>
                 ) : !activeRecipe ? (
                   <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
-                    Nothing planned yet.
+                    No meal in yet.
                   </p>
                 ) : (
                   <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
-                    This meal is in place.
+                    This day is sorted.
                   </p>
                 )}
               </div>
@@ -1111,16 +1111,16 @@ export default function PlannerPage() {
               ) : (
                 <div className="mt-2 rounded-[16px] border border-dashed border-[#d8dfd3] bg-[rgba(255,255,255,0.74)] px-3 py-2.5">
                   <p className="text-sm font-medium text-[#213128]">
-                    Nothing planned yet
+                    No meal in yet
                   </p>
                   <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
-                    Start with an idea or pick something from your favourites.
+                    Start with an idea or use a favourite.
                   </p>
                 </div>
               )}
 
-              <div className="mt-2.5 border-t border-[#e1e7dd] pt-2.5 sm:mt-3 sm:pt-3">
-                <div className="grid grid-cols-2 gap-2">
+              <div className="mt-2 border-t border-[#e1e7dd] pt-2 sm:mt-2.5 sm:pt-2.5">
+                <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                   <button
                     type="button"
                     onClick={() =>
@@ -1128,7 +1128,7 @@ export default function PlannerPage() {
                         current === "idea" ? null : "idea",
                       )
                     }
-                    className={`inline-flex h-8.5 items-center justify-center rounded-xl border px-3 text-[13px] font-medium transition sm:h-9 sm:text-sm ${
+                    className={`inline-flex h-8.5 items-center justify-center rounded-xl border px-2 text-[12px] font-medium leading-none transition sm:h-9 sm:px-3 sm:text-sm ${
                       panelMode === "idea"
                         ? "border-[#213128] bg-[#213128] text-white"
                         : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
@@ -1145,7 +1145,7 @@ export default function PlannerPage() {
                       );
                       setShowSaved(true);
                     }}
-                    className={`inline-flex h-8.5 items-center justify-center rounded-xl border px-3 text-[13px] font-medium transition sm:h-9 sm:text-sm ${
+                    className={`inline-flex h-8.5 items-center justify-center rounded-xl border px-2 text-[12px] font-medium leading-none transition sm:h-9 sm:px-3 sm:text-sm ${
                       panelMode === "recipes" && showSaved
                         ? "border-[#213128] bg-[#213128] text-white"
                         : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
@@ -1153,19 +1153,19 @@ export default function PlannerPage() {
                   >
                     {panelMode === "recipes" && showSaved
                       ? "Favourites open"
-                      : "Pick from favourites"}
+                      : "Use a favourite"}
                   </button>
                 </div>
 
                 {panelMode === "idea" ? (
-                  <div className="mt-2.5 space-y-2 rounded-[18px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.78)] p-2.5 sm:mt-3 sm:space-y-2.5 sm:rounded-[20px] sm:p-3">
+                  <div className="mt-2 space-y-2 rounded-[18px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.78)] p-2.5 sm:mt-2.5 sm:space-y-2.5 sm:rounded-[20px] sm:p-3">
                     <div>
                       <p className="text-sm font-medium text-[#213128]">
                         Get an idea for {selectedDay.toLowerCase()}
                       </p>
                       <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-xs sm:leading-5">
                         Add what you’ve got, pull in your basket if useful, then
-                        place the meal into the week.
+                        place it into the week.
                       </p>
                     </div>
 
@@ -1472,7 +1472,7 @@ export default function PlannerPage() {
                 ) : null}
               </div>
 
-              <div className="mt-2.5 rounded-[18px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.78)] p-2.5 sm:mt-3 sm:p-3 md:hidden">
+              <div className="mt-2 rounded-[18px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.78)] p-2.5 sm:mt-2.5 sm:p-3 md:hidden">
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
@@ -1523,7 +1523,7 @@ export default function PlannerPage() {
                     Recipe library
                   </p>
                   <h3 className="mt-1 text-sm font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-base">
-                    Add into {selectedDay}
+                    Add to {selectedDay}
                   </h3>
                 </div>
 
