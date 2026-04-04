@@ -894,14 +894,14 @@ export default function ShopRecipeCard({
               Choose a product
             </p>
 
-            <div className="mt-3 space-y-2.5">
+            <div className="mt-2.5 space-y-2">
               {productGroups.map((group) => (
                 <div key={group.key}>
                   <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#7a8478]">
                     {group.title}
                   </p>
 
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <div className="mt-1 flex flex-wrap gap-1.5">
                     {group.items.map((item) => {
                       const isActive = selectedProduct?.name === item.name;
 
@@ -910,10 +910,10 @@ export default function ShopRecipeCard({
                           key={item.name}
                           type="button"
                           onClick={() => setSelectedProductName(item.name)}
-                          className={`rounded-full border px-3 py-1.5 text-[12px] leading-5 transition sm:px-3.5 sm:text-[13px] ${
+                          className={`rounded-full border px-2.5 py-1 text-[11px] leading-4 transition sm:px-3 sm:py-1.5 sm:text-[12px] ${
                             isActive
-                              ? "border-[#243328] bg-[#243328] font-semibold text-white shadow-[0_4px_10px_rgba(36,51,40,0.14)]"
-                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.92)] font-medium text-[#243328] hover:bg-white"
+                              ? "border-[#243328] bg-[#243328] font-semibold text-white shadow-[0_3px_8px_rgba(36,51,40,0.12)]"
+                              : "border-[#ddd4c8] bg-[rgba(255,255,255,0.92)] font-medium text-[#4f5c50] hover:border-[#cfc4b6] hover:bg-white hover:text-[#243328]"
                           }`}
                         >
                           {item.name}
