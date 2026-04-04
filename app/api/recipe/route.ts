@@ -952,7 +952,7 @@ export async function POST(request: Request) {
                 typeof (item as PreviousRecipe).title === "string" &&
                 typeof (item as PreviousRecipe).description === "string",
             )
-            .map((item) => ({
+            .map((item: unknown) => ({
               title: String((item as PreviousRecipe).title).trim(),
               description: String((item as PreviousRecipe).description).trim(),
               ingredientsUsed: normaliseList(
