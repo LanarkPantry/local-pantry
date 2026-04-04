@@ -236,6 +236,22 @@ function getProductGroupTitle(item: ShopDisplayItem) {
   return "Extras";
 }
 
+function getWorksWellWith(item: ShopDisplayItem) {
+  if (item.category === "pantry") {
+    return ["toast", "crackers", "roast veg"];
+  }
+
+  if (looksLikeNutItem(item)) {
+    return ["porridge", "yoghurt", "snacking"];
+  }
+
+  if (item.category === "cupboard") {
+    return ["pasta", "soups", "traybakes"];
+  }
+
+  return ["simple meals", "weekly planning", "easy top-ups"];
+}
+
 export default function ShopRecipeCard({
   starterBox,
   onStartWeeklyBox,
@@ -409,6 +425,11 @@ export default function ShopRecipeCard({
 
     return [selectedProduct.name];
   }, [selectedProduct, starterBoxIngredients]);
+
+  const selectedProductWorksWellWith = useMemo(() => {
+    if (!selectedProduct || selectedProduct.category === "boxes") return [];
+    return getWorksWellWith(selectedProduct);
+  }, [selectedProduct]);
 
   useEffect(() => {
     try {
@@ -850,7 +871,7 @@ export default function ShopRecipeCard({
   return (
     <section
       id="shop-recipe-card"
-      className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md md:rounded-[28px] md:p-5"
+      className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md md:rounded-[28px] md:p-5"
     >
       <div className="max-w-2xl">
         <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
@@ -858,30 +879,29 @@ export default function ShopRecipeCard({
         </p>
 
         <h2 className="mt-2 font-serif text-xl leading-tight md:text-3xl">
-          Pick a product, then see what you could make with it.
+          Pick a product, then get an idea.
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-[#667164]">
-          Start with one thing you want to highlight, show a useful recipe idea,
-          then let people try another without losing the product.
+          Choose one thing to anchor the meal, then shape the idea around it.
         </p>
       </div>
 
       <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <div>
             <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
               Choose a product
             </p>
 
-            <div className="mt-3 space-y-3">
+            <div className="mt-3 space-y-2.5">
               {productGroups.map((group) => (
                 <div key={group.key}>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7a8478]">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#7a8478]">
                     {group.title}
                   </p>
 
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {group.items.map((item) => {
                       const isActive = selectedProduct?.name === item.name;
 
@@ -890,10 +910,10 @@ export default function ShopRecipeCard({
                           key={item.name}
                           type="button"
                           onClick={() => setSelectedProductName(item.name)}
-                          className={`rounded-full border px-3 py-1.5 text-[12px] font-medium leading-5 transition sm:px-3.5 sm:py-2 sm:text-[13px] ${
+                          className={`rounded-full border px-3 py-1.5 text-[12px] leading-5 transition sm:px-3.5 sm:text-[13px] ${
                             isActive
-                              ? "border-[#243328] bg-[#243328] text-white"
-                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.92)] text-[#243328] hover:bg-white"
+                              ? "border-[#243328] bg-[#243328] font-semibold text-white shadow-[0_4px_10px_rgba(36,51,40,0.14)]"
+                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.92)] font-medium text-[#243328] hover:bg-white"
                           }`}
                         >
                           {item.name}
@@ -908,8 +928,8 @@ export default function ShopRecipeCard({
 
           {selectedProduct ? (
             <div className="overflow-hidden rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] md:rounded-[20px]">
-              <div className="flex items-center gap-3 p-3 md:p-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[14px] border border-[#e9dfd2] bg-[rgba(255,255,255,0.78)] p-2 md:h-20 md:w-20 md:rounded-[16px]">
+              <div className="flex items-center gap-3 p-3">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[#e9dfd2] bg-[rgba(255,255,255,0.78)] p-2 md:h-16 md:w-16">
                   <img
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
@@ -922,27 +942,35 @@ export default function ShopRecipeCard({
                     {getProductTypeLabel(selectedProduct)}
                   </p>
 
-                  <h3 className="mt-1 font-serif text-lg leading-tight text-[#243328] md:text-xl">
+                  <h3 className="mt-1 font-serif text-base leading-tight text-[#243328] md:text-lg">
                     {selectedProduct.name}
                   </h3>
 
                   {selectedProduct.category === "boxes" ? (
-                    <p className="mt-1 text-xs leading-5 text-[#7a8478]">
-                      Box ingredients stay locked in for recipe ideas.
+                    <p className="mt-1 text-[11px] leading-5 text-[#7a8478]">
+                      Box ingredients stay locked in.
                     </p>
-                  ) : (
-                    <p className="mt-1 text-xs leading-5 text-[#7a8478]">
-                      This stays at the centre of each idea you try.
-                    </p>
-                  )}
+                  ) : selectedProductWorksWellWith.length > 0 ? (
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] leading-5 text-[#7a8478]">
+                      <span>Works well with</span>
+                      {selectedProductWorksWellWith.map((item) => (
+                        <span
+                          key={item}
+                          className="rounded-full border border-[#e5ddcf] bg-[rgba(255,255,255,0.8)] px-2 py-0.5 text-[10px] text-[#5f675c]"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               </div>
 
               {selectedProduct.category === "boxes" ? (
-                <div className="border-t border-[#e9dfd2] px-3 py-3 md:px-4 md:py-4">
+                <div className="border-t border-[#e9dfd2] px-3 py-3">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Usually includes things like
+                      Usually includes
                     </p>
                     <p className="text-[10px] text-[#7a8478]">
                       {boxPreviewIngredients.length} shown
@@ -963,7 +991,7 @@ export default function ShopRecipeCard({
                 </div>
               ) : null}
 
-              <div className="border-t border-[#e9dfd2] px-3 py-3 md:px-4 md:py-4">
+              <div className="border-t border-[#e9dfd2] px-3 py-3">
                 <button
                   type="button"
                   onClick={handleGenerate}
@@ -988,12 +1016,12 @@ export default function ShopRecipeCard({
 
       {selectedProduct?.category === "boxes" ? (
         <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
               <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
                 Quick box starts
               </p>
-              <p className="mt-2 text-sm font-medium text-[#243328] md:text-base">
+              <p className="mt-1.5 text-sm font-medium text-[#243328] md:text-base">
                 Start from the box and nudge the idea in a useful direction.
               </p>
             </div>
@@ -1032,15 +1060,19 @@ export default function ShopRecipeCard({
 
       <div className="mt-4 grid gap-4">
         <div className="rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-3 md:rounded-[22px] md:p-4">
-          <label
-            htmlFor="shop-recipe-input"
-            className="block text-sm font-medium text-[#243328]"
-          >
-            Add a few extras if you like
-          </label>
+          <div className="flex items-center justify-between gap-3">
+            <label
+              htmlFor="shop-recipe-input"
+              className="block text-sm font-medium text-[#243328]"
+            >
+              Add a few extras if you like
+            </label>
+
+            <div className="hidden md:block h-px flex-1 bg-[#ece3d7]" />
+          </div>
 
           <p className="mt-1 text-sm leading-6 text-[#667164]">
-            The product stays locked in. These just help shape the idea.
+            The product stays fixed. These just shape the idea.
           </p>
 
           <input
@@ -1052,7 +1084,7 @@ export default function ShopRecipeCard({
             className="mt-3 w-full rounded-[18px] border border-[#d6cec2] bg-[rgba(255,255,255,0.88)] px-4 py-3 text-sm text-[#243328] outline-none placeholder:text-[#7b8478] focus:border-[#a9b2a3]"
           />
 
-          <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="mt-3 flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
             <label className="inline-flex items-center gap-3 text-sm text-[#243328]">
               <input
                 type="checkbox"
@@ -1074,7 +1106,7 @@ export default function ShopRecipeCard({
             </select>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="mt-3 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
             <button
               type="button"
               onClick={handleGenerate}
@@ -1167,7 +1199,7 @@ export default function ShopRecipeCard({
                   disabled={loading}
                   className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328] disabled:opacity-60"
                 >
-                  Try another
+                  Try another idea
                 </button>
               </div>
 
