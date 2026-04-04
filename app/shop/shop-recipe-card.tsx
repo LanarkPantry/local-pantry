@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
 import { allShopItems, type ShopDisplayItem } from "./shop-data";
@@ -273,6 +273,7 @@ function dedupeStrings(values: string[]) {
 export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   const { starterBox, onStartWeeklyBox } = props;
   const { groupedCart, addToCart } = useCart();
+  const recipeResultRef = useRef<HTMLDivElement | null>(null);
 
   const basketItemNames = useMemo(
     () => groupedCart.map((entry) => entry.item.name),
@@ -501,6 +502,19 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     setBasketMessage("");
     setShowMethod(false);
   }, [selectedProductNames]);
+
+  useEffect(() => {
+    if (!result?.recipe || !recipeResultRef.current) return;
+
+    const timeout = window.setTimeout(() => {
+      recipeResultRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 120);
+
+    return () => window.clearTimeout(timeout);
+  }, [result?.recipe?.title]);
 
   const isCurrentRecipeSaved = useMemo(() => {
     if (!result?.recipe) return false;
@@ -1265,7 +1279,10 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         </div>
 
         {result?.recipe ? (
-          <div className="overflow-hidden rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] md:rounded-[24px]">
+          <div
+            ref={recipeResultRef}
+            className="overflow-hidden rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] md:rounded-[24px]"
+          >
             {result.imageUrl ? (
               <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.64)] p-3 md:p-4">
                 <div className="overflow-hidden rounded-[18px] bg-[rgba(248,244,238,0.82)] md:rounded-[20px]">
