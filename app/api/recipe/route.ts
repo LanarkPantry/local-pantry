@@ -109,6 +109,26 @@ const PRODUCE_BOX_REFERENCE = {
   ],
 };
 
+const COMMON_NON_PANTRY_SUPPORT_INGREDIENTS = [
+  "lemon",
+  "lime",
+  "herbs",
+  "parsley",
+  "chilli",
+  "cheese",
+  "yoghurt",
+  "cream",
+  "stock",
+  "bread",
+  "pasta",
+  "rice",
+  "orzo",
+  "couscous",
+  "lentils",
+  "beans",
+  "eggs",
+];
+
 function normaliseList(value: unknown, maxItems: number) {
   if (!Array.isArray(value)) return [];
 
@@ -293,12 +313,80 @@ Important:
 `.trim();
 }
 
-async function generateRecipe(
+function buildIngredientPriorityInstruction(items: string[], isRetry: boolean) {
+  const joinedItems = items.join(", ");
+
+  return `
+The provided ingredients are the anchor for this recipe: ${joinedItems}.
+
+Very important:
+- Centre the recipe on the ingredients the user actually provided.
+- The main idea must come from those provided ingredients, not from substitute produce.
+- Do not swap in unrelated fruit or vegetables just because they are common in a weekly box.
+- If the user gives fruit, nuts, dairy, herbs, or dessert-leaning ingredients, follow that lead rather than forcing a savoury veg-box idea.
+- Onion, leek, carrot, and apple are not default hero ingredients unless the user actually provided them or they are truly essential.
+- Ingredients used should mostly come directly from the provided items, with only a small number of sensible supporting additions if needed.
+- Never replace obvious hero ingredients such as raspberry, banana, cream, or walnut with unrelated produce.
+
+${
+  isRetry
+    ? `Your previous attempt drifted away from the provided ingredients. This retry must stay much closer to them and must not introduce a different produce-led idea.`
+    : ""
+}
+`.trim();
+}
+
+function isRecipeGroundedInItems(recipe: GeneratedRecipe, items: string[]) {
+  const normalisedItems = items.map((item) => item.toLowerCase());
+  const normalisedUsed = recipe.ingredientsUsed.map((item) =>
+    item.toLowerCase(),
+  );
+
+  let directMatches = 0;
+  let unsupportedIngredients = 0;
+
+  for (const used of normalisedUsed) {
+    const matchesProvided = normalisedItems.some(
+      (item) => item.includes(used) || used.includes(item),
+    );
+
+    if (matchesProvided) {
+      directMatches += 1;
+      continue;
+    }
+
+    const isCommonSupport = COMMON_NON_PANTRY_SUPPORT_INGREDIENTS.some(
+      (support) => used.includes(support) || support.includes(used),
+    );
+
+    if (!isCommonSupport) {
+      unsupportedIngredients += 1;
+    }
+  }
+
+  const titleAndDescription =
+    `${recipe.title} ${recipe.description}`.toLowerCase();
+
+  const mentionsProvidedHero = normalisedItems.some(
+    (item) => item.length > 2 && titleAndDescription.includes(item),
+  );
+
+  if (normalisedItems.length <= 4) {
+    return (
+      directMatches >= 2 && unsupportedIngredients <= 1 && mentionsProvidedHero
+    );
+  }
+
+  return directMatches >= 3 && unsupportedIngredients <= 2;
+}
+
+async function requestRecipe(
   client: OpenAI,
   items: string[],
   quickStart: string,
   preferences: string[],
-  previousRecipe?: PreviousRecipe | null,
+  previousRecipe: PreviousRecipe | null | undefined,
+  isRetry: boolean,
 ) {
   const quickStartInstruction = quickStartPromptMap[quickStart] ?? "";
   const preferencesInstruction =
@@ -308,6 +396,10 @@ async function generateRecipe(
 
   const mealDirection = pickMealDirection(items, quickStart, previousRecipe);
   const produceBoxInstruction = buildProduceBoxInstruction(items);
+  const ingredientPriorityInstruction = buildIngredientPriorityInstruction(
+    items,
+    isRetry,
+  );
 
   const previousRecipeInstruction = previousRecipe
     ? `
@@ -347,6 +439,7 @@ Do not drift into the same obvious pasta, traybake, or bowl every time.
 ${quickStartInstruction}
 ${preferencesInstruction}
 ${produceBoxInstruction}
+${ingredientPriorityInstruction}
 ${previousRecipeInstruction}
 
 Return valid JSON only.
@@ -400,6 +493,36 @@ Meal direction: ${mealDirection.label}
   }
 
   return recipe;
+}
+
+async function generateRecipe(
+  client: OpenAI,
+  items: string[],
+  quickStart: string,
+  preferences: string[],
+  previousRecipe?: PreviousRecipe | null,
+) {
+  const firstRecipe = await requestRecipe(
+    client,
+    items,
+    quickStart,
+    preferences,
+    previousRecipe,
+    false,
+  );
+
+  if (isRecipeGroundedInItems(firstRecipe, items)) {
+    return firstRecipe;
+  }
+
+  return requestRecipe(
+    client,
+    items,
+    quickStart,
+    preferences,
+    previousRecipe,
+    true,
+  );
 }
 
 async function generateRecipeImage(client: OpenAI, recipeTitle: string) {
