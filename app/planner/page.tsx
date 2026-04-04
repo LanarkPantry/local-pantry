@@ -727,18 +727,12 @@ export default function PlannerPage() {
                   Weekly planner
                 </p>
                 <h1 className="mt-1 text-base font-semibold tracking-[-0.03em] text-[#1f2b24] sm:text-4xl">
-                  Plan your week
+                  Plan what to cook this week
                 </h1>
                 <p className="mt-1 max-w-2xl text-[11px] leading-5 text-[#5d6b62] sm:mt-1.5 sm:text-sm sm:leading-6">
-                  Planning works wherever you are. Delivery is available across
-                  the Lanark area for now.{" "}
-                  <Link
-                    href="/#postcode-checker"
-                    className="font-medium text-[#213128] underline decoration-[rgba(33,49,40,0.28)] underline-offset-4 transition hover:decoration-[rgba(33,49,40,0.58)]"
-                  >
-                    Check your postcode
-                  </Link>
-                  .
+                  Start with a meal idea, place it into your week, then build
+                  your basket around it. Delivery is weekly and local, with home
+                  delivery in ML11 only.
                 </p>
               </div>
 
@@ -753,15 +747,21 @@ export default function PlannerPage() {
                   href="/shop"
                   className="inline-flex h-8 items-center rounded-full bg-[#213128] px-3 text-xs font-medium text-white transition hover:opacity-95 sm:h-10 sm:px-4 sm:text-sm"
                 >
-                  Shop
+                  Shop weekly boxes
                 </Link>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-2.5 py-1 text-[11px] text-[#58675e] sm:px-3 sm:py-1.5 sm:text-sm">
-                {plannedCount} of 7 planned
+                {plannedCount} of 7 meals planned
               </div>
+
+              {!hasPlannerAccess ? (
+                <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-2.5 py-1 text-[11px] text-[#58675e] sm:px-3 sm:py-1.5 sm:text-sm">
+                  {remainingFreeRecipes} free ideas left
+                </div>
+              ) : null}
 
               {statusMessage ? (
                 <div className="inline-flex rounded-full border border-[#dbe2d7] bg-[rgba(251,252,250,0.88)] px-2.5 py-1 text-[11px] text-[#58675e] sm:px-3 sm:py-1.5 sm:text-sm">
@@ -779,7 +779,7 @@ export default function PlannerPage() {
                 This week
               </p>
               <h2 className="mt-1 text-sm font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-lg">
-                Choose a day
+                Pick your next meal
               </h2>
             </div>
 
@@ -860,7 +860,7 @@ export default function PlannerPage() {
                 </h3>
                 {!activeRecipe && firstOpenDay === selectedDay ? (
                   <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
-                    A good place to start.
+                    Start here and build the week from this meal.
                   </p>
                 ) : null}
               </div>
@@ -877,7 +877,7 @@ export default function PlannerPage() {
                     <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm sm:leading-6">
                       {activeRecipe.description
                         ? truncate(activeRecipe.description, 72)
-                        : "Placed into your week and ready when you are."}
+                        : "Added to your week and ready to shop from."}
                     </p>
                   </div>
                 </div>
@@ -887,7 +887,7 @@ export default function PlannerPage() {
                     Nothing planned yet
                   </p>
                   <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
-                    Add a recipe or get an idea.
+                    Start with an idea or add a saved recipe.
                   </p>
                 </div>
               )}
@@ -929,7 +929,8 @@ export default function PlannerPage() {
                         Get an idea for {selectedDay.toLowerCase()}
                       </p>
                       <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-xs sm:leading-5">
-                        Start with a few ingredients.
+                        Start with ingredients you already have, then place the
+                        meal into your week.
                       </p>
                     </div>
 
@@ -990,6 +991,10 @@ export default function PlannerPage() {
                         <p className="text-[13px] font-medium text-[#213128] sm:text-sm">
                           Include basket ingredients
                         </p>
+                        <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:text-xs">
+                          Pull in what’s already in your basket and build from
+                          there.
+                        </p>
                         {includeBasketIngredients &&
                         basketIngredients.length > 0 ? (
                           <div className="mt-1 flex flex-wrap gap-1">
@@ -1044,12 +1049,6 @@ export default function PlannerPage() {
                       ) : null}
                     </div>
 
-                    {!hasPlannerAccess ? (
-                      <p className="text-[11px] text-[#617067] sm:text-sm">
-                        Free ideas remaining: {remainingFreeRecipes}
-                      </p>
-                    ) : null}
-
                     <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-2">
                       <button
                         type="button"
@@ -1068,7 +1067,7 @@ export default function PlannerPage() {
                         href="/recipes"
                         className="inline-flex h-8 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3 text-[13px] font-medium text-[#213128] transition hover:bg-white sm:h-9 sm:px-3.5 sm:text-sm"
                       >
-                        Full recipes page
+                        Browse recipes
                       </Link>
                     </div>
 
@@ -1294,7 +1293,7 @@ export default function PlannerPage() {
                       <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
                         {showSaved
                           ? "Save a few recipes first."
-                          : "Use saved recipes or get a few ideas here."}
+                          : "Get a few ideas here, then place them into the week."}
                       </p>
                     </div>
                   ) : filteredRecipes.length === 0 ? (
@@ -1338,7 +1337,7 @@ export default function PlannerPage() {
                                 <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:text-xs sm:leading-5">
                                   {recipe.description
                                     ? truncate(recipe.description, 54)
-                                    : "A calm, useful meal idea ready for the week."}
+                                    : "A useful meal idea ready to add into the week."}
                                 </p>
 
                                 <div className="mt-1.5 flex flex-wrap gap-1.5 sm:mt-2">
@@ -1452,6 +1451,10 @@ export default function PlannerPage() {
             <h2 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">
               Ingredients showing up this week
             </h2>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-[#617067]">
+              Use this to spot what you’ll need more than once before you build
+              the weekly shop.
+            </p>
           </div>
 
           {weekSummary.length === 0 ? (
