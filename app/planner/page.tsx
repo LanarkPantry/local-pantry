@@ -211,9 +211,9 @@ function getDayStatusCopy(
   isComplete: boolean,
   isSelected: boolean,
 ) {
-  if (isSelected && isComplete) return "Planned";
-  if (isSelected && !isComplete) return "Start here";
-  if (isComplete) return "Meal added";
+  if (isSelected && isComplete) return "This meal";
+  if (isSelected && !isComplete) return "Choose next";
+  if (isComplete) return "Sorted";
   return day === "Saturday" || day === "Sunday" ? "Open" : "Open";
 }
 
@@ -496,7 +496,7 @@ export default function PlannerPage() {
     if (!activeRecipe) {
       return {
         title: `${selectedDay} is still open`,
-        body: "Start with an idea, or use something you've already saved.",
+        body: "Get an idea or use a favourite, then add it to the week.",
       };
     }
 
@@ -504,13 +504,13 @@ export default function PlannerPage() {
       return {
         title: `${selectedDay} is sorted`,
         body: firstOpenDay
-          ? `Keep going and sort ${firstOpenDay.toLowerCase()} next.`
+          ? `Keep going and choose a meal for ${firstOpenDay.toLowerCase()} next.`
           : "Keep shaping the week, then build the shop from it.",
       };
     }
 
     return {
-      title: "Your week is planned",
+      title: "Your week is taking shape",
       body: "Now pull the ingredients together and build the weekly shop.",
     };
   }, [activeRecipe, firstOpenDay, plannedCount, selectedDay]);
@@ -783,9 +783,9 @@ export default function PlannerPage() {
                   Work out what to cook this week
                 </h1>
                 <p className="mt-1 max-w-2xl text-[11px] leading-5 text-[#5d6b62] sm:mt-1.5 sm:text-sm sm:leading-6">
-                  Start with a meal, place it into the week, then build your
-                  basket around it. Local delivery is weekly, with home delivery
-                  in ML11 only.
+                  Start with a meal, add it to the week, then build your basket
+                  around it. Local delivery is weekly, with home delivery in
+                  ML11 only.
                 </p>
               </div>
 
@@ -851,7 +851,7 @@ export default function PlannerPage() {
                 <p className="mt-1 text-sm font-semibold text-[#213128] sm:text-base">
                   {activeRecipe
                     ? "Keep filling the week"
-                    : `Sort ${selectedDay}`}
+                    : `Choose ${selectedDay.toLowerCase()}`}
                 </p>
               </div>
             </div>
@@ -1042,7 +1042,7 @@ export default function PlannerPage() {
                 </h3>
                 {!activeRecipe && firstOpenDay === selectedDay ? (
                   <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
-                    Start here and build the week from this meal.
+                    Start here and build the week one meal at a time.
                   </p>
                 ) : !activeRecipe ? (
                   <p className="mt-0.5 text-[11px] text-[#6b786e] sm:mt-1 sm:text-sm">
@@ -1134,7 +1134,7 @@ export default function PlannerPage() {
                         : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
                     }`}
                   >
-                    {panelMode === "idea" ? "Idea open" : "Get an idea"}
+                    Get an idea
                   </button>
 
                   <button
@@ -1151,9 +1151,7 @@ export default function PlannerPage() {
                         : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
                     }`}
                   >
-                    {panelMode === "recipes" && showSaved
-                      ? "Favourites open"
-                      : "Use a favourite"}
+                    Use a favourite
                   </button>
                 </div>
 
@@ -1165,7 +1163,7 @@ export default function PlannerPage() {
                       </p>
                       <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-xs sm:leading-5">
                         Add what you’ve got, pull in your basket if useful, then
-                        place it into the week.
+                        add the meal to the week.
                       </p>
                     </div>
 
@@ -1224,11 +1222,10 @@ export default function PlannerPage() {
                       />
                       <div className="min-w-0">
                         <p className="text-[13px] font-medium text-[#213128] sm:text-sm">
-                          Include basket ingredients
+                          Use what’s already in your basket
                         </p>
                         <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:text-xs">
-                          Pull in what’s already in your basket and build from
-                          there.
+                          Pull in what’s already there and build from it.
                         </p>
                         {includeBasketIngredients &&
                         basketIngredients.length > 0 ? (
@@ -1274,7 +1271,7 @@ export default function PlannerPage() {
                       >
                         {showPreferences
                           ? "Hide preferences"
-                          : "Add preferences"}
+                          : "Add a few preferences"}
                       </button>
 
                       {showPreferences ? (
@@ -1310,7 +1307,7 @@ export default function PlannerPage() {
                         className="inline-flex h-8.5 items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:h-9"
                       >
                         {isGenerating
-                          ? "Pulling an idea together..."
+                          ? "Getting an idea..."
                           : hasFreeRecipeAccess
                             ? `Get an idea for ${selectedDay}`
                             : "Unlock unlimited recipes"}
@@ -1355,8 +1352,7 @@ export default function PlannerPage() {
                     {isGenerating ? (
                       <div className="rounded-[16px] border border-[#d8dfd3] bg-[rgba(255,255,255,0.86)] p-2.5 sm:rounded-[18px] sm:p-3">
                         <p className="text-sm font-medium text-[#213128]">
-                          Pulling together an idea for{" "}
-                          {selectedDay.toLowerCase()}
+                          Getting an idea for {selectedDay.toLowerCase()}
                         </p>
                         <p className="mt-0.5 text-sm text-[#66756b] sm:mt-1">
                           Just a moment.
@@ -1568,7 +1564,7 @@ export default function PlannerPage() {
                         placeholder={
                           showSaved
                             ? "Search favourites"
-                            : "Search planner recipes"
+                            : "Search planner meals"
                         }
                         className="w-full rounded-[16px] border border-[#d8dfd3] bg-[rgba(255,255,255,0.84)] px-3 py-2 text-sm text-[#213128] outline-none transition placeholder:text-[#839085] focus:border-[#b8c5b4] focus:bg-white sm:rounded-[18px]"
                       />
@@ -1580,7 +1576,7 @@ export default function PlannerPage() {
                       <p className="text-sm font-medium text-[#213128]">
                         {showSaved
                           ? "No favourites yet"
-                          : "No planner recipes yet"}
+                          : "No meals in your planner yet"}
                       </p>
                       <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
                         {showSaved
@@ -1629,7 +1625,7 @@ export default function PlannerPage() {
                                 <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:text-xs sm:leading-5">
                                   {recipe.description
                                     ? truncate(recipe.description, 64)
-                                    : "A useful meal idea ready to add into the week."}
+                                    : "A meal idea ready to add to the week."}
                                 </p>
 
                                 {recipe.ingredientsUsed?.length ||
@@ -1747,7 +1743,7 @@ export default function PlannerPage() {
                       {day}
                     </p>
                     <p className="mt-1 truncate text-sm font-medium text-[#213128]">
-                      {recipe ? recipe.title : "Nothing planned"}
+                      {recipe ? recipe.title : "No meal yet"}
                     </p>
                   </div>
                 </button>
