@@ -86,16 +86,17 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto flex min-h-[72vh] max-w-7xl items-end px-4 pb-8 pt-10 sm:px-6 md:min-h-[78vh] md:px-10 md:pb-16 md:pt-16">
           <div className="w-full max-w-3xl text-white">
             <p className="text-[11px] uppercase tracking-[0.24em] text-white/80 sm:text-sm">
-              Weekly delivery in ML11
+              Weekly delivery for Lanark and surrounding ML11 areas
             </p>
 
             <h1 className="mt-3 max-w-2xl font-serif text-[2.35rem] leading-[0.95] tracking-tight text-white/95 sm:text-5xl md:mt-4 md:text-7xl">
               A local pantry that helps you plan what to cook.
             </h1>
 
-            <p className="mt-4 max-w-xl text-base leading-7 text-white/90 md:mt-5 md:text-xl md:leading-8">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/90 md:mt-5 md:text-xl md:leading-8">
               Weekly produce, useful extras, and meal ideas that help you work
-              out the week and build your basket from real food.
+              out the week, cook from real ingredients, and build the basket
+              around what you&apos;ll actually make.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -115,9 +116,11 @@ export default function HomePage() {
             </div>
 
             <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-white/78">
-              <span>Built from a real local kitchen and delivery service</span>
+              <span>
+                Built from a real local kitchen and weekly delivery service
+              </span>
               <span className="hidden sm:inline">•</span>
-              <span>Delivery only</span>
+              <span>New nearby areas open as demand grows</span>
             </div>
           </div>
         </div>
@@ -200,19 +203,21 @@ export default function HomePage() {
             <div className="mt-5 space-y-3">
               <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
                 <p className="text-sm font-medium text-[#243328]">
-                  ML11 delivery
+                  Lanark and ML11 delivery
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  Everything is prepared for local weekly delivery.
+                  Everything is prepared for weekly delivery across Lanark and
+                  surrounding ML11 areas.
                 </p>
               </div>
 
               <div className="rounded-[18px] border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
                 <p className="text-sm font-medium text-[#243328]">
-                  A smaller, curated shop
+                  New nearby areas by demand
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  Weekly produce and a restrained range of useful extras.
+                  We&apos;re opening nearby delivery areas as more local
+                  households join.
                 </p>
               </div>
 
@@ -254,12 +259,13 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-2 font-serif text-3xl leading-tight md:mt-3 md:text-4xl">
-                Less browsing. A clearer way to work out dinner.
+                A weekly local food service that helps you work out dinner.
               </h2>
 
               <p className="mt-3 leading-7 text-[#5f675c]">
                 Start with the planner if you want to shape the week. Start with
-                the shop if you already know what you need.
+                the shop if you already know what you need for your next few
+                meals.
               </p>
             </div>
 
