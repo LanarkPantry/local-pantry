@@ -876,11 +876,13 @@ export default function PlannerPage() {
     weeklyMeals?: WeeklyMeals;
     selectedDay?: string;
   }) {
+    // Update local state for React
     setSavedRecipes(newSaved);
     setPlannerRecipes(newPlanner);
     setWeeklyMeals(newMeals);
     setSelectedDay(newDay);
 
+    // Write individual keys (still needed for backward compatibility)
     safeWrite(SAVED_FAVOURITES_KEY, newSaved);
     safeWrite(PLANNER_RECIPES_KEY, newPlanner);
     safeWrite(WEEKLY_MEALS_KEY, newMeals);
@@ -890,12 +892,16 @@ export default function PlannerPage() {
       buildWeeklyPlanRecipeSnapshot(newMeals, [...newSaved, ...newPlanner]),
     );
 
-    safeWrite(FULL_PLANNER_STATE_KEY, {
+    // ✅ Always build and save the full planner state too
+    const fullState: PersistedPlannerState = {
       savedRecipes: newSaved,
       plannerRecipes: newPlanner,
       weeklyMeals: newMeals,
       selectedDay: newDay,
-    });
+    };
+
+    safeWrite(FULL_PLANNER_STATE_KEY, fullState);
+    console.log("✅ Saved full planner state:", fullState);
   }
 
   function persistFullPlannerState(params: {
