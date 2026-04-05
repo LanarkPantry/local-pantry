@@ -41,7 +41,7 @@ type GeneratedRecipe = {
 };
 
 type PlannerPanelMode = "idea" | "recipes" | null;
-type WeekPlanningStage = "confirm" | "loading" | "preview";
+type WeekPlanningStage = "loading" | "preview";
 
 type WeekPlanPreviewItem = {
   day: string;
@@ -474,7 +474,7 @@ export default function PlannerPage() {
 
   const [showWeekPlannerModal, setShowWeekPlannerModal] = useState(false);
   const [weekPlanningStage, setWeekPlanningStage] =
-    useState<WeekPlanningStage>("confirm");
+    useState<WeekPlanningStage>("loading");
   const [weekPlanningStatus, setWeekPlanningStatus] = useState(
     "Balancing meals for the week...",
   );
@@ -782,9 +782,11 @@ export default function PlannerPage() {
   function openWeekPlannerModal() {
     setWeekPlanError("");
     setWeekPlanMessage("");
-    setWeekPlanningStage("confirm");
+    setWeekPlanPreview(null);
+    setWeekPlanningStage("loading");
     setWeekPlanningStatus("Balancing meals for the week...");
     setShowWeekPlannerModal(true);
+    void handlePlanWeekPreview();
   }
 
   function closeWeekPlannerModal() {
@@ -845,7 +847,7 @@ export default function PlannerPage() {
     setGeneratedImageUrl(null);
     setWeekPlanPreview(null);
     setShowWeekPlannerModal(false);
-    setWeekPlanningStage("confirm");
+    setWeekPlanningStage("loading");
     setWeekPlanError("");
     setStatusMessage("Week cleared");
   }
@@ -951,11 +953,7 @@ export default function PlannerPage() {
   }
 
   async function handlePlanWeekPreview() {
-    if (emptyDays.length === 0) {
-      setWeekPlanError("Your week is already full.");
-      setShowWeekPlannerModal(false);
-      return;
-    }
+    const daysToPlan = DAYS;
 
     try {
       setIsPlanningWeek(true);
@@ -973,14 +971,14 @@ export default function PlannerPage() {
         ingredientsUsed: string[];
       }> = [];
 
-      for (let index = 0; index < emptyDays.length; index += 1) {
-        const day = emptyDays[index];
+      for (let index = 0; index < daysToPlan.length; index += 1) {
+        const day = daysToPlan[index];
 
         if (index === 0) {
           setWeekPlanningStatus(`Starting with ${day.toLowerCase()}...`);
         } else if (index === 1) {
           setWeekPlanningStatus("Avoiding repetition across the week...");
-        } else if (index === emptyDays.length - 1) {
+        } else if (index === daysToPlan.length - 1) {
           setWeekPlanningStatus("Finishing the week and shaping the basket...");
         } else {
           setWeekPlanningStatus(`Planning ${day.toLowerCase()}...`);
@@ -988,7 +986,7 @@ export default function PlannerPage() {
 
         const items = buildWeekPlanSeedIngredients({
           mealIndex: index,
-          totalMeals: emptyDays.length,
+          totalMeals: daysToPlan.length,
           basketIngredients,
           typedIngredients,
           includeBasketIngredients,
@@ -1012,7 +1010,7 @@ export default function PlannerPage() {
             weekPlanContext: {
               mode: "plan-week",
               mealIndex: index,
-              totalMeals: emptyDays.length,
+              totalMeals: daysToPlan.length,
               includeMeatIdeas,
             },
           }),
@@ -1066,7 +1064,7 @@ export default function PlannerPage() {
         "We couldn’t plan the week just now. Please try again in a moment.",
       );
       setShowWeekPlannerModal(false);
-      setWeekPlanningStage("confirm");
+      setWeekPlanningStage("loading");
     } finally {
       setIsPlanningWeek(false);
     }
@@ -1118,7 +1116,7 @@ export default function PlannerPage() {
     setPanelMode(null);
     setWeekPlanMessage("Week planned");
     setShowWeekPlannerModal(false);
-    setWeekPlanningStage("confirm");
+    setWeekPlanningStage("loading");
 
     const nextOpenDay = DAYS.find((day) => !nextMeals[day]);
     if (nextOpenDay) {
@@ -1236,24 +1234,20 @@ export default function PlannerPage() {
                     Plan my week
                   </p>
                   <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-lg">
-                    {weekPlanningStage === "confirm"
-                      ? "Build the rest of your week"
-                      : weekPlanningStage === "loading"
-                        ? "Planning your week..."
-                        : "Here’s a week you could cook"}
+                    {weekPlanningStage === "loading"
+                      ? "Planning your week..."
+                      : "Here’s a week you could cook"}
                   </h2>
                   <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm">
-                    {weekPlanningStage === "confirm"
-                      ? "Fill your empty days with practical meal ideas and a clearer basket path."
-                      : weekPlanningStage === "loading"
-                        ? weekPlanningStatus
-                        : `${plannedNowCount} ${
-                            plannedNowCount === 1 ? "meal" : "meals"
-                          } planned now${
-                            filledDays.length > 0
-                              ? ` · ${filledDays.length} already sorted`
-                              : ""
-                          }`}
+                    {weekPlanningStage === "loading"
+                      ? weekPlanningStatus
+                      : `${plannedNowCount} ${
+                          plannedNowCount === 1 ? "meal" : "meals"
+                        } planned now${
+                          filledDays.length > 0
+                            ? ` · ${filledDays.length} already sorted`
+                            : ""
+                        }`}
                   </p>
                 </div>
 
@@ -1274,155 +1268,6 @@ export default function PlannerPage() {
             </div>
 
             <div className="overflow-y-auto px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
-              {weekPlanningStage === "confirm" ? (
-                <div className="space-y-4">
-                  <div className="rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      We’ll build a simple, useful week
-                    </p>
-
-                    <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Empty days
-                        </p>
-                        <p className="mt-1 text-lg font-semibold text-[#213128]">
-                          {emptyDays.length}
-                        </p>
-                        <p className="mt-1 text-[11px] leading-5 text-[#617067]">
-                          We’ll fill what’s left.
-                        </p>
-                      </div>
-
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Sorted already
-                        </p>
-                        <p className="mt-1 text-lg font-semibold text-[#213128]">
-                          {filledDays.length}
-                        </p>
-                        <p className="mt-1 text-[11px] leading-5 text-[#617067]">
-                          We’ll work around these.
-                        </p>
-                      </div>
-
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Basket support
-                        </p>
-                        <p className="mt-1 text-sm font-semibold text-[#213128]">
-                          {includeBasketIngredients && hasBasketIngredients
-                            ? "Using basket items"
-                            : "Box-first suggestions"}
-                        </p>
-                        <p className="mt-1 text-[11px] leading-5 text-[#617067]">
-                          Built to help shopping next.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[20px] border border-[#dbe2d7] bg-white p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      Week rules
-                    </p>
-
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setIncludeMeatIdeas((current) => !current)
-                        }
-                        disabled={veganSelected}
-                        className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
-                          includeMeatIdeas && !veganSelected
-                            ? "border-[#213128] bg-[#213128] text-white"
-                            : veganSelected
-                              ? "border-[#dde4d8] bg-[#eef2eb] text-[#8a968e]"
-                              : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
-                        }`}
-                      >
-                        {veganSelected
-                          ? "Vegan week"
-                          : includeMeatIdeas
-                            ? "Including meat ideas"
-                            : "Include meat ideas"}
-                      </button>
-
-                      {hasBasketIngredients ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setIncludeBasketIngredients((current) => !current)
-                          }
-                          className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
-                            includeBasketIngredients
-                              ? "border-[#213128] bg-[rgba(233,240,228,0.92)] text-[#213128]"
-                              : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
-                          }`}
-                        >
-                          {includeBasketIngredients
-                            ? "Using what's in your basket"
-                            : "Use what's in your basket"}
-                        </button>
-                      ) : null}
-
-                      <span className="inline-flex items-center rounded-full border border-[#e1e7dd] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
-                        {recommendedBoxName} to start
-                      </span>
-                    </div>
-
-                    {hasBasketIngredients && includeBasketIngredients ? (
-                      <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.9)] px-3 py-3">
-                        <p className="text-[11px] text-[#617067] sm:text-xs">
-                          Using {basketIngredients.length} basket
-                          {basketIngredients.length === 1
-                            ? " ingredient"
-                            : " ingredients"}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {basketIngredients.slice(0, 6).map((ingredient) => (
-                            <span
-                              key={ingredient}
-                              className="rounded-full border border-[#d8dfd3] bg-white px-2 py-0.5 text-[10px] text-[#58675e] sm:text-[11px]"
-                            >
-                              {ingredient}
-                            </span>
-                          ))}
-                          {basketIngredients.length > 6 ? (
-                            <span className="rounded-full border border-[#d8dfd3] bg-white px-2 py-0.5 text-[10px] text-[#58675e] sm:text-[11px]">
-                              +{basketIngredients.length - 6} more
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <button
-                      type="button"
-                      onClick={handlePlanWeekPreview}
-                      disabled={isPlanningWeek}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isPlanningWeek
-                        ? "Planning your week..."
-                        : weekPlanningButtonLabel}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={closeWeekPlannerModal}
-                      disabled={isPlanningWeek}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-2xl border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Not now
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-
               {weekPlanningStage === "loading" ? (
                 <div className="space-y-4">
                   <div className="rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-4">
