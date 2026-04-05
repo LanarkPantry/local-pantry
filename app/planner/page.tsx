@@ -519,9 +519,11 @@ export default function PlannerPage() {
       const rawSaved =
         fullPlannerState?.savedRecipes ??
         safeRead<any[]>(SAVED_FAVOURITES_KEY, []);
+
       const rawPlanner =
         fullPlannerState?.plannerRecipes ??
         safeRead<any[]>(PLANNER_RECIPES_KEY, []);
+
       const rawWeekly =
         fullPlannerState?.weeklyMeals ??
         safeRead<WeeklyMeals>(WEEKLY_MEALS_KEY, buildEmptyWeek());
@@ -643,6 +645,7 @@ export default function PlannerPage() {
       setIncludeMeatIdeas(false);
     }
   }, [selectedPreferences]);
+
   useEffect(() => {
     if (!hasLoaded) return;
 
