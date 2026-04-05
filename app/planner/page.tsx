@@ -653,6 +653,7 @@ export default function PlannerPage() {
       selectedDay,
     });
   }, [selectedDay, hasLoaded]);
+
   const basketIngredients = useMemo(() => {
     return Array.from(new Set(cart.map((item) => item.name)));
   }, [cart]);
@@ -839,6 +840,38 @@ export default function PlannerPage() {
   const totalIfApplied = plannedCount + plannedNowCount;
   const recommendedBoxName =
     totalIfApplied >= 4 ? "Family Produce Box" : "Weekly Produce Box";
+  function saveAll({
+    savedRecipes: newSaved = savedRecipes,
+    plannerRecipes: newPlanner = plannerRecipes,
+    weeklyMeals: newMeals = weeklyMeals,
+    selectedDay: newDay = selectedDay,
+  }: {
+    savedRecipes?: RecipeLike[];
+    plannerRecipes?: RecipeLike[];
+    weeklyMeals?: WeeklyMeals;
+    selectedDay?: string;
+  }) {
+    setSavedRecipes(newSaved);
+    setPlannerRecipes(newPlanner);
+    setWeeklyMeals(newMeals);
+    setSelectedDay(newDay);
+
+    safeWrite(SAVED_FAVOURITES_KEY, newSaved);
+    safeWrite(PLANNER_RECIPES_KEY, newPlanner);
+    safeWrite(WEEKLY_MEALS_KEY, newMeals);
+
+    safeWrite(
+      WEEKLY_PLAN_RECIPES_KEY,
+      buildWeeklyPlanRecipeSnapshot(newMeals, [...newSaved, ...newPlanner]),
+    );
+
+    safeWrite(FULL_PLANNER_STATE_KEY, {
+      savedRecipes: newSaved,
+      plannerRecipes: newPlanner,
+      weeklyMeals: newMeals,
+      selectedDay: newDay,
+    });
+  }
 
   function persistFullPlannerState(params: {
     savedRecipes?: RecipeLike[];
@@ -856,30 +889,6 @@ export default function PlannerPage() {
       plannerRecipes: nextPlannerRecipes,
       weeklyMeals: nextWeeklyMeals,
       selectedDay: nextSelectedDay,
-    });
-  }
-
-  function persistPlannerRecipes(next: RecipeLike[]) {
-    setPlannerRecipes(next);
-    safeWrite(PLANNER_RECIPES_KEY, next);
-
-    persistFullPlannerState({
-      plannerRecipes: next,
-    });
-  }
-
-  function persistWeeklyMeals(
-    next: WeeklyMeals,
-    recipePool: RecipeLike[] = [...savedRecipes, ...plannerRecipes],
-  ) {
-    setWeeklyMeals(next);
-    safeWrite(WEEKLY_MEALS_KEY, next);
-
-    const recipeSnapshot = buildWeeklyPlanRecipeSnapshot(next, recipePool);
-    safeWrite(WEEKLY_PLAN_RECIPES_KEY, recipeSnapshot);
-
-    persistFullPlannerState({
-      weeklyMeals: next,
     });
   }
 
@@ -904,8 +913,12 @@ export default function PlannerPage() {
       return;
     }
 
-    const next = [recipe, ...plannerRecipes];
-    persistPlannerRecipes(next);
+    const nextPlannerRecipes = [recipe, ...plannerRecipes];
+
+    saveAll({
+      plannerRecipes: nextPlannerRecipes,
+    });
+
     setShowSaved(false);
     setStatusMessage("Saved for later");
   }
@@ -913,39 +926,56 @@ export default function PlannerPage() {
   function assignRecipeToSelectedDay(recipe: RecipeLike) {
     const dayBeingAssigned = selectedDay;
 
-    const next = {
+    const nextMeals = {
       ...weeklyMeals,
       [dayBeingAssigned]: recipe.id,
     };
 
-    persistWeeklyMeals(next, [...savedRecipes, ...plannerRecipes, recipe]);
-    const nextOpenDay = DAYS.find(
-      (day) => day !== dayBeingAssigned && !next[day],
+    const recipeAlreadyInPlanner = plannerRecipes.some(
+      (item) => item.id === recipe.id,
     );
 
-    if (nextOpenDay) {
-      setSelectedDay(nextOpenDay);
-    }
+    const nextPlannerRecipes = recipeAlreadyInPlanner
+      ? plannerRecipes
+      : [recipe, ...plannerRecipes];
+
+    const nextOpenDay =
+      DAYS.find((day) => day !== dayBeingAssigned && !nextMeals[day]) ||
+      selectedDay;
+
+    saveAll({
+      plannerRecipes: nextPlannerRecipes,
+      weeklyMeals: nextMeals,
+      selectedDay: nextOpenDay,
+    });
 
     setPanelMode(null);
     setStatusMessage(`${dayBeingAssigned} sorted`);
   }
 
   function clearSelectedDay() {
-    const next = {
+    const nextMeals = {
       ...weeklyMeals,
       [selectedDay]: null,
     };
 
-    persistWeeklyMeals(next, [...savedRecipes, ...plannerRecipes]);
+    saveAll({
+      weeklyMeals: nextMeals,
+    });
+
     setGeneratedRecipe(null);
     setGeneratedImageUrl(null);
     setStatusMessage(`${selectedDay} cleared`);
   }
 
   function clearWeek() {
-    persistWeeklyMeals(buildEmptyWeek(), [...savedRecipes, ...plannerRecipes]);
-    setSelectedDay("Monday");
+    const emptyWeek = buildEmptyWeek();
+
+    saveAll({
+      weeklyMeals: emptyWeek,
+      selectedDay: "Monday",
+    });
+
     setGeneratedRecipe(null);
     setGeneratedImageUrl(null);
     setWeekPlanPreview(null);
@@ -959,15 +989,20 @@ export default function PlannerPage() {
     const nextPlannerRecipes = plannerRecipes.filter(
       (recipe) => recipe.id !== recipeId,
     );
-    persistPlannerRecipes(nextPlannerRecipes);
 
     const nextMeals = { ...weeklyMeals };
+
     for (const day of DAYS) {
       if (nextMeals[day] === recipeId) {
         nextMeals[day] = null;
       }
     }
-    persistWeeklyMeals(nextMeals, [...savedRecipes, ...nextPlannerRecipes]);
+
+    saveAll({
+      plannerRecipes: nextPlannerRecipes,
+      weeklyMeals: nextMeals,
+    });
+
     setStatusMessage("Removed from planner");
   }
 
@@ -1214,13 +1249,7 @@ export default function PlannerPage() {
         ? [...recipesToAdd, ...plannerRecipes]
         : plannerRecipes;
 
-    if (recipesToAdd.length > 0) {
-      persistPlannerRecipes(nextPlannerRecipes);
-    }
-
-    persistWeeklyMeals(nextMeals, [...savedRecipes, ...nextPlannerRecipes]);
-
-    persistFullPlannerState({
+    saveAll({
       savedRecipes,
       plannerRecipes: nextPlannerRecipes,
       weeklyMeals: nextMeals,
@@ -1274,8 +1303,12 @@ export default function PlannerPage() {
       return;
     }
 
-    const next = [recipe, ...plannerRecipes];
-    persistPlannerRecipes(next);
+    const nextPlannerRecipes = [recipe, ...plannerRecipes];
+
+    saveAll({
+      plannerRecipes: nextPlannerRecipes,
+    });
+
     setPanelMode("recipes");
     setShowSaved(false);
     setGeneratorMessage("Saved for later");
@@ -1297,26 +1330,23 @@ export default function PlannerPage() {
       ? plannerRecipes
       : [recipeToUse, ...plannerRecipes];
 
-    if (!existing) {
-      persistPlannerRecipes(nextPlannerRecipes);
-    }
-
-    const next = {
+    const nextMeals = {
       ...weeklyMeals,
       [dayBeingAssigned]: recipeToUse.id,
     };
 
-    persistWeeklyMeals(next, [...savedRecipes, ...nextPlannerRecipes]);
+    const nextOpenDay =
+      DAYS.find((day) => day !== dayBeingAssigned && !nextMeals[day]) ||
+      selectedDay;
+
+    saveAll({
+      plannerRecipes: nextPlannerRecipes,
+      weeklyMeals: nextMeals,
+      selectedDay: nextOpenDay,
+    });
+
     setGeneratorMessage(`${dayBeingAssigned} sorted`);
     setPanelMode(null);
-
-    const nextOpenDay = DAYS.find(
-      (day) => day !== dayBeingAssigned && !next[day],
-    );
-
-    if (nextOpenDay) {
-      setSelectedDay(nextOpenDay);
-    }
   }
 
   function handleSaveGeneratedToFavourites() {
@@ -1333,12 +1363,10 @@ export default function PlannerPage() {
       return;
     }
 
-    const next = [recipe, ...savedRecipes];
-    setSavedRecipes(next);
-    safeWrite(SAVED_FAVOURITES_KEY, next);
+    const nextSavedRecipes = [recipe, ...savedRecipes];
 
-    persistFullPlannerState({
-      savedRecipes: next,
+    saveAll({
+      savedRecipes: nextSavedRecipes,
     });
 
     setSaveMessage("Saved to favourites");
@@ -1483,7 +1511,6 @@ export default function PlannerPage() {
                       </div>
                     </div>
                   )}
-
                   {filledDays.length > 0 ? (
                     <div className="rounded-[18px] border border-[#dbe2d7] bg-white p-3">
                       <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
@@ -1864,7 +1891,6 @@ export default function PlannerPage() {
                   ) : null}
                 </div>
               </div>
-
               <div className="mt-3 flex flex-wrap gap-1.5">
                 <button
                   type="button"
