@@ -133,12 +133,6 @@ function buildEmptyWeek(): WeeklyMeals {
     return acc;
   }, {} as WeeklyMeals);
 }
-function buildEmptyWeek(): WeeklyMeals {
-  return DAYS.reduce((acc, day) => {
-    acc[day] = null;
-    return acc;
-  }, {} as WeeklyMeals);
-}
 
 function buildWeeklyPlanRecipeSnapshot(
   meals: WeeklyMeals,
