@@ -133,6 +133,13 @@ function buildEmptyWeek(): WeeklyMeals {
     return acc;
   }, {} as WeeklyMeals);
 }
+function buildEmptyWeek(): WeeklyMeals {
+  return DAYS.reduce((acc, day) => {
+    acc[day] = null;
+    return acc;
+  }, {} as WeeklyMeals);
+}
+
 function buildWeeklyPlanRecipeSnapshot(
   meals: WeeklyMeals,
   recipes: RecipeLike[],
@@ -147,6 +154,7 @@ function buildWeeklyPlanRecipeSnapshot(
 
   return snapshot;
 }
+
 function toId(value: unknown, fallback: string) {
   if (typeof value === "string" && value.trim()) return value;
   return fallback;
@@ -523,7 +531,7 @@ export default function PlannerPage() {
       const normalisedWeeklySnapshot = DAYS.map((day, index) => {
         const recipe = rawWeeklyRecipeSnapshot?.[day];
         return recipe ? normalizeRecipe(recipe, index + 1000) : null;
-      }).filter(Boolean) as RecipeLike[];
+      }).filter((recipe): recipe is RecipeLike => Boolean(recipe));
 
       const mergedPlanner = [
         ...normalisedWeeklySnapshot,
