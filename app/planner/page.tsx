@@ -473,7 +473,7 @@ export default function PlannerPage() {
   const [showPreferences, setShowPreferences] = useState(false);
   const [showMethod, setShowMethod] = useState(false);
 
-  con  const [isPlanningWeek, setIsPlanningWeek] = useState(false);
+  const [isPlanningWeek, setIsPlanningWeek] = useState(false);
   const [weekPlanError, setWeekPlanError] = useState("");
   const [weekPlanMessage, setWeekPlanMessage] = useState("");
   const [weekPlanPreview, setWeekPlanPreview] = useState<
