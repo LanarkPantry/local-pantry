@@ -41,7 +41,6 @@ type GeneratedRecipe = {
 };
 
 type PlannerPanelMode = "idea" | "recipes" | null;
-type WeekPlanningStage = "confirm" | "loading" | "preview";
 
 type WeekPlanPreviewItem = {
   day: string;
@@ -473,20 +472,13 @@ export default function PlannerPage() {
   const [showPreferences, setShowPreferences] = useState(false);
   const [showMethod, setShowMethod] = useState(false);
 
-  con  const [isPlanningWeek, setIsPlanningWeek] = useState(false);
+  const [isPlanningWeek, setIsPlanningWeek] = useState(false);
   const [weekPlanError, setWeekPlanError] = useState("");
   const [weekPlanMessage, setWeekPlanMessage] = useState("");
   const [weekPlanPreview, setWeekPlanPreview] = useState<
     WeekPlanPreviewItem[] | null
   >(null);
   const [basketSuggestionMessage, setBasketSuggestionMessage] = useState("");
-
-  const [showWeekPlannerModal, setShowWeekPlannerModal] = useState(false);
-  const [weekPlanningStage, setWeekPlanningStage] =
-    useState<WeekPlanningStage>("confirm");
-  const [weekPlanningStatus, setWeekPlanningStatus] = useState(
-    "Balancing meals for the week...",
-  );
 
   const ideaPanelRef = useRef<HTMLDivElement | null>(null);
   const recipeLibraryRef = useRef<HTMLDivElement | null>(null);
@@ -570,20 +562,7 @@ export default function PlannerPage() {
     const timer = window.setTimeout(() => setBasketSuggestionMessage(""), 2400);
     return () => window.clearTimeout(timer);
   }, [basketSuggestionMessage]);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
 
-    if (!showWeekPlannerModal) {
-      document.body.style.overflow = "";
-      return;
-    }
-
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [showWeekPlannerModal]);
   useEffect(() => {
     if (selectedPreferences.includes("Vegan")) {
       setIncludeMeatIdeas(false);
@@ -798,30 +777,21 @@ export default function PlannerPage() {
   const shouldShowBasketGuide = plannedCount >= 2;
   const shouldPromoteShop = plannedCount >= 3;
   const hasBasketIngredients = basketIngredients.length > 0;
-    const weekProgressLabel =
+  const weekProgressLabel =
     plannedCount === 0
-      ? "Start your week"
+      ? "Nothing planned yet"
       : plannedCount === 1
         ? "1 meal sorted"
         : `${plannedCount} meals sorted`;
-
   const weekProgressText =
     plannedCount >= 3
-      ? "Ready to build your basket around your meals."
-      : plannedCount >= 1
-        ? "Build the rest of your week day by day."
-        : "Pick your first meal to get started.";
-    const veganSelected = selectedPreferences.includes("Vegan");
+      ? "Your week is taking shape. Build the basket around what you’re actually cooking."
+      : plannedCount >= 2
+        ? "Your week is starting to take shape."
+        : "Start with one day, then keep going.";
+  const veganSelected = selectedPreferences.includes("Vegan");
   const weekPlanningButtonLabel =
-    plannedCount <= 1 ? "Plan my week" : "Plan the rest of my week";
-
-  const primaryMobileActionLabel = activeRecipe
-    ? shouldPromoteShop
-      ? "Build your basket"
-      : firstOpenDay
-        ? `Choose ${firstOpenDay}`
-        : "Meal sorted"
-    : "Get an idea";
+    plannedCount <= 1 ? "Plan my week for me" : "Plan the rest of my week";
 
   const basketSuggestions = useMemo(() => {
     const previewRecipes = weekPlanPreview
@@ -839,7 +809,7 @@ export default function PlannerPage() {
   const recommendedBoxName =
     totalIfApplied >= 4 ? "Family Produce Box" : "Weekly Produce Box";
 
-    function persistPlannerRecipes(next: RecipeLike[]) {
+  function persistPlannerRecipes(next: RecipeLike[]) {
     setPlannerRecipes(next);
     safeWrite(PLANNER_RECIPES_KEY, next);
   }
@@ -847,19 +817,6 @@ export default function PlannerPage() {
   function persistWeeklyMeals(next: WeeklyMeals) {
     setWeeklyMeals(next);
     safeWrite(WEEKLY_MEALS_KEY, next);
-  }
-
-  function openWeekPlannerModal() {
-    setWeekPlanError("");
-    setWeekPlanMessage("");
-    setWeekPlanningStage("confirm");
-    setWeekPlanningStatus("Balancing meals for the week...");
-    setShowWeekPlannerModal(true);
-  }
-
-  function closeWeekPlannerModal() {
-    if (isPlanningWeek) return;
-    setShowWeekPlannerModal(false);
   }
 
   function addRecipeToPlanner(recipe: RecipeLike) {
@@ -908,15 +865,12 @@ export default function PlannerPage() {
     setStatusMessage(`${selectedDay} cleared`);
   }
 
-   function clearWeek() {
+  function clearWeek() {
     persistWeeklyMeals(buildEmptyWeek());
     setSelectedDay("Monday");
     setGeneratedRecipe(null);
     setGeneratedImageUrl(null);
     setWeekPlanPreview(null);
-    setShowWeekPlannerModal(false);
-    setWeekPlanningStage("confirm");
-    setWeekPlanError("");
     setStatusMessage("Week cleared");
   }
 
@@ -1020,10 +974,9 @@ export default function PlannerPage() {
     }
   }
 
-     async function handlePlanWeekPreview() {
+  async function handlePlanWeekPreview() {
     if (emptyDays.length === 0) {
       setWeekPlanError("Your week is already full.");
-      setShowWeekPlannerModal(false);
       return;
     }
 
@@ -1033,8 +986,6 @@ export default function PlannerPage() {
       setWeekPlanMessage("");
       setPaywallMessage("");
       setWeekPlanPreview(null);
-      setWeekPlanningStage("loading");
-      setWeekPlanningStatus("Balancing meals for the week...");
 
       const previewItems: WeekPlanPreviewItem[] = [];
       const previousRecipesForWeek: Array<{
@@ -1045,17 +996,6 @@ export default function PlannerPage() {
 
       for (let index = 0; index < emptyDays.length; index += 1) {
         const day = emptyDays[index];
-
-        if (index === 0) {
-          setWeekPlanningStatus(`Starting with ${day.toLowerCase()}...`);
-        } else if (index === 1) {
-          setWeekPlanningStatus("Avoiding repetition across the week...");
-        } else if (index === emptyDays.length - 1) {
-          setWeekPlanningStatus("Finishing the week and shaping the basket...");
-        } else {
-          setWeekPlanningStatus(`Planning ${day.toLowerCase()}...`);
-        }
-
         const items = buildWeekPlanSeedIngredients({
           mealIndex: index,
           totalMeals: emptyDays.length,
@@ -1129,14 +1069,11 @@ export default function PlannerPage() {
           previewItems.length === 1 ? "meal" : "meals"
         } planned for the week`,
       );
-      setWeekPlanningStage("preview");
     } catch (error) {
       console.error(error);
       setWeekPlanError(
         "We couldn’t plan the week just now. Please try again in a moment.",
       );
-      setShowWeekPlannerModal(false);
-      setWeekPlanningStage("confirm");
     } finally {
       setIsPlanningWeek(false);
     }
@@ -1156,7 +1093,7 @@ export default function PlannerPage() {
     setBasketSuggestionMessage("Added to basket");
   }
 
-    function handleAddWeekPreviewToPlanner() {
+  function handleAddWeekPreviewToPlanner() {
     if (!weekPlanPreview || weekPlanPreview.length === 0) return;
 
     const nextMeals = { ...weeklyMeals };
@@ -1185,8 +1122,6 @@ export default function PlannerPage() {
     setWeekPlanPreview(null);
     setPanelMode(null);
     setWeekPlanMessage("Week planned");
-    setShowWeekPlannerModal(false);
-    setWeekPlanningStage("confirm");
 
     const nextOpenDay = DAYS.find((day) => !nextMeals[day]);
     if (nextOpenDay) {
@@ -1292,454 +1227,7 @@ export default function PlannerPage() {
 
   return (
     <main className="min-h-screen overflow-x-clip text-[#213128]">
-      <      {showWeekPlannerModal ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-[rgba(18,28,22,0.46)] md:items-center md:justify-center">
-          <div className="max-h-[92vh] w-full overflow-hidden rounded-t-[28px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.98)] shadow-[0_-8px_30px_rgba(18,28,22,0.16)] md:max-h-[88vh] md:max-w-3xl md:rounded-[28px] md:shadow-[0_18px_48px_rgba(18,28,22,0.18)]">
-            <div className="sticky top-0 z-10 border-b border-[#e6ece2] bg-[rgba(255,255,255,0.96)] px-4 py-3 backdrop-blur-md sm:px-5">
-              <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-[#d8dfd3] md:hidden" />
-
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#78867c]">
-                    Plan my week
-                  </p>
-                  <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-lg">
-                    {weekPlanningStage === "confirm"
-                      ? "Build the rest of your week"
-                      : weekPlanningStage === "loading"
-                        ? "Planning your week..."
-                        : "Here’s a week you could cook"}
-                  </h2>
-                  <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm">
-                    {weekPlanningStage === "confirm"
-                      ? "Fill your empty days with practical meal ideas and a clearer basket path."
-                      : weekPlanningStage === "loading"
-                        ? weekPlanningStatus
-                        : `${plannedNowCount} ${
-                            plannedNowCount === 1 ? "meal" : "meals"
-                          } planned now${filledDays.length > 0 ? ` · ${filledDays.length} already sorted` : ""}`}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={closeWeekPlannerModal}
-                  disabled={isPlanningWeek}
-                  className={`inline-flex h-9 min-w-[36px] items-center justify-center rounded-full border px-3 text-sm font-medium transition ${
-                    isPlanningWeek
-                      ? "border-[#e3e8df] bg-[#f2f5ef] text-[#94a096]"
-                      : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
-                  }`}
-                  aria-label="Close week planner"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            <div className="overflow-y-auto px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
-              {weekPlanningStage === "confirm" ? (
-                <div className="space-y-4">
-                  <div className="rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      We’ll build a simple, useful week
-                    </p>
-                    <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Empty days
-                        </p>
-                        <p className="mt-1 text-lg font-semibold text-[#213128]">
-                          {emptyDays.length}
-                        </p>
-                        <p className="mt-1 text-[11px] leading-5 text-[#617067]">
-                          We’ll fill what’s left.
-                        </p>
-                      </div>
-
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Sorted already
-                        </p>
-                        <p className="mt-1 text-lg font-semibold text-[#213128]">
-                          {filledDays.length}
-                        </p>
-                        <p className="mt-1 text-[11px] leading-5 text-[#617067]">
-                          We’ll work around these.
-                        </p>
-                      </div>
-
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Basket support
-                        </p>
-                        <p className="mt-1 text-sm font-semibold text-[#213128]">
-                          {includeBasketIngredients && hasBasketIngredients
-                            ? "Using basket items"
-                            : "Box-first suggestions"}
-                        </p>
-                        <p className="mt-1 text-[11px] leading-5 text-[#617067]">
-                          Built to help shopping next.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[20px] border border-[#dbe2d7] bg-white p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      Week rules
-                    </p>
-
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setIncludeMeatIdeas((current) => !current)}
-                        disabled={veganSelected}
-                        className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
-                          includeMeatIdeas && !veganSelected
-                            ? "border-[#213128] bg-[#213128] text-white"
-                            : veganSelected
-                              ? "border-[#dde4d8] bg-[#eef2eb] text-[#8a968e]"
-                              : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
-                        }`}
-                      >
-                        {veganSelected
-                          ? "Vegan week"
-                          : includeMeatIdeas
-                            ? "Including meat ideas"
-                            : "Include meat ideas"}
-                      </button>
-
-                      {hasBasketIngredients ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setIncludeBasketIngredients((current) => !current)
-                          }
-                          className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition sm:text-sm ${
-                            includeBasketIngredients
-                              ? "border-[#213128] bg-[rgba(233,240,228,0.92)] text-[#213128]"
-                              : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
-                          }`}
-                        >
-                          {includeBasketIngredients
-                            ? "Using what's in your basket"
-                            : "Use what's in your basket"}
-                        </button>
-                      ) : null}
-
-                      <span className="inline-flex items-center rounded-full border border-[#e1e7dd] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#617067] sm:text-sm">
-                        {recommendedBoxName} to start
-                      </span>
-                    </div>
-
-                    {hasBasketIngredients && includeBasketIngredients ? (
-                      <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.9)] px-3 py-3">
-                        <p className="text-[11px] text-[#617067] sm:text-xs">
-                          Using {basketIngredients.length} basket
-                          {basketIngredients.length === 1
-                            ? " ingredient"
-                            : " ingredients"}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {basketIngredients.slice(0, 6).map((ingredient) => (
-                            <span
-                              key={ingredient}
-                              className="rounded-full border border-[#d8dfd3] bg-white px-2 py-0.5 text-[10px] text-[#58675e] sm:text-[11px]"
-                            >
-                              {ingredient}
-                            </span>
-                          ))}
-                          {basketIngredients.length > 6 ? (
-                            <span className="rounded-full border border-[#d8dfd3] bg-white px-2 py-0.5 text-[10px] text-[#58675e] sm:text-[11px]">
-                              +{basketIngredients.length - 6} more
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <button
-                      type="button"
-                      onClick={handlePlanWeekPreview}
-                      disabled={isPlanningWeek}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isPlanningWeek ? "Planning your week..." : weekPlanningButtonLabel}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={closeWeekPlannerModal}
-                      disabled={isPlanningWeek}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-2xl border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Not now
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-
-              {weekPlanningStage === "loading" ? (
-                <div className="space-y-4">
-                  <div className="rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-4">
-                    <p className="text-sm font-medium text-[#213128]">
-                      Taking a moment to build a better week
-                    </p>
-                    <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm">
-                      {weekPlanningStatus}
-                    </p>
-
-                    <div className="mt-4 space-y-2.5">
-                      <div className="flex items-center gap-2.5 rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#213128]" />
-                        <p className="text-sm text-[#213128]">
-                          Balancing the week
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2.5 rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#213128]" />
-                        <p className="text-sm text-[#213128]">
-                          Avoiding duplicate meals
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2.5 rounded-[16px] border border-[#dbe2d7] bg-white px-3 py-3">
-                        <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#213128]" />
-                        <p className="text-sm text-[#213128]">
-                          Shaping the basket
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div
-                        key={index}
-                        className="overflow-hidden rounded-[18px] border border-[#dbe2d7] bg-white p-3"
-                      >
-                        <div className="h-24 animate-pulse rounded-[14px] bg-[#eef2eb]" />
-                        <div className="mt-3 h-4 w-2/3 animate-pulse rounded bg-[#eef2eb]" />
-                        <div className="mt-2 h-3 w-full animate-pulse rounded bg-[#f2f5ef]" />
-                        <div className="mt-1.5 h-3 w-5/6 animate-pulse rounded bg-[#f2f5ef]" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {weekPlanningStage === "preview" && weekPlanPreview ? (
-                <div className="space-y-4">
-                  {(filledDays.length > 0 || weekPlanPreview.length > 0) && (
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Already sorted
-                        </p>
-                        <p className="mt-1 text-lg font-semibold text-[#213128]">
-                          {filledDays.length}
-                        </p>
-                      </div>
-
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Planned now
-                        </p>
-                        <p className="mt-1 text-lg font-semibold text-[#213128]">
-                          {plannedNowCount}
-                        </p>
-                      </div>
-
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Week total
-                        </p>
-                        <p className="mt-1 text-lg font-semibold text-[#213128]">
-                          {totalIfApplied}
-                        </p>
-                      </div>
-
-                      <div className="rounded-[16px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] px-3 py-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
-                          Box to start with
-                        </p>
-                        <p className="mt-1 text-sm font-semibold text-[#213128]">
-                          {recommendedBoxName}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {filledDays.length > 0 ? (
-                    <div className="rounded-[18px] border border-[#dbe2d7] bg-white p-3">
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                        Already in your week
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {filledDays.map((day) => {
-                          const recipeId = weeklyMeals[day];
-                          const recipe = recipeId
-                            ? recipesById.get(recipeId)
-                            : null;
-
-                          return (
-                            <div
-                              key={`modal-planned-${day}`}
-                              className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm"
-                            >
-                              {day}: {recipe ? truncate(recipe.title, 22) : "Sorted"}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {weekPlanPreview.map((item) => (
-                      <article
-                        key={`modal-${item.day}-${item.recipe.id}`}
-                        className="rounded-[18px] border border-[#dbe2d7] bg-white p-3"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                            {item.day}
-                          </p>
-                          <span className="inline-flex rounded-full border border-[#d8dfd3] bg-[rgba(233,240,228,0.82)] px-2 py-0.5 text-[10px] text-[#213128]">
-                            Planned now
-                          </span>
-                        </div>
-
-                        <div className="mt-2 flex items-start gap-2.5">
-                          <div className="w-12 shrink-0">
-                            <RecipeImage recipe={item.recipe} compact />
-                          </div>
-
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-[#213128]">
-                              {item.recipe.title}
-                            </p>
-                            <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067]">
-                              {item.recipe.description
-                                ? truncate(item.recipe.description, 84)
-                                : "A meal idea for the week."}
-                            </p>
-                          </div>
-                        </div>
-
-                        {item.recipe.ingredientsUsed &&
-                        item.recipe.ingredientsUsed.length > 0 ? (
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {item.recipe.ingredientsUsed.slice(0, 4).map((chip) => (
-                              <span
-                                key={`modal-${item.day}-${chip}`}
-                                className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e]"
-                              >
-                                {chip}
-                              </span>
-                            ))}
-                          </div>
-                        ) : null}
-                      </article>
-                    ))}
-                  </div>
-
-                  {basketSuggestions.length > 0 ? (
-                    <div className="rounded-[18px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-3">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
-                            Basket from this week
-                          </p>
-                          <p className="mt-1 text-sm font-medium text-[#213128]">
-                            Start with a box, then add a few useful extras
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={handleAddSuggestedBasket}
-                          className="inline-flex h-10 items-center justify-center rounded-xl bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
-                        >
-                          Add these to basket
-                        </button>
-                      </div>
-
-                      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        {basketSuggestions.map((item, index) => (
-                          <div
-                            key={`modal-basket-${item.name}`}
-                            className={`rounded-[16px] border p-3 ${
-                              index === 0
-                                ? "border-[#cbd8c5] bg-[rgba(233,240,228,0.7)]"
-                                : "border-[#e1e7dd] bg-white"
-                            }`}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium text-[#213128]">
-                                  {item.name}
-                                </p>
-                                <p className="mt-0.5 text-[11px] text-[#617067]">
-                                  £{item.price.toFixed(2)}
-                                </p>
-                              </div>
-
-                              <span
-                                className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] ${
-                                  item.category === "boxes"
-                                    ? "border border-[#dbe2d7] bg-white text-[#213128]"
-                                    : "border border-[#e1e7dd] bg-white text-[#58675e]"
-                                }`}
-                              >
-                                {item.category === "boxes" ? "Recommended box" : "Add-on"}
-                              </span>
-                            </div>
-
-                            <p className="mt-1.5 text-[11px] leading-5 text-[#617067]">
-                              {item.description}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {basketSuggestionMessage ? (
-                        <div className="mt-3 rounded-[14px] border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-2 text-sm text-[#425142]">
-                          {basketSuggestionMessage}
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
-
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <button
-                      type="button"
-                      onClick={handleAddWeekPreviewToPlanner}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
-                    >
-                      Add this week to my planner
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handlePlanWeekPreview}
-                      disabled={isPlanningWeek}
-                      className="inline-flex h-12 w-full items-center justify-center rounded-2xl border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Try another week
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
-        div className="mx-auto w-full max-w-6xl px-3 pb-5 pt-1.5 sm:px-6 sm:pb-8 sm:pt-5">
+      <div className="mx-auto w-full max-w-6xl px-3 pb-5 pt-1.5 sm:px-6 sm:pb-8 sm:pt-5">
         <section className="rounded-[20px] border border-[rgba(223,230,218,0.95)] bg-[rgba(255,255,255,0.78)] p-3 shadow-[0_8px_24px_rgba(31,43,36,0.05)] backdrop-blur-md sm:rounded-[22px] sm:p-4.5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-3xl">
@@ -1908,8 +1396,9 @@ export default function PlannerPage() {
                   <h3 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
                     Here’s a simple week you could cook
                   </h3>
-                                    <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
-                    Fill your empty days with practical meal ideas and a clearer basket path.
+                  <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+                    Fill the rest of the week with veg-first meals, practical
+                    pantry support, and a clear basket path.
                   </p>
 
                   <div className="mt-2 flex flex-wrap gap-1.5">
@@ -1926,9 +1415,9 @@ export default function PlannerPage() {
                 </div>
 
                 <div className="flex w-full flex-col gap-2 lg:w-auto lg:min-w-[260px]">
-                                    <button
+                  <button
                     type="button"
-                    onClick={openWeekPlannerModal}
+                    onClick={handlePlanWeekPreview}
                     disabled={isPlanningWeek}
                     className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
                   >
@@ -2031,7 +1520,234 @@ export default function PlannerPage() {
             </div>
           ) : null}
 
-  
+          {weekPlanPreview ? (
+            <div
+              ref={weekPlanPreviewRef}
+              className="mt-2.5 rounded-[18px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.92)] p-3 sm:mt-3 sm:rounded-[20px] sm:p-4"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                    Week preview
+                  </p>
+                  <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-xl">
+                    Here’s a week you could cook
+                  </h2>
+                  <p className="mt-1 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+                    {filledDays.length > 0
+                      ? `${filledDays.length} day${
+                          filledDays.length === 1 ? "" : "s"
+                        } already sorted · ${plannedNowCount} planned now`
+                      : `${plannedNowCount} meals planned for the week`}{" "}
+                    · Built around a {recommendedBoxName}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAddWeekPreviewToPlanner}
+                    className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                  >
+                    Add this week to my planner
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handlePlanWeekPreview}
+                    disabled={isPlanningWeek}
+                    className="inline-flex h-9 items-center justify-center rounded-full border border-[#d5ddd1] bg-white px-4 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Try another week
+                  </button>
+                </div>
+              </div>
+
+              {(filledDays.length > 0 || weekPlanPreview.length > 0) && (
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Already sorted
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[#213128]">
+                      {filledDays.length}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Planned now
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[#213128]">
+                      {plannedNowCount}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Week total
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[#213128]">
+                      {totalIfApplied}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[14px] border border-[#dbe2d7] bg-white px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#78867c]">
+                      Box to start with
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-[#213128]">
+                      {recommendedBoxName}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {filledDays.length > 0 ? (
+                <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-white p-3">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                    Already in your week
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {filledDays.map((day) => {
+                      const recipeId = weeklyMeals[day];
+                      const recipe = recipeId
+                        ? recipesById.get(recipeId)
+                        : null;
+
+                      return (
+                        <div
+                          key={`planned-${day}`}
+                          className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-3 py-1.5 text-[11px] text-[#58675e] sm:text-sm"
+                        >
+                          {day}:{" "}
+                          {recipe ? truncate(recipe.title, 24) : "Sorted"}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {weekPlanPreview.map((item) => (
+                  <article
+                    key={`${item.day}-${item.recipe.id}`}
+                    className="rounded-[16px] border border-[#dbe2d7] bg-white p-2.5"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                        {item.day}
+                      </p>
+                      <span className="inline-flex rounded-full border border-[#d8dfd3] bg-[rgba(233,240,228,0.82)] px-2 py-0.5 text-[10px] text-[#213128]">
+                        Planned now
+                      </span>
+                    </div>
+
+                    <div className="mt-2 flex items-start gap-2.5">
+                      <div className="w-12 shrink-0">
+                        <RecipeImage recipe={item.recipe} compact />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-[#213128]">
+                          {item.recipe.title}
+                        </p>
+                        <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067]">
+                          {item.recipe.description
+                            ? truncate(item.recipe.description, 84)
+                            : "A meal idea for the week."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {item.recipe.ingredientsUsed &&
+                    item.recipe.ingredientsUsed.length > 0 ? (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {item.recipe.ingredientsUsed.slice(0, 4).map((chip) => (
+                          <span
+                            key={`${item.day}-${chip}`}
+                            className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e]"
+                          >
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+
+              {basketSuggestions.length > 0 ? (
+                <div className="mt-3 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.88)] p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                        Build your basket from this week
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#213128]">
+                        Start with a box, then add a few useful extras
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleAddSuggestedBasket}
+                      className="inline-flex h-9 items-center justify-center rounded-full bg-[#213128] px-4 text-sm font-medium text-white transition hover:opacity-95"
+                    >
+                      Add these to basket
+                    </button>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {basketSuggestions.map((item, index) => (
+                      <div
+                        key={item.name}
+                        className={`rounded-[14px] border p-2.5 ${
+                          index === 0
+                            ? "border-[#cbd8c5] bg-[rgba(233,240,228,0.7)]"
+                            : "border-[#e1e7dd] bg-[rgba(252,252,250,0.82)]"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[#213128]">
+                              {item.name}
+                            </p>
+                            <p className="mt-0.5 text-[11px] text-[#617067]">
+                              £{item.price.toFixed(2)}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] ${
+                              item.category === "boxes"
+                                ? "border border-[#dbe2d7] bg-white text-[#213128]"
+                                : "border border-[#e1e7dd] bg-white text-[#58675e]"
+                            }`}
+                          >
+                            {item.category === "boxes"
+                              ? "Recommended box"
+                              : "Add-on"}
+                          </span>
+                        </div>
+
+                        <p className="mt-1.5 text-[11px] leading-5 text-[#617067]">
+                          {item.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {basketSuggestionMessage ? (
+                    <div className="mt-3 rounded-[14px] border border-[#dbe4d5] bg-[#f4f8f1] px-3 py-2 text-sm text-[#425142]">
+                      {basketSuggestionMessage}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="mt-2.5 grid gap-2.5 sm:mt-3 sm:gap-3 lg:grid-cols-[1.04fr_0.96fr]">
             <div className="rounded-[20px] border border-[#dbe2d7] bg-[rgba(246,248,243,0.9)] p-2.5 sm:rounded-[22px] sm:p-4">
@@ -2055,33 +1771,28 @@ export default function PlannerPage() {
                   )}
                 </div>
 
-                                <div className="flex items-center gap-2">
-                  {!activeRecipe ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPanelMode("idea");
-                        setShowSaved(false);
-                      }}
-                      className="inline-flex h-8.5 items-center rounded-full bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 sm:h-9"
-                    >
-                      {primaryMobileActionLabel}
-                    </button>
-                  ) : null}
-
-                  {activeRecipe && firstOpenDay ? (
-                    <button
-                      type="button"
-                      onClick={chooseNextOpenDay}
-                      className="inline-flex h-8.5 items-center rounded-full border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
-                    >
-                      {primaryMobileActionLabel}
-                    </button>
-                  ) : null}
-                </div>
+                {activeRecipe && firstOpenDay ? (
+                  <button
+                    type="button"
+                    onClick={chooseNextOpenDay}
+                    className="inline-flex h-8.5 items-center rounded-full border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9"
+                  >
+                    Choose {firstOpenDay}
+                  </button>
+                ) : null}
               </div>
 
-              
+              {plannedCount >= 2 ? (
+                <div className="mt-2 rounded-[16px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.8)] px-3 py-2.5">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
+                        Week taking shape
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#213128]">
+                        {weekProgressLabel}
+                      </p>
+                    </div>
 
                     {shouldPromoteShop ? (
                       <Link
@@ -2093,7 +1804,13 @@ export default function PlannerPage() {
                     ) : null}
                   </div>
 
-         
+                  <p className="mt-1.5 text-[11px] leading-5 text-[#617067] sm:text-sm sm:leading-6">
+                    {shouldPromoteShop
+                      ? "You’ve got enough shape to start building the basket around your meals."
+                      : "Keep going day by day and the basket guide will start to help."}
+                  </p>
+                </div>
+              ) : null}
 
               {activeRecipe ? (
                 <div className="mt-2 rounded-[18px] border border-[#dbe2d7] bg-white p-2.5 sm:mt-3 sm:p-3">
@@ -2129,36 +1846,26 @@ export default function PlannerPage() {
                     </div>
                   </div>
 
-                                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPanelMode("idea");
-                        setShowSaved(false);
-                      }}
-                      className={`inline-flex h-11 w-full items-center justify-center rounded-xl border px-3 text-sm font-medium leading-none transition ${
-                        panelMode === "idea"
-                          ? "border-[#213128] bg-[#213128] text-white"
-                          : "border-[#213128] bg-[#213128] text-white hover:opacity-95"
-                      }`}
-                    >
-                      Get an idea
-                    </button>
-
+                  <div className="mt-2.5 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
                     <button
                       type="button"
                       onClick={() => {
                         setPanelMode("recipes");
-                        setShowSaved(true);
+                        setShowSaved(false);
                       }}
-                      className={`inline-flex h-11 w-full items-center justify-center rounded-xl border px-3 text-sm font-medium leading-none transition ${
-                        panelMode === "recipes" && showSaved
-                          ? "border-[#d5ddd1] bg-white text-[#213128]"
-                          : "border-[#d5ddd1] bg-white text-[#213128] hover:bg-[rgba(255,255,255,0.94)]"
-                      }`}
+                      className="inline-flex h-9 w-full items-center justify-center rounded-xl border border-[#d5ddd1] bg-white px-3.5 text-sm font-medium text-[#213128] transition hover:bg-[rgba(255,255,255,0.94)] sm:h-9 sm:w-auto"
                     >
-                      Use a favourite
+                      Change meal
                     </button>
+
+                    {shouldPromoteShop ? (
+                      <Link
+                        href="/shop"
+                        className="inline-flex h-9 w-full items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 sm:h-9 sm:w-auto"
+                      >
+                        Build your basket
+                      </Link>
+                    ) : null}
                   </div>
                 </div>
               ) : (
@@ -2168,7 +1875,7 @@ export default function PlannerPage() {
                       Choose the next meal
                     </p>
                     <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-sm">
-                      Start with an idea, or pick a favourite.
+                      Start with an idea, or use a favourite.
                     </p>
                   </div>
 
@@ -2263,8 +1970,9 @@ export default function PlannerPage() {
                     <p className="text-sm font-medium text-[#213128]">
                       Get an idea for {selectedDay.toLowerCase()}
                     </p>
-                                        <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-xs sm:leading-5">
-                      Add a few ingredients or use what&apos;s already in your basket.
+                    <p className="mt-0.5 text-[11px] leading-4.5 text-[#617067] sm:mt-1 sm:text-xs sm:leading-5">
+                      Add a few ingredients, or pull in what&apos;s already in
+                      your basket.
                     </p>
                   </div>
 
@@ -2366,33 +2074,27 @@ export default function PlannerPage() {
                     ) : null}
                   </div>
 
-                                          <div className="mt-2 grid grid-cols-1 gap-2 sm:mt-2.5 sm:flex sm:flex-wrap">
-                          <button
-                            type="button"
-                            onClick={handleAddGeneratedToDay}
-                            className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 sm:h-9 sm:w-auto"
-                          >
-                            Add to {selectedDay}
-                          </button>
+                  <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-2">
+                    <button
+                      type="button"
+                      onClick={handleGetRecipeIdea}
+                      disabled={isGenerating || !hasFreeRecipeAccess}
+                      className="inline-flex h-10 w-full items-center justify-center rounded-xl bg-[#213128] px-3.5 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:h-9"
+                    >
+                      {isGenerating
+                        ? "Getting an idea..."
+                        : hasFreeRecipeAccess
+                          ? `Get an idea for ${selectedDay}`
+                          : "Unlock unlimited recipes"}
+                    </button>
 
-                          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-                            <button
-                              type="button"
-                              onClick={handleKeepGeneratedInPlanner}
-                              className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3.5 text-sm font-medium text-[#213128] transition hover:bg-white sm:h-9"
-                            >
-                              Keep for later
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={handleSaveGeneratedToFavourites}
-                              className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3.5 text-sm font-medium text-[#213128] transition hover:bg-white sm:h-9"
-                            >
-                              Save favourite
-                            </button>
-                          </div>
-                        </div>
+                    <Link
+                      href="/recipes"
+                      className="inline-flex h-9 items-center justify-center rounded-xl border border-[#d5ddd1] bg-[rgba(255,255,255,0.86)] px-3 text-[13px] font-medium text-[#213128] transition hover:bg-white sm:h-9 sm:px-3.5 sm:text-sm"
+                    >
+                      Browse recipes
+                    </Link>
+                  </div>
 
                   {generatorError ? (
                     <div className="rounded-[16px] border border-[#e4d8cb] bg-[#fbf6f0] px-3 py-2 text-sm text-[#6a5c4f]">
@@ -2550,9 +2252,8 @@ export default function PlannerPage() {
                       <p className="text-[10px] uppercase tracking-[0.18em] text-[#78867c]">
                         Basket guide
                       </p>
-                                            <p className="mt-1 text-sm font-medium text-[#213128]">
-                                          <p className="mt-1 text-sm font-medium text-[#213128]">
-                        Repeats this week
+                      <p className="mt-1 text-sm font-medium text-[#213128]">
+                        What shows up this week
                       </p>
                     </div>
 
@@ -2591,10 +2292,10 @@ export default function PlannerPage() {
                   <p className="text-[10px] uppercase tracking-[0.2em] text-[#78867c]">
                     Recipe library
                   </p>
-                                    <h3 className="mt-1 text-sm font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-base">
+                  <h3 className="mt-1 text-sm font-semibold tracking-[-0.02em] text-[#1f2b24] sm:text-base">
                     {activeRecipe
                       ? `Change ${selectedDay.toLowerCase()}`
-                      : `Choose for ${selectedDay.toLowerCase()}`}
+                      : `Meals for ${selectedDay.toLowerCase()}`}
                   </h3>
                 </div>
 
@@ -2703,14 +2404,14 @@ export default function PlannerPage() {
                                     : "A meal idea ready for the week."}
                                 </p>
 
-                                                                {recipe.ingredientsUsed?.length ||
+                                {recipe.ingredientsUsed?.length ||
                                 recipe.ingredients?.length ? (
                                   <div className="mt-1 flex flex-wrap gap-1">
                                     {(recipe.ingredientsUsed?.length
                                       ? recipe.ingredientsUsed
                                       : recipe.ingredients || []
                                     )
-                                      .slice(0, 3)
+                                      .slice(0, 4)
                                       .map((item) => (
                                         <span
                                           key={item}
@@ -2719,37 +2420,8 @@ export default function PlannerPage() {
                                           {item}
                                         </span>
                                       ))}
-
-                                                                    {recipe.ingredientsUsed?.length ||
-                                recipe.ingredients?.length ? (
-                                  <div className="mt-1 flex flex-wrap gap-1">
-                                    {(
-                                      recipe.ingredientsUsed?.length
-                                        ? recipe.ingredientsUsed
-                                        : recipe.ingredients || []
-                                    )
-                                      .slice(0, 3)
-                                      .map((item) => (
-                                        <span
-                                          key={item}
-                                          className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e]"
-                                        >
-                                          {item}
-                                        </span>
-                                      ))}
-
-                                    
-                                      <span className="rounded-full border border-[#d8dfd3] bg-[rgba(251,252,250,0.88)] px-2 py-0.5 text-[10px] text-[#58675e]">
-                                        +
-                                        {(
-                                          recipe.ingredientsUsed?.length
-                                            ? recipe.ingredientsUsed
-                                            : recipe.ingredients || []
-                                        ).length - 3}
-                                      </span>
-                                    ) : null}
                                   </div>
-                                ) : null}  
+                                ) : null}
 
                                 <div className="mt-1.5 grid grid-cols-1 gap-1.5 sm:mt-2 sm:flex sm:flex-wrap">
                                   <button
