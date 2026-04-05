@@ -1292,7 +1292,7 @@ export default function PlannerPage() {
 
   return (
     <main className="min-h-screen overflow-x-clip text-[#213128]">
-      <      {showWeekPlannerModal ? (
+            {showWeekPlannerModal ? (
         <div className="fixed inset-0 z-50 flex items-end bg-[rgba(18,28,22,0.46)] md:items-center md:justify-center">
           <div className="max-h-[92vh] w-full overflow-hidden rounded-t-[28px] border border-[#dbe2d7] bg-[rgba(255,255,255,0.98)] shadow-[0_-8px_30px_rgba(18,28,22,0.16)] md:max-h-[88vh] md:max-w-3xl md:rounded-[28px] md:shadow-[0_18px_48px_rgba(18,28,22,0.18)]">
             <div className="sticky top-0 z-10 border-b border-[#e6ece2] bg-[rgba(255,255,255,0.96)] px-4 py-3 backdrop-blur-md sm:px-5">
