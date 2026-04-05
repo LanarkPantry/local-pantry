@@ -555,9 +555,16 @@ export default function PlannerPage() {
       );
 
       const cleanedWeek = buildEmptyWeek();
+
+      const availableRecipeIds = new Set(
+        [...normalisedSaved, ...mergedPlanner].map((recipe) => recipe.id),
+      );
+
       for (const day of DAYS) {
-        cleanedWeek[day] =
+        const mealId =
           typeof rawWeekly?.[day] === "string" ? rawWeekly[day] : null;
+        cleanedWeek[day] =
+          mealId && availableRecipeIds.has(mealId) ? mealId : null;
       }
 
       setSavedRecipes(normalisedSaved);
@@ -696,8 +703,12 @@ export default function PlannerPage() {
   );
 
   const plannedCount = useMemo(() => {
-    return DAYS.filter((day) => Boolean(weeklyMeals[day])).length;
-  }, [weeklyMeals]);
+    return DAYS.filter((day) => {
+      const recipeId = weeklyMeals[day];
+      if (!recipeId) return false;
+      return Boolean(recipesById.get(recipeId));
+    }).length;
+  }, [weeklyMeals, recipesById]);
 
   const activeRecipe = weeklyMeals[selectedDay]
     ? recipesById.get(weeklyMeals[selectedDay] as string) || null
@@ -782,16 +793,30 @@ export default function PlannerPage() {
   }, [weeklyMeals, recipesById]);
 
   const firstOpenDay = useMemo(() => {
-    return DAYS.find((day) => !weeklyMeals[day]) || null;
-  }, [weeklyMeals]);
+    return (
+      DAYS.find((day) => {
+        const recipeId = weeklyMeals[day];
+        if (!recipeId) return true;
+        return !recipesById.get(recipeId);
+      }) || null
+    );
+  }, [weeklyMeals, recipesById]);
 
   const emptyDays = useMemo(() => {
-    return DAYS.filter((day) => !weeklyMeals[day]);
-  }, [weeklyMeals]);
+    return DAYS.filter((day) => {
+      const recipeId = weeklyMeals[day];
+      if (!recipeId) return true;
+      return !recipesById.get(recipeId);
+    });
+  }, [weeklyMeals, recipesById]);
 
   const filledDays = useMemo(() => {
-    return DAYS.filter((day) => Boolean(weeklyMeals[day]));
-  }, [weeklyMeals]);
+    return DAYS.filter((day) => {
+      const recipeId = weeklyMeals[day];
+      if (!recipeId) return false;
+      return Boolean(recipesById.get(recipeId));
+    });
+  }, [weeklyMeals, recipesById]);
 
   const canClearWeek = plannedCount > 0;
   const shouldShowBasketGuide = plannedCount >= 2;
