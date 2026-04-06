@@ -269,6 +269,12 @@ function tinyDescription(text: string) {
   return `${text.slice(0, 107).trim()}...`;
 }
 
+function formatBuiltAround(family: DayFamily) {
+  const heroVeg = family.heroVegCandidates.slice(0, 2).join(", ");
+  const base = family.baseItems[0] ?? "something simple";
+  return `Built around: ${heroVeg} and ${base}`;
+}
+
 function normalise(text: string) {
   return text.toLowerCase().trim();
 }
@@ -623,9 +629,9 @@ export default function PlannerPage() {
 
                   {showInfo ? (
                     <div className="absolute left-0 top-7 z-20 w-[290px] rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.98)] p-3 text-sm leading-6 text-[#5f675c] shadow-[0_14px_28px_rgba(36,51,40,0.10)]">
-                      Built for local weekly food shopping, this planner uses a
-                      stronger hero veg system so each day feels distinct before
-                      the recipe API even starts shaping the meal.
+                      Start with your box and build a week of simple meals. Each
+                      day is shaped around a few key ingredients so the week
+                      feels varied before the recipe API starts helping.
                     </div>
                   ) : null}
                 </div>
@@ -636,8 +642,8 @@ export default function PlannerPage() {
               </h1>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5f675c] md:text-base">
-                Distinct day families, stronger veg-led variation, and recipe
-                cards that feel more usable across the full week.
+                Get a full week of simple, flexible meal ideas built from what
+                is in your box - then add what you need in one go.
               </p>
 
               <div className="mt-4 flex flex-wrap items-center gap-2.5">
@@ -647,7 +653,7 @@ export default function PlannerPage() {
                   disabled={isPlanningWeek}
                   className="inline-flex items-center justify-center rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isPlanningWeek ? "Planning..." : "Plan your week"}
+                  {isPlanningWeek ? "Planning..." : "Plan my week"}
                 </button>
 
                 <Link
@@ -686,14 +692,15 @@ export default function PlannerPage() {
 
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-[0.16em] text-[#6b776c]">
-                    Stronger planner logic
+                    Your produce-box week
                   </p>
                   <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                    A clearer week before the AI starts
+                    Simple meals, mapped to the week
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                    Onion, leek, and garlic stay in support. The planner now
-                    builds each day from a separate veg family and base.
+                    Plan your week around what you already get in your produce
+                    box. Each day is built around a few key ingredients -
+                    simple, flexible, and easy to adapt.
                   </p>
                 </div>
               </div>
@@ -713,16 +720,16 @@ export default function PlannerPage() {
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
               <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
-                The actual planner
+                Your week, built from your box
               </p>
               <h2 className="mt-1 font-serif text-[1.7rem] leading-tight md:text-[2rem]">
-                Seven day families, not just rotated ingredients
+                A week of distinct, usable meal ideas
               </h2>
             </div>
 
             <p className="hidden max-w-md text-right text-sm leading-6 text-[#5f675c] md:block">
-              Plan the full week at once, or build one day at a time with the
-              same hero veg rules and repeat suppression.
+              Plan the whole week at once, build one day at a time, or replan
+              any day without losing the overall structure.
             </p>
           </div>
 
@@ -751,7 +758,9 @@ export default function PlannerPage() {
                           {family.label}
                         </p>
                         <p className="mt-1 text-sm text-[#5f675c]">
-                          {family.intro}
+                          {recipe
+                            ? family.intro
+                            : "A simple idea using what you've got."}
                         </p>
                       </div>
                     </div>
@@ -772,13 +781,17 @@ export default function PlannerPage() {
                         {isBusy
                           ? "Planning..."
                           : recipe
-                            ? "Replan day"
+                            ? "Try a different idea"
                             : "Plan day"}
                       </button>
                     </div>
 
                     <p className="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
                       {family.label}
+                    </p>
+
+                    <p className="mt-2 text-sm text-[#5f675c]">
+                      {formatBuiltAround(family)}
                     </p>
 
                     {recipe ? (
@@ -808,7 +821,7 @@ export default function PlannerPage() {
                             onClick={() => setOpenDay(isOpen ? null : day.key)}
                             className="text-sm text-[#5f675c] underline underline-offset-4"
                           >
-                            {isOpen ? "Hide recipe card" : "Follow recipe"}
+                            {isOpen ? "Hide recipe card" : "See recipe card"}
                           </button>
                         </div>
 
@@ -835,7 +848,9 @@ export default function PlannerPage() {
                       </>
                     ) : (
                       <p className="mt-3 text-sm leading-6 text-[#5f675c]">
-                        {family.intro}
+                        {recipe
+                          ? family.intro
+                          : "A simple idea using what you've got."}
                       </p>
                     )}
                   </div>
@@ -855,11 +870,10 @@ export default function PlannerPage() {
                   Basket bridge
                 </p>
                 <h2 className="mt-1 font-serif text-[1.6rem] leading-tight md:text-[1.9rem]">
-                  Add the useful bits
+                  Based on your plan
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5f675c]">
-                  A compact set of extras to help the planned week work without
-                  pushing the basket too far.
+                  Based on your plan - here's what you'll need this week.
                 </p>
               </div>
 
@@ -873,7 +887,7 @@ export default function PlannerPage() {
                   onClick={addAllSuggestions}
                   className="rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  Add suggested extras
+                  Add what you need
                 </button>
 
                 <Link
@@ -924,7 +938,7 @@ export default function PlannerPage() {
                     onClick={() => addSuggestedItem(item.name)}
                     className="mt-4 rounded-full border border-[#d6cec2] bg-white/80 px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
                   >
-                    Add to basket
+                    Get what's missing
                   </button>
                 </article>
               ))}
