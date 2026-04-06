@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useCart } from "../cart-context";
+import { allShopItems, type ShopDisplayItem } from "../shop/shop-data";
 
 type DayKey =
   | "monday"
@@ -12,6 +13,8 @@ type DayKey =
   | "friday"
   | "saturday"
   | "sunday";
+
+type QuickStart = "quick-tonight" | "comforting" | "use-what-ive-got";
 
 type GeneratedRecipe = {
   title: string;
@@ -28,36 +31,40 @@ type StoredRecipe = {
   ingredientsUsed: string[];
 };
 
-type ShopSuggestion = {
-  name: string;
-  price: number;
-  image: string;
-  category: "boxes" | "pantry" | "cupboard" | "extras";
-  checkoutType: "subscription" | "one-off";
-  matches: string[];
-};
-
 type DayFamily = {
   key: string;
   label: string;
   intro: string;
-  baseItems: string[];
-  heroVegCandidates: string[];
+  anchorVegCandidates: string[];
+  optionalVegCandidates: string[];
   supportItems: string[];
-  quickStart: "quick-tonight" | "comforting" | "use-what-ive-got";
+  everydayBaseOptions: string[];
+  shopBaseOptions: string[];
+  shopBoostOptions: string[];
+  quickStart: QuickStart;
 };
 
 type DayPlanSeed = {
   familyKey: string;
   familyLabel: string;
   intro: string;
-  heroVeg: string[];
+  anchorVeg: string;
+  optionalVeg: string | null;
   supportVeg: string[];
-  baseItems: string[];
-  quickStart: DayFamily["quickStart"];
+  everydayBaseOptions: string[];
+  shopBaseOptions: string[];
+  shopBoostOptions: string[];
+  quickStart: QuickStart;
 };
 
-const STORAGE_KEY = "tlp_weekly_planner_v8";
+type SuggestedProduct = {
+  product: ShopDisplayItem;
+  matchedDays: string[];
+  role: "base" | "boost";
+  score: number;
+};
+
+const STORAGE_KEY = "tlp_weekly_planner_v9";
 
 const DAYS: { key: DayKey; label: string; short: string }[] = [
   { key: "monday", label: "Monday", short: "Mon" },
@@ -102,139 +109,120 @@ const HERO_VEG_POOL = [
 
 const SUPPORT_VEG_POOL = ["onion", "leek", "garlic"] as const;
 
+const TOP_IMAGE_STRIP = [
+  {
+    src: "/images/recipes/rose-harissa-carrots.jpg",
+    alt: "Roast carrots and chickpeas with harissa",
+    title: "Veg-first suppers",
+  },
+  {
+    src: "/images/recipes/pesto-roast-potatoes.jpg",
+    alt: "Roast potatoes with pesto",
+    title: "Flexible pantry add-ons",
+  },
+  {
+    src: "/images/recipes/chocolate-recipe.jpg",
+    alt: "A spoonable bowl with yoghurt and chocolate",
+    title: "A week that feels real",
+  },
+  {
+    src: "/images/recipes/caramel-recipe.jpg",
+    alt: "Toast with fruit and caramel",
+    title: "Simple enough to make",
+  },
+] as const;
+
 const DAY_FAMILIES: DayFamily[] = [
   {
-    key: "rice-bowl",
-    label: "broccoli, peppers + rice",
-    intro: "A bowl-led start with crisp veg and a simple rice base.",
-    baseItems: ["rice", "lemon", "herbs"],
-    heroVegCandidates: ["broccoli", "peppers", "green beans", "spinach"],
-    supportItems: ["garlic", "stock"],
-    quickStart: "use-what-ive-got",
-  },
-  {
-    key: "pasta-night",
-    label: "courgette, tomatoes + pasta",
+    key: "green-bowl",
+    label: "Greens with a flexible bowl base",
     intro:
-      "A softer, saucier pasta-shaped day with enough contrast to feel different.",
-    baseItems: ["pasta", "basil", "cheese"],
-    heroVegCandidates: ["courgette", "tomatoes", "aubergine", "mushrooms"],
-    supportItems: ["garlic", "onion"],
-    quickStart: "quick-tonight",
-  },
-  {
-    key: "potato-pan",
-    label: "potatoes, kale + eggs",
-    intro:
-      "A comforting potato-led supper with greens and a more filling finish.",
-    baseItems: ["potatoes", "eggs", "yoghurt"],
-    heroVegCandidates: ["potatoes", "kale", "spinach", "cabbage"],
-    supportItems: ["onion", "garlic"],
-    quickStart: "comforting",
-  },
-  {
-    key: "lentil-pot",
-    label: "squash + lentils",
-    intro: "A lentil and herb day with depth rather than rush.",
-    baseItems: ["lentils", "thyme", "stock"],
-    heroVegCandidates: ["squash", "carrots", "beetroot", "cauliflower"],
-    supportItems: ["onion", "garlic"],
-    quickStart: "comforting",
-  },
-  {
-    key: "couscous-plate",
-    label: "cauliflower + couscous",
-    intro: "A brighter plate with softness, crunch, and a good finish.",
-    baseItems: ["couscous", "mint", "yoghurt"],
-    heroVegCandidates: ["cauliflower", "peppers", "cucumber", "lettuce"],
+      "A fresher start to the week built around green veg, with something simple underneath to make it a proper meal.",
+    anchorVegCandidates: ["broccoli", "spinach", "green beans", "kale"],
+    optionalVegCandidates: ["peppers", "courgette", "cucumber"],
     supportItems: ["garlic"],
+    everydayBaseOptions: ["rice", "potatoes"],
+    shopBaseOptions: ["Short Grain Rice", "Orzo Pasta"],
+    shopBoostOptions: ["Sorrel & Walnut Pesto"],
+    quickStart: "use-what-ive-got",
+  },
+  {
+    key: "tomato-pan",
+    label: "A softer tomato-led supper",
+    intro:
+      "A more saucy, pan-led day that still feels easy and midweek-friendly rather than heavy.",
+    anchorVegCandidates: ["tomatoes", "courgette", "aubergine", "peppers"],
+    optionalVegCandidates: ["mushrooms", "spinach"],
+    supportItems: ["garlic", "onion"],
+    everydayBaseOptions: ["pasta", "rice"],
+    shopBaseOptions: ["Casarecce Pasta", "Orzo Pasta"],
+    shopBoostOptions: ["Sorrel & Walnut Pesto", "Rose Harissa"],
     quickStart: "quick-tonight",
   },
   {
-    key: "orzo-pan",
-    label: "mushrooms, greens + orzo",
+    key: "potato-comfort",
+    label: "A comforting potato night",
     intro:
-      "A softer pan-led meal that still feels distinct enough for the weekend.",
-    baseItems: ["orzo", "lemon", "cheese"],
-    heroVegCandidates: ["mushrooms", "spinach", "kale", "tomatoes"],
-    supportItems: ["garlic", "leek"],
+      "A more grounding day with potatoes at the centre and enough flexibility to swing towards eggs, beans, or greens.",
+    anchorVegCandidates: ["potatoes", "kale", "cabbage", "spinach"],
+    optionalVegCandidates: ["mushrooms", "cauliflower"],
+    supportItems: ["onion", "garlic"],
+    everydayBaseOptions: ["eggs", "beans"],
+    shopBaseOptions: ["Polenta", "Puy Lentils"],
+    shopBoostOptions: ["Sorrel & Walnut Pesto"],
     quickStart: "comforting",
   },
   {
-    key: "bean-supper",
-    label: "carrots, cabbage + beans",
+    key: "lentil-roast",
+    label: "A roast-and-lentil kind of day",
     intro:
-      "A hearty end-of-week bean supper with robust veg and a bit more backbone.",
-    baseItems: ["beans", "rosemary", "stock"],
-    heroVegCandidates: ["carrots", "cabbage", "beetroot", "potatoes"],
+      "A slower-feeling supper built around roots or squash, with lentils or a sturdy base to carry it.",
+    anchorVegCandidates: ["squash", "carrots", "beetroot", "cauliflower"],
+    optionalVegCandidates: ["kale", "cabbage"],
     supportItems: ["onion", "garlic"],
+    everydayBaseOptions: ["lentils", "beans"],
+    shopBaseOptions: ["Puy Lentils", "Farro"],
+    shopBoostOptions: ["Rose Harissa", "Walnuts"],
+    quickStart: "comforting",
+  },
+  {
+    key: "bright-plate",
+    label: "A brighter plate with crunch",
+    intro:
+      "A lighter-feeling day with a cleaner finish, built around one veg anchor and a couple of easy ways to make it feel complete.",
+    anchorVegCandidates: ["cauliflower", "peppers", "cucumber", "lettuce"],
+    optionalVegCandidates: ["tomatoes", "green beans", "carrots"],
+    supportItems: ["garlic"],
+    everydayBaseOptions: ["couscous", "potatoes"],
+    shopBaseOptions: ["Giant Couscous", "Farro"],
+    shopBoostOptions: ["Rose Harissa", "Cashews"],
+    quickStart: "quick-tonight",
+  },
+  {
+    key: "mushroom-weekend",
+    label: "A softer mushroom-led supper",
+    intro:
+      "A looser weekend sort of meal that can swing towards grains, pasta, or a softer bowl without boxing the user in.",
+    anchorVegCandidates: ["mushrooms", "spinach", "kale", "tomatoes"],
+    optionalVegCandidates: ["courgette", "cabbage"],
+    supportItems: ["garlic", "leek"],
+    everydayBaseOptions: ["orzo", "rice"],
+    shopBaseOptions: ["Orzo Pasta", "Farro"],
+    shopBoostOptions: ["Sorrel & Walnut Pesto", "Walnuts"],
+    quickStart: "comforting",
+  },
+  {
+    key: "hearty-end",
+    label: "A hearty end-of-week supper",
+    intro:
+      "A sturdier final day built around roots or brassicas, with beans, grains, or something from the cupboard doing the supporting work.",
+    anchorVegCandidates: ["cabbage", "carrots", "beetroot", "potatoes"],
+    optionalVegCandidates: ["cauliflower", "spinach", "kale"],
+    supportItems: ["onion", "garlic"],
+    everydayBaseOptions: ["beans", "rice"],
+    shopBaseOptions: ["Puy Lentils", "Polenta"],
+    shopBoostOptions: ["Rose Harissa", "Cashews"],
     quickStart: "use-what-ive-got",
-  },
-];
-
-const SHOP_SUGGESTIONS: ShopSuggestion[] = [
-  {
-    name: "Weekly Produce Box",
-    price: 20,
-    image: "/weekly-harvest-box.png",
-    category: "boxes",
-    checkoutType: "subscription",
-    matches: [
-      "broccoli",
-      "pepper",
-      "tomato",
-      "courgette",
-      "spinach",
-      "kale",
-      "carrot",
-      "potato",
-      "cucumber",
-      "lettuce",
-      "cauliflower",
-      "cabbage",
-      "mushroom",
-      "squash",
-    ],
-  },
-  {
-    name: "Sorrel & Walnut Pesto",
-    price: 4.5,
-    image: "/sorrel-walnut-pesto.png",
-    category: "pantry",
-    checkoutType: "one-off",
-    matches: ["pasta", "orzo", "potato", "greens", "courgette", "broccoli"],
-  },
-  {
-    name: "Rose Harissa",
-    price: 5.25,
-    image: "/rose-harissa.png",
-    category: "pantry",
-    checkoutType: "one-off",
-    matches: ["couscous", "cauliflower", "carrot", "squash", "pepper"],
-  },
-  {
-    name: "Orzo Pasta",
-    price: 4.5,
-    image: "/images/cupboard/orzo.jpg",
-    category: "cupboard",
-    checkoutType: "one-off",
-    matches: ["orzo", "mushroom", "greens", "lemon", "spinach"],
-  },
-  {
-    name: "Giant Couscous",
-    price: 4.75,
-    image: "/images/cupboard/giant-couscous.jpg",
-    category: "cupboard",
-    checkoutType: "one-off",
-    matches: ["couscous", "harissa", "cauliflower", "pepper", "herbs"],
-  },
-  {
-    name: "Puy Lentils",
-    price: 4.95,
-    image: "/images/cupboard/puy-lentils.jpg",
-    category: "cupboard",
-    checkoutType: "one-off",
-    matches: ["lentils", "squash", "carrot", "beetroot", "herbs"],
   },
 ];
 
@@ -268,31 +256,48 @@ function writeStoredWeek(value: Record<DayKey, GeneratedRecipe | null>) {
   } catch {}
 }
 
+function uniqueStrings(values: string[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value.trim();
+    if (!trimmed) continue;
+
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    result.push(trimmed);
+  }
+
+  return result;
+}
+
 function tinyDescription(text: string) {
-  if (text.length <= 120) return text;
-  return `${text.slice(0, 117).trim()}...`;
+  if (text.length <= 132) return text;
+  return `${text.slice(0, 129).trim()}...`;
 }
 
 function normalise(text: string) {
   return text.toLowerCase().trim();
 }
 
-function titleCase(value: string) {
-  return value
+function titleCase(text: string) {
+  return text
     .split(" ")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .map((word) =>
+      word.length > 0 ? `${word[0].toUpperCase()}${word.slice(1)}` : word,
+    )
     .join(" ");
 }
 
-function uniqueStrings(values: string[]) {
-  return Array.from(new Set(values.filter(Boolean)));
-}
-
-function isSupportVeg(value: string) {
-  const key = normalise(value);
+function isSupportVeg(item: string) {
+  const lower = item.toLowerCase();
   return (
-    key.includes("onion") || key.includes("leek") || key.includes("garlic")
+    lower.includes("onion") ||
+    lower.includes("leek") ||
+    lower.includes("garlic")
   );
 }
 
@@ -325,72 +330,75 @@ function countHeroVegUsage(
 
   for (const day of DAYS) {
     if (excludeDay && day.key === excludeDay) continue;
+
     const recipe = week[day.key];
     if (!recipe) continue;
 
-    recipe.ingredientsUsed.forEach((ingredient) => {
-      const key = normalise(ingredient);
-      if (isSupportVeg(key)) return;
+    const nonSupport = recipe.ingredientsUsed
+      .map((item) => item.toLowerCase())
+      .filter((item) => !isSupportVeg(item))
+      .slice(0, 2);
 
-      HERO_VEG_POOL.forEach((heroVeg) => {
-        if (
-          key.includes(heroVeg) ||
-          heroVeg.includes(key as (typeof HERO_VEG_POOL)[number])
-        ) {
-          counts[heroVeg] = (counts[heroVeg] ?? 0) + 1;
-        }
-      });
-    });
+    for (const ingredient of nonSupport) {
+      counts[ingredient] = (counts[ingredient] ?? 0) + 1;
+    }
   }
 
   return counts;
 }
 
-function pickSupportVeg(dayIndex: number, family: DayFamily) {
-  const baseSupport = uniqueStrings(
-    family.supportItems.filter(
-      (item) => item === "onion" || item === "leek" || item === "garlic",
-    ),
-  );
-
-  const rotatingSupport = SUPPORT_VEG_POOL[dayIndex % SUPPORT_VEG_POOL.length];
-  return uniqueStrings([...baseSupport, rotatingSupport]).slice(0, 1);
-}
-
-function pickHeroVegForFamily(
+function pickAnchorVegForFamily(
   family: DayFamily,
   usageCounts: Record<string, number>,
 ) {
-  const rankedCandidates = [...family.heroVegCandidates].sort((a, b) => {
+  const ranked = [...family.anchorVegCandidates].sort((a, b) => {
     const aCount = usageCounts[a] ?? 0;
     const bCount = usageCounts[b] ?? 0;
+
     if (aCount !== bCount) return aCount - bCount;
     return a.localeCompare(b);
   });
 
-  const selected: string[] = [];
+  const picked =
+    ranked.find((veg) => (usageCounts[veg] ?? 0) < 2) ??
+    HERO_VEG_POOL.find((veg) => (usageCounts[veg] ?? 0) < 2) ??
+    family.anchorVegCandidates[0];
 
-  for (const veg of rankedCandidates) {
-    if ((usageCounts[veg] ?? 0) >= 2) continue;
-    selected.push(veg);
-    usageCounts[veg] = (usageCounts[veg] ?? 0) + 1;
-    if (selected.length === 2) break;
-  }
+  usageCounts[picked] = (usageCounts[picked] ?? 0) + 1;
 
-  if (selected.length < 2) {
-    const backupCandidates = HERO_VEG_POOL.filter(
-      (veg) =>
-        !family.heroVegCandidates.includes(veg) && (usageCounts[veg] ?? 0) < 2,
-    );
+  return picked;
+}
 
-    for (const veg of backupCandidates) {
-      selected.push(veg);
-      usageCounts[veg] = (usageCounts[veg] ?? 0) + 1;
-      if (selected.length === 2) break;
-    }
-  }
+function pickOptionalVegForFamily(
+  family: DayFamily,
+  usageCounts: Record<string, number>,
+  anchorVeg: string,
+) {
+  const ranked = [...family.optionalVegCandidates].sort((a, b) => {
+    const aCount = usageCounts[a] ?? 0;
+    const bCount = usageCounts[b] ?? 0;
 
-  return selected.slice(0, 2);
+    if (aCount !== bCount) return aCount - bCount;
+    return a.localeCompare(b);
+  });
+
+  const picked = ranked.find(
+    (veg) => veg !== anchorVeg && (usageCounts[veg] ?? 0) < 2,
+  );
+
+  if (!picked) return null;
+
+  usageCounts[picked] = (usageCounts[picked] ?? 0) + 1;
+  return picked;
+}
+
+function pickSupportVeg(dayIndex: number, family: DayFamily) {
+  const supportFromFamily = family.supportItems.filter((item) =>
+    isSupportVeg(item),
+  );
+  const rotatingSupport = SUPPORT_VEG_POOL[dayIndex % SUPPORT_VEG_POOL.length];
+
+  return uniqueStrings([...supportFromFamily, rotatingSupport]).slice(0, 1);
 }
 
 function buildDaySeed(
@@ -400,69 +408,97 @@ function buildDaySeed(
 ): DayPlanSeed {
   const family = DAY_FAMILIES[dayIndex % DAY_FAMILIES.length];
   const usageCounts = countHeroVegUsage(week, targetDay);
-  const heroVeg = pickHeroVegForFamily(family, usageCounts);
+  const anchorVeg = pickAnchorVegForFamily(family, usageCounts);
+  const optionalVeg = pickOptionalVegForFamily(family, usageCounts, anchorVeg);
   const supportVeg = pickSupportVeg(dayIndex, family);
 
   return {
     familyKey: family.key,
     familyLabel: family.label,
     intro: family.intro,
-    heroVeg,
+    anchorVeg,
+    optionalVeg,
     supportVeg,
-    baseItems: family.baseItems,
+    everydayBaseOptions: family.everydayBaseOptions,
+    shopBaseOptions: family.shopBaseOptions,
+    shopBoostOptions: family.shopBoostOptions,
     quickStart: family.quickStart,
   };
 }
 
 function getDayInputs(seed: DayPlanSeed) {
   return uniqueStrings([
-    ...seed.heroVeg,
-    ...seed.baseItems,
+    seed.anchorVeg,
+    seed.optionalVeg ?? "",
+    ...seed.everydayBaseOptions.slice(0, 1),
+    ...seed.shopBaseOptions.slice(0, 1),
+    ...seed.shopBoostOptions.slice(0, 1),
     ...seed.supportVeg,
   ]);
 }
 
-function getMatchedSuggestions(week: Record<DayKey, GeneratedRecipe | null>) {
-  const used = Object.values(week)
+function getShopItemByName(name: string) {
+  return allShopItems.find((item) => item.name === name) ?? null;
+}
+
+function getSuggestedProducts(
+  week: Record<DayKey, GeneratedRecipe | null>,
+): SuggestedProduct[] {
+  const map = new Map<string, SuggestedProduct>();
+
+  for (const [dayIndex, day] of DAYS.entries()) {
+    const recipe = week[day.key];
+    if (!recipe) continue;
+
+    const family = DAY_FAMILIES[dayIndex];
+    const productNames = [
+      ...family.shopBaseOptions.map((name) => ({
+        name,
+        role: "base" as const,
+      })),
+      ...family.shopBoostOptions.map((name) => ({
+        name,
+        role: "boost" as const,
+      })),
+    ];
+
+    productNames.forEach((entry, productIndex) => {
+      const product = getShopItemByName(entry.name);
+      if (!product) return;
+
+      const existing = map.get(product.name);
+
+      if (existing) {
+        if (!existing.matchedDays.includes(day.label)) {
+          existing.matchedDays.push(day.label);
+        }
+        existing.score += entry.role === "base" ? 2 : 1;
+        return;
+      }
+
+      map.set(product.name, {
+        product,
+        matchedDays: [day.label],
+        role: entry.role,
+        score: entry.role === "base" ? 3 - productIndex : 1,
+      });
+    });
+  }
+
+  return Array.from(map.values())
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.product.name.localeCompare(b.product.name);
+    })
+    .slice(0, 6);
+}
+
+function getFromBoxItems(week: Record<DayKey, GeneratedRecipe | null>) {
+  const ingredients = Object.values(week)
     .filter(Boolean)
     .flatMap((recipe) => recipe!.ingredientsUsed.map(normalise));
 
-  return SHOP_SUGGESTIONS.filter((product) =>
-    product.matches.some((match) =>
-      used.some(
-        (ingredient) =>
-          ingredient.includes(match) || match.includes(ingredient),
-      ),
-    ),
-  ).slice(0, 4);
-}
-
-function getBuiltAroundLine(recipe: GeneratedRecipe | null, family: DayFamily) {
-  if (!recipe) return titleCase(family.label);
-
-  const preferred = recipe.ingredientsUsed.filter(
-    (item) => !isSupportVeg(item),
-  );
-  const heroItems = uniqueStrings(preferred.slice(0, 3));
-
-  if (heroItems.length > 0) {
-    return heroItems.map(titleCase).join(", ");
-  }
-
-  return titleCase(family.label);
-}
-
-function getPlanCoverage(
-  week: Record<DayKey, GeneratedRecipe | null>,
-  matchedSuggestions: ShopSuggestion[],
-) {
-  const ingredients = Object.values(week)
-    .filter(Boolean)
-    .flatMap((recipe) => recipe!.ingredientsUsed);
-
-  const deduped = uniqueStrings(ingredients.map(normalise)).filter(Boolean);
-
-  const fromBox = deduped.filter(
+  const fromBox = ingredients.filter(
     (ingredient) =>
       HERO_VEG_POOL.some(
         (veg) =>
@@ -471,22 +507,72 @@ function getPlanCoverage(
       ) || isSupportVeg(ingredient),
   );
 
-  const pantryMatchedTerms = uniqueStrings(
-    matchedSuggestions.flatMap((item) => item.matches.map(normalise)),
+  return uniqueStrings(fromBox).slice(0, 10);
+}
+
+function getEverydayExtras(
+  week: Record<DayKey, GeneratedRecipe | null>,
+  suggestions: SuggestedProduct[],
+) {
+  const suggestionTerms = suggestions.map((entry) =>
+    normalise(entry.product.name),
   );
 
-  const optionalExtras = deduped.filter(
-    (ingredient) =>
-      !fromBox.includes(ingredient) &&
-      !pantryMatchedTerms.some(
-        (match) => ingredient.includes(match) || match.includes(ingredient),
-      ),
-  );
+  const ingredients = Object.values(week)
+    .filter(Boolean)
+    .flatMap((recipe) => recipe!.ingredientsUsed.map(normalise));
 
-  return {
-    fromBox: fromBox.slice(0, 8),
-    optionalExtras: optionalExtras.slice(0, 8),
-  };
+  return uniqueStrings(
+    ingredients.filter(
+      (ingredient) =>
+        !isSupportVeg(ingredient) &&
+        !HERO_VEG_POOL.some(
+          (veg) =>
+            ingredient.includes(veg) ||
+            veg.includes(ingredient as (typeof HERO_VEG_POOL)[number]),
+        ) &&
+        !suggestionTerms.some(
+          (term) => ingredient.includes(term) || term.includes(ingredient),
+        ),
+    ),
+  ).slice(0, 8);
+}
+
+function getBuiltAroundText(seed: DayPlanSeed, recipe: GeneratedRecipe | null) {
+  if (!recipe) return titleCase(seed.anchorVeg);
+
+  const nonSupport = recipe.ingredientsUsed
+    .filter((item) => !isSupportVeg(item))
+    .slice(0, 2);
+
+  if (nonSupport.length > 0) {
+    return titleCase(nonSupport[0]);
+  }
+
+  return titleCase(seed.anchorVeg);
+}
+
+function formatNaturalList(values: string[]) {
+  if (values.length === 0) return "";
+  if (values.length === 1) return values[0];
+  if (values.length === 2) return `${values[0]} or ${values[1]}`;
+
+  const start = values.slice(0, -1).join(", ");
+  return `${start}, or ${values[values.length - 1]}`;
+}
+
+function getWorksWellWithText(seed: DayPlanSeed) {
+  const preferred = uniqueStrings([
+    ...seed.shopBaseOptions.slice(0, 2),
+    ...seed.everydayBaseOptions.slice(0, 2),
+  ]);
+
+  return formatNaturalList(preferred);
+}
+
+function getOptionalBoostText(seed: DayPlanSeed) {
+  const boosts = uniqueStrings(seed.shopBoostOptions.slice(0, 2));
+  return boosts.length > 0 ? formatNaturalList(boosts) : "";
 }
 
 export default function PlannerPage() {
@@ -512,14 +598,15 @@ export default function PlannerPage() {
     [week],
   );
   const totalBasketItems = useMemo(() => cart.length, [cart]);
-  const matchedSuggestions = useMemo(() => getMatchedSuggestions(week), [week]);
-  const matchedTotal = useMemo(
-    () => matchedSuggestions.reduce((sum, item) => sum + item.price, 0),
-    [matchedSuggestions],
+  const suggestedProducts = useMemo(() => getSuggestedProducts(week), [week]);
+  const suggestedTotal = useMemo(
+    () => suggestedProducts.reduce((sum, item) => sum + item.product.price, 0),
+    [suggestedProducts],
   );
-  const coverage = useMemo(
-    () => getPlanCoverage(week, matchedSuggestions),
-    [week, matchedSuggestions],
+  const fromBoxItems = useMemo(() => getFromBoxItems(week), [week]);
+  const everydayExtras = useMemo(
+    () => getEverydayExtras(week, suggestedProducts),
+    [week, suggestedProducts],
   );
 
   async function requestRecipeForDay(
@@ -544,16 +631,20 @@ export default function PlannerPage() {
           mode: "weekly-staples",
           familyKey: seed.familyKey,
           familyLabel: seed.familyLabel,
-          heroVeg: seed.heroVeg,
+          anchorVeg: seed.anchorVeg,
+          optionalVeg: seed.optionalVeg,
           supportVeg: seed.supportVeg,
-          baseItems: seed.baseItems,
+          everydayBaseOptions: seed.everydayBaseOptions,
+          shopBaseOptions: seed.shopBaseOptions,
+          shopBoostOptions: seed.shopBoostOptions,
           avoidHeroVeg: ["onion", "leek", "garlic"],
           guidance: [
             "Do not make onion, leek, or garlic the lead ingredient.",
-            "Treat onion, leek, and garlic only as background support.",
-            "Keep the meal identity clearly centered around the selected hero veg and base.",
-            "Avoid repeating the same weeknight identity as previous recipes when possible.",
-            "Keep the tone practical, direct, and realistic for everyday cooking.",
+            "Use one anchor veg and optionally one second veg, not a crowded ingredient pile.",
+            "Let bases stay flexible. A shop base can fit naturally, but do not force it.",
+            "Shop products should feel like useful options, not mandatory ingredients.",
+            "Avoid tartines or toast-led ideas unless they are clearly the best fit.",
+            "Keep the meal practical, direct, and realistic for everyday cooking.",
           ],
         },
         weekPlanContext: {
@@ -563,9 +654,13 @@ export default function PlannerPage() {
           previousRecipes,
           familyKey: seed.familyKey,
           familyLabel: seed.familyLabel,
-          heroVeg: seed.heroVeg,
+          anchorVeg: seed.anchorVeg,
+          optionalVeg: seed.optionalVeg,
           supportVeg: seed.supportVeg,
           intro: seed.intro,
+          everydayBaseOptions: seed.everydayBaseOptions,
+          shopBaseOptions: seed.shopBaseOptions,
+          shopBoostOptions: seed.shopBoostOptions,
         },
       }),
     });
@@ -636,27 +731,27 @@ export default function PlannerPage() {
     setError("");
   }
 
-  function addSuggestedItem(name: string) {
-    const item = SHOP_SUGGESTIONS.find((product) => product.name === name);
-    if (!item) return;
+  function addSuggestedItem(productName: string) {
+    const product = getShopItemByName(productName);
+    if (!product) return;
 
     addToCart({
-      name: item.name,
-      price: item.price,
-      image: item.image,
-      category: item.category,
-      checkoutType: item.checkoutType,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+      checkoutType: product.checkoutType,
     });
   }
 
   function addAllSuggestions() {
-    matchedSuggestions.forEach((item) => {
+    suggestedProducts.forEach((entry) => {
       addToCart({
-        name: item.name,
-        price: item.price,
-        image: item.image,
-        category: item.category,
-        checkoutType: item.checkoutType,
+        name: entry.product.name,
+        price: entry.product.price,
+        image: entry.product.image,
+        category: entry.product.category,
+        checkoutType: entry.product.checkoutType,
       });
     });
   }
@@ -665,8 +760,8 @@ export default function PlannerPage() {
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
         <div className="mx-auto max-w-7xl">
-          <div className="grid items-start gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-            <div>
+          <div className="grid gap-4 lg:grid-cols-[1.12fr_0.88fr]">
+            <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
               <div className="flex items-center gap-2">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
                   Weekly planner
@@ -687,40 +782,36 @@ export default function PlannerPage() {
                   </button>
 
                   {showInfo ? (
-                    <div className="absolute left-0 top-7 z-20 w-[300px] rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.98)] p-3 text-sm leading-6 text-[#5f675c] shadow-[0_14px_28px_rgba(36,51,40,0.10)]">
-                      Built for local weekly food shopping, this planner sets
-                      the meal identity first so each day feels distinct before
-                      the recipe API starts shaping the details.
+                    <div className="absolute left-0 top-7 z-20 w-[320px] rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.98)] p-3 text-sm leading-6 text-[#5f675c] shadow-[0_14px_28px_rgba(36,51,40,0.10)]">
+                      Build a whole week or plan day by day. Each day starts
+                      from one anchor veg, one optional supporting veg, and a
+                      few flexible base ideas so the plan feels useful rather
+                      than boxed in.
                     </div>
                   ) : null}
                 </div>
               </div>
 
-              <h1 className="mt-2 max-w-4xl font-serif text-[2rem] leading-[0.96] tracking-tight md:text-[3rem]">
+              <h1 className="mt-3 max-w-3xl font-serif text-[2rem] leading-[1.02] tracking-tight text-[#243328] md:text-[3.4rem]">
                 Plan what to cook around weekly staples from our produce boxes
               </h1>
 
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5f675c] md:text-base">
-                Get a full week of simple, flexible meal ideas built from what’s
-                in your box — then add what you need in one go.
-              </p>
-
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5f675c]">
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
                 Plan your week around what you already get in your produce box.
-                Each day is built around a few key ingredients — simple,
-                flexible, and easy to adapt.
+                Each day starts with one clear veg anchor, then opens into a few
+                flexible ways to make it work.
               </p>
 
-              <p className="mt-3 text-sm text-[#6b776c]">
+              <p className="mt-3 text-sm text-[#5f675c]">
                 Built from a real local kitchen and delivery service.
               </p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={() => void handlePlanFullWeek()}
-                  disabled={isPlanningWeek}
-                  className="inline-flex items-center justify-center rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={isPlanningWeek || planningDay !== null}
+                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isPlanningWeek
                     ? "Planning your week..."
@@ -729,113 +820,122 @@ export default function PlannerPage() {
 
                 <Link
                   href="/shop"
-                  className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-white/80 px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
+                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
                 >
                   Browse the shop
                 </Link>
 
-                <button
-                  type="button"
-                  onClick={handleClearWeek}
-                  className="inline-flex items-center justify-center rounded-full border border-transparent px-3 py-2 text-xs text-[#6b776c] transition hover:border-[#ddd4c8] hover:bg-white/50"
+                <Link
+                  href="/basket"
+                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
                 >
-                  Clear week
-                </button>
-
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#ddd4c8] bg-white/70 px-3 py-2 text-xs text-[#4f5e52]">
-                  <span className="font-medium text-[#243328]">
-                    {filledDays}/7
-                  </span>
-                  <span>filled days</span>
-                </div>
+                  Basket{totalBasketItems > 0 ? ` (${totalBasketItems})` : ""}
+                </Link>
               </div>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#ddd4c8] bg-white/80 px-3 py-1.5 text-xs text-[#5f675c]">
+                  1 anchor veg + 1 optional veg
+                </span>
+                <span className="rounded-full border border-[#ddd4c8] bg-white/80 px-3 py-1.5 text-xs text-[#5f675c]">
+                  Flexible base options
+                </span>
+                <span className="rounded-full border border-[#ddd4c8] bg-white/80 px-3 py-1.5 text-xs text-[#5f675c]">
+                  Replan any day
+                </span>
+              </div>
+
+              {error ? (
+                <div className="mt-5 rounded-[18px] border border-[#ead4d0] bg-[rgba(255,245,244,0.92)] px-4 py-3 text-sm text-[#7b4a42]">
+                  {error}
+                </div>
+              ) : null}
             </div>
 
-            <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] p-4 shadow-[0_12px_26px_rgba(36,51,40,0.05)] backdrop-blur-md">
-              <div className="flex items-center gap-4">
-                <div className="flex h-[92px] w-[104px] shrink-0 items-center justify-center rounded-[18px] bg-[rgba(255,255,255,0.84)] p-2">
+            <div className="grid grid-cols-2 gap-3">
+              {TOP_IMAGE_STRIP.map((card) => (
+                <div
+                  key={card.src}
+                  className="overflow-hidden rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-white/70 shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
+                >
                   <img
-                    src="/family-harvest-box.png"
-                    alt="Weekly produce box"
-                    className="h-full w-full object-contain"
+                    src={card.src}
+                    alt={card.alt}
+                    className="h-32 w-full object-cover md:h-40"
                   />
+                  <div className="p-3">
+                    <p className="text-xs uppercase tracking-[0.14em] text-[#6b776c]">
+                      {card.title}
+                    </p>
+                  </div>
                 </div>
-
-                <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#6b776c]">
-                    Weekly staples first
-                  </p>
-                  <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                    A more useful week before the AI starts
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                    Onion, leek, and garlic stay in support. Each day gets its
-                    own veg identity, base, and shape before the recipe is
-                    written.
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
-
-          {error ? (
-            <div className="mt-4 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
-              {error}
-            </div>
-          ) : null}
         </div>
       </section>
 
       <section className="px-4 py-6 sm:px-6 md:px-10 md:py-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
+        <div className="mx-auto max-w-7xl rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.7)] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
                 Your week, built from your box
               </p>
-              <h2 className="mt-1 font-serif text-[1.7rem] leading-tight md:text-[2rem]">
-                Plan the full week at once, or build it day by day
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5f675c]">
-                You can plan a whole week in one go, plan a day at a time, or
-                come back and try a different idea whenever a day needs
-                changing.
+              <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                Each day starts from a different veg identity, but the bases
+                stay flexible so the plan feels helpful, not rigid.
               </p>
             </div>
 
-            <p className="hidden max-w-md text-right text-sm leading-6 text-[#5f675c] md:block">
-              Each day starts from a different veg identity, so the week feels
-              varied before the API even starts shaping the meal.
-            </p>
-          </div>
+            <div className="flex flex-wrap gap-2">
+              <div className="rounded-full border border-[#ddd4c8] bg-white/80 px-3 py-1.5 text-sm text-[#5f675c]">
+                {filledDays}/7 planned
+              </div>
 
+              <button
+                type="button"
+                onClick={handleClearWeek}
+                className="rounded-full border border-[#d6cec2] bg-white/80 px-3 py-1.5 text-sm text-[#243328] transition hover:bg-white"
+              >
+                Clear week
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-8 sm:px-6 md:px-10 md:pb-10">
+        <div className="mx-auto max-w-7xl">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {DAYS.map((day, dayIndex) => {
               const recipe = week[day.key];
               const isBusy = planningDay === day.key;
               const isOpen = openDay === day.key;
-              const family = DAY_FAMILIES[dayIndex];
-              const builtAround = getBuiltAroundLine(recipe, family);
+              const seed = buildDaySeed(dayIndex, week, day.key);
+              const builtAround = getBuiltAroundText(seed, recipe);
+              const worksWellWith = getWorksWellWithText(seed);
+              const optionalBoost = getOptionalBoostText(seed);
 
               return (
                 <article
                   key={day.key}
-                  className="overflow-hidden rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.82)] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
+                  className="overflow-hidden rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.82)] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
                 >
                   {recipe?.imageUrl ? (
                     <img
                       src={recipe.imageUrl}
                       alt={recipe.title}
-                      className="h-32 w-full object-cover"
+                      className="h-36 w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-32 items-end bg-[linear-gradient(180deg,rgba(228,221,211,0.9),rgba(245,240,233,0.85))] p-4">
+                    <div className="flex h-36 items-end bg-[linear-gradient(180deg,rgba(228,221,211,0.9),rgba(245,240,233,0.85))] p-4">
                       <div>
                         <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
-                          {titleCase(family.label)}
+                          {day.label}
                         </p>
-                        <p className="mt-1 text-sm text-[#5f675c]">
-                          {family.intro}
+                        <p className="mt-1 max-w-[14rem] text-sm leading-6 text-[#5f675c]">
+                          {seed.intro}
                         </p>
                       </div>
                     </div>
@@ -861,14 +961,36 @@ export default function PlannerPage() {
                       </button>
                     </div>
 
-                    <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Built around
-                    </p>
-                    <p className="mt-1 text-sm text-[#243328]">{builtAround}</p>
+                    <div className="mt-3 rounded-[18px] border border-[#e8dfd3] bg-[rgba(249,246,241,0.76)] p-3">
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                        Built around
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#243328]">
+                        {builtAround}
+                      </p>
+
+                      <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                        Works well with
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-[#5f675c]">
+                        {worksWellWith}
+                      </p>
+
+                      {optionalBoost ? (
+                        <>
+                          <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                            Optional from the shop
+                          </p>
+                          <p className="mt-1 text-sm leading-6 text-[#5f675c]">
+                            {optionalBoost}
+                          </p>
+                        </>
+                      ) : null}
+                    </div>
 
                     {recipe ? (
                       <>
-                        <p className="mt-3 font-serif text-[1.15rem] leading-tight text-[#243328]">
+                        <p className="mt-4 font-serif text-[1.18rem] leading-tight text-[#243328]">
                           {recipe.title}
                         </p>
 
@@ -876,16 +998,9 @@ export default function PlannerPage() {
                           {tinyDescription(recipe.description)}
                         </p>
 
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {recipe.ingredientsUsed.slice(0, 5).map((item) => (
-                            <span
-                              key={`${day.key}-${item}`}
-                              className="rounded-full border border-[#ddd4c8] bg-[rgba(247,242,235,0.82)] px-2.5 py-1 text-[11px] text-[#4f5e52]"
-                            >
-                              {item}
-                            </span>
-                          ))}
-                        </div>
+                        <p className="mt-2 text-xs text-[#6b776c]">
+                          Same ingredients, new direction.
+                        </p>
 
                         <div className="mt-4 flex items-center gap-3">
                           <button
@@ -902,6 +1017,7 @@ export default function PlannerPage() {
                             <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
                               A simple idea using what you’ve got
                             </p>
+
                             <ol className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
                               {recipe.steps.map((step, index) => (
                                 <li
@@ -920,10 +1036,7 @@ export default function PlannerPage() {
                       </>
                     ) : (
                       <>
-                        <p className="mt-3 text-sm leading-6 text-[#5f675c]">
-                          {family.intro}
-                        </p>
-                        <p className="mt-3 text-sm leading-6 text-[#5f675c]">
+                        <p className="mt-4 text-sm leading-6 text-[#5f675c]">
                           Start with your box and we’ll build you a simple meal
                           idea for this day.
                         </p>
@@ -940,18 +1053,18 @@ export default function PlannerPage() {
       {filledDays > 0 ? (
         <section className="border-t border-[rgba(230,221,210,0.86)] px-4 py-6 sm:px-6 md:px-10 md:py-8">
           <div className="mx-auto max-w-7xl">
-            <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-              <article className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.82)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
+            <div className="grid gap-4 lg:grid-cols-[0.98fr_1.02fr]">
+              <article className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.82)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
                   Finish your week
                 </p>
                 <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                  Add a few extras to make everything work smoothly
+                  Add a few good things to make the whole week work smoothly
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  Your produce box still does the heavy lifting. This is just
-                  the short list that helps the week cook more easily from start
-                  to finish.
+                  The produce box still does the heavy lifting. These are the
+                  pantry adds that fit the plan best, plus any normal extras you
+                  may want on hand.
                 </p>
 
                 <div className="mt-5 space-y-4">
@@ -959,9 +1072,10 @@ export default function PlannerPage() {
                     <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
                       From your box
                     </p>
+
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {coverage.fromBox.length > 0 ? (
-                        coverage.fromBox.map((item) => (
+                      {fromBoxItems.length > 0 ? (
+                        fromBoxItems.map((item) => (
                           <span
                             key={`box-${item}`}
                             className="rounded-full border border-[#ddd4c8] bg-[rgba(247,242,235,0.82)] px-2.5 py-1 text-[11px] text-[#4f5e52]"
@@ -971,8 +1085,8 @@ export default function PlannerPage() {
                         ))
                       ) : (
                         <p className="text-sm text-[#5f675c]">
-                          Plan a few days and your core box staples will show
-                          here.
+                          Plan a few days and your box staples will start to
+                          show here.
                         </p>
                       )}
                     </div>
@@ -983,44 +1097,59 @@ export default function PlannerPage() {
                       <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
                         Add from your pantry
                       </p>
-                      {matchedSuggestions.length > 0 ? (
+
+                      {suggestedProducts.length > 0 ? (
                         <div className="rounded-full border border-[#ddd4c8] bg-white/75 px-3 py-1.5 text-xs text-[#4f5e52]">
-                          £{matchedTotal.toFixed(2)}
+                          £{suggestedTotal.toFixed(2)}
                         </div>
                       ) : null}
                     </div>
 
-                    {matchedSuggestions.length > 0 ? (
+                    {suggestedProducts.length > 0 ? (
                       <div className="mt-3 space-y-3">
-                        {matchedSuggestions.map((item) => (
+                        {suggestedProducts.map((entry) => (
                           <div
-                            key={item.name}
+                            key={entry.product.name}
                             className="flex items-center gap-3 rounded-[18px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.88)] p-3"
                           >
                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-white p-2">
                               <img
-                                src={item.image}
-                                alt={item.name}
+                                src={entry.product.image}
+                                alt={entry.product.name}
                                 className="h-full w-full object-contain"
                               />
                             </div>
 
                             <div className="min-w-0 flex-1">
                               <p className="font-medium text-[#243328]">
-                                {item.name}
+                                {entry.product.name}
                               </p>
                               <p className="mt-1 text-sm text-[#5f675c]">
-                                £{item.price.toFixed(2)}
+                                {entry.role === "base"
+                                  ? "Works as a flexible base in this plan"
+                                  : "Good as an optional flavour boost"}
+                              </p>
+                              <p className="mt-1 text-xs text-[#6b776c]">
+                                Used across{" "}
+                                {formatNaturalList(entry.matchedDays)}
                               </p>
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => addSuggestedItem(item.name)}
-                              className="rounded-full border border-[#d6cec2] bg-white/80 px-3 py-2 text-sm text-[#243328] transition hover:bg-white"
-                            >
-                              Add
-                            </button>
+                            <div className="flex flex-col items-end gap-2">
+                              <p className="text-sm text-[#5f675c]">
+                                £{entry.product.price.toFixed(2)}
+                              </p>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  addSuggestedItem(entry.product.name)
+                                }
+                                className="rounded-full border border-[#d6cec2] bg-white/80 px-3 py-2 text-sm text-[#243328] transition hover:bg-white"
+                              >
+                                Add
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1032,13 +1161,14 @@ export default function PlannerPage() {
                     )}
                   </div>
 
-                  {coverage.optionalExtras.length > 0 ? (
+                  {everydayExtras.length > 0 ? (
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                        Optional extras
+                        Everyday extras
                       </p>
+
                       <div className="mt-2 flex flex-wrap gap-1.5">
-                        {coverage.optionalExtras.map((item) => (
+                        {everydayExtras.map((item) => (
                           <span
                             key={`extra-${item}`}
                             className="rounded-full border border-[#ddd4c8] bg-white px-2.5 py-1 text-[11px] text-[#4f5e52]"
@@ -1052,7 +1182,7 @@ export default function PlannerPage() {
                 </div>
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
-                  {matchedSuggestions.length > 0 ? (
+                  {suggestedProducts.length > 0 ? (
                     <button
                       type="button"
                       onClick={addAllSuggestions}
@@ -1078,53 +1208,46 @@ export default function PlannerPage() {
                 </div>
               </article>
 
-              <article className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
+              <article className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
-                  Basket nudge
+                  How this planner is working
                 </p>
                 <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                  Start with the box, then add the bits that make the week
-                  easier
+                  Flexible enough to feel real, commercial enough to support the
+                  week
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  This keeps the planner commercial without making the range
-                  feel incomplete. Your produce box is the base. The pantry adds
-                  the finishing touch where it genuinely helps.
+                  The plan can point towards your shop where it helps, without
+                  pretending every meal only works with products you stock.
                 </p>
 
-                <div className="mt-5 rounded-[18px] border border-[#e6ddd2] bg-white/80 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                    How this week is working
-                  </p>
+                <div className="mt-5 grid gap-3 md:grid-cols-3">
+                  <div className="rounded-[18px] border border-[#e6ddd2] bg-white/85 p-4">
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                      1
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#243328]">
+                      One clear anchor veg gives the day a direction.
+                    </p>
+                  </div>
 
-                  <div className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
-                    <div className="flex gap-3">
-                      <span className="mt-[3px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
-                        1
-                      </span>
-                      <p>
-                        Your box covers the staples and gives each day its veg
-                        identity.
-                      </p>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="mt-[3px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
-                        2
-                      </span>
-                      <p>
-                        Your pantry products show up where they genuinely help a
-                        meal come together.
-                      </p>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="mt-[3px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
-                        3
-                      </span>
-                      <p>
-                        Anything else stays optional, so the plan still feels
-                        flexible and realistic.
-                      </p>
-                    </div>
+                  <div className="rounded-[18px] border border-[#e6ddd2] bg-white/85 p-4">
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                      2
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#243328]">
+                      A shop base or boost can fit naturally, but never has to.
+                    </p>
+                  </div>
+
+                  <div className="rounded-[18px] border border-[#e6ddd2] bg-white/85 p-4">
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                      3
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#243328]">
+                      Replanning keeps the same spirit while giving the user a
+                      fresh way through the week.
+                    </p>
                   </div>
                 </div>
               </article>
