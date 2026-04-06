@@ -796,13 +796,13 @@ export default function PlannerPage() {
               Weekly planner
             </p>
             <h1 className="mt-3 font-serif text-3xl leading-tight tracking-tight md:text-5xl">
-              Plan your week around your veg box.
+              Plan your week around what you have got.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
-              Use the same AI recipe logic you already have, but apply it across
-              the full week. Your produce box leads, your selected products
-              shape the meals, and the basket suggestions are built from the
-              plan.
+              Built for local weekly food shopping, this planner helps you turn
+              what you have got into a week of realistic meals. Use the box as a
+              base, get inspired, follow the recipe cards, and build your basket
+              as you go.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -812,9 +812,7 @@ export default function PlannerPage() {
                 disabled={loading || isGeneratingWeek}
                 className="inline-flex items-center justify-center rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
               >
-                {isGeneratingWeek
-                  ? "Planning your week..."
-                  : "Generate my week"}
+                {isGeneratingWeek ? "Planning your week..." : "Plan my week"}
               </button>
               <button
                 type="button"
@@ -840,7 +838,7 @@ export default function PlannerPage() {
               </div>
               <div className="rounded-[20px] border border-[#e5ddcf] bg-white/80 p-4">
                 <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                  Planner status
+                  Your week
                 </p>
                 <p className="mt-2 text-lg font-semibold">
                   {loading ? "Loading" : saving ? "Saving" : "Ready"}
@@ -848,7 +846,7 @@ export default function PlannerPage() {
               </div>
               <div className="rounded-[20px] border border-[#e5ddcf] bg-white/80 p-4">
                 <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                  Week style
+                  Cooking style
                 </p>
                 <p className="mt-2 text-lg font-semibold">
                   {QUICK_STARTS.find((item) => item.value === quickStart)
@@ -860,13 +858,13 @@ export default function PlannerPage() {
 
           <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 md:p-8">
             <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
-              Set the week up
+              Start with what you have got
             </p>
 
             <div className="mt-4 space-y-5">
               <div>
                 <label className="text-sm font-medium text-[#243328]">
-                  Produce box
+                  Weekly produce box
                 </label>
                 <select
                   value={selectedBoxName}
@@ -892,11 +890,15 @@ export default function PlannerPage() {
                 <p className="mt-2 text-sm leading-6 text-[#667164]">
                   {selectedBox?.description}
                 </p>
+                <p className="mt-1 text-sm leading-6 text-[#667164]">
+                  Start from the box first, then shape the week around a few
+                  extras, your basket, and the meals that make sense for home.
+                </p>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-[#243328]">
-                  Selected products
+                  Useful extras and pantry things
                 </label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {allShopItems.slice(0, 10).map((item) => {
@@ -921,7 +923,7 @@ export default function PlannerPage() {
 
               <div>
                 <label className="text-sm font-medium text-[#243328]">
-                  Extra ingredients
+                  A few extra ingredients
                 </label>
                 <textarea
                   value={customIngredients}
@@ -935,7 +937,7 @@ export default function PlannerPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label className="text-sm font-medium text-[#243328]">
-                    Week style
+                    Cooking style
                   </label>
                   <select
                     value={quickStart}
@@ -965,7 +967,7 @@ export default function PlannerPage() {
 
               <div>
                 <p className="text-sm font-medium text-[#243328]">
-                  Preferences
+                  Shape the week
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {PREFERENCES.map((preference) => {
@@ -1000,8 +1002,12 @@ export default function PlannerPage() {
                 This week
               </p>
               <h2 className="mt-2 font-serif text-2xl md:text-3xl">
-                A fuller weekly board
+                Your week at a glance
               </h2>
+              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                Follow the recipe cards, swap anything that does not fit, and
+                build a week that feels realistic for home.
+              </p>
             </div>
             {error ? <p className="text-sm text-[#8a574d]">{error}</p> : null}
           </div>
@@ -1035,15 +1041,15 @@ export default function PlannerPage() {
                         {day.label}
                       </p>
                       <span className="rounded-full border border-[#e5ddcf] bg-[rgba(247,242,235,0.82)] px-2.5 py-1 text-[11px] text-[#5f675c]">
-                        {meal ? "Planned" : "Waiting"}
+                        {meal ? "Planned" : "Ready to fill"}
                       </span>
                     </div>
                     <h3 className="mt-2 font-serif text-xl leading-tight text-[#243328]">
-                      {meal?.title ?? "Generate your week to fill this day"}
+                      {meal?.title ?? "Plan your week to fill this day"}
                     </h3>
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
                       {meal?.description ??
-                        "The weekly generator will use your veg box, selected products, and basket items to shape this meal."}
+                        "Use the weekly box, your basket, and a few good extras to build a realistic meal for this day."}
                     </p>
                     {meal?.ingredientsUsed?.length ? (
                       <div className="mt-3 flex flex-wrap gap-2">
@@ -1069,7 +1075,7 @@ export default function PlannerPage() {
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1fr_0.9fr]">
           <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-white/80 p-5 md:p-8">
             <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
-              Selected day
+              Recipe card
             </p>
             <h2 className="mt-2 font-serif text-2xl md:text-3xl">
               {DAYS.find((day) => day.key === activeDay)?.label}
@@ -1117,7 +1123,8 @@ export default function PlannerPage() {
               </>
             ) : (
               <p className="mt-3 text-sm leading-7 text-[#5f675c]">
-                Generate the week to fill in the details for this day.
+                Plan the week to open up the recipe card for this day and follow
+                it as you cook.
               </p>
             )}
           </div>
@@ -1126,11 +1133,15 @@ export default function PlannerPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
-                  Build the basket around it
+                  Turn the plan into your next order
                 </p>
                 <h2 className="mt-2 font-serif text-2xl md:text-3xl">
-                  Suggested weekly top-ups
+                  Useful extras for the week
                 </h2>
+                <p className="mt-2 text-sm leading-6 text-[#667164]">
+                  Use the plan to build a more useful weekly order. We will
+                  highlight the extras that help make the week work.
+                </p>
               </div>
               <div className="rounded-[16px] border border-[#ddd4c8] bg-white px-4 py-3 text-right">
                 <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
@@ -1174,8 +1185,8 @@ export default function PlannerPage() {
               ) : (
                 <div className="rounded-[18px] border border-[#ddd4c8] bg-white/80 p-4">
                   <p className="text-sm leading-6 text-[#5f675c]">
-                    Generate your week first and the planner will pull together
-                    useful shop matches here.
+                    Plan your week first and we will pull together the useful
+                    extras that help make it work.
                   </p>
                 </div>
               )}
