@@ -452,7 +452,10 @@ function getBuiltAroundLine(recipe: GeneratedRecipe | null, family: DayFamily) {
   return titleCase(family.label);
 }
 
-function getPlanCoverage(week: Record<DayKey, GeneratedRecipe | null>) {
+function getPlanCoverage(
+  week: Record<DayKey, GeneratedRecipe | null>,
+  matchedSuggestions: ShopSuggestion[],
+) {
   const ingredients = Object.values(week)
     .filter(Boolean)
     .flatMap((recipe) => recipe!.ingredientsUsed);
@@ -468,13 +471,21 @@ function getPlanCoverage(week: Record<DayKey, GeneratedRecipe | null>) {
       ) || isSupportVeg(ingredient),
   );
 
-  const likelyTopUps = deduped.filter(
-    (ingredient) => !fromBox.includes(ingredient),
+  const pantryMatchedTerms = uniqueStrings(
+    matchedSuggestions.flatMap((item) => item.matches.map(normalise)),
+  );
+
+  const optionalExtras = deduped.filter(
+    (ingredient) =>
+      !fromBox.includes(ingredient) &&
+      !pantryMatchedTerms.some(
+        (match) => ingredient.includes(match) || match.includes(ingredient),
+      ),
   );
 
   return {
     fromBox: fromBox.slice(0, 8),
-    likelyTopUps: likelyTopUps.slice(0, 10),
+    optionalExtras: optionalExtras.slice(0, 8),
   };
 }
 
@@ -506,7 +517,10 @@ export default function PlannerPage() {
     () => matchedSuggestions.reduce((sum, item) => sum + item.price, 0),
     [matchedSuggestions],
   );
-  const coverage = useMemo(() => getPlanCoverage(week), [week]);
+  const coverage = useMemo(
+    () => getPlanCoverage(week, matchedSuggestions),
+    [week, matchedSuggestions],
+  );
 
   async function requestRecipeForDay(
     dayIndex: number,
@@ -926,24 +940,24 @@ export default function PlannerPage() {
       {filledDays > 0 ? (
         <section className="border-t border-[rgba(230,221,210,0.86)] px-4 py-6 sm:px-6 md:px-10 md:py-8">
           <div className="mx-auto max-w-7xl">
-            <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+            <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
               <article className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.82)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
-                  Week at a glance
+                  Finish your week
                 </p>
                 <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                  Based on your plan — here’s what you’ll need this week
+                  Add a few extras to make everything work smoothly
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  Use this as a quick sense-check before you shop. The idea is
-                  to keep the produce box doing the heavy lifting, then top up
-                  only where it helps the week work.
+                  Your produce box still does the heavy lifting. This is just
+                  the short list that helps the week cook more easily from start
+                  to finish.
                 </p>
 
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="mt-5 space-y-4">
                   <div>
                     <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Likely covered by your box
+                      From your box
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {coverage.fromBox.length > 0 ? (
@@ -957,53 +971,100 @@ export default function PlannerPage() {
                         ))
                       ) : (
                         <p className="text-sm text-[#5f675c]">
-                          Plan a few days and this will fill in.
+                          Plan a few days and your core box staples will show
+                          here.
                         </p>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
-                      Likely top-ups
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {coverage.likelyTopUps.length > 0 ? (
-                        coverage.likelyTopUps.map((item) => (
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                        Add from your pantry
+                      </p>
+                      {matchedSuggestions.length > 0 ? (
+                        <div className="rounded-full border border-[#ddd4c8] bg-white/75 px-3 py-1.5 text-xs text-[#4f5e52]">
+                          £{matchedTotal.toFixed(2)}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {matchedSuggestions.length > 0 ? (
+                      <div className="mt-3 space-y-3">
+                        {matchedSuggestions.map((item) => (
+                          <div
+                            key={item.name}
+                            className="flex items-center gap-3 rounded-[18px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.88)] p-3"
+                          >
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-white p-2">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="h-full w-full object-contain"
+                              />
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-[#243328]">
+                                {item.name}
+                              </p>
+                              <p className="mt-1 text-sm text-[#5f675c]">
+                                £{item.price.toFixed(2)}
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => addSuggestedItem(item.name)}
+                              className="rounded-full border border-[#d6cec2] bg-white/80 px-3 py-2 text-sm text-[#243328] transition hover:bg-white"
+                            >
+                              Add
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-sm text-[#5f675c]">
+                        As soon as the plan lines up with one of your pantry
+                        products, it will show here.
+                      </p>
+                    )}
+                  </div>
+
+                  {coverage.optionalExtras.length > 0 ? (
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                        Optional extras
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {coverage.optionalExtras.map((item) => (
                           <span
-                            key={`topup-${item}`}
+                            key={`extra-${item}`}
                             className="rounded-full border border-[#ddd4c8] bg-white px-2.5 py-1 text-[11px] text-[#4f5e52]"
                           >
                             {titleCase(item)}
                           </span>
-                        ))
-                      ) : (
-                        <p className="text-sm text-[#5f675c]">
-                          Once recipes are in place, your likely top-ups will
-                          show here.
-                        </p>
-                      )}
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
-              </article>
 
-              <article className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
-                  Basket nudge
-                </p>
-                <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                  Most weeks start with the box, then a few useful extras
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  Keep the basket simple. Start with your produce box, then add
-                  the bits that make the plan easier to cook through.
-                </p>
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  {matchedSuggestions.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={addAllSuggestions}
+                      className="rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                    >
+                      Add everything I need
+                    </button>
+                  ) : null}
 
-                <div className="mt-4 flex flex-wrap items-center gap-3">
                   <Link
                     href="/shop"
-                    className="rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                    className="rounded-full border border-[#d6cec2] bg-white/80 px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
                   >
                     Browse the shop
                   </Link>
@@ -1016,93 +1077,57 @@ export default function PlannerPage() {
                   </Link>
                 </div>
               </article>
-            </div>
-          </div>
-        </section>
-      ) : null}
 
-      {matchedSuggestions.length > 0 ? (
-        <section className="border-t border-[rgba(230,221,210,0.86)] px-4 py-6 sm:px-6 md:px-10 md:py-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div>
+              <article className="rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
                 <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
-                  Add what you need
+                  Basket nudge
                 </p>
-                <h2 className="mt-1 font-serif text-[1.6rem] leading-tight md:text-[1.9rem]">
-                  A few useful extras to make this week work
+                <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
+                  Start with the box, then add the bits that make the week
+                  easier
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5f675c]">
-                  Based on your plan, these are the items most likely to help.
-                  Add them one by one, or add everything you need in one go.
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  This keeps the planner commercial without making the range
+                  feel incomplete. Your produce box is the base. The pantry adds
+                  the finishing touch where it genuinely helps.
                 </p>
-              </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-full border border-[#ddd4c8] bg-white/75 px-3 py-2 text-sm text-[#4f5e52]">
-                  £{matchedTotal.toFixed(2)}
-                </div>
+                <div className="mt-5 rounded-[18px] border border-[#e6ddd2] bg-white/80 p-4">
+                  <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                    How this week is working
+                  </p>
 
-                <button
-                  type="button"
-                  onClick={addAllSuggestions}
-                  className="rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Add everything I need
-                </button>
-
-                <Link
-                  href="/basket"
-                  className="rounded-full border border-[#d6cec2] bg-white/80 px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
-                >
-                  Basket{totalBasketItems > 0 ? ` (${totalBasketItems})` : ""}
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              {matchedSuggestions.map((item) => (
-                <article
-                  key={item.name}
-                  className="rounded-[20px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.82)] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[14px] bg-[rgba(247,242,235,0.9)] p-2">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-contain"
-                      />
+                  <div className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">
+                    <div className="flex gap-3">
+                      <span className="mt-[3px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
+                        1
+                      </span>
+                      <p>
+                        Your box covers the staples and gives each day its veg
+                        identity.
+                      </p>
                     </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-[#243328]">{item.name}</p>
-                      <p className="mt-1 text-sm text-[#5f675c]">
-                        £{item.price.toFixed(2)}
+                    <div className="flex gap-3">
+                      <span className="mt-[3px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
+                        2
+                      </span>
+                      <p>
+                        Your pantry products show up where they genuinely help a
+                        meal come together.
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <span className="mt-[3px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px]">
+                        3
+                      </span>
+                      <p>
+                        Anything else stays optional, so the plan still feels
+                        flexible and realistic.
                       </p>
                     </div>
                   </div>
-
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {item.matches.slice(0, 3).map((match) => (
-                      <span
-                        key={`${item.name}-${match}`}
-                        className="rounded-full border border-[#ddd4c8] bg-[rgba(247,242,235,0.82)] px-2.5 py-1 text-[11px] text-[#4f5e52]"
-                      >
-                        {titleCase(match)}
-                      </span>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => addSuggestedItem(item.name)}
-                    className="mt-4 rounded-full border border-[#d6cec2] bg-white/80 px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
-                  >
-                    Add what you need for this
-                  </button>
-                </article>
-              ))}
+                </div>
+              </article>
             </div>
           </div>
         </section>
