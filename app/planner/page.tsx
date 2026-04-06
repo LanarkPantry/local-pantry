@@ -41,6 +41,8 @@ type DayFamily = {
   everydayBaseOptions: string[];
   shopBaseOptions: string[];
   shopBoostOptions: string[];
+  flavourDirection: string;
+  flavourNotes: string[];
   quickStart: QuickStart;
 };
 
@@ -55,6 +57,8 @@ type DayPlanSeed = {
   shopBaseOptions: string[];
   shopBoostOptions: string[];
   selectedShopBoosts: string[];
+  flavourDirection: string;
+  flavourNotes: string[];
   quickStart: QuickStart;
 };
 
@@ -148,6 +152,8 @@ const DAY_FAMILIES: DayFamily[] = [
     everydayBaseOptions: ["rice", "potatoes"],
     shopBaseOptions: ["Short Grain Rice", "Orzo Pasta"],
     shopBoostOptions: ["Sorrel & Walnut Pesto"],
+    flavourDirection: "bright and herby",
+    flavourNotes: ["lemon", "soft herbs", "olive oil"],
     quickStart: "use-what-ive-got",
   },
   {
@@ -161,6 +167,8 @@ const DAY_FAMILIES: DayFamily[] = [
     everydayBaseOptions: ["pasta", "rice"],
     shopBaseOptions: ["Casarecce Pasta", "Orzo Pasta"],
     shopBoostOptions: ["Sorrel & Walnut Pesto", "Rose Harissa"],
+    flavourDirection: "softly savoury and tomato-led",
+    flavourNotes: ["garlic", "basil", "black pepper"],
     quickStart: "quick-tonight",
   },
   {
@@ -174,6 +182,8 @@ const DAY_FAMILIES: DayFamily[] = [
     everydayBaseOptions: ["eggs", "beans"],
     shopBaseOptions: ["Polenta", "Puy Lentils"],
     shopBoostOptions: ["Sorrel & Walnut Pesto"],
+    flavourDirection: "comforting and gently savoury",
+    flavourNotes: ["mustard", "butter", "herbs"],
     quickStart: "comforting",
   },
   {
@@ -187,6 +197,8 @@ const DAY_FAMILIES: DayFamily[] = [
     everydayBaseOptions: ["lentils", "beans"],
     shopBaseOptions: ["Puy Lentils", "Farro"],
     shopBoostOptions: ["Rose Harissa", "Walnuts"],
+    flavourDirection: "warm and gently spiced",
+    flavourNotes: ["paprika", "cumin", "thyme"],
     quickStart: "comforting",
   },
   {
@@ -200,6 +212,8 @@ const DAY_FAMILIES: DayFamily[] = [
     everydayBaseOptions: ["couscous", "potatoes"],
     shopBaseOptions: ["Giant Couscous", "Farro"],
     shopBoostOptions: ["Rose Harissa", "Cashews"],
+    flavourDirection: "bright and lightly spiced",
+    flavourNotes: ["lemon", "mint", "coriander"],
     quickStart: "quick-tonight",
   },
   {
@@ -213,6 +227,8 @@ const DAY_FAMILIES: DayFamily[] = [
     everydayBaseOptions: ["orzo", "rice"],
     shopBaseOptions: ["Orzo Pasta", "Farro"],
     shopBoostOptions: ["Sorrel & Walnut Pesto", "Walnuts"],
+    flavourDirection: "earthy and softly creamy",
+    flavourNotes: ["thyme", "black pepper", "stock"],
     quickStart: "comforting",
   },
   {
@@ -226,6 +242,8 @@ const DAY_FAMILIES: DayFamily[] = [
     everydayBaseOptions: ["beans", "rice"],
     shopBaseOptions: ["Puy Lentils", "Polenta"],
     shopBoostOptions: ["Rose Harissa", "Cashews"],
+    flavourDirection: "hearty and gently spiced",
+    flavourNotes: ["paprika", "rosemary", "mustard"],
     quickStart: "use-what-ive-got",
   },
 ];
@@ -499,6 +517,8 @@ function buildDaySeed(
     shopBaseOptions: family.shopBaseOptions,
     shopBoostOptions: family.shopBoostOptions,
     selectedShopBoosts,
+    flavourDirection: family.flavourDirection,
+    flavourNotes: family.flavourNotes,
     quickStart: family.quickStart,
   };
 }
@@ -712,6 +732,8 @@ export default function PlannerPage() {
           everydayBaseOptions: seed.everydayBaseOptions,
           shopBaseOptions: seed.shopBaseOptions,
           shopBoostOptions: seed.selectedShopBoosts,
+          flavourDirection: seed.flavourDirection,
+          flavourNotes: seed.flavourNotes,
           avoidHeroVeg: ["onion", "leek", "garlic"],
           guidance: [
             "Do not make onion, leek, or garlic the lead ingredient.",
@@ -739,6 +761,8 @@ export default function PlannerPage() {
           everydayBaseOptions: seed.everydayBaseOptions,
           shopBaseOptions: seed.shopBaseOptions,
           shopBoostOptions: seed.selectedShopBoosts,
+          flavourDirection: seed.flavourDirection,
+          flavourNotes: seed.flavourNotes,
         },
       }),
     });
@@ -1000,30 +1024,19 @@ export default function PlannerPage() {
                   key={day.key}
                   className="overflow-hidden rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.82)] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
                 >
-                  {recipe?.imageUrl ? (
-                    <img
-                      src={recipe.imageUrl}
-                      alt={recipe.title}
-                      className="h-36 w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-36 items-end bg-[linear-gradient(180deg,rgba(228,221,211,0.9),rgba(245,240,233,0.85))] p-4">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
-                          {day.label}
-                        </p>
-                        <p className="mt-1 max-w-[14rem] text-sm leading-6 text-[#5f675c]">
-                          {seed.intro}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
                   <div className="p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-medium text-[#243328]">
-                        {day.label}
-                      </h3>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-medium text-[#243328]">
+                          {day.label}
+                        </h3>
+
+                        {recipe ? (
+                          <p className="mt-3 font-serif text-[1.18rem] leading-tight text-[#243328]">
+                            {recipe.title}
+                          </p>
+                        ) : null}
+                      </div>
 
                       <button
                         type="button"
@@ -1066,27 +1079,38 @@ export default function PlannerPage() {
                       ) : null}
                     </div>
 
+                    {recipe?.imageUrl ? (
+                      <img
+                        src={recipe.imageUrl}
+                        alt={recipe.title}
+                        className="mt-4 h-36 w-full rounded-[18px] object-cover"
+                      />
+                    ) : (
+                      <div className="mt-4 flex h-36 items-end rounded-[18px] bg-[linear-gradient(180deg,rgba(228,221,211,0.9),rgba(245,240,233,0.85))] p-4">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
+                            {day.label}
+                          </p>
+                          <p className="mt-1 max-w-[14rem] text-sm leading-6 text-[#5f675c]">
+                            {seed.intro}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {recipe ? (
                       <>
-                        <p className="mt-4 font-serif text-[1.18rem] leading-tight text-[#243328]">
-                          {recipe.title}
-                        </p>
-
-                        <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                        <p className="mt-4 text-sm leading-6 text-[#5f675c]">
                           {tinyDescription(recipe.description)}
                         </p>
 
-                        <p className="mt-2 text-xs text-[#6b776c]">
-                          Same ingredients, new direction.
-                        </p>
-
-                        <div className="mt-4 flex items-center gap-3">
+                        <div className="mt-3 flex items-center gap-3">
                           <button
                             type="button"
                             onClick={() => setOpenDay(isOpen ? null : day.key)}
                             className="text-sm text-[#5f675c] underline underline-offset-4"
                           >
-                            {isOpen ? "Hide recipe card" : "Follow recipe"}
+                            {isOpen ? "Hide instructions" : "See instructions"}
                           </button>
                         </div>
 
@@ -1094,6 +1118,10 @@ export default function PlannerPage() {
                           <div className="mt-4 rounded-[18px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.78)] p-4">
                             <p className="text-[10px] uppercase tracking-[0.14em] text-[#6b776c]">
                               A simple idea using what you’ve got
+                            </p>
+
+                            <p className="mt-2 text-xs text-[#6b776c]">
+                              Same ingredients, new direction.
                             </p>
 
                             <ol className="mt-3 space-y-3 text-sm leading-6 text-[#243328]">

@@ -32,6 +32,33 @@ type WeekPlanContext = {
   totalMeals: number;
   includeMeatIdeas?: boolean;
   previousRecipes?: PreviousRecipe[];
+  familyKey?: string;
+  familyLabel?: string;
+  anchorVeg?: string;
+  optionalVeg?: string | null;
+  supportVeg?: string[];
+  intro?: string;
+  everydayBaseOptions?: string[];
+  shopBaseOptions?: string[];
+  shopBoostOptions?: string[];
+  flavourDirection?: string;
+  flavourNotes?: string[];
+};
+
+type PlannerIntent = {
+  mode?: string;
+  familyKey?: string;
+  familyLabel?: string;
+  anchorVeg?: string;
+  optionalVeg?: string | null;
+  supportVeg?: string[];
+  everydayBaseOptions?: string[];
+  shopBaseOptions?: string[];
+  shopBoostOptions?: string[];
+  avoidHeroVeg?: string[];
+  flavourDirection?: string;
+  flavourNotes?: string[];
+  guidance?: string[];
 };
 
 const quickStartPromptMap: Record<string, string> = {
@@ -69,10 +96,10 @@ const SAVOURY_MEAL_DIRECTIONS: MealDirection[] = [
       "Take it in the direction of a pasta, orzo, couscous, rice, farro, or lentil-led meal with a strong sense of structure.",
   },
   {
-    key: "toast-tartine",
-    label: "toast or tartine supper",
+    key: "simple-pan",
+    label: "simple pan supper",
     instruction:
-      "Take it in the direction of a toast, tartine, or open-faced supper with something piled on top and a good contrast in texture.",
+      "Take it in the direction of a simple pan-cooked supper with a clear main ingredient, a practical base, and a straightforward finish.",
   },
   {
     key: "bake-gratin",
@@ -161,6 +188,24 @@ const COMMON_SUPPORT_INGREDIENTS = [
   "lemon",
   "lime",
   "herbs",
+  "basil",
+  "parsley",
+  "mint",
+  "dill",
+  "coriander",
+  "thyme",
+  "rosemary",
+  "paprika",
+  "smoked paprika",
+  "cumin",
+  "ground cumin",
+  "coriander seeds",
+  "ground coriander",
+  "chilli",
+  "chilli flakes",
+  "mustard",
+  "vinegar",
+  "lemon zest",
 ];
 
 const OVERUSED_BOX_DEFAULTS = ["apple", "carrot", "leek", "leeks", "onion"];
@@ -204,6 +249,24 @@ function normaliseList(value: unknown, maxItems: number) {
     .map((item) => String(item).trim())
     .filter((item) => item.length > 0)
     .slice(0, maxItems);
+}
+
+function uniqueStrings(values: string[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value.trim();
+    if (!trimmed) continue;
+
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    result.push(trimmed);
+  }
+
+  return result;
 }
 
 function safeParseRecipe(outputText: string): GeneratedRecipe | null {
@@ -328,7 +391,7 @@ function inferPreviousDirection(previousRecipe?: PreviousRecipe | null) {
     text.includes("tartine") ||
     text.includes("open sandwich")
   ) {
-    return "toast-tartine";
+    return "simple-pan";
   }
 
   if (
@@ -506,6 +569,78 @@ Very important:
 - Keep it practical, quick, and realistic for normal home use.
 - If chocolate spread, jam, honey, fruit, or yoghurt are present, let those ingredients genuinely shape the recipe.
 - The result should still feel like something this shop would sensibly suggest to help someone use what they picked.
+`.trim();
+}
+
+function buildPlannerIntentInstruction(
+  plannerIntent: PlannerIntent | null | undefined,
+) {
+  if (!plannerIntent) {
+    return "";
+  }
+
+  const guidance = Array.isArray(plannerIntent.guidance)
+    ? plannerIntent.guidance.filter(Boolean).join("\n- ")
+    : "";
+
+  const avoidLead = Array.isArray(plannerIntent.avoidHeroVeg)
+    ? plannerIntent.avoidHeroVeg.filter(Boolean).join(", ")
+    : "";
+
+  return `
+Planner intent:
+- Family: ${plannerIntent.familyLabel || plannerIntent.familyKey || "none"}
+- Anchor veg: ${plannerIntent.anchorVeg || "none"}
+- Optional veg: ${plannerIntent.optionalVeg || "none"}
+- Everyday bases: ${(plannerIntent.everydayBaseOptions ?? []).join(", ") || "none"}
+- Shop bases: ${(plannerIntent.shopBaseOptions ?? []).join(", ") || "none"}
+- Shop boosts: ${(plannerIntent.shopBoostOptions ?? []).join(", ") || "none"}
+
+Important:
+- Keep the meal clearly centred on the anchor veg.
+- The optional veg should support the meal only if it fits naturally.
+- Let the meal feel flexible, not over-specified.
+- Treat shop bases and shop boosts as useful options, not mandatory ingredients.
+${avoidLead ? `- Never make these the lead ingredient: ${avoidLead}.` : ""}
+${guidance ? `- ${guidance}` : ""}
+`.trim();
+}
+
+function buildFlavourInstruction(
+  items: string[],
+  quickStart: string,
+  plannerIntent?: PlannerIntent | null,
+  weekPlanContext?: WeekPlanContext | null,
+) {
+  const flavourDirection =
+    plannerIntent?.flavourDirection ||
+    weekPlanContext?.flavourDirection ||
+    (quickStart === "comforting"
+      ? "warm and savoury"
+      : quickStart === "quick-tonight"
+        ? "bright and lively"
+        : "simple and well-seasoned");
+
+  const flavourNotes = uniqueStrings(
+    [
+      ...(plannerIntent?.flavourNotes ?? []),
+      ...(weekPlanContext?.flavourNotes ?? []),
+    ].filter(Boolean),
+  ).slice(0, 4);
+
+  return `
+Use flavour confidently but simply.
+
+Important:
+- Do not keep the recipe bland, flat, or under-seasoned.
+- Let flavour come from practical things such as lemon, herbs, paprika, cumin, coriander, chilli flakes, mustard, stock, yoghurt, butter, olive oil, nuts, or black pepper when they fit naturally.
+- A good meal can be bright, herby, warm, gently spiced, creamy, earthy, brothy, or softly smoky without becoming complicated.
+- Use one or two clear flavour moves rather than piling everything in.
+- Do not rely on pesto, harissa, or another jar every time. If a jar boost is not clearly provided for the day, do not invent one.
+- If the day has no shop boost, finish the meal with everyday flavour instead.
+- Keep the flavour direction leaning towards: ${flavourDirection}.
+${flavourNotes.length > 0 ? `- Helpful flavour notes: ${flavourNotes.join(", ")}.` : ""}
+- The flavour should support the anchor ingredients rather than overpower them.
 `.trim();
 }
 
@@ -717,6 +852,7 @@ async function requestRecipe(
   previousRecipe: PreviousRecipe | null | undefined,
   isRetry: boolean,
   weekPlanContext?: WeekPlanContext | null,
+  plannerIntent?: PlannerIntent | null,
 ) {
   const quickStartInstruction = quickStartPromptMap[quickStart] ?? "";
   const preferencesInstruction =
@@ -738,6 +874,13 @@ async function requestRecipe(
   const sweetIngredientInstruction = buildSweetIngredientInstruction(items);
   const dietaryInstruction = buildDietaryInstruction(preferences);
   const weekPlanInstruction = buildWeekPlanInstruction(weekPlanContext);
+  const plannerIntentInstruction = buildPlannerIntentInstruction(plannerIntent);
+  const flavourInstruction = buildFlavourInstruction(
+    items,
+    quickStart,
+    plannerIntent,
+    weekPlanContext,
+  );
   const previousRecipesInstruction = buildPreviousRecipesInstruction(
     weekPlanContext?.previousRecipes ?? [],
   );
@@ -762,7 +905,7 @@ Avoid repeating the same meal shape, title pattern, or main finishing idea.
 You are a warm, practical recipe writer for a premium local grocery shop.
 
 Create one simple, realistic recipe based mainly on the provided ingredients.
-You may include up to 3 common pantry staples such as salt, pepper, oil, butter, flour, or water if needed.
+You may include up to 5 practical pantry supports such as salt, pepper, oil, butter, flour, water, lemon, herbs, spices, stock, or yoghurt if needed.
 Keep the tone grounded, useful, and quietly confident.
 Make the recipe feel like a genuinely good local food idea, not a chef demo and not an AI gimmick.
 Avoid overly complicated techniques or niche ingredients.
@@ -784,6 +927,8 @@ ${produceBoxInstruction}
 ${ingredientPriorityInstruction}
 ${sweetIngredientInstruction}
 ${weekPlanInstruction}
+${plannerIntentInstruction}
+${flavourInstruction}
 ${previousRecipeInstruction}
 ${previousRecipesInstruction}
 
@@ -847,6 +992,7 @@ async function generateRecipe(
   preferences: string[],
   previousRecipe?: PreviousRecipe | null,
   weekPlanContext?: WeekPlanContext | null,
+  plannerIntent?: PlannerIntent | null,
 ) {
   const firstRecipe = await requestRecipe(
     client,
@@ -856,6 +1002,7 @@ async function generateRecipe(
     previousRecipe,
     false,
     weekPlanContext,
+    plannerIntent,
   );
 
   if (isRecipeGroundedInItems(firstRecipe, items)) {
@@ -870,6 +1017,7 @@ async function generateRecipe(
     previousRecipe,
     true,
     weekPlanContext,
+    plannerIntent,
   );
 
   if (isRecipeGroundedInItems(retryRecipe, items)) {
@@ -963,6 +1111,52 @@ export async function POST(request: Request) {
             .slice(0, 8)
         : [];
 
+    const plannerIntent =
+      body.plannerIntent && typeof body.plannerIntent === "object"
+        ? {
+            mode:
+              typeof body.plannerIntent.mode === "string"
+                ? body.plannerIntent.mode
+                : undefined,
+            familyKey:
+              typeof body.plannerIntent.familyKey === "string"
+                ? body.plannerIntent.familyKey
+                : undefined,
+            familyLabel:
+              typeof body.plannerIntent.familyLabel === "string"
+                ? body.plannerIntent.familyLabel
+                : undefined,
+            anchorVeg:
+              typeof body.plannerIntent.anchorVeg === "string"
+                ? body.plannerIntent.anchorVeg
+                : undefined,
+            optionalVeg:
+              typeof body.plannerIntent.optionalVeg === "string"
+                ? body.plannerIntent.optionalVeg
+                : null,
+            supportVeg: normaliseList(body.plannerIntent.supportVeg, 6),
+            everydayBaseOptions: normaliseList(
+              body.plannerIntent.everydayBaseOptions,
+              6,
+            ),
+            shopBaseOptions: normaliseList(
+              body.plannerIntent.shopBaseOptions,
+              6,
+            ),
+            shopBoostOptions: normaliseList(
+              body.plannerIntent.shopBoostOptions,
+              4,
+            ),
+            avoidHeroVeg: normaliseList(body.plannerIntent.avoidHeroVeg, 6),
+            flavourDirection:
+              typeof body.plannerIntent.flavourDirection === "string"
+                ? body.plannerIntent.flavourDirection
+                : undefined,
+            flavourNotes: normaliseList(body.plannerIntent.flavourNotes, 6),
+            guidance: normaliseList(body.plannerIntent.guidance, 12),
+          }
+        : null;
+
     const weekPlanContext =
       body.weekPlanContext &&
       typeof body.weekPlanContext === "object" &&
@@ -975,6 +1169,44 @@ export async function POST(request: Request) {
             totalMeals: body.weekPlanContext.totalMeals,
             includeMeatIdeas: Boolean(body.weekPlanContext.includeMeatIdeas),
             previousRecipes,
+            familyKey:
+              typeof body.weekPlanContext.familyKey === "string"
+                ? body.weekPlanContext.familyKey
+                : undefined,
+            familyLabel:
+              typeof body.weekPlanContext.familyLabel === "string"
+                ? body.weekPlanContext.familyLabel
+                : undefined,
+            anchorVeg:
+              typeof body.weekPlanContext.anchorVeg === "string"
+                ? body.weekPlanContext.anchorVeg
+                : undefined,
+            optionalVeg:
+              typeof body.weekPlanContext.optionalVeg === "string"
+                ? body.weekPlanContext.optionalVeg
+                : null,
+            supportVeg: normaliseList(body.weekPlanContext.supportVeg, 6),
+            intro:
+              typeof body.weekPlanContext.intro === "string"
+                ? body.weekPlanContext.intro
+                : undefined,
+            everydayBaseOptions: normaliseList(
+              body.weekPlanContext.everydayBaseOptions,
+              6,
+            ),
+            shopBaseOptions: normaliseList(
+              body.weekPlanContext.shopBaseOptions,
+              6,
+            ),
+            shopBoostOptions: normaliseList(
+              body.weekPlanContext.shopBoostOptions,
+              4,
+            ),
+            flavourDirection:
+              typeof body.weekPlanContext.flavourDirection === "string"
+                ? body.weekPlanContext.flavourDirection
+                : undefined,
+            flavourNotes: normaliseList(body.weekPlanContext.flavourNotes, 6),
           }
         : null;
 
@@ -992,6 +1224,7 @@ export async function POST(request: Request) {
       preferences,
       previousRecipe,
       weekPlanContext,
+      plannerIntent,
     );
 
     const imageUrl = await generateRecipeImage(client, recipe.title);
