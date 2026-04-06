@@ -37,7 +37,27 @@ type ShopSuggestion = {
   matches: string[];
 };
 
-const STORAGE_KEY = "tlp_weekly_planner_v6";
+type DayFamily = {
+  key: string;
+  label: string;
+  intro: string;
+  baseItems: string[];
+  heroVegCandidates: string[];
+  supportItems: string[];
+  quickStart: "quick-tonight" | "comforting" | "use-what-ive-got";
+};
+
+type DayPlanSeed = {
+  familyKey: string;
+  familyLabel: string;
+  intro: string;
+  heroVeg: string[];
+  supportVeg: string[];
+  baseItems: string[];
+  quickStart: DayFamily["quickStart"];
+};
+
+const STORAGE_KEY = "tlp_weekly_planner_v7";
 
 const DAYS: { key: DayKey; label: string; short: string }[] = [
   { key: "monday", label: "Monday", short: "Mon" },
@@ -59,44 +79,93 @@ const EMPTY_WEEK: Record<DayKey, GeneratedRecipe | null> = {
   sunday: null,
 };
 
-const BOX_PRODUCE_POOL = [
-  "carrots",
-  "potatoes",
-  "onions",
-  "leeks",
+const HERO_VEG_POOL = [
   "broccoli",
-  "spinach",
   "peppers",
   "tomatoes",
   "courgette",
+  "spinach",
   "kale",
   "cucumber",
   "lettuce",
-  "spring onion",
-  "apples",
-  "oranges",
-  "grapes",
-  "herbs",
-];
+  "carrots",
+  "potatoes",
+  "green beans",
+  "cauliflower",
+  "beetroot",
+  "squash",
+  "aubergine",
+  "sweetcorn",
+  "mushrooms",
+  "cabbage",
+] as const;
 
-const DAY_SUPPORTS = [
-  ["lentils", "thyme", "stock"],
-  ["orzo", "spinach", "lemon"],
-  ["rice", "beans", "coriander"],
-  ["eggs", "greens", "yoghurt"],
-  ["couscous", "harissa", "mint"],
-  ["pasta", "basil", "cheese"],
-  ["chickpeas", "rosemary", "garlic"],
-];
+const SUPPORT_VEG_POOL = ["onion", "leek", "garlic"] as const;
 
-const DAY_QUICK_STARTS = [
-  "use-what-ive-got",
-  "quick-tonight",
-  "use-what-ive-got",
-  "comforting",
-  "quick-tonight",
-  "comforting",
-  "use-what-ive-got",
+const DAY_FAMILIES: DayFamily[] = [
+  {
+    key: "rice-bowl",
+    label: "Broccoli, peppers + rice",
+    intro: "A bowl-led start with crisp veg and a rice base.",
+    baseItems: ["rice", "lemon", "herbs"],
+    heroVegCandidates: ["broccoli", "peppers", "green beans", "spinach"],
+    supportItems: ["garlic", "stock"],
+    quickStart: "use-what-ive-got",
+  },
+  {
+    key: "pasta-night",
+    label: "Courgette, tomatoes + pasta",
+    intro: "A softer, saucier pasta-shaped day.",
+    baseItems: ["pasta", "basil", "cheese"],
+    heroVegCandidates: ["courgette", "tomatoes", "aubergine", "mushrooms"],
+    supportItems: ["garlic", "onion"],
+    quickStart: "quick-tonight",
+  },
+  {
+    key: "potato-pan",
+    label: "Potatoes, kale + eggs",
+    intro: "A comforting potato-led supper with greens.",
+    baseItems: ["potatoes", "eggs", "yoghurt"],
+    heroVegCandidates: ["potatoes", "kale", "spinach", "cabbage"],
+    supportItems: ["onion", "garlic"],
+    quickStart: "comforting",
+  },
+  {
+    key: "lentil-pot",
+    label: "Squash + lentils",
+    intro: "A lentil and herb day with depth rather than speed.",
+    baseItems: ["lentils", "thyme", "stock"],
+    heroVegCandidates: ["squash", "carrots", "beetroot", "cauliflower"],
+    supportItems: ["onion", "garlic"],
+    quickStart: "comforting",
+  },
+  {
+    key: "couscous-plate",
+    label: "Cauliflower + couscous",
+    intro: "A bright, spiced plate with enough softness to carry the week.",
+    baseItems: ["couscous", "mint", "yoghurt"],
+    heroVegCandidates: ["cauliflower", "peppers", "cucumber", "lettuce"],
+    supportItems: ["garlic"],
+    quickStart: "quick-tonight",
+  },
+  {
+    key: "orzo-pan",
+    label: "Mushrooms + greens + orzo",
+    intro: "A softer pan-led meal that still feels distinct.",
+    baseItems: ["orzo", "lemon", "cheese"],
+    heroVegCandidates: ["mushrooms", "spinach", "kale", "tomatoes"],
+    supportItems: ["garlic", "leek"],
+    quickStart: "comforting",
+  },
+  {
+    key: "bean-supper",
+    label: "Carrots, cabbage + beans",
+    intro: "A hearty end-of-week bean supper with robust veg.",
+    baseItems: ["beans", "rosemary", "stock"],
+    heroVegCandidates: ["carrots", "cabbage", "beetroot", "potatoes"],
+    supportItems: ["onion", "garlic"],
+    quickStart: "use-what-ive-got",
+  },
 ];
 
 const SHOP_SUGGESTIONS: ShopSuggestion[] = [
@@ -107,21 +176,20 @@ const SHOP_SUGGESTIONS: ShopSuggestion[] = [
     category: "boxes",
     checkoutType: "subscription",
     matches: [
-      "carrot",
-      "potato",
       "broccoli",
-      "spinach",
       "pepper",
       "tomato",
       "courgette",
-      "apple",
-      "orange",
-      "grape",
-      "lettuce",
-      "cucumber",
-      "onion",
-      "leek",
+      "spinach",
       "kale",
+      "carrot",
+      "potato",
+      "cucumber",
+      "lettuce",
+      "cauliflower",
+      "cabbage",
+      "mushroom",
+      "squash",
     ],
   },
   {
@@ -130,7 +198,7 @@ const SHOP_SUGGESTIONS: ShopSuggestion[] = [
     image: "/sorrel-walnut-pesto.png",
     category: "pantry",
     checkoutType: "one-off",
-    matches: ["pasta", "potato", "greens", "spinach", "broccoli", "courgette"],
+    matches: ["pasta", "orzo", "potato", "greens", "courgette", "broccoli"],
   },
   {
     name: "Rose Harissa",
@@ -138,7 +206,7 @@ const SHOP_SUGGESTIONS: ShopSuggestion[] = [
     image: "/rose-harissa.png",
     category: "pantry",
     checkoutType: "one-off",
-    matches: ["carrot", "couscous", "chickpea", "pepper", "tomato"],
+    matches: ["couscous", "cauliflower", "carrot", "squash", "pepper"],
   },
   {
     name: "Orzo Pasta",
@@ -146,7 +214,7 @@ const SHOP_SUGGESTIONS: ShopSuggestion[] = [
     image: "/images/cupboard/orzo.jpg",
     category: "cupboard",
     checkoutType: "one-off",
-    matches: ["orzo", "tomato", "greens", "lemon", "spinach"],
+    matches: ["orzo", "mushroom", "greens", "lemon", "spinach"],
   },
   {
     name: "Giant Couscous",
@@ -154,7 +222,7 @@ const SHOP_SUGGESTIONS: ShopSuggestion[] = [
     image: "/images/cupboard/giant-couscous.jpg",
     category: "cupboard",
     checkoutType: "one-off",
-    matches: ["couscous", "harissa", "courgette", "pepper", "herbs"],
+    matches: ["couscous", "harissa", "cauliflower", "pepper", "herbs"],
   },
   {
     name: "Puy Lentils",
@@ -162,7 +230,7 @@ const SHOP_SUGGESTIONS: ShopSuggestion[] = [
     image: "/images/cupboard/puy-lentils.jpg",
     category: "cupboard",
     checkoutType: "one-off",
-    matches: ["lentils", "carrot", "onion", "leek", "herbs"],
+    matches: ["lentils", "squash", "carrot", "beetroot", "herbs"],
   },
 ];
 
@@ -173,6 +241,7 @@ function readStoredWeek() {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return EMPTY_WEEK;
     const parsed = JSON.parse(raw) as Record<DayKey, GeneratedRecipe | null>;
+
     return {
       monday: parsed.monday ?? null,
       tuesday: parsed.tuesday ?? null,
@@ -189,38 +258,10 @@ function readStoredWeek() {
 
 function writeStoredWeek(value: Record<DayKey, GeneratedRecipe | null>) {
   if (typeof window === "undefined") return;
+
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
   } catch {}
-}
-
-function getDayInputs(dayIndex: number) {
-  const rotatedProduce = [
-    ...BOX_PRODUCE_POOL.slice(dayIndex),
-    ...BOX_PRODUCE_POOL.slice(0, dayIndex),
-  ];
-
-  const heroProduce = rotatedProduce.slice(0, 4);
-  const supportProduce = DAY_SUPPORTS[dayIndex % DAY_SUPPORTS.length];
-  return Array.from(new Set([...heroProduce, ...supportProduce]));
-}
-
-function toPreviousRecipes(
-  week: Record<DayKey, GeneratedRecipe | null>,
-  excludeDay?: DayKey,
-) {
-  const recipes: StoredRecipe[] = [];
-  for (const day of DAYS) {
-    if (excludeDay && day.key === excludeDay) continue;
-    const recipe = week[day.key];
-    if (!recipe) continue;
-    recipes.push({
-      title: recipe.title,
-      description: recipe.description,
-      ingredientsUsed: recipe.ingredientsUsed,
-    });
-  }
-  return recipes;
 }
 
 function tinyDescription(text: string) {
@@ -230,6 +271,144 @@ function tinyDescription(text: string) {
 
 function normalise(text: string) {
   return text.toLowerCase().trim();
+}
+
+function toPreviousRecipes(
+  week: Record<DayKey, GeneratedRecipe | null>,
+  excludeDay?: DayKey,
+) {
+  const recipes: StoredRecipe[] = [];
+
+  for (const day of DAYS) {
+    if (excludeDay && day.key === excludeDay) continue;
+    const recipe = week[day.key];
+    if (!recipe) continue;
+
+    recipes.push({
+      title: recipe.title,
+      description: recipe.description,
+      ingredientsUsed: recipe.ingredientsUsed,
+    });
+  }
+
+  return recipes;
+}
+
+function countHeroVegUsage(
+  week: Record<DayKey, GeneratedRecipe | null>,
+  excludeDay?: DayKey,
+) {
+  const counts: Record<string, number> = {};
+
+  for (const day of DAYS) {
+    if (excludeDay && day.key === excludeDay) continue;
+    const recipe = week[day.key];
+    if (!recipe) continue;
+
+    recipe.ingredientsUsed.forEach((ingredient) => {
+      const key = normalise(ingredient);
+
+      if (
+        key.includes("onion") ||
+        key.includes("leek") ||
+        key.includes("garlic")
+      ) {
+        return;
+      }
+
+      HERO_VEG_POOL.forEach((heroVeg) => {
+        if (
+          key.includes(heroVeg) ||
+          heroVeg.includes(key as (typeof HERO_VEG_POOL)[number])
+        ) {
+          counts[heroVeg] = (counts[heroVeg] ?? 0) + 1;
+        }
+      });
+    });
+  }
+
+  return counts;
+}
+
+function uniqueStrings(values: string[]) {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+function pickSupportVeg(dayIndex: number, family: DayFamily) {
+  const baseSupport = uniqueStrings(
+    family.supportItems.filter(
+      (item) => item === "onion" || item === "leek" || item === "garlic",
+    ),
+  );
+
+  const rotatingSupport = SUPPORT_VEG_POOL[dayIndex % SUPPORT_VEG_POOL.length];
+  return uniqueStrings([...baseSupport, rotatingSupport]).slice(0, 1);
+}
+
+function pickHeroVegForFamily(
+  family: DayFamily,
+  usageCounts: Record<string, number>,
+) {
+  const rankedCandidates = [...family.heroVegCandidates].sort((a, b) => {
+    const aCount = usageCounts[a] ?? 0;
+    const bCount = usageCounts[b] ?? 0;
+    if (aCount !== bCount) return aCount - bCount;
+    return a.localeCompare(b);
+  });
+
+  const selected: string[] = [];
+
+  for (const veg of rankedCandidates) {
+    if ((usageCounts[veg] ?? 0) >= 2) continue;
+    selected.push(veg);
+    usageCounts[veg] = (usageCounts[veg] ?? 0) + 1;
+    if (selected.length === 2) break;
+  }
+
+  if (selected.length < 2) {
+    const backupCandidates = HERO_VEG_POOL.filter(
+      (veg) =>
+        family.heroVegCandidates.includes(veg) === false &&
+        (usageCounts[veg] ?? 0) < 2,
+    );
+
+    for (const veg of backupCandidates) {
+      selected.push(veg);
+      usageCounts[veg] = (usageCounts[veg] ?? 0) + 1;
+      if (selected.length === 2) break;
+    }
+  }
+
+  return selected.slice(0, 2);
+}
+
+function buildDaySeed(
+  dayIndex: number,
+  week: Record<DayKey, GeneratedRecipe | null>,
+  targetDay?: DayKey,
+): DayPlanSeed {
+  const family = DAY_FAMILIES[dayIndex % DAY_FAMILIES.length];
+  const usageCounts = countHeroVegUsage(week, targetDay);
+  const heroVeg = pickHeroVegForFamily(family, usageCounts);
+  const supportVeg = pickSupportVeg(dayIndex, family);
+
+  return {
+    familyKey: family.key,
+    familyLabel: family.label,
+    intro: family.intro,
+    heroVeg,
+    supportVeg,
+    baseItems: family.baseItems,
+    quickStart: family.quickStart,
+  };
+}
+
+function getDayInputs(seed: DayPlanSeed) {
+  return uniqueStrings([
+    ...seed.heroVeg,
+    ...seed.baseItems,
+    ...seed.supportVeg,
+  ]);
 }
 
 function getMatchedSuggestions(week: Record<DayKey, GeneratedRecipe | null>) {
@@ -269,8 +448,11 @@ export default function PlannerPage() {
     () => Object.values(week).filter(Boolean).length,
     [week],
   );
+
   const totalBasketItems = useMemo(() => cart.length, [cart]);
+
   const matchedSuggestions = useMemo(() => getMatchedSuggestions(week), [week]);
+
   const matchedTotal = useMemo(
     () => matchedSuggestions.reduce((sum, item) => sum + item.price, 0),
     [matchedSuggestions],
@@ -281,7 +463,7 @@ export default function PlannerPage() {
     existingWeek: Record<DayKey, GeneratedRecipe | null>,
     targetDay: DayKey,
   ) {
-    const items = getDayInputs(dayIndex);
+    const seed = buildDaySeed(dayIndex, existingWeek, targetDay);
     const previousRecipes = toPreviousRecipes(existingWeek, targetDay);
 
     const response = await fetch("/api/recipe", {
@@ -290,20 +472,41 @@ export default function PlannerPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        items,
-        quickStart: DAY_QUICK_STARTS[dayIndex % DAY_QUICK_STARTS.length],
+        items: getDayInputs(seed),
+        quickStart: seed.quickStart,
         preferences: [],
         previousRecipes,
+        plannerIntent: {
+          mode: "weekly-staples",
+          familyKey: seed.familyKey,
+          familyLabel: seed.familyLabel,
+          heroVeg: seed.heroVeg,
+          supportVeg: seed.supportVeg,
+          baseItems: seed.baseItems,
+          avoidHeroVeg: ["onion", "leek", "garlic"],
+          guidance: [
+            "Do not make onion, leek, or garlic the lead ingredient.",
+            "Treat onion, leek, and garlic only as background support.",
+            "Keep the meal identity clearly centered around the selected hero veg and base.",
+            "Avoid repeating the same weeknight identity as previous recipes when possible.",
+          ],
+        },
         weekPlanContext: {
           mode: "plan-week",
           mealIndex: dayIndex,
           totalMeals: 7,
           previousRecipes,
+          familyKey: seed.familyKey,
+          familyLabel: seed.familyLabel,
+          heroVeg: seed.heroVeg,
+          supportVeg: seed.supportVeg,
+          intro: seed.intro,
         },
       }),
     });
 
     const data = await response.json();
+
     if (!response.ok || !data?.recipe) {
       throw new Error(data?.error || "Could not plan this meal just now.");
     }
@@ -320,13 +523,16 @@ export default function PlannerPage() {
 
     try {
       let nextWeek = { ...week };
+
       for (let i = 0; i < DAYS.length; i++) {
         const day = DAYS[i];
         const recipe = await requestRecipeForDay(i, nextWeek, day.key);
+
         nextWeek = {
           ...nextWeek,
           [day.key]: recipe,
         };
+
         setWeek(nextWeek);
       }
     } catch (err) {
@@ -344,10 +550,12 @@ export default function PlannerPage() {
     try {
       const dayIndex = DAYS.findIndex((item) => item.key === day);
       const recipe = await requestRecipeForDay(dayIndex, week, day);
+
       setWeek((current) => ({
         ...current,
         [day]: recipe,
       }));
+
       setOpenDay(day);
     } catch (err) {
       console.error(err);
@@ -414,22 +622,22 @@ export default function PlannerPage() {
                   </button>
 
                   {showInfo ? (
-                    <div className="absolute left-0 top-7 z-20 w-[260px] rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.98)] p-3 text-sm leading-6 text-[#5f675c] shadow-[0_14px_28px_rgba(36,51,40,0.10)]">
-                      Built for local weekly food shopping, this planner helps
-                      you turn what you’ve got into a week of realistic meals.
-                      Use the box as a base, get inspired, and build your basket
-                      as you go.
+                    <div className="absolute left-0 top-7 z-20 w-[290px] rounded-[16px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.98)] p-3 text-sm leading-6 text-[#5f675c] shadow-[0_14px_28px_rgba(36,51,40,0.10)]">
+                      Built for local weekly food shopping, this planner uses a
+                      stronger hero veg system so each day feels distinct before
+                      the recipe API even starts shaping the meal.
                     </div>
                   ) : null}
                 </div>
               </div>
 
-              <h1 className="mt-2 max-w-3xl font-serif text-[2rem] leading-[0.96] tracking-tight md:text-[3rem]">
-                Plan your week around what you’ve got
+              <h1 className="mt-2 max-w-4xl font-serif text-[2rem] leading-[0.96] tracking-tight md:text-[3rem]">
+                Plan what to cook around weekly staples from our produce boxes
               </h1>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5f675c] md:text-base">
-                Use the box, shape the week, follow the recipe cards.
+                Distinct day families, stronger veg-led variation, and recipe
+                cards that feel more usable across the full week.
               </p>
 
               <div className="mt-4 flex flex-wrap items-center gap-2.5">
@@ -478,14 +686,14 @@ export default function PlannerPage() {
 
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-[0.16em] text-[#6b776c]">
-                    Use your box as a base
+                    Stronger planner logic
                   </p>
                   <h2 className="mt-1 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                    A stronger start to the week
+                    A clearer week before the AI starts
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                    Start with the weekly box, then plan the full week or build
-                    day by day.
+                    Onion, leek, and garlic stay in support. The planner now
+                    builds each day from a separate veg family and base.
                   </p>
                 </div>
               </div>
@@ -508,21 +716,22 @@ export default function PlannerPage() {
                 The actual planner
               </p>
               <h2 className="mt-1 font-serif text-[1.7rem] leading-tight md:text-[2rem]">
-                Your week, seen sooner
+                Seven day families, not just rotated ingredients
               </h2>
             </div>
 
             <p className="hidden max-w-md text-right text-sm leading-6 text-[#5f675c] md:block">
-              Plan the full week at once, or pick any day and build it on its
-              own.
+              Plan the full week at once, or build one day at a time with the
+              same hero veg rules and repeat suppression.
             </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {DAYS.map((day) => {
+            {DAYS.map((day, dayIndex) => {
               const recipe = week[day.key];
               const isBusy = planningDay === day.key;
               const isOpen = openDay === day.key;
+              const family = DAY_FAMILIES[dayIndex];
 
               return (
                 <article
@@ -537,9 +746,14 @@ export default function PlannerPage() {
                     />
                   ) : (
                     <div className="flex h-32 items-end bg-[linear-gradient(180deg,rgba(228,221,211,0.9),rgba(245,240,233,0.85))] p-4">
-                      <p className="text-sm text-[#6b776c]">
-                        {recipe ? "Meal planned" : "Plan this day"}
-                      </p>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.16em] text-[#6b776c]">
+                          {family.label}
+                        </p>
+                        <p className="mt-1 text-sm text-[#5f675c]">
+                          {family.intro}
+                        </p>
+                      </div>
                     </div>
                   )}
 
@@ -563,6 +777,10 @@ export default function PlannerPage() {
                       </button>
                     </div>
 
+                    <p className="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                      {family.label}
+                    </p>
+
                     {recipe ? (
                       <>
                         <p className="mt-3 font-serif text-[1.15rem] leading-tight text-[#243328]">
@@ -574,7 +792,7 @@ export default function PlannerPage() {
                         </p>
 
                         <div className="mt-3 flex flex-wrap gap-1.5">
-                          {recipe.ingredientsUsed.slice(0, 4).map((item) => (
+                          {recipe.ingredientsUsed.slice(0, 5).map((item) => (
                             <span
                               key={`${day.key}-${item}`}
                               className="rounded-full border border-[#ddd4c8] bg-[rgba(247,242,235,0.82)] px-2.5 py-1 text-[11px] text-[#4f5e52]"
@@ -617,7 +835,7 @@ export default function PlannerPage() {
                       </>
                     ) : (
                       <p className="mt-3 text-sm leading-6 text-[#5f675c]">
-                        Start here if you just want to sort one day first.
+                        {family.intro}
                       </p>
                     )}
                   </div>
@@ -640,7 +858,8 @@ export default function PlannerPage() {
                   Add the useful bits
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5f675c]">
-                  A compact set of extras to help make the week work.
+                  A compact set of extras to help the planned week work without
+                  pushing the basket too far.
                 </p>
               </div>
 
