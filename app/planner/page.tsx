@@ -54,6 +54,7 @@ type DayPlanSeed = {
   everydayBaseOptions: string[];
   shopBaseOptions: string[];
   shopBoostOptions: string[];
+  selectedShopBoosts: string[];
   quickStart: QuickStart;
 };
 
@@ -64,7 +65,10 @@ type SuggestedProduct = {
   score: number;
 };
 
-const STORAGE_KEY = "tlp_weekly_planner_v9";
+const STORAGE_KEY = "tlp_weekly_planner_v10";
+
+const MAX_BOOST_DAYS_PER_WEEK = 2;
+const MAX_SAME_BOOST_PER_WEEK = 1;
 
 const DAYS: { key: DayKey; label: string; short: string }[] = [
   { key: "monday", label: "Monday", short: "Mon" },
@@ -401,6 +405,76 @@ function pickSupportVeg(dayIndex: number, family: DayFamily) {
   return uniqueStrings([...supportFromFamily, rotatingSupport]).slice(0, 1);
 }
 
+function recipeMentionsProduct(
+  recipe: GeneratedRecipe | null,
+  productName: string,
+) {
+  if (!recipe) return false;
+
+  const target = normalise(productName);
+  const searchable = [
+    ...recipe.ingredientsUsed,
+    ...recipe.pantryStaples,
+    recipe.title,
+    recipe.description,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return searchable.includes(target.toLowerCase());
+}
+
+function getBoostUsageCounts(
+  week: Record<DayKey, GeneratedRecipe | null>,
+  excludeDay?: DayKey,
+) {
+  const counts: Record<string, number> = {};
+  let totalBoostDays = 0;
+
+  for (const [dayIndex, day] of DAYS.entries()) {
+    if (excludeDay && day.key === excludeDay) continue;
+
+    const recipe = week[day.key];
+    if (!recipe) continue;
+
+    const family = DAY_FAMILIES[dayIndex];
+    const matchedBoosts = family.shopBoostOptions.filter((boost) =>
+      recipeMentionsProduct(recipe, boost),
+    );
+
+    if (matchedBoosts.length > 0) {
+      totalBoostDays += 1;
+    }
+
+    matchedBoosts.forEach((boost) => {
+      counts[boost] = (counts[boost] ?? 0) + 1;
+    });
+  }
+
+  return { counts, totalBoostDays };
+}
+
+function pickBoostsForFamily(
+  family: DayFamily,
+  week: Record<DayKey, GeneratedRecipe | null>,
+  targetDay?: DayKey,
+) {
+  const { counts, totalBoostDays } = getBoostUsageCounts(week, targetDay);
+
+  if (totalBoostDays >= MAX_BOOST_DAYS_PER_WEEK) return [];
+
+  const eligibleBoosts = family.shopBoostOptions.filter(
+    (boost) => (counts[boost] ?? 0) < MAX_SAME_BOOST_PER_WEEK,
+  );
+
+  if (eligibleBoosts.length === 0) return [];
+
+  const shouldUseBoost = family.quickStart === "comforting";
+  if (!shouldUseBoost) return [];
+
+  return eligibleBoosts.slice(0, 1);
+}
+
 function buildDaySeed(
   dayIndex: number,
   week: Record<DayKey, GeneratedRecipe | null>,
@@ -412,6 +486,8 @@ function buildDaySeed(
   const optionalVeg = pickOptionalVegForFamily(family, usageCounts, anchorVeg);
   const supportVeg = pickSupportVeg(dayIndex, family);
 
+  const selectedShopBoosts = pickBoostsForFamily(family, week, targetDay);
+
   return {
     familyKey: family.key,
     familyLabel: family.label,
@@ -422,6 +498,7 @@ function buildDaySeed(
     everydayBaseOptions: family.everydayBaseOptions,
     shopBaseOptions: family.shopBaseOptions,
     shopBoostOptions: family.shopBoostOptions,
+    selectedShopBoosts,
     quickStart: family.quickStart,
   };
 }
@@ -432,7 +509,7 @@ function getDayInputs(seed: DayPlanSeed) {
     seed.optionalVeg ?? "",
     ...seed.everydayBaseOptions.slice(0, 1),
     ...seed.shopBaseOptions.slice(0, 1),
-    ...seed.shopBoostOptions.slice(0, 1),
+    ...seed.selectedShopBoosts,
     ...seed.supportVeg,
   ]);
 }
@@ -451,18 +528,16 @@ function getSuggestedProducts(
     if (!recipe) continue;
 
     const family = DAY_FAMILIES[dayIndex];
-    const productNames = [
-      ...family.shopBaseOptions.map((name) => ({
-        name,
-        role: "base" as const,
-      })),
-      ...family.shopBoostOptions.map((name) => ({
-        name,
-        role: "boost" as const,
-      })),
+    const matchedEntries = [
+      ...family.shopBaseOptions
+        .filter((name) => recipeMentionsProduct(recipe, name))
+        .map((name) => ({ name, role: "base" as const })),
+      ...family.shopBoostOptions
+        .filter((name) => recipeMentionsProduct(recipe, name))
+        .map((name) => ({ name, role: "boost" as const })),
     ];
 
-    productNames.forEach((entry, productIndex) => {
+    matchedEntries.forEach((entry, productIndex) => {
       const product = getShopItemByName(entry.name);
       if (!product) return;
 
@@ -571,7 +646,7 @@ function getWorksWellWithText(seed: DayPlanSeed) {
 }
 
 function getOptionalBoostText(seed: DayPlanSeed) {
-  const boosts = uniqueStrings(seed.shopBoostOptions.slice(0, 2));
+  const boosts = uniqueStrings(seed.selectedShopBoosts.slice(0, 1));
   return boosts.length > 0 ? formatNaturalList(boosts) : "";
 }
 
@@ -636,12 +711,15 @@ export default function PlannerPage() {
           supportVeg: seed.supportVeg,
           everydayBaseOptions: seed.everydayBaseOptions,
           shopBaseOptions: seed.shopBaseOptions,
-          shopBoostOptions: seed.shopBoostOptions,
+          shopBoostOptions: seed.selectedShopBoosts,
           avoidHeroVeg: ["onion", "leek", "garlic"],
           guidance: [
             "Do not make onion, leek, or garlic the lead ingredient.",
             "Use one anchor veg and optionally one second veg, not a crowded ingredient pile.",
             "Let bases stay flexible. A shop base can fit naturally, but do not force it.",
+            "A flavour boost from the shop should be occasional, not standard.",
+            "If no boost is provided, do not invent pesto, harissa, or another jar-led shortcut.",
+            "Use at most one shop boost for the day, and only when it clearly improves the meal.",
             "Shop products should feel like useful options, not mandatory ingredients.",
             "Avoid tartines or toast-led ideas unless they are clearly the best fit.",
             "Keep the meal practical, direct, and realistic for everyday cooking.",
@@ -660,7 +738,7 @@ export default function PlannerPage() {
           intro: seed.intro,
           everydayBaseOptions: seed.everydayBaseOptions,
           shopBaseOptions: seed.shopBaseOptions,
-          shopBoostOptions: seed.shopBoostOptions,
+          shopBoostOptions: seed.selectedShopBoosts,
         },
       }),
     });
