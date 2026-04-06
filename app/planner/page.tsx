@@ -1,163 +1,206 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { getUser } from "../lib/authClient";
 import { loadPlanner, savePlanner } from "../lib/plannerApi";
 
-type MealSlot = {
+type DayKey =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
+
+type PlannerMeal = {
   id: string;
   title: string;
-  subtitle?: string;
-  image: string;
-  category?: string;
-  cookTime?: string;
-  wow?: boolean;
-  ingredients?: string[];
-  notes?: string;
-  sourceUrl?: string;
+  description?: string;
+  image?: string;
+  tags?: string[];
+  ingredientsHint?: string;
 };
 
-type DayPlan = {
-  day: string;
-  meal: MealSlot | null;
+type PlannerState = Record<DayKey, PlannerMeal | null>;
+
+type UserLike = {
+  id: string;
 };
 
-type PlannerState = {
-  weekOf: string;
-  plans: DayPlan[];
-  notes: string;
-};
-
-const DAY_NAMES = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
+const DAYS: { key: DayKey; label: string; short: string }[] = [
+  { key: "monday", label: "Monday", short: "Mon" },
+  { key: "tuesday", label: "Tuesday", short: "Tue" },
+  { key: "wednesday", label: "Wednesday", short: "Wed" },
+  { key: "thursday", label: "Thursday", short: "Thu" },
+  { key: "friday", label: "Friday", short: "Fri" },
+  { key: "saturday", label: "Saturday", short: "Sat" },
+  { key: "sunday", label: "Sunday", short: "Sun" },
 ];
 
-const STARTER_MEALS: MealSlot[] = [
+const EMPTY_PLANNER: PlannerState = {
+  monday: null,
+  tuesday: null,
+  wednesday: null,
+  thursday: null,
+  friday: null,
+  saturday: null,
+  sunday: null,
+};
+
+const IMAGE_FALLBACKS = [
+  "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1543332164-6e82f355badc?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1400&q=80",
+];
+
+const SAMPLE_MEALS: PlannerMeal[] = [
   {
-    id: "1",
-    title: "Roast Chicken with Herb Butter",
-    subtitle: "Golden, comforting, and dinner-party worthy",
-    image:
-      "https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&w=1200&q=80",
-    category: "Family favourite",
-    cookTime: "1 hr 10 mins",
-    wow: true,
-    ingredients: ["Chicken", "Potatoes", "Carrots", "Butter", "Herbs"],
+    id: "lp-1",
+    title: "Creamy Tuscan Chicken Pasta",
+    description:
+      "Big flavour, simple midweek comfort, and easy to build a basket around.",
+    image: IMAGE_FALLBACKS[0],
+    tags: ["wow", "midweek", "family"],
+    ingredientsHint: "Chicken, cream, pasta, spinach, garlic",
   },
   {
-    id: "2",
-    title: "Creamy Tuscan Salmon",
-    subtitle: "Fast midweek dinner with a little theatre",
-    image:
-      "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80",
-    category: "Midweek wow",
-    cookTime: "25 mins",
-    wow: true,
-    ingredients: ["Salmon", "Spinach", "Cream", "Garlic", "Lemon"],
+    id: "lp-2",
+    title: "Roast Veg & Halloumi Traybake",
+    description:
+      "Colourful, easy, and perfect for a Local Pantry veg-first week.",
+    image: IMAGE_FALLBACKS[1],
+    tags: ["veg", "easy", "colourful"],
+    ingredientsHint: "Peppers, courgette, red onion, halloumi, herbs",
   },
   {
-    id: "3",
-    title: "Veggie Gnocchi Traybake",
-    subtitle: "Minimal washing up, maximum colour",
-    image:
-      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
-    category: "Easy prep",
-    cookTime: "30 mins",
-    ingredients: ["Gnocchi", "Peppers", "Tomatoes", "Mozzarella"],
+    id: "lp-3",
+    title: "Sticky Ginger Beef Noodles",
+    description:
+      "Fast, glossy, and feels like a Friday meal without much effort.",
+    image: IMAGE_FALLBACKS[2],
+    tags: ["fast", "friday", "takeaway"],
+    ingredientsHint: "Beef strips, noodles, soy, ginger, spring onion",
   },
   {
-    id: "4",
-    title: "Steak Fajita Board",
-    subtitle: "Big flavours and a fun table moment",
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
-    category: "Weekend crowd-pleaser",
-    cookTime: "35 mins",
-    wow: true,
-    ingredients: ["Steak", "Peppers", "Onions", "Wraps", "Lime"],
+    id: "lp-4",
+    title: "Loaded Baked Potato Night",
+    description: "Cosy, low-lift, and easy to personalise for everyone.",
+    image: IMAGE_FALLBACKS[3],
+    tags: ["budget", "comfort", "easy"],
+    ingredientsHint: "Potatoes, cheese, salad, beans, toppings",
   },
   {
-    id: "5",
-    title: "Tomato Basil Rigatoni",
-    subtitle: "Simple, glossy, and always welcome",
-    image:
-      "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=1200&q=80",
-    category: "Comfort bowl",
-    cookTime: "20 mins",
-    ingredients: ["Rigatoni", "Tomatoes", "Basil", "Parmesan"],
+    id: "lp-5",
+    title: "Herby Lemon Salmon with Greens",
+    description: "Light, fresh, and gives the planner a premium feel.",
+    image: IMAGE_FALLBACKS[4],
+    tags: ["fresh", "premium", "healthy"],
+    ingredientsHint: "Salmon, lemon, greens, potatoes",
   },
   {
-    id: "6",
-    title: "Sticky Halloumi Grain Bowl",
-    subtitle: "Fresh, bright, and packed with texture",
-    image:
-      "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1200&q=80",
-    category: "Lighter pick",
-    cookTime: "20 mins",
-    ingredients: ["Halloumi", "Couscous", "Cucumber", "Mint", "Pomegranate"],
+    id: "lp-6",
+    title: "Slow Cooker Chilli with Rice",
+    description: "A practical crowd-pleaser that still feels generous.",
+    image: IMAGE_FALLBACKS[5],
+    tags: ["batch", "comfort", "easy"],
+    ingredientsHint: "Mince, beans, tomatoes, rice, spices",
+  },
+  {
+    id: "lp-7",
+    title: "Crispy Chicken Tacos",
+    description: "Crunchy, bright, and much more fun than a plain text slot.",
+    image: IMAGE_FALLBACKS[6],
+    tags: ["fun", "weekend", "shareable"],
+    ingredientsHint: "Chicken, tortillas, slaw, salsa, lime",
   },
 ];
 
-function createDefaultPlanner(): PlannerState {
-  const today = new Date();
-  const monday = new Date(today);
-  const day = monday.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  monday.setDate(monday.getDate() + diff);
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normaliseLoadedPlanner(input: unknown): PlannerState {
+  if (!input || typeof input !== "object") return EMPTY_PLANNER;
+
+  const source = input as Record<string, unknown>;
+  const next: PlannerState = { ...EMPTY_PLANNER };
+
+  for (const day of DAYS) {
+    const value = source[day.key];
+    if (value && typeof value === "object") {
+      const meal = value as Record<string, unknown>;
+      next[day.key] = {
+        id: String(meal.id ?? `${day.key}-saved`),
+        title: String(meal.title ?? "Untitled meal"),
+        description:
+          typeof meal.description === "string" ? meal.description : "",
+        image:
+          typeof meal.image === "string"
+            ? meal.image
+            : IMAGE_FALLBACKS[DAYS.findIndex((d) => d.key === day.key)],
+        tags: Array.isArray(meal.tags)
+          ? meal.tags.filter((tag): tag is string => typeof tag === "string")
+          : [],
+        ingredientsHint:
+          typeof meal.ingredientsHint === "string"
+            ? meal.ingredientsHint
+            : "Ingredients list to follow",
+      };
+    }
+  }
+
+  return next;
+}
+
+function pickMealForDay(dayIndex: number, usedIds: Set<string>): PlannerMeal {
+  const orderedPool = [
+    ...SAMPLE_MEALS.slice(dayIndex),
+    ...SAMPLE_MEALS.slice(0, dayIndex),
+  ];
+  const fresh =
+    orderedPool.find((meal) => !usedIds.has(meal.id)) ?? orderedPool[0];
 
   return {
-    weekOf: monday.toISOString(),
-    plans: DAY_NAMES.map((dayName) => ({ day: dayName, meal: null })),
-    notes: "",
+    ...fresh,
+    id: `${fresh.id}-${Date.now()}-${dayIndex}`,
   };
 }
 
-function formatWeekLabel(isoDate: string) {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+function getPreviewImage(meal: PlannerMeal | null, index: number) {
+  return meal?.image ?? IMAGE_FALLBACKS[index];
 }
 
-function plannerCompletion(plans: DayPlan[]) {
-  const completed = plans.filter((plan) => plan.meal).length;
-  return {
-    completed,
-    total: plans.length,
-    percent: Math.round((completed / plans.length) * 100),
-  };
-}
-
-export default function PlannerDevPage() {
-  const [planner, setPlanner] = useState<PlannerState>(createDefaultPlanner());
-  const [selectedDay, setSelectedDay] = useState<string>(DAY_NAMES[0]);
+export default function PlannerDevPagePolished() {
+  const [planner, setPlanner] = useState<PlannerState>(EMPTY_PLANNER);
+  const [activeDay, setActiveDay] = useState<DayKey>("monday");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string>("");
-  const [search, setSearch] = useState("");
-  const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isGeneratingWeek, setIsGeneratingWeek] = useState(false);
+  const [generatingDay, setGeneratingDay] = useState<DayKey | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function initialisePlanner() {
+    async function bootstrap() {
       try {
-        const user = await getUser();
+        setLoading(true);
+        setError(null);
+
+        const user = (await getUser()) as UserLike | null;
 
         if (!user?.id) {
           if (!cancelled) {
-            setLoading(false);
             setCurrentUserId(null);
+            setPlanner(EMPTY_PLANNER);
+            setLoading(false);
           }
           return;
         }
@@ -166,10 +209,13 @@ export default function PlannerDevPage() {
 
         if (!cancelled) {
           setCurrentUserId(user.id);
-          setPlanner(loaded && loaded.plans ? loaded : createDefaultPlanner());
+          setPlanner(normaliseLoadedPlanner(loaded));
         }
-      } catch (error) {
-        console.error("Failed to load planner", error);
+      } catch (err) {
+        console.error(err);
+        if (!cancelled) {
+          setError("Could not load your planner yet.");
+        }
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -177,511 +223,615 @@ export default function PlannerDevPage() {
       }
     }
 
-    void initialisePlanner();
+    void bootstrap();
 
     return () => {
       cancelled = true;
     };
   }, []);
 
-  useEffect(() => {
-    if (!currentUserId || loading) return;
-    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+  async function saveAll(nextState: PlannerState) {
+    if (!currentUserId) return;
 
-    saveTimeout.current = setTimeout(async () => {
-      try {
-        setSaving(true);
-        await savePlanner(currentUserId, planner);
-        setSaveMessage("Saved");
-      } catch (error) {
-        console.error("Failed to save planner", error);
-        setSaveMessage("Save failed");
-      } finally {
-        setSaving(false);
-        setTimeout(() => setSaveMessage(""), 1800);
-      }
-    }, 500);
+    try {
+      setSaving(true);
+      await savePlanner(currentUserId, nextState);
+    } catch (err) {
+      console.error(err);
+      setError("Your latest change could not be saved.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
-    return () => {
-      if (saveTimeout.current) clearTimeout(saveTimeout.current);
+  function updateDay(day: DayKey, meal: PlannerMeal | null) {
+    const nextState = {
+      ...planner,
+      [day]: meal,
     };
-  }, [planner, currentUserId, loading]);
 
-  const selectedPlan = useMemo(
-    () =>
-      planner.plans.find((plan) => plan.day === selectedDay) ??
-      planner.plans[0],
-    [planner.plans, selectedDay],
-  );
-
-  const filteredMeals = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return STARTER_MEALS;
-    return STARTER_MEALS.filter((meal) => {
-      const haystack = [
-        meal.title,
-        meal.subtitle,
-        meal.category,
-        ...(meal.ingredients ?? []),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(q);
-    });
-  }, [search]);
-
-  const stats = plannerCompletion(planner.plans);
-  const wowMeals = planner.plans.filter((plan) => plan.meal?.wow).length;
-
-  function assignMeal(day: string, meal: MealSlot) {
-    setPlanner((current) => ({
-      ...current,
-      plans: current.plans.map((plan) =>
-        plan.day === day ? { ...plan, meal } : plan,
-      ),
-    }));
+    setPlanner(nextState);
+    void saveAll(nextState);
   }
 
-  function clearMeal(day: string) {
-    setPlanner((current) => ({
-      ...current,
-      plans: current.plans.map((plan) =>
-        plan.day === day ? { ...plan, meal: null } : plan,
-      ),
-    }));
-  }
+  async function generateForDay(day: DayKey, options?: { quiet?: boolean }) {
+    if (!options?.quiet) setGeneratingDay(day);
+    setError(null);
 
-  function autofillWeek() {
-    setPlanner((current) => ({
-      ...current,
-      plans: current.plans.map((plan, index) => ({
-        ...plan,
-        meal: STARTER_MEALS[index % STARTER_MEALS.length],
-      })),
-    }));
-  }
+    try {
+      const response = await fetch("/api/generate-meal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ day }),
+      });
 
-  function updateNotes(value: string) {
-    setPlanner((current) => ({ ...current, notes: value }));
-  }
+      if (response.ok) {
+        const generated = (await response.json()) as Partial<PlannerMeal>;
+        const index = DAYS.findIndex((d) => d.key === day);
+        const meal: PlannerMeal = {
+          id: String(generated.id ?? `generated-${day}-${Date.now()}`),
+          title: String(generated.title ?? "Chef's pick"),
+          description:
+            typeof generated.description === "string"
+              ? generated.description
+              : "A generated meal idea ready to tweak.",
+          image:
+            typeof generated.image === "string"
+              ? generated.image
+              : IMAGE_FALLBACKS[index],
+          tags: Array.isArray(generated.tags)
+            ? generated.tags.filter(
+                (tag): tag is string => typeof tag === "string",
+              )
+            : ["generated"],
+          ingredientsHint:
+            typeof generated.ingredientsHint === "string"
+              ? generated.ingredientsHint
+              : "Tap through to add ingredients to basket",
+        };
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-stone-50 px-4 py-10 text-stone-900">
-        <div className="mx-auto max-w-6xl animate-pulse space-y-6">
-          <div className="h-48 rounded-[28px] bg-white shadow-sm" />
-          <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-            <div className="h-[640px] rounded-[28px] bg-white shadow-sm" />
-            <div className="h-[640px] rounded-[28px] bg-white shadow-sm" />
-          </div>
-        </div>
-      </main>
+        updateDay(day, meal);
+        return;
+      }
+    } catch (err) {
+      console.warn("Falling back to local sample meal", err);
+    } finally {
+      if (!options?.quiet) setGeneratingDay(null);
+    }
+
+    const usedIds = new Set(
+      Object.values(planner)
+        .filter(Boolean)
+        .map((meal) => meal!.id.split("-").slice(0, 2).join("-")),
     );
+
+    const index = DAYS.findIndex((d) => d.key === day);
+    const fallbackMeal = pickMealForDay(index, usedIds);
+    updateDay(day, fallbackMeal);
   }
+
+  async function generateWholeWeek() {
+    setIsGeneratingWeek(true);
+    setError(null);
+
+    try {
+      for (const [index, day] of DAYS.entries()) {
+        setActiveDay(day.key);
+        setGeneratingDay(day.key);
+        // eslint-disable-next-line no-await-in-loop
+        await generateForDay(day.key, { quiet: true });
+        // eslint-disable-next-line no-await-in-loop
+        await wait(index === 0 ? 120 : 170);
+      }
+    } finally {
+      setGeneratingDay(null);
+      setIsGeneratingWeek(false);
+    }
+  }
+
+  function clearWeek() {
+    setPlanner(EMPTY_PLANNER);
+    void saveAll(EMPTY_PLANNER);
+  }
+
+  const filledCount = useMemo(
+    () => Object.values(planner).filter(Boolean).length,
+    [planner],
+  );
+  const activeMeal = planner[activeDay];
+  const nextEmptyDay = useMemo(
+    () => DAYS.find((day) => !planner[day.key])?.label ?? "All set",
+    [planner],
+  );
+  const weekLooksGood = filledCount >= 5;
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-900">
-      <section className="border-b border-stone-200 bg-white">
-        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-stretch">
-          <div className="relative overflow-hidden rounded-[32px] bg-stone-900 p-8 text-white">
-            <div className="absolute inset-0 opacity-25">
-              <img
-                src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1600&q=80"
-                alt="Fresh ingredients arranged on a kitchen table"
-                className="h-full w-full object-cover"
-              />
+    <main className="min-h-screen bg-[#f7f2ea] text-stone-900">
+      <section className="relative overflow-hidden border-b border-[#d9d0c3] bg-[#14382a] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(240,196,25,0.22),transparent_26%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_34%)]" />
+        <div className="absolute right-[-8rem] top-[-6rem] h-72 w-72 rounded-full bg-[#f0c419]/15 blur-3xl" />
+
+        <div className="relative mx-auto grid max-w-7xl gap-6 px-4 py-7 sm:px-6 lg:grid-cols-[1.12fr_0.88fr] lg:px-8 lg:py-10">
+          <div className="space-y-5">
+            <div className="flex flex-wrap items-center gap-2.5 text-sm text-white/75">
+              <span className="rounded-full border border-white/20 px-3 py-1">
+                Weekly planner
+              </span>
+              <span>{saving ? "Saving changes…" : "Saved to your plan"}</span>
+              <span>ML11 delivery</span>
             </div>
-            <div className="relative z-10 flex h-full flex-col justify-between gap-8">
-              <div className="space-y-4">
-                <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-sm font-medium backdrop-blur">
-                  Local Pantry planner
-                </span>
-                <div className="space-y-3">
-                  <h1 className="max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl">
-                    Your weekly meal plan, with a little wow built in.
-                  </h1>
-                  <p className="max-w-xl text-base leading-7 text-stone-200 sm:text-lg">
-                    Plan the week, keep the useful links close, and make every
-                    day feel more visual, delicious, and on-brand.
-                  </p>
+
+            <div className="space-y-3">
+              <h1 className="max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl">
+                Your week, with more flavour and less dead space.
+              </h1>
+              <p className="max-w-2xl text-base text-white/80 sm:text-lg">
+                A more visual planner page with image-led day cards, a proper
+                weekly preview, and fast actions that still keep your useful
+                links close by.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => void generateWholeWeek()}
+                disabled={loading || isGeneratingWeek}
+                className="rounded-full bg-[#f0c419] px-5 py-3 text-sm font-semibold text-stone-950 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isGeneratingWeek ? "Planning your week…" : "Generate my week"}
+              </button>
+              <Link
+                href="/recipes"
+                className="rounded-full border border-white/18 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                Browse recipes
+              </Link>
+              <Link
+                href="/basket"
+                className="rounded-full border border-white/18 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                View basket
+              </Link>
+            </div>
+
+            <div className="grid max-w-3xl grid-cols-2 gap-3 pt-1 sm:grid-cols-4">
+              <div className="rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-white/60">
+                  Filled days
+                </div>
+                <div className="mt-2 text-3xl font-semibold">
+                  {filledCount}/7
                 </div>
               </div>
-
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-                  <p className="text-sm text-stone-200">Week of</p>
-                  <p className="mt-1 text-lg font-semibold">
-                    {formatWeekLabel(planner.weekOf)}
-                  </p>
+              <div className="rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-white/60">
+                  Next to fill
                 </div>
-                <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-                  <p className="text-sm text-stone-200">Meals planned</p>
-                  <p className="mt-1 text-lg font-semibold">
-                    {stats.completed}/{stats.total}
-                  </p>
+                <div className="mt-2 text-lg font-semibold">{nextEmptyDay}</div>
+              </div>
+              <div className="rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-white/60">
+                  Mood
                 </div>
-                <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-                  <p className="text-sm text-stone-200">Wow nights</p>
-                  <p className="mt-1 text-lg font-semibold">{wowMeals}</p>
+                <div className="mt-2 text-lg font-semibold">
+                  {weekLooksGood ? "Looking delicious" : "Building nicely"}
+                </div>
+              </div>
+              <div className="rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-white/60">
+                  Planner
+                </div>
+                <div className="mt-2 text-lg font-semibold">
+                  {loading ? "Loading" : "Ready"}
                 </div>
               </div>
             </div>
           </div>
 
-          <aside className="flex flex-col justify-between rounded-[32px] bg-[#efe7dc] p-6 shadow-sm">
-            <div className="space-y-5">
+          <div className="rounded-[30px] border border-white/10 bg-white/10 p-4 shadow-2xl shadow-black/15 backdrop-blur-md">
+            <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-                  Quick actions
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
-                  Keep the useful links. Lose the empty space.
-                </h2>
+                <p className="text-sm text-white/70">This week at a glance</p>
+                <h2 className="text-xl font-semibold">Preview strip</h2>
               </div>
-
-              <div className="grid gap-3">
-                <button
-                  type="button"
-                  onClick={autofillWeek}
-                  className="inline-flex items-center justify-center rounded-2xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Auto-fill a starter week
-                </button>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <Link
-                    href="/shop"
-                    className="rounded-2xl bg-white px-4 py-3 text-center text-sm font-medium text-stone-900 shadow-sm transition hover:-translate-y-0.5"
-                  >
-                    Shop ingredients
-                  </Link>
-                  <Link
-                    href="/basket"
-                    className="rounded-2xl bg-white px-4 py-3 text-center text-sm font-medium text-stone-900 shadow-sm transition hover:-translate-y-0.5"
-                  >
-                    View basket
-                  </Link>
-                </div>
-
-                <Link
-                  href="/boxes"
-                  className="rounded-2xl bg-white px-4 py-3 text-center text-sm font-medium text-stone-900 shadow-sm transition hover:-translate-y-0.5"
-                >
-                  Browse weekly boxes
-                </Link>
-              </div>
+              <button
+                type="button"
+                onClick={clearWeek}
+                className="text-sm text-white/75 underline decoration-white/30 underline-offset-4 hover:text-white"
+              >
+                Clear week
+              </button>
             </div>
 
-            <div className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium text-stone-600">
-                  Save status
-                </p>
-                <span className="text-sm text-stone-500">
-                  {saving ? "Saving…" : saveMessage || "Up to date"}
-                </span>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-200">
-                <div
-                  className="h-full rounded-full bg-stone-900 transition-all"
-                  style={{ width: `${stats.percent}%` }}
-                />
-              </div>
-              <p className="mt-3 text-sm text-stone-600">
-                {stats.completed === 0
-                  ? "Start by choosing a meal for the first day."
-                  : `${stats.completed} day${stats.completed === 1 ? "" : "s"} planned so far.`}
-              </p>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-[1.4fr_0.9fr]">
-        <div className="space-y-6">
-          <div className="rounded-[28px] bg-white p-5 shadow-sm">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-                  Weekly planner
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-                  A tighter weekly view with less dead space
-                </h2>
-              </div>
-              <div className="text-sm text-stone-500">Tap a day to edit it</div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {planner.plans.map((plan) => {
-                const active = plan.day === selectedDay;
-                const meal = plan.meal;
+            <div className="grid grid-cols-7 gap-2">
+              {DAYS.map((day, index) => {
+                const meal = planner[day.key];
+                const isActive = activeDay === day.key;
+                const isBusy = generatingDay === day.key;
 
                 return (
                   <button
-                    key={plan.day}
+                    key={day.key}
                     type="button"
-                    onClick={() => setSelectedDay(plan.day)}
-                    className={`overflow-hidden rounded-[24px] border text-left transition ${
-                      active
-                        ? "border-stone-900 shadow-md"
-                        : "border-stone-200 shadow-sm hover:-translate-y-0.5 hover:shadow-md"
+                    onClick={() => setActiveDay(day.key)}
+                    className={`overflow-hidden rounded-[20px] border text-left transition duration-300 ${
+                      isActive
+                        ? "border-[#f0c419] shadow-lg shadow-black/20"
+                        : "border-white/10 hover:border-white/25"
                     }`}
                   >
-                    <div className="relative h-40 bg-stone-100">
-                      {meal ? (
-                        <img
-                          src={meal.image}
-                          alt={meal.title}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#f1e7da] to-[#ddd3c8] px-6 text-center">
-                          <div>
-                            <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-                              {plan.day}
-                            </p>
-                            <p className="mt-2 text-lg font-semibold text-stone-800">
-                              Add a meal with some visual pull
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-stone-900 backdrop-blur">
-                        {plan.day}
-                      </div>
-
-                      {meal?.wow ? (
-                        <div className="absolute right-3 top-3 rounded-full bg-amber-300 px-3 py-1 text-xs font-semibold text-stone-900">
-                          Wow factor
+                    <div className="relative aspect-[3/4] bg-stone-900">
+                      <img
+                        src={getPreviewImage(meal, index)}
+                        alt={meal?.title ?? `${day.label} preview`}
+                        className={`h-full w-full object-cover transition duration-500 ${
+                          meal ? "opacity-100" : "opacity-45"
+                        } ${isBusy ? "scale-105 saturate-125" : ""}`}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+                      {isBusy ? (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/28 text-xs font-semibold text-white backdrop-blur-[1px]">
+                          Generating…
                         </div>
                       ) : null}
                     </div>
-
-                    <div className="space-y-2 p-4">
-                      {meal ? (
-                        <>
-                          <h3 className="text-lg font-semibold leading-tight text-stone-900">
-                            {meal.title}
-                          </h3>
-                          {meal.subtitle ? (
-                            <p className="line-clamp-2 text-sm text-stone-600">
-                              {meal.subtitle}
-                            </p>
-                          ) : null}
-                          <div className="flex flex-wrap gap-2 pt-1">
-                            {meal.category ? (
-                              <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700">
-                                {meal.category}
-                              </span>
-                            ) : null}
-                            {meal.cookTime ? (
-                              <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700">
-                                {meal.cookTime}
-                              </span>
-                            ) : null}
-                          </div>
-                        </>
-                      ) : (
-                        <p className="text-sm text-stone-600">
-                          No meal chosen yet. Pick one from the inspiration
-                          list.
-                        </p>
-                      )}
+                    <div className="bg-stone-950/70 p-2">
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+                        {day.short}
+                      </div>
+                      <div className="mt-1 line-clamp-2 text-xs text-white">
+                        {meal?.title ?? "Add meal"}
+                      </div>
                     </div>
                   </button>
                 );
               })}
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="rounded-[28px] bg-white p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-                  Planner notes
-                </p>
-                <h2 className="mt-2 text-xl font-semibold tracking-tight">
-                  Keep the extra details tucked in
-                </h2>
-              </div>
-            </div>
-            <textarea
-              value={planner.notes}
-              onChange={(event) => updateNotes(event.target.value)}
-              placeholder="Add delivery notes, prep reminders, or anything you want to remember this week..."
-              className="min-h-[140px] w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 outline-none ring-0 placeholder:text-stone-400 focus:border-stone-400"
-            />
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-[#14382a]">Planner grid</p>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Each day should feel like a food card, not an empty box
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/recipes"
+              className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-medium hover:border-stone-400"
+            >
+              Recipes
+            </Link>
+            <Link
+              href="/shop"
+              className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-medium hover:border-stone-400"
+            >
+              Shop
+            </Link>
+            <Link
+              href="/basket"
+              className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-medium hover:border-stone-400"
+            >
+              Basket
+            </Link>
           </div>
         </div>
 
-        <aside className="space-y-6">
-          <div className="overflow-hidden rounded-[28px] bg-white shadow-sm">
-            <div className="relative h-56">
-              <img
-                src={
-                  selectedPlan.meal?.image ||
-                  "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=80"
-                }
-                alt={
-                  selectedPlan.meal?.title ||
-                  `${selectedPlan.day} placeholder meal image`
-                }
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-200">
-                  Selected day
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-                  {selectedPlan.day}
-                </h2>
-                <p className="mt-1 text-sm text-stone-200">
-                  {selectedPlan.meal?.title ||
-                    "Choose a meal to bring this day to life."}
-                </p>
-              </div>
-            </div>
+        {error ? (
+          <div className="mb-5 rounded-[20px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {error}
+          </div>
+        ) : null}
 
-            <div className="space-y-4 p-5">
-              {selectedPlan.meal ? (
-                <>
-                  <div>
-                    <p className="text-sm font-medium text-stone-500">Meal</p>
-                    <h3 className="mt-1 text-xl font-semibold text-stone-900">
-                      {selectedPlan.meal.title}
-                    </h3>
-                    {selectedPlan.meal.subtitle ? (
-                      <p className="mt-2 text-sm leading-6 text-stone-600">
-                        {selectedPlan.meal.subtitle}
-                      </p>
-                    ) : null}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-7">
+          {DAYS.map((day, index) => {
+            const meal = planner[day.key];
+            const isActive = activeDay === day.key;
+            const isBusy = generatingDay === day.key;
+
+            return (
+              <article
+                key={day.key}
+                className={`group overflow-hidden rounded-[28px] border bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                  isActive
+                    ? "border-[#14382a] ring-2 ring-[#14382a]/10"
+                    : "border-stone-200"
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setActiveDay(day.key)}
+                  className="block w-full text-left"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
+                    <img
+                      src={getPreviewImage(meal, index)}
+                      alt={meal?.title ?? `${day.label} placeholder image`}
+                      className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
+                        meal ? "opacity-100" : "opacity-35"
+                      } ${isBusy ? "scale-105 saturate-125" : ""}`}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+
+                    <div className="absolute left-4 top-4 flex items-center gap-2">
+                      <span className="rounded-full bg-white/92 px-3 py-1 text-xs font-semibold text-stone-900">
+                        {day.label}
+                      </span>
+                      {isBusy ? (
+                        <span className="rounded-full bg-[#f0c419] px-2.5 py-1 text-[11px] font-semibold text-stone-950">
+                          Generating
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {!meal ? (
+                      <div className="absolute bottom-4 left-4 right-4 rounded-[22px] border border-dashed border-white/45 bg-white/10 p-3.5 text-white backdrop-blur-sm">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-semibold">
+                              Give {day.label.toLowerCase()} something good
+                            </div>
+                            <div className="mt-1 text-xs text-white/80">
+                              Generate a meal or swap in a favourite.
+                            </div>
+                          </div>
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-xl">
+                            +
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="absolute bottom-4 left-4 right-4 text-white">
+                        <div className="text-lg font-semibold leading-tight">
+                          {meal.title}
+                        </div>
+                        <div className="mt-1 line-clamp-2 text-sm text-white/85">
+                          {meal.description}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                </button>
 
-                  {selectedPlan.meal.ingredients?.length ? (
-                    <div>
-                      <p className="text-sm font-medium text-stone-500">
-                        Main ingredients
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {selectedPlan.meal.ingredients.map((ingredient) => (
+                <div className="space-y-3 p-4">
+                  <div className="min-h-[3rem]">
+                    {meal?.tags?.length ? (
+                      <div className="flex flex-wrap gap-2">
+                        {meal.tags.slice(0, 3).map((tag) => (
                           <span
-                            key={ingredient}
-                            className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700"
+                            key={`${day.key}-${tag}`}
+                            className="rounded-full bg-[#f3efe8] px-2.5 py-1 text-xs font-medium text-stone-700"
                           >
-                            {ingredient}
+                            {tag}
                           </span>
                         ))}
                       </div>
-                    </div>
-                  ) : null}
+                    ) : (
+                      <p className="text-sm text-stone-500">
+                        Designed empty state so the week still feels full and
+                        intentional.
+                      </p>
+                    )}
+                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <Link
-                      href="/shop"
-                      className="rounded-2xl bg-stone-900 px-4 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
-                    >
-                      Shop this meal
-                    </Link>
+                  <div className="grid grid-cols-1 gap-2">
                     <button
                       type="button"
-                      onClick={() => clearMeal(selectedPlan.day)}
-                      className="rounded-2xl border border-stone-200 px-4 py-3 text-sm font-medium text-stone-900 transition hover:bg-stone-50"
+                      onClick={() => void generateForDay(day.key)}
+                      disabled={isBusy || isGeneratingWeek}
+                      className="rounded-full bg-[#14382a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#102d22] disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                      Clear day
+                      {isBusy
+                        ? "Generating…"
+                        : meal
+                          ? "Regenerate meal"
+                          : "Generate meal"}
                     </button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setActiveDay(day.key)}
+                        className="rounded-full border border-stone-300 px-4 py-2.5 text-sm font-medium text-stone-800 hover:border-stone-400"
+                      >
+                        Focus
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateDay(day.key, null)}
+                        className="rounded-full border border-stone-300 px-4 py-2.5 text-sm font-medium text-stone-800 hover:border-stone-400"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
-                </>
-              ) : (
-                <div className="rounded-2xl bg-stone-50 p-4 text-sm leading-6 text-stone-600">
-                  Pick a meal from the inspiration list below to remove the
-                  empty state and make this day feel finished.
                 </div>
-              )}
-            </div>
-          </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
-          <div className="rounded-[28px] bg-white p-5 shadow-sm">
-            <div className="mb-4 flex flex-col gap-3">
+      <section className="mx-auto max-w-7xl px-4 pb-9 sm:px-6 lg:px-8">
+        <div className="grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
+          <div className="rounded-[32px] border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-                  Inspiration
+                <p className="text-sm font-medium text-[#14382a]">
+                  Focused day
                 </p>
-                <h2 className="mt-2 text-xl font-semibold tracking-tight">
-                  More imagery, less friction
-                </h2>
+                <h3 className="mt-1 text-2xl font-semibold">
+                  {DAYS.find((d) => d.key === activeDay)?.label}
+                </h3>
               </div>
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search meals, ingredients, or mood"
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-stone-400"
-              />
+              <button
+                type="button"
+                onClick={() => void generateForDay(activeDay)}
+                disabled={Boolean(generatingDay) || isGeneratingWeek}
+                className="rounded-full bg-[#f0c419] px-4 py-2 text-sm font-semibold text-stone-950 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {generatingDay === activeDay
+                  ? "Generating…"
+                  : "Generate for this day"}
+              </button>
             </div>
 
-            <div className="space-y-3">
-              {filteredMeals.map((meal) => (
-                <div
-                  key={meal.id}
-                  className="grid grid-cols-[88px_1fr] gap-3 rounded-2xl border border-stone-200 p-3"
-                >
-                  <img
-                    src={meal.image}
-                    alt={meal.title}
-                    className="h-[88px] w-[88px] rounded-xl object-cover"
-                  />
-
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <h3 className="text-sm font-semibold text-stone-900">
-                          {meal.title}
-                        </h3>
-                        <p className="mt-1 line-clamp-2 text-sm text-stone-600">
-                          {meal.subtitle}
-                        </p>
-                      </div>
-                      {meal.wow ? (
-                        <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold text-amber-900">
-                          Wow
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {meal.cookTime ? (
-                        <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-medium text-stone-700">
-                          {meal.cookTime}
-                        </span>
-                      ) : null}
-                      {meal.category ? (
-                        <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-medium text-stone-700">
-                          {meal.category}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => assignMeal(selectedPlan.day, meal)}
-                      className="mt-3 inline-flex rounded-xl bg-stone-900 px-3 py-2 text-xs font-medium text-white transition hover:opacity-90"
-                    >
-                      Add to {selectedPlan.day}
-                    </button>
+            <div className="mt-5 overflow-hidden rounded-[28px] bg-stone-100">
+              <div className="relative aspect-[16/8]">
+                <img
+                  src={getPreviewImage(
+                    activeMeal,
+                    DAYS.findIndex((d) => d.key === activeDay),
+                  )}
+                  alt={activeMeal?.title ?? `${activeDay} preview image`}
+                  className={`h-full w-full object-cover ${activeMeal ? "opacity-100" : "opacity-45"}`}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-6">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-white/70">
+                    Selected day
+                  </div>
+                  <div className="mt-2 text-3xl font-semibold">
+                    {activeMeal?.title ?? "No meal chosen yet"}
+                  </div>
+                  <div className="mt-2 max-w-2xl text-sm text-white/85">
+                    {activeMeal?.description ??
+                      "Use the button above to add a meal with more colour, appetite appeal, and less empty space."}
                   </div>
                 </div>
-              ))}
+              </div>
+            </div>
 
-              {filteredMeals.length === 0 ? (
-                <div className="rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
-                  No meals matched that search. Try “salmon”, “quick”, or “wow”.
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[24px] bg-[#f7f2ea] p-4">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+                  Basket hint
                 </div>
-              ) : null}
+                <p className="mt-2 text-sm text-stone-700">
+                  {activeMeal?.ingredientsHint ??
+                    "No ingredients yet. Generate or assign a meal first."}
+                </p>
+              </div>
+              <div className="rounded-[24px] bg-[#f7f2ea] p-4">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+                  Useful links
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href="/recipes"
+                    className="rounded-full border border-stone-300 px-3 py-2 text-sm font-medium"
+                  >
+                    Recipes
+                  </Link>
+                  <Link
+                    href="/shop"
+                    className="rounded-full border border-stone-300 px-3 py-2 text-sm font-medium"
+                  >
+                    Shop
+                  </Link>
+                  <Link
+                    href="/basket"
+                    className="rounded-full border border-stone-300 px-3 py-2 text-sm font-medium"
+                  >
+                    Basket
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
-        </aside>
+
+          <aside className="space-y-5">
+            <div className="rounded-[32px] border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+              <p className="text-sm font-medium text-[#14382a]">
+                Quick actions
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <button
+                  type="button"
+                  onClick={() => void generateWholeWeek()}
+                  disabled={loading || isGeneratingWeek}
+                  className="rounded-[24px] bg-[#14382a] px-4 py-4 text-left text-white disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <div className="text-sm font-semibold">
+                    {isGeneratingWeek
+                      ? "Planning your week…"
+                      : "Generate my week"}
+                  </div>
+                  <div className="mt-1 text-sm text-white/75">
+                    Fill the full planner fast with image-led cards.
+                  </div>
+                </button>
+                <Link
+                  href="/recipes"
+                  className="rounded-[24px] border border-stone-200 px-4 py-4 text-left hover:border-stone-300"
+                >
+                  <div className="text-sm font-semibold text-stone-900">
+                    Browse recipes
+                  </div>
+                  <div className="mt-1 text-sm text-stone-500">
+                    Keep favourites and hand-picked ideas close.
+                  </div>
+                </Link>
+                <Link
+                  href="/basket"
+                  className="rounded-[24px] border border-stone-200 px-4 py-4 text-left hover:border-stone-300"
+                >
+                  <div className="text-sm font-semibold text-stone-900">
+                    Open basket
+                  </div>
+                  <div className="mt-1 text-sm text-stone-500">
+                    Build your shop around the week you just planned.
+                  </div>
+                </Link>
+              </div>
+            </div>
+
+            <div className="rounded-[32px] border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium text-[#14382a]">
+                    Starter inspiration
+                  </p>
+                  <h4 className="mt-1 text-xl font-semibold">
+                    Looks good from the start
+                  </h4>
+                </div>
+                <span className="rounded-full bg-[#f7f2ea] px-3 py-1 text-xs font-semibold text-stone-700">
+                  Visual picks
+                </span>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {SAMPLE_MEALS.slice(0, 4).map((meal) => (
+                  <div
+                    key={meal.id}
+                    className="flex items-center gap-3 rounded-[24px] bg-[#f7f2ea] p-3"
+                  >
+                    <img
+                      src={meal.image}
+                      alt={meal.title}
+                      className="h-16 w-16 rounded-[18px] object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold text-stone-900">
+                        {meal.title}
+                      </div>
+                      <div className="line-clamp-2 text-sm text-stone-500">
+                        {meal.description}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
       </section>
     </main>
   );
