@@ -205,6 +205,13 @@ const TOP_IMAGE_STRIP = [
   },
 ] as const;
 
+const BUILD_STATUS_LINES = [
+  "Looking at what is in season",
+  "Keeping the week manageable",
+  "Making sure the meals feel cookable",
+  "Pulling through the useful shop bits",
+] as const;
+
 function uniqueStrings(values: string[]) {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -428,6 +435,7 @@ export default function PlannerPage() {
   const [isPlanningWeek, setIsPlanningWeek] = useState(false);
   const [planningDay, setPlanningDay] = useState<DayKey | null>(null);
   const [openDay, setOpenDay] = useState<DayKey | null>(null);
+  const [buildStatusIndex, setBuildStatusIndex] = useState(0);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -437,6 +445,21 @@ export default function PlannerPage() {
   useEffect(() => {
     writeStoredWeek(week);
   }, [week]);
+
+  useEffect(() => {
+    if (!isPlanningWeek) {
+      setBuildStatusIndex(0);
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setBuildStatusIndex(
+        (current) => (current + 1) % BUILD_STATUS_LINES.length,
+      );
+    }, 1400);
+
+    return () => window.clearInterval(timer);
+  }, [isPlanningWeek]);
 
   const totalBasketItems = useMemo(() => cart.length, [cart]);
   const plannedDays = useMemo(
@@ -628,8 +651,8 @@ export default function PlannerPage() {
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
-                A few quick choices, then we build a week that looks real, feels
-                cookable, and still keeps the food side easy.
+                A few quick choices, then we build a week that feels real, looks
+                good enough to cook, and keeps the food side easy.
               </p>
 
               <div className="mt-7 grid gap-4 md:grid-cols-3">
@@ -749,6 +772,20 @@ export default function PlannerPage() {
                 </Link>
               </div>
 
+              {isPlanningWeek ? (
+                <div className="mt-5 rounded-[20px] border border-[#e6ddd2] bg-[rgba(255,255,255,0.84)] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                    Building your week
+                  </p>
+                  <p className="mt-2 text-base font-medium text-[#243328]">
+                    {BUILD_STATUS_LINES[buildStatusIndex]}
+                  </p>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#ebe3d8]">
+                    <div className="h-full w-1/2 animate-pulse rounded-full bg-[#243328]" />
+                  </div>
+                </div>
+              ) : null}
+
               <div className="mt-5 flex flex-wrap gap-2">
                 <span className="rounded-full border border-[#ddd4c8] bg-white/80 px-3 py-1.5 text-xs text-[#5f675c]">
                   {getSettingsLabel(settings)}
@@ -799,8 +836,8 @@ export default function PlannerPage() {
                 Your week
               </p>
               <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                Food-led, calm, and built to feel manageable. The instructions
-                stay tucked away until you are actually cooking.
+                Food-led, calm, and built to feel manageable. Open the cooking
+                steps only when you are standing there ready to make it.
               </p>
             </div>
 
@@ -880,6 +917,26 @@ export default function PlannerPage() {
                     ) : null}
                   </div>
 
+                  {recipe ? (
+                    <div className="mt-4 rounded-[18px] border border-[#ede6dc] bg-[rgba(250,247,242,0.85)] p-3">
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c]">
+                        In this meal
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {recipe.ingredientsUsed
+                          .slice(0, 5)
+                          .map((ingredient) => (
+                            <span
+                              key={`${card.key}-${ingredient}`}
+                              className="rounded-full bg-white px-2.5 py-1 text-xs text-[#5f675c]"
+                            >
+                              {titleCase(ingredient)}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  ) : null}
+
                   <div className="mt-5 flex flex-wrap gap-3">
                     <button
                       type="button"
@@ -893,39 +950,41 @@ export default function PlannerPage() {
                           ? `Swap ${card.short}`
                           : `Plan ${card.short}`}
                     </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setOpenDay(openDay === card.key ? null : card.key)
-                      }
-                      className="rounded-full border border-[#d6cec2] bg-white px-4 py-2.5 text-sm text-[#243328] transition hover:bg-[#f8f4ee]"
-                    >
-                      {openDay === card.key
-                        ? "Hide cooking steps"
-                        : "Show cooking steps"}
-                    </button>
                   </div>
 
-                  {openDay === card.key && recipe ? (
-                    <div className="mt-5 rounded-[20px] border border-[#e6ddd2] bg-[rgba(247,242,235,0.72)] p-4">
-                      <p className="text-sm font-medium text-[#243328]">
-                        Cook this
-                      </p>
-                      <ol className="mt-3 space-y-2 text-sm leading-6 text-[#5f675c]">
-                        {recipe.steps.map((step, index) => (
-                          <li
-                            key={`${card.key}-${index}`}
-                            className="flex gap-3"
-                          >
-                            <span className="mt-[2px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-medium text-[#243328]">
-                              {index + 1}
-                            </span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
+                  {recipe ? (
+                    <details
+                      className="mt-5 overflow-hidden rounded-[20px] border border-[#e6ddd2] bg-[rgba(247,242,235,0.72)]"
+                      open={openDay === card.key}
+                      onToggle={(event) => {
+                        const element = event.currentTarget;
+                        setOpenDay(element.open ? card.key : null);
+                      }}
+                    >
+                      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-[#243328]">
+                        <div className="flex items-center justify-between gap-3">
+                          <span>Cooking steps</span>
+                          <span className="text-xs text-[#6b776c]">
+                            {openDay === card.key ? "Hide" : "Show"}
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="border-t border-[#e6ddd2] px-4 pb-4 pt-3">
+                        <ol className="space-y-2 text-sm leading-6 text-[#5f675c]">
+                          {recipe.steps.map((step, index) => (
+                            <li
+                              key={`${card.key}-${index}`}
+                              className="flex gap-3"
+                            >
+                              <span className="mt-[2px] inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-medium text-[#243328]">
+                                {index + 1}
+                              </span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    </details>
                   ) : null}
                 </div>
               </article>
