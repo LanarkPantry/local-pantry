@@ -61,7 +61,8 @@ export default function HomePage() {
           className="absolute inset-0 h-full w-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.45)]" />
+        {/* LIGHTER GRADIENT OVERLAY */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.45)_100%)]" />
 
         <div className="relative z-10 mx-auto flex min-h-[70vh] max-w-7xl items-end px-4 pb-10 sm:px-6 md:px-10">
           <div className="max-w-2xl text-white">
@@ -134,8 +135,17 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* IMAGE / VISION */}
+      {/* VISION */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+        <div className="mb-6 text-center">
+          <p className="text-sm text-[#667164]">
+            This is the shop we’re building locally.
+          </p>
+          <p className="mt-1 text-sm text-[#667164]">
+            Starting online first — and growing it from here.
+          </p>
+        </div>
+
         <div className="relative overflow-hidden rounded-2xl">
           <img
             src="/hero.jpg"
