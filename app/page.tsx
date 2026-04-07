@@ -138,7 +138,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
         <div className="relative overflow-hidden rounded-2xl">
           <img
-            src="/shop-vision.jpg"
+            src="/hero.jpg"
             alt="Shop vision"
             className="h-[420px] w-full object-cover"
           />
