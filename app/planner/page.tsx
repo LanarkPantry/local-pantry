@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useCart } from "../cart-context";
 import {
   produceBoxes,
@@ -14,12 +14,32 @@ type WeekMood = "quick" | "balanced" | "comforting";
 type WeekFocus = "veg-heavy" | "low-waste" | "family-friendly";
 type PlannerStep = "choices" | "building" | "results";
 
+type GeneratedRecipe = {
+  title: string;
+  description: string;
+  ingredientsUsed: string[];
+  pantryStaples: string[];
+  steps: string[];
+};
+
+type RecipeResponse = {
+  recipe?: GeneratedRecipe;
+  imageUrl?: string | null;
+  error?: string;
+  debug?: {
+    imageGenerated?: boolean;
+    imageError?: string | null;
+    apiVersion?: string;
+  };
+};
+
 type PlannedMeal = {
   id: string;
   day: string;
   title: string;
   description: string;
-  image: string;
+  imageUrl: string | null;
+  imageError?: string | null;
   ingredients: string[];
   matchedProducts: string[];
   steps: string[];
@@ -29,6 +49,21 @@ type ChoiceChipProps = {
   active: boolean;
   label: string;
   onClick: () => void;
+};
+
+type PlannerIntent = {
+  familyKey: string;
+  familyLabel: string;
+  anchorVeg: string;
+  optionalVeg: string | null;
+  supportVeg: string[];
+  everydayBaseOptions: string[];
+  shopBaseOptions: string[];
+  shopBoostOptions: string[];
+  avoidHeroVeg: string[];
+  flavourDirection: string;
+  flavourNotes: string[];
+  guidance: string[];
 };
 
 const LOADING_MESSAGES = [
@@ -48,302 +83,90 @@ const DAY_NAMES = [
   "Saturday",
 ] as const;
 
-const IMAGE_POOL = [
-  "/images/recipes/rose-harissa-carrots.jpg",
-  "/images/recipes/pesto-roast-potatoes.jpg",
-  "/images/recipes/chocolate-recipe.jpg",
-  "/images/recipes/caramel-recipe.jpg",
-] as const;
+const FALLBACK_IMAGE = "/hero.jpg";
 
-const QUICK_LIBRARY: PlannedMeal[] = [
-  {
-    id: "quick-1",
-    day: "Monday",
-    title: "Tomato pasta with greens",
-    description:
-      "Soft tomato sauce, a quick pan finish, and something green folded through.",
-    image: IMAGE_POOL[1],
-    ingredients: ["Tomatoes", "Greens", "Pasta", "Garlic"],
-    matchedProducts: ["Casarecce Pasta", "Orzo Pasta"],
-    steps: [
-      "Bring a pan of salted water to the boil and cook the pasta.",
-      "Soften the garlic in olive oil, then add tomatoes and cook until soft.",
-      "Fold through chopped greens for the last couple of minutes.",
-      "Toss with the pasta and finish with black pepper.",
-    ],
-  },
-  {
-    id: "quick-2",
-    day: "Tuesday",
-    title: "Roast carrots with harissa and yoghurt",
-    description:
-      "A tray-led supper with something warm, sweet, and gently spiced.",
-    image: IMAGE_POOL[0],
-    ingredients: ["Carrots", "Chickpeas", "Rose Harissa", "Yoghurt"],
-    matchedProducts: ["Rose Harissa"],
-    steps: [
-      "Heat the oven to 220°C.",
-      "Roast the carrots with olive oil and salt until tender and coloured.",
-      "Warm the chickpeas and spoon over a little harissa.",
-      "Serve with yoghurt and any herbs you have.",
-    ],
-  },
-  {
-    id: "quick-3",
-    day: "Wednesday",
-    title: "Pesto potatoes with beans",
-    description:
-      "A very easy midweek plate with a useful jar doing the heavy lifting.",
-    image: IMAGE_POOL[1],
-    ingredients: ["Potatoes", "Beans", "Sorrel & Walnut Pesto"],
-    matchedProducts: ["Sorrel & Walnut Pesto"],
-    steps: [
-      "Boil the potatoes until tender.",
-      "Warm the beans in a small pan with a splash of water.",
-      "Toss the potatoes with pesto.",
-      "Serve everything together with black pepper or soft herbs.",
-    ],
-  },
-  {
-    id: "quick-4",
-    day: "Thursday",
-    title: "Mushroom orzo",
-    description: "One-pan, soft-edged, and easy to put together.",
-    image: IMAGE_POOL[2],
-    ingredients: ["Mushrooms", "Orzo", "Onion", "Stock"],
-    matchedProducts: ["Orzo Pasta"],
-    steps: [
-      "Soften onion in olive oil.",
-      "Add mushrooms and cook until they lose their water.",
-      "Stir through orzo and stock, then simmer until tender.",
-      "Finish with butter, herbs, or a little cheese if you like.",
-    ],
-  },
-  {
-    id: "quick-5",
-    day: "Friday",
-    title: "Couscous with roast veg",
-    description: "A fast end-of-week bowl with a bright finish.",
-    image: IMAGE_POOL[3],
-    ingredients: ["Peppers", "Courgette", "Giant Couscous", "Lemon"],
-    matchedProducts: ["Giant Couscous", "Rose Harissa"],
-    steps: [
-      "Roast the vegetables until softened and coloured.",
-      "Cook the giant couscous until tender.",
-      "Dress with lemon, olive oil, and salt.",
-      "Pile into bowls and finish with herbs or a spoon of harissa.",
-    ],
-  },
-  {
-    id: "quick-6",
-    day: "Saturday",
-    title: "Toast, fruit, and something sweet",
-    description: "A lighter weekend idea for brunch or an easy sweet bite.",
-    image: IMAGE_POOL[3],
-    ingredients: ["Toast", "Fruit", "Dark Chocolate & Hazelnut Spread"],
-    matchedProducts: [
-      "Dark Chocolate & Hazelnut Spread",
-      "Salted Caramel Sauce",
-    ],
-    steps: [
-      "Toast the bread well.",
-      "Slice whatever fruit is around.",
-      "Spread with chocolate or spoon over a little caramel.",
-      "Finish with fruit on the side or piled on top.",
-    ],
-  },
+const DEFAULT_BOX_INGREDIENTS = [
+  "potatoes",
+  "onions",
+  "garlic",
+  "carrots",
+  "celery",
+  "sweet potato",
+  "peppers",
+  "courgette",
+  "ginger",
+  "leeks",
+  "lettuce",
+  "cucumber",
+  "tomatoes",
+  "spinach",
+  "basil",
+  "rosemary",
+  "thyme",
+  "coriander",
+  "avocado",
+  "broccoli",
+  "bananas",
+  "apples",
+  "oranges",
+  "strawberries",
+  "grapes",
+  "melon",
+  "seasonal extras",
+  "occasional specials like lychees, dragon fruit, Jerusalem artichokes or pineapple",
 ];
 
-const BALANCED_LIBRARY: PlannedMeal[] = [
-  {
-    id: "balanced-1",
-    day: "Monday",
-    title: "Greens, rice, and a herby finish",
-    description:
-      "A fresh start to the week with one useful base and a bright finish.",
-    image: IMAGE_POOL[1],
-    ingredients: ["Greens", "Rice", "Garlic", "Lemon"],
-    matchedProducts: ["Short Grain Rice", "Sorrel & Walnut Pesto"],
-    steps: [
-      "Cook the rice until tender.",
-      "Steam or sauté the greens with garlic.",
-      "Spoon over pesto or lemony olive oil.",
-      "Serve warm with black pepper.",
-    ],
-  },
-  {
-    id: "balanced-2",
-    day: "Tuesday",
-    title: "Tomato pan with casarecce",
-    description:
-      "Saucy enough to feel generous, easy enough for a normal Tuesday.",
-    image: IMAGE_POOL[0],
-    ingredients: ["Tomatoes", "Casarecce Pasta", "Garlic", "Basil"],
-    matchedProducts: ["Casarecce Pasta"],
-    steps: [
-      "Cook the pasta in salted water.",
-      "Soften garlic in oil, then add tomatoes and cook down.",
-      "Stir through basil or soft herbs.",
-      "Toss with the pasta and finish with pepper.",
-    ],
-  },
-  {
-    id: "balanced-3",
-    day: "Wednesday",
-    title: "Potatoes, greens, and pesto beans",
-    description:
-      "A grounding midweek plate with a useful jar tying it together.",
-    image: IMAGE_POOL[1],
-    ingredients: ["Potatoes", "Greens", "Beans", "Sorrel & Walnut Pesto"],
-    matchedProducts: ["Sorrel & Walnut Pesto"],
-    steps: [
-      "Boil the potatoes until tender.",
-      "Warm the beans and greens together in a pan.",
-      "Spoon over pesto just before serving.",
-      "Finish with herbs if you have them.",
-    ],
-  },
-  {
-    id: "balanced-4",
-    day: "Thursday",
-    title: "Farro with roast veg",
-    description: "A slower-feeling supper that still stays practical.",
-    image: IMAGE_POOL[2],
-    ingredients: ["Farro", "Roots", "Garlic", "Herbs"],
-    matchedProducts: ["Farro", "Rose Harissa"],
-    steps: [
-      "Cook the farro until tender.",
-      "Roast the vegetables with oil and salt.",
-      "Dress with herbs and lemon or a little harissa.",
-      "Fold everything together and serve warm.",
-    ],
-  },
-  {
-    id: "balanced-5",
-    day: "Friday",
-    title: "Mushroom orzo with greens",
-    description:
-      "Soft, useful, and easy to finish with what is already around.",
-    image: IMAGE_POOL[2],
-    ingredients: ["Mushrooms", "Orzo", "Greens", "Stock"],
-    matchedProducts: ["Orzo Pasta"],
-    steps: [
-      "Cook mushrooms until golden.",
-      "Add orzo and stock and simmer gently.",
-      "Fold through chopped greens at the end.",
-      "Finish with butter or olive oil.",
-    ],
-  },
-  {
-    id: "balanced-6",
-    day: "Saturday",
-    title: "Polenta with roast vegetables",
-    description:
-      "A weekend supper that feels a little more generous without becoming fussy.",
-    image: IMAGE_POOL[0],
-    ingredients: ["Polenta", "Cauliflower", "Peppers", "Rose Harissa"],
-    matchedProducts: ["Polenta", "Rose Harissa"],
-    steps: [
-      "Roast the vegetables until deeply coloured.",
-      "Cook the polenta until soft and spoonable.",
-      "Season well and loosen with butter or olive oil.",
-      "Pile vegetables on top and finish with harissa.",
-    ],
-  },
+const SHOP_BASES = [
+  "Casarecce Pasta",
+  "Bucatini",
+  "Orzo",
+  "Giant Couscous",
+  "Farro",
+  "Polenta",
+  "Risotto Rice",
+  "Puy Lentils",
+  "Butter Beans",
+  "Cannellini Beans",
+  "Chickpeas",
+  "Premium Whole Tomatoes",
 ];
 
-const COMFORTING_LIBRARY: PlannedMeal[] = [
-  {
-    id: "comforting-1",
-    day: "Monday",
-    title: "Soft potatoes with greens and mustard butter",
-    description: "A warm start to the week that feels cooked and generous.",
-    image: IMAGE_POOL[1],
-    ingredients: ["Potatoes", "Greens", "Mustard", "Butter"],
-    matchedProducts: ["Sorrel & Walnut Pesto"],
-    steps: [
-      "Boil the potatoes until tender.",
-      "Cook the greens in a pan with butter.",
-      "Stir a little mustard through the butter.",
-      "Serve everything together with black pepper.",
-    ],
-  },
-  {
-    id: "comforting-2",
-    day: "Tuesday",
-    title: "Orzo with mushrooms and stock",
-    description: "Softer, more spoonable, and exactly right for a colder day.",
-    image: IMAGE_POOL[2],
-    ingredients: ["Orzo", "Mushrooms", "Onion", "Stock"],
-    matchedProducts: ["Orzo Pasta"],
-    steps: [
-      "Soften onion in oil.",
-      "Add mushrooms and cook until golden.",
-      "Add orzo and stock and simmer until tender.",
-      "Finish with butter, herbs, or a little cheese.",
-    ],
-  },
-  {
-    id: "comforting-3",
-    day: "Wednesday",
-    title: "Lentils with roast roots",
-    description: "A more grounded supper with plenty of room for extras.",
-    image: IMAGE_POOL[0],
-    ingredients: ["Puy Lentils", "Carrots", "Beetroot", "Rose Harissa"],
-    matchedProducts: ["Puy Lentils", "Rose Harissa"],
-    steps: [
-      "Roast the roots until tender and coloured.",
-      "Warm the lentils with olive oil or stock.",
-      "Dress with a little harissa or lemon.",
-      "Pile together and finish with herbs.",
-    ],
-  },
-  {
-    id: "comforting-4",
-    day: "Thursday",
-    title: "Soft polenta with greens",
-    description:
-      "A comforting bowl with a useful finish from the fridge or pantry.",
-    image: IMAGE_POOL[2],
-    ingredients: ["Polenta", "Greens", "Garlic", "Butter"],
-    matchedProducts: ["Polenta", "Sorrel & Walnut Pesto"],
-    steps: [
-      "Cook the polenta until soft.",
-      "Sauté greens with garlic.",
-      "Spoon polenta into bowls and top with greens.",
-      "Finish with butter, pesto, or black pepper.",
-    ],
-  },
-  {
-    id: "comforting-5",
-    day: "Friday",
-    title: "Tomato beans on toast",
-    description: "A very good end-of-week supper that still feels satisfying.",
-    image: IMAGE_POOL[3],
-    ingredients: ["Beans", "Tomatoes", "Toast", "Garlic"],
-    matchedProducts: [],
-    steps: [
-      "Cook garlic in olive oil.",
-      "Add tomatoes and simmer until soft.",
-      "Add beans and warm through.",
-      "Serve on toast with pepper or herbs.",
-    ],
-  },
-  {
-    id: "comforting-6",
-    day: "Saturday",
-    title: "Roast veg with giant couscous",
-    description: "Warm, generous, and easy to stretch into a proper meal.",
-    image: IMAGE_POOL[0],
-    ingredients: ["Roots", "Squash", "Giant Couscous", "Rose Harissa"],
-    matchedProducts: ["Giant Couscous", "Rose Harissa"],
-    steps: [
-      "Roast the vegetables until tender.",
-      "Cook giant couscous until soft.",
-      "Dress with olive oil and lemon or harissa.",
-      "Pile into a warm bowl and finish with herbs.",
-    ],
-  },
+const SHOP_BOOSTS = [
+  "Rose Harissa",
+  "Sorrel & Walnut Pesto",
+  "Signature Gochujang",
+  "Vegetable Stock Concentrate",
+  "Tahini",
+  "White Miso",
+  "Salted Caramel Sauce",
+  "Dark Chocolate & Hazelnut Spread",
+];
+
+const QUICK_ANCHORS = [
+  "spinach",
+  "tomatoes",
+  "broccoli",
+  "peppers",
+  "potatoes",
+  "cucumber",
+];
+
+const BALANCED_ANCHORS = [
+  "potatoes",
+  "tomatoes",
+  "greens",
+  "broccoli",
+  "peppers",
+  "carrots",
+];
+
+const COMFORTING_ANCHORS = [
+  "potatoes",
+  "mushrooms",
+  "roots",
+  "greens",
+  "tomatoes",
+  "carrots",
 ];
 
 function ChoiceChip({ active, label, onClick }: ChoiceChipProps) {
@@ -398,47 +221,255 @@ function compactCardItem(item: ShopDisplayItem, onAdd: () => void) {
   );
 }
 
-function buildWeek(mood: WeekMood, nights: number, focus: WeekFocus | null) {
-  const source =
+function normalise(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function dedupeStrings(values: string[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value.trim();
+    if (!trimmed) continue;
+
+    const key = normalise(trimmed);
+    if (!key || seen.has(key)) continue;
+
+    seen.add(key);
+    result.push(trimmed);
+  }
+
+  return result;
+}
+
+function getBoxIngredients() {
+  const firstBox = produceBoxes[0];
+
+  if (firstBox?.weeklyIncludes && firstBox.weeklyIncludes.length > 0) {
+    return firstBox.weeklyIncludes.map((item) => item.trim()).filter(Boolean);
+  }
+
+  return DEFAULT_BOX_INGREDIENTS;
+}
+
+function pickFromList(values: string[], index: number) {
+  if (values.length === 0) return "";
+  return values[index % values.length];
+}
+
+function buildMealIntent(
+  mood: WeekMood,
+  focus: WeekFocus | null,
+  mealIndex: number,
+  totalMeals: number,
+  boxIngredients: string[],
+): PlannerIntent {
+  const anchors =
     mood === "quick"
-      ? QUICK_LIBRARY
+      ? QUICK_ANCHORS
       : mood === "comforting"
-        ? COMFORTING_LIBRARY
-        : BALANCED_LIBRARY;
+        ? COMFORTING_ANCHORS
+        : BALANCED_ANCHORS;
 
-  return source.slice(0, nights).map((meal, index) => {
-    if (focus === "family-friendly") {
-      return {
-        ...meal,
-        description:
-          index % 2 === 0
-            ? `${meal.description} Easy to put on the table without too much fuss.`
-            : meal.description,
-      };
-    }
+  const boxMatches = anchors.filter((anchor) =>
+    boxIngredients.some((item) => normalise(item).includes(normalise(anchor))),
+  );
 
-    if (focus === "low-waste") {
-      return {
-        ...meal,
-        description:
-          index % 2 === 1
-            ? `${meal.description} Built to use what is already around.`
-            : meal.description,
-      };
-    }
+  const anchorPool = boxMatches.length > 0 ? boxMatches : anchors;
+  const anchorVeg = pickFromList(anchorPool, mealIndex);
 
-    if (focus === "veg-heavy") {
-      return {
-        ...meal,
-        description:
-          index === 0
-            ? `${meal.description} Led by produce first, with the rest supporting it.`
-            : meal.description,
-      };
-    }
+  const optionalVeg = pickFromList(
+    boxIngredients.filter(
+      (item) => !normalise(item).includes(normalise(anchorVeg)),
+    ),
+    mealIndex + 2,
+  );
 
-    return meal;
+  const shopBaseOptions = [
+    pickFromList(SHOP_BASES, mealIndex),
+    pickFromList(SHOP_BASES, mealIndex + 3),
+  ].filter(Boolean);
+
+  const shopBoostOptions =
+    mealIndex % 2 === 0
+      ? [pickFromList(SHOP_BOOSTS, mealIndex)]
+      : [pickFromList(SHOP_BOOSTS, mealIndex + 2)];
+
+  const focusGuidance =
+    focus === "family-friendly"
+      ? ["Keep this especially easy to serve and not too polarising."]
+      : focus === "low-waste"
+        ? ["Use ingredients flexibly and avoid creating lots of leftovers."]
+        : focus === "veg-heavy"
+          ? ["Let vegetables be the lead, not just a side."]
+          : [];
+
+  const moodDirection =
+    mood === "quick"
+      ? "quick, bright, practical and weeknight-friendly"
+      : mood === "comforting"
+        ? "warm, generous, soft-edged and comforting"
+        : "balanced, colourful, useful and varied";
+
+  return {
+    familyKey: mood,
+    familyLabel:
+      mood === "quick"
+        ? "Quick and easy"
+        : mood === "comforting"
+          ? "Comforting"
+          : "Balanced",
+    anchorVeg,
+    optionalVeg: optionalVeg || null,
+    supportVeg: boxIngredients.slice(mealIndex, mealIndex + 4),
+    everydayBaseOptions: ["rice", "bread", "eggs", "yoghurt", "lemon", "herbs"],
+    shopBaseOptions,
+    shopBoostOptions,
+    avoidHeroVeg:
+      mealIndex > 0 ? [pickFromList(anchorPool, mealIndex - 1)] : [],
+    flavourDirection: moodDirection,
+    flavourNotes:
+      mood === "quick"
+        ? ["bright", "simple", "minimal prep"]
+        : mood === "comforting"
+          ? ["warm", "soft", "savoury"]
+          : ["fresh", "colourful", "varied"],
+    guidance: focusGuidance,
+  };
+}
+
+function getQuickStartForMood(mood: WeekMood) {
+  if (mood === "quick") return "quick-tonight";
+  if (mood === "comforting") return "comforting";
+  return "use-what-ive-got";
+}
+
+function matchedProductsForRecipe(recipe: GeneratedRecipe) {
+  const text = [
+    recipe.title,
+    recipe.description,
+    ...recipe.ingredientsUsed,
+    ...recipe.pantryStaples,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return [...pantryItems, ...cupboardItems]
+    .filter((item) => text.includes(item.name.toLowerCase()))
+    .map((item) => item.name);
+}
+
+function fallbackMeal(day: string, index: number): PlannedMeal {
+  return {
+    id: `fallback-${index}-${Date.now()}`,
+    day,
+    title: "Simple veg box supper",
+    description:
+      "A flexible meal built from the week’s produce with pantry support.",
+    imageUrl: null,
+    imageError: "Recipe API did not return a generated image.",
+    ingredients: ["Seasonal vegetables", "Pantry base", "Herbs", "Lemon"],
+    matchedProducts: ["Giant Couscous", "Rose Harissa"],
+    steps: [
+      "Cook the vegetables simply until tender.",
+      "Prepare a pantry base such as grains, pasta, beans or rice.",
+      "Bring everything together with oil, herbs, lemon or a jarred boost.",
+      "Taste, season, and serve warm.",
+    ],
+  };
+}
+
+async function generatePlannerMeal(args: {
+  mood: WeekMood;
+  focus: WeekFocus | null;
+  mealIndex: number;
+  totalMeals: number;
+  basketNames: string[];
+  previousMeals: PlannedMeal[];
+}) {
+  const { mood, focus, mealIndex, totalMeals, basketNames, previousMeals } =
+    args;
+  const day = DAY_NAMES[mealIndex] ?? `Meal ${mealIndex + 1}`;
+  const boxIngredients = getBoxIngredients();
+  const intent = buildMealIntent(
+    mood,
+    focus,
+    mealIndex,
+    totalMeals,
+    boxIngredients,
+  );
+
+  const items = dedupeStrings([
+    "Weekly Produce Box",
+    intent.anchorVeg,
+    ...(intent.optionalVeg ? [intent.optionalVeg] : []),
+    ...intent.supportVeg,
+    ...intent.shopBaseOptions,
+    ...intent.shopBoostOptions,
+    ...basketNames,
+  ]).slice(0, 20);
+
+  const previousRecipes = previousMeals.map((meal) => ({
+    title: meal.title,
+    description: meal.description,
+    ingredientsUsed: meal.ingredients,
+  }));
+
+  const response = await fetch("/api/recipe", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+    body: JSON.stringify({
+      items,
+      quickStart: getQuickStartForMood(mood),
+      preferences: [],
+      previousRecipes,
+      weekPlanContext: {
+        mode: "plan-week",
+        mealIndex,
+        totalMeals,
+        includeMeatIdeas: false,
+        previousRecipes,
+        familyKey: intent.familyKey,
+        familyLabel: intent.familyLabel,
+        anchorVeg: intent.anchorVeg,
+        optionalVeg: intent.optionalVeg,
+        supportVeg: intent.supportVeg,
+        everydayBaseOptions: intent.everydayBaseOptions,
+        shopBaseOptions: intent.shopBaseOptions,
+        shopBoostOptions: intent.shopBoostOptions,
+        flavourDirection: intent.flavourDirection,
+        flavourNotes: intent.flavourNotes,
+      },
+      plannerIntent: intent,
+    }),
   });
+
+  const data = (await response.json()) as RecipeResponse;
+
+  if (!response.ok || !data.recipe) {
+    return fallbackMeal(day, mealIndex);
+  }
+
+  return {
+    id: `${day}-${data.recipe.title}-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`,
+    day,
+    title: data.recipe.title,
+    description: data.recipe.description,
+    imageUrl: data.imageUrl ?? null,
+    imageError: data.debug?.imageError ?? null,
+    ingredients: data.recipe.ingredientsUsed,
+    matchedProducts: matchedProductsForRecipe(data.recipe),
+    steps: data.recipe.steps,
+  } satisfies PlannedMeal;
 }
 
 export default function PlannerPage() {
@@ -451,6 +482,7 @@ export default function PlannerPage() {
   const [loadingIndex, setLoadingIndex] = useState(0);
   const [week, setWeek] = useState<PlannedMeal[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(null);
+  const [plannerError, setPlannerError] = useState("");
 
   const totalBasketItems = useMemo(
     () => groupedCart.reduce((sum, entry) => sum + entry.quantity, 0),
@@ -507,6 +539,8 @@ export default function PlannerPage() {
             "squash",
             "cauliflower",
             "beetroot",
+            "broccoli",
+            "spinach",
           ].includes(lower)
         ) {
           ingredientSet.add(ingredient);
@@ -516,62 +550,70 @@ export default function PlannerPage() {
     return Array.from(ingredientSet);
   }, [week]);
 
-  useEffect(() => {
-    if (step !== "building") return;
-
+  async function buildAiWeek() {
+    setStep("building");
     setLoadingIndex(0);
+    setPlannerError("");
+    setWeek([]);
 
-    const interval = window.setInterval(() => {
+    const loadingTimer = window.setInterval(() => {
       setLoadingIndex((current) => {
         if (current >= LOADING_MESSAGES.length - 1) return current;
         return current + 1;
       });
-    }, 7000);
+    }, 1800);
 
-    const reveal = window.setTimeout(() => {
-      const plannedWeek = buildWeek(mood, nights, focus);
-      setWeek(
-        plannedWeek.map((meal, index) => ({
-          ...meal,
-          day: DAY_NAMES[index] ?? meal.day,
-        })),
-      );
-      setOpenDay(plannedWeek[0]?.id ?? null);
+    try {
+      const builtMeals: PlannedMeal[] = [];
+
+      for (let index = 0; index < nights; index += 1) {
+        setLoadingIndex(Math.min(index, LOADING_MESSAGES.length - 1));
+
+        const meal = await generatePlannerMeal({
+          mood,
+          focus,
+          mealIndex: index,
+          totalMeals: nights,
+          basketNames,
+          previousMeals: builtMeals,
+        });
+
+        builtMeals.push(meal);
+        setWeek([...builtMeals]);
+      }
+
+      setOpenDay(builtMeals[0]?.id ?? null);
       setStep("results");
-    }, 45000);
-
-    return () => {
-      window.clearInterval(interval);
-      window.clearTimeout(reveal);
-    };
-  }, [step, mood, nights, focus]);
-
-  function handleBuildWeek() {
-    setStep("building");
+    } catch {
+      setPlannerError("Something went wrong while building your week.");
+      setStep("choices");
+    } finally {
+      window.clearInterval(loadingTimer);
+    }
   }
 
-  function handleSwapDay(dayId: string) {
-    setWeek((current) =>
-      current.map((meal) => {
-        if (meal.id !== dayId) return meal;
+  function handleBuildWeek() {
+    void buildAiWeek();
+  }
 
-        return {
-          ...meal,
-          title: "Roast veg with grains and a good finish",
-          description:
-            "A more flexible plate built from what is already in the week.",
-          image: IMAGE_POOL[0],
-          ingredients: ["Roast vegetables", "Grains", "Lemon", "Herbs"],
-          matchedProducts: ["Giant Couscous", "Farro", "Rose Harissa"],
-          steps: [
-            "Roast whatever vegetables you have until coloured and tender.",
-            "Cook the grain until soft enough to eat warm or cold.",
-            "Dress with lemon, olive oil, and black pepper.",
-            "Finish with herbs or a spoon of something punchy from the fridge.",
-          ],
-        };
-      }),
+  async function handleSwapDay(dayId: string) {
+    const mealIndex = week.findIndex((meal) => meal.id === dayId);
+    if (mealIndex < 0) return;
+
+    const previousMeals = week.filter((meal) => meal.id !== dayId);
+    const replacement = await generatePlannerMeal({
+      mood,
+      focus,
+      mealIndex,
+      totalMeals: nights,
+      basketNames,
+      previousMeals,
+    });
+
+    setWeek((current) =>
+      current.map((meal) => (meal.id === dayId ? replacement : meal)),
     );
+    setOpenDay(replacement.id);
   }
 
   function addProductByName(productName: string) {
@@ -633,8 +675,14 @@ export default function PlannerPage() {
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
                 A few quick choices, then we’ll build your meals for the week
-                ahead.
+                ahead using the AI recipe generator.
               </p>
+
+              {plannerError ? (
+                <div className="mt-5 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
+                  {plannerError}
+                </div>
+              ) : null}
 
               {step === "choices" ? (
                 <div className="mt-8 space-y-7">
@@ -742,9 +790,8 @@ export default function PlannerPage() {
                   </h2>
 
                   <p className="mt-3 max-w-xl text-sm leading-6 text-[#667164]">
-                    This takes a little longer because the week is being put
-                    together as one complete plan, not as a set of disconnected
-                    recipe ideas.
+                    This planner now calls the recipe API for each meal, so the
+                    images come from the same generator as the shop page.
                   </p>
 
                   <div className="mt-5 h-2 overflow-hidden rounded-full bg-[rgba(221,212,200,0.95)]">
@@ -756,23 +803,11 @@ export default function PlannerPage() {
                     />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const plannedWeek = buildWeek(mood, nights, focus);
-                      setWeek(
-                        plannedWeek.map((meal, index) => ({
-                          ...meal,
-                          day: DAY_NAMES[index] ?? meal.day,
-                        })),
-                      );
-                      setOpenDay(plannedWeek[0]?.id ?? null);
-                      setStep("results");
-                    }}
-                    className="mt-6 text-sm text-[#243328] underline underline-offset-4"
-                  >
-                    See my week now
-                  </button>
+                  {week.length > 0 ? (
+                    <p className="mt-4 text-sm text-[#667164]">
+                      Built {week.length} of {nights} meals.
+                    </p>
+                  ) : null}
                 </div>
               ) : (
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -850,11 +885,32 @@ export default function PlannerPage() {
                       key={meal.id}
                       className="overflow-hidden rounded-[26px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.86)] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
                     >
-                      <img
-                        src={meal.image}
-                        alt={meal.title}
-                        className="h-56 w-full object-cover"
-                      />
+                      {meal.imageUrl ? (
+                        <img
+                          key={`${meal.id}-${meal.imageUrl.slice(0, 80)}`}
+                          src={meal.imageUrl}
+                          alt={meal.title}
+                          className="h-56 w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-56 w-full items-center justify-center bg-[rgba(238,231,220,0.82)] p-5 text-center">
+                          <div>
+                            <p className="text-sm font-medium text-[#243328]">
+                              Image did not generate
+                            </p>
+                            {meal.imageError ? (
+                              <p className="mt-2 max-w-md break-words text-xs leading-5 text-[#6a5c4f]">
+                                {meal.imageError}
+                              </p>
+                            ) : (
+                              <p className="mt-2 text-xs leading-5 text-[#6a5c4f]">
+                                The meal was generated, but the image API did
+                                not return a usable image.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="p-5 md:p-6">
                         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -872,7 +928,7 @@ export default function PlannerPage() {
 
                           <button
                             type="button"
-                            onClick={() => handleSwapDay(meal.id)}
+                            onClick={() => void handleSwapDay(meal.id)}
                             className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
                           >
                             Swap
