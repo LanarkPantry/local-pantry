@@ -17,6 +17,21 @@ type RecipeResponse = {
   recipe: GeneratedRecipe;
   imageUrl: string | null;
   error?: string;
+  debug?: {
+    apiVersion?: string;
+    startedAt?: string;
+    finishedAt?: string;
+    receivedItems?: unknown;
+    cleanedItems?: string[];
+    quickStart?: string;
+    preferences?: string[];
+    attempts?: number;
+    grounded?: boolean;
+    mealDirection?: string;
+    imageGenerated?: boolean;
+    imageError?: string | null;
+    imagePromptUsed?: string;
+  };
 };
 
 type StarterBox = {
@@ -698,6 +713,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
         headers: {
           "Content-Type": "application/json",
         },
+        cache: "no-store",
         body: JSON.stringify({
           items: uniqueItems,
           quickStart,
@@ -1247,17 +1263,37 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
             ref={recipeResultRef}
             className="overflow-hidden rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] md:rounded-[24px]"
           >
-            {result.imageUrl ? (
-              <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.64)] p-3 md:p-4">
+            <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.64)] p-3 md:p-4">
+              {result.imageUrl ? (
                 <div className="overflow-hidden rounded-[18px] bg-[rgba(248,244,238,0.82)] md:rounded-[20px]">
                   <img
+                    key={`${result.recipe.title}-${result.imageUrl.slice(0, 80)}`}
                     src={result.imageUrl}
                     alt={result.recipe.title}
                     className="h-44 w-full object-cover md:h-52"
                   />
                 </div>
-              </div>
-            ) : null}
+              ) : (
+                <div className="rounded-[18px] border border-[#e5ddcf] bg-[#fbf6f0] p-4 text-sm leading-6 text-[#6a5c4f]">
+                  <p className="font-medium text-[#243328]">
+                    Image did not generate for this recipe.
+                  </p>
+                  <p className="mt-1">
+                    The recipe text worked, but the image API returned no image.
+                  </p>
+                  {result.debug?.imageError ? (
+                    <p className="mt-2 break-words text-xs text-[#6a5c4f]">
+                      Image error: {result.debug.imageError}
+                    </p>
+                  ) : null}
+                  {result.debug?.apiVersion ? (
+                    <p className="mt-2 text-xs text-[#7a8478]">
+                      API version: {result.debug.apiVersion}
+                    </p>
+                  ) : null}
+                </div>
+              )}
+            </div>
 
             <div className="p-4 md:p-5">
               <p className="text-[10px] uppercase tracking-[0.16em] text-[#6b776c]">
@@ -1283,6 +1319,26 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                     </span>
                   ))}
                 </div>
+              ) : null}
+
+              {result.debug ? (
+                <details className="mt-4 rounded-[16px] border border-[#e5ddcf] bg-[rgba(251,250,248,0.82)] p-3 text-xs text-[#5f675c]">
+                  <summary className="cursor-pointer font-medium text-[#243328]">
+                    Recipe debug info
+                  </summary>
+                  <div className="mt-3 space-y-1 break-words">
+                    <p>
+                      Image generated: {String(result.debug.imageGenerated)}
+                    </p>
+                    <p>Image error: {result.debug.imageError || "none"}</p>
+                    <p>Attempts: {result.debug.attempts ?? "unknown"}</p>
+                    <p>Grounded: {String(result.debug.grounded)}</p>
+                    <p>
+                      Meal direction: {result.debug.mealDirection || "unknown"}
+                    </p>
+                    <p>API version: {result.debug.apiVersion || "unknown"}</p>
+                  </div>
+                </details>
               ) : null}
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
