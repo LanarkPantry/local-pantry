@@ -790,8 +790,9 @@ export default function PlannerPage() {
                   </h2>
 
                   <p className="mt-3 max-w-xl text-sm leading-6 text-[#667164]">
-                    This planner now calls the recipe API for each meal, so the
-                    images come from the same generator as the shop page.
+                    Building a week that works together — balanced meals,
+                    gorgeous ingredients, and straightforward cooking for the
+                    days ahead.
                   </p>
 
                   <div className="mt-5 h-2 overflow-hidden rounded-full bg-[rgba(221,212,200,0.95)]">
