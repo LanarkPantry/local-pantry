@@ -182,6 +182,7 @@ const COMMON_SUPPORT_INGREDIENTS = [
   "salt",
   "pepper",
   "oil",
+  "olive oil",
   "butter",
   "water",
   "flour",
@@ -195,6 +196,7 @@ const COMMON_SUPPORT_INGREDIENTS = [
   "beans",
   "stock",
   "yoghurt",
+  "yogurt",
   "cream",
   "cheese",
   "eggs",
@@ -233,21 +235,29 @@ const COMMON_SUPPORT_INGREDIENTS = [
   "farro",
   "polenta",
   "risotto rice",
+  "arborio",
+  "carnaroli",
   "butter beans",
   "cannellini beans",
+  "white beans",
   "chickpeas",
   "puy lentils",
   "whole tomatoes",
   "san marzano tomatoes",
   "tinned tomatoes",
+  "tomatoes",
   "tahini",
   "white miso",
+  "miso",
   "almonds",
   "walnuts",
   "cashews",
   "salted caramel",
+  "caramel sauce",
   "chocolate hazelnut spread",
+  "chocolate spread",
   "dark chocolate spread",
+  "hazelnut spread",
 ];
 
 const OVERUSED_BOX_DEFAULTS = ["apple", "carrot", "leek", "leeks", "onion"];
@@ -287,6 +297,50 @@ const SWEET_SIGNAL_INGREDIENTS = [
 ];
 
 const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
+  {
+    name: "Seasonal Veg Box",
+    aliases: [
+      "veg box",
+      "vegetable box",
+      "seasonal veg box",
+      "produce box",
+      "fruit and veg box",
+      "fruit box",
+      "weekly box",
+      "weekly veg box",
+      "mixed box",
+      "mixed veg box",
+      "local box",
+    ],
+    category: "produce box",
+    role: "hero",
+    useFrequency: "high",
+    pairsWith: [
+      "orzo",
+      "farro",
+      "puy lentils",
+      "butter beans",
+      "chickpeas",
+      "risotto rice",
+      "polenta",
+      "pesto",
+      "harissa",
+      "gochujang",
+      "white miso",
+      "tinned tomatoes",
+    ],
+    bestMealStyles: [
+      "traybake",
+      "warm bowl",
+      "soup",
+      "stew",
+      "pasta",
+      "grain bowl",
+      "roast plate",
+    ],
+    guidance:
+      "Use as the main seasonal foundation. Let the actual selected vegetables lead the recipe where available, and use pantry products to make the box feel like a complete meal.",
+  },
   {
     name: "Rose Harissa",
     aliases: ["harissa", "rose harissa"],
@@ -1481,9 +1535,62 @@ async function generateRecipe(
   return retryRecipe;
 }
 
-async function generateRecipeImage(client: OpenAI, recipeTitle: string) {
+async function generateRecipeImage(
+  client: OpenAI,
+  recipe: GeneratedRecipe,
+  providedItems: string[],
+  preferences: string[],
+) {
   try {
-    const imagePrompt = `A beautiful, realistic food photograph of ${recipeTitle}. Styled like premium editorial food photography. Natural light, elegant plating, warm inviting tones, appetising and believable. No text, no labels, no collage, no split screen.`;
+    const visibleIngredients = uniqueStrings([
+      ...recipe.ingredientsUsed,
+      ...providedItems,
+    ]).slice(0, 12);
+
+    const isVegan = preferences
+      .map((item) => item.toLowerCase())
+      .includes("vegan");
+    const isNoDairy = preferences
+      .map((item) => item.toLowerCase())
+      .includes("no dairy");
+
+    const dietaryImageRules = [
+      isVegan
+        ? "- The image must look fully vegan: no meat, fish, eggs, cheese, cream, yoghurt, butter, or honey."
+        : "",
+      !isVegan && isNoDairy
+        ? "- The image must not show dairy: no cheese, cream, butter, yoghurt, or milky sauces."
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const imagePrompt = `
+Create one realistic food photograph for this exact recipe.
+
+Recipe title:
+${recipe.title}
+
+Recipe description:
+${recipe.description}
+
+Visible ingredients that should guide the image:
+${visibleIngredients.join(", ")}
+
+Recipe pantry staples:
+${recipe.pantryStaples.join(", ") || "none"}
+
+Image requirements:
+- Show a finished dish that clearly matches the recipe title and ingredients.
+- The food should look believable, home-cookable, and appetising.
+- Prioritise the listed visible ingredients.
+- Do not introduce obvious unrelated hero ingredients.
+- Do not show meat or fish unless the recipe clearly includes it.
+- Do not show random garnish that changes the identity of the dish.
+${dietaryImageRules}
+- Use natural light, premium grocery editorial styling, warm tones, and simple elegant plating.
+- No text, no labels, no collage, no split screen, no packaging.
+`.trim();
 
     const imageResponse = await client.images.generate({
       model: "gpt-image-1",
@@ -1681,7 +1788,12 @@ export async function POST(request: Request) {
       plannerIntent,
     );
 
-    const imageUrl = await generateRecipeImage(client, recipe.title);
+    const imageUrl = await generateRecipeImage(
+      client,
+      recipe,
+      cleanedItems,
+      preferences,
+    );
 
     const payload: RecipeApiSuccess = {
       recipe,
