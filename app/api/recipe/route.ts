@@ -1353,7 +1353,7 @@ Avoid repeating the same meal shape, title pattern, or main finishing idea.
     : "";
 
   const response = await client.responses.create({
-    model: "gpt-5.4-mini",
+    model: "gpt-4.1-mini",
     instructions: `
 You are a warm, practical recipe writer for a premium local grocery shop.
 
@@ -1486,7 +1486,7 @@ async function generateRecipeImage(client: OpenAI, recipeTitle: string) {
     const imagePrompt = `A beautiful, realistic food photograph of ${recipeTitle}. Styled like premium editorial food photography. Natural light, elegant plating, warm inviting tones, appetising and believable. No text, no labels, no collage, no split screen.`;
 
     const imageResponse = await client.images.generate({
-      model: "gpt-image-1.5",
+      model: "gpt-image-1",
       prompt: imagePrompt,
       size: "1024x1024",
       quality: "medium",
