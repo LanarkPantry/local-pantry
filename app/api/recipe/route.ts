@@ -26,6 +26,19 @@ type MealDirection = {
   instruction: string;
 };
 
+type PantryProductRole = "hero" | "core" | "supporting";
+
+type PantryProduct = {
+  name: string;
+  aliases: string[];
+  category: string;
+  role: PantryProductRole;
+  useFrequency: "high" | "medium" | "low";
+  pairsWith: string[];
+  bestMealStyles: string[];
+  guidance: string;
+};
+
 type WeekPlanContext = {
   mode: "plan-week";
   mealIndex: number;
@@ -206,6 +219,35 @@ const COMMON_SUPPORT_INGREDIENTS = [
   "mustard",
   "vinegar",
   "lemon zest",
+  "rose harissa",
+  "harissa",
+  "sorrel pesto",
+  "walnut pesto",
+  "pesto",
+  "gochujang",
+  "vegetable stock concentrate",
+  "stock concentrate",
+  "casarecce",
+  "bucatini",
+  "giant couscous",
+  "farro",
+  "polenta",
+  "risotto rice",
+  "butter beans",
+  "cannellini beans",
+  "chickpeas",
+  "puy lentils",
+  "whole tomatoes",
+  "san marzano tomatoes",
+  "tinned tomatoes",
+  "tahini",
+  "white miso",
+  "almonds",
+  "walnuts",
+  "cashews",
+  "salted caramel",
+  "chocolate hazelnut spread",
+  "dark chocolate spread",
 ];
 
 const OVERUSED_BOX_DEFAULTS = ["apple", "carrot", "leek", "leeks", "onion"];
@@ -221,6 +263,8 @@ const SWEET_SIGNAL_INGREDIENTS = [
   "lemon curd",
   "sweet jar",
   "sweet jars",
+  "salted caramel",
+  "caramel sauce",
   "banana",
   "berries",
   "strawberry",
@@ -240,6 +284,364 @@ const SWEET_SIGNAL_INGREDIENTS = [
   "apples",
   "yoghurt",
   "yogurt",
+];
+
+const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
+  {
+    name: "Rose Harissa",
+    aliases: ["harissa", "rose harissa"],
+    category: "flavour foundation",
+    role: "hero",
+    useFrequency: "medium",
+    pairsWith: [
+      "butter beans",
+      "chickpeas",
+      "tomatoes",
+      "couscous",
+      "orzo",
+      "farro",
+      "roast vegetables",
+      "carrots",
+      "peppers",
+      "aubergine",
+      "potatoes",
+    ],
+    bestMealStyles: ["warm bowl", "traybake", "beans", "pasta", "roast plate"],
+    guidance:
+      "Use as a bold flavour builder. It should bring smoky warmth and depth, but should not appear in every recipe.",
+  },
+  {
+    name: "Sorrel & Walnut Pesto",
+    aliases: ["sorrel pesto", "walnut pesto", "pesto"],
+    category: "flavour foundation",
+    role: "hero",
+    useFrequency: "medium",
+    pairsWith: [
+      "casarecce",
+      "bucatini",
+      "orzo",
+      "farro",
+      "potatoes",
+      "white beans",
+      "cannellini beans",
+      "greens",
+      "broccoli",
+      "peas",
+      "walnuts",
+    ],
+    bestMealStyles: ["pasta", "grain bowl", "warm salad", "potatoes"],
+    guidance:
+      "Use as a green, sharp, savoury lift. Keep it fresh and practical rather than making every pesto recipe feel like the same pasta dish.",
+  },
+  {
+    name: "Signature Gochujang",
+    aliases: ["gochujang", "chilli paste", "korean chilli paste"],
+    category: "flavour foundation",
+    role: "hero",
+    useFrequency: "medium",
+    pairsWith: [
+      "rice",
+      "risotto rice",
+      "orzo",
+      "butter beans",
+      "chickpeas",
+      "puy lentils",
+      "roast carrots",
+      "broccoli",
+      "mushrooms",
+      "cabbage",
+      "noodles",
+    ],
+    bestMealStyles: [
+      "rice bowl",
+      "traybake",
+      "noodles",
+      "beans",
+      "roast vegetables",
+    ],
+    guidance:
+      "Use as a deep savoury chilli paste for everyday cooking. Keep it versatile, not aggressively hot or niche.",
+  },
+  {
+    name: "Vegetable Stock Concentrate",
+    aliases: ["stock", "vegetable stock", "stock concentrate"],
+    category: "flavour foundation",
+    role: "hero",
+    useFrequency: "high",
+    pairsWith: [
+      "risotto rice",
+      "orzo",
+      "puy lentils",
+      "farro",
+      "polenta",
+      "beans",
+      "tomatoes",
+      "soups",
+      "stews",
+      "grains",
+    ],
+    bestMealStyles: ["soup", "stew", "risotto", "one-pot", "grains"],
+    guidance:
+      "Use as background depth. It should improve flavour without becoming the headline ingredient.",
+  },
+  {
+    name: "Salted Caramel Sauce",
+    aliases: ["salted caramel", "caramel sauce"],
+    category: "comfort sweet",
+    role: "hero",
+    useFrequency: "low",
+    pairsWith: [
+      "apples",
+      "bananas",
+      "pears",
+      "porridge",
+      "yoghurt",
+      "pancakes",
+      "toast",
+    ],
+    bestMealStyles: ["breakfast", "snack", "simple sweet"],
+    guidance:
+      "Use for simple sweet ideas, breakfasts and low-effort puddings. Avoid complicated baking projects.",
+  },
+  {
+    name: "Dark Chocolate & Hazelnut Spread",
+    aliases: ["chocolate spread", "hazelnut spread", "dark chocolate spread"],
+    category: "comfort sweet",
+    role: "hero",
+    useFrequency: "low",
+    pairsWith: [
+      "banana",
+      "strawberries",
+      "raspberries",
+      "toast",
+      "crumpets",
+      "porridge",
+      "pancakes",
+    ],
+    bestMealStyles: ["breakfast", "snack", "simple sweet"],
+    guidance:
+      "Use for simple, everyday sweet ideas. Keep it generous but not dessert-heavy.",
+  },
+  {
+    name: "Casarecce",
+    aliases: ["casarecce"],
+    category: "pasta",
+    role: "core",
+    useFrequency: "medium",
+    pairsWith: ["pesto", "tomatoes", "harissa", "greens", "beans"],
+    bestMealStyles: ["pasta"],
+    guidance: "Use for sauce-catching pasta dishes with texture and comfort.",
+  },
+  {
+    name: "Bucatini",
+    aliases: ["bucatini"],
+    category: "pasta",
+    role: "core",
+    useFrequency: "medium",
+    pairsWith: ["tomatoes", "harissa", "pesto", "olive oil", "chilli"],
+    bestMealStyles: ["pasta"],
+    guidance: "Use for slightly elevated but still simple pasta meals.",
+  },
+  {
+    name: "Orzo",
+    aliases: ["orzo"],
+    category: "pasta",
+    role: "core",
+    useFrequency: "high",
+    pairsWith: ["stock", "tomatoes", "greens", "beans", "pesto", "harissa"],
+    bestMealStyles: ["one-pot", "soup", "pasta-grain", "warm bowl"],
+    guidance:
+      "Use as a flexible quick base for one-pot meals, soups and warm bowls.",
+  },
+  {
+    name: "Giant Couscous",
+    aliases: ["giant couscous", "couscous"],
+    category: "grain base",
+    role: "core",
+    useFrequency: "high",
+    pairsWith: [
+      "harissa",
+      "pesto",
+      "roast vegetables",
+      "chickpeas",
+      "tahini",
+      "nuts",
+    ],
+    bestMealStyles: ["warm bowl", "traybake", "salad"],
+    guidance:
+      "Use for quick bowls and roast veg meals. Good for low-effort weeknight structure.",
+  },
+  {
+    name: "Farro",
+    aliases: ["farro"],
+    category: "grain base",
+    role: "core",
+    useFrequency: "medium",
+    pairsWith: ["pesto", "beans", "greens", "mushrooms", "walnuts", "stock"],
+    bestMealStyles: ["warm bowl", "salad", "grain pot"],
+    guidance: "Use for nutty, hearty bowls and seasonal salads.",
+  },
+  {
+    name: "Polenta",
+    aliases: ["polenta"],
+    category: "grain base",
+    role: "supporting",
+    useFrequency: "low",
+    pairsWith: ["mushrooms", "tomatoes", "greens", "harissa", "stock", "beans"],
+    bestMealStyles: ["comfort", "soft bowl", "bake"],
+    guidance:
+      "Use occasionally for cosy comfort meals. Keep instructions simple and approachable.",
+  },
+  {
+    name: "Risotto Rice",
+    aliases: ["risotto rice", "arborio", "carnaroli"],
+    category: "grain base",
+    role: "core",
+    useFrequency: "medium",
+    pairsWith: ["stock", "mushrooms", "greens", "pesto", "peas", "lemon"],
+    bestMealStyles: ["risotto", "one-pot", "comfort"],
+    guidance:
+      "Use for comforting rice dishes where stock concentrate can add depth.",
+  },
+  {
+    name: "Butter Beans",
+    aliases: ["butter beans", "jarred butter beans"],
+    category: "beans",
+    role: "core",
+    useFrequency: "high",
+    pairsWith: ["harissa", "tomatoes", "pesto", "stock", "greens", "tahini"],
+    bestMealStyles: ["beans", "stew", "warm bowl", "toast"],
+    guidance:
+      "Use as a creamy, satisfying protein base. Excellent for quick meals.",
+  },
+  {
+    name: "Cannellini Beans",
+    aliases: ["cannellini beans", "white beans"],
+    category: "beans",
+    role: "core",
+    useFrequency: "high",
+    pairsWith: [
+      "pesto",
+      "stock",
+      "tomatoes",
+      "greens",
+      "olive oil",
+      "rosemary",
+    ],
+    bestMealStyles: ["soup", "stew", "toast", "warm bowl"],
+    guidance: "Use for soft, creamy meals, soups and pesto-led dishes.",
+  },
+  {
+    name: "Chickpeas",
+    aliases: ["chickpeas", "jarred chickpeas"],
+    category: "beans",
+    role: "core",
+    useFrequency: "high",
+    pairsWith: [
+      "harissa",
+      "gochujang",
+      "couscous",
+      "tahini",
+      "tomatoes",
+      "roast vegetables",
+    ],
+    bestMealStyles: ["traybake", "bowl", "stew", "salad"],
+    guidance: "Use for texture, protein and quick filling meals.",
+  },
+  {
+    name: "Puy Lentils",
+    aliases: ["puy lentils", "lentils"],
+    category: "lentils",
+    role: "core",
+    useFrequency: "medium",
+    pairsWith: [
+      "stock",
+      "tomatoes",
+      "greens",
+      "carrots",
+      "mushrooms",
+      "walnuts",
+    ],
+    bestMealStyles: ["stew", "warm salad", "bowl"],
+    guidance:
+      "Use for earthy, substantial meals. Avoid making them feel worthy or bland.",
+  },
+  {
+    name: "Premium Whole Tomatoes",
+    aliases: [
+      "tomatoes",
+      "whole tomatoes",
+      "san marzano tomatoes",
+      "tinned tomatoes",
+    ],
+    category: "cooking foundation",
+    role: "core",
+    useFrequency: "high",
+    pairsWith: ["bucatini", "casarecce", "orzo", "harissa", "beans", "stock"],
+    bestMealStyles: ["pasta", "stew", "sauce", "bake"],
+    guidance:
+      "Use as a foundational sauce ingredient. Especially useful with pasta, beans and harissa.",
+  },
+  {
+    name: "Tahini",
+    aliases: ["tahini"],
+    category: "flavour boost",
+    role: "core",
+    useFrequency: "medium",
+    pairsWith: [
+      "chickpeas",
+      "couscous",
+      "roast vegetables",
+      "carrots",
+      "greens",
+      "lemon",
+    ],
+    bestMealStyles: ["bowl", "dressing", "traybake"],
+    guidance:
+      "Use as a creamy, nutty dressing or sauce base. Keep it bright with lemon or vinegar.",
+  },
+  {
+    name: "White Miso",
+    aliases: ["white miso", "miso"],
+    category: "flavour boost",
+    role: "supporting",
+    useFrequency: "medium",
+    pairsWith: ["stock", "mushrooms", "greens", "rice", "orzo", "beans"],
+    bestMealStyles: ["soup", "broth", "glaze", "one-pot"],
+    guidance:
+      "Use for savoury depth. Avoid making recipes too specialist or overly Japanese unless the ingredients support it.",
+  },
+  {
+    name: "Almonds",
+    aliases: ["almonds"],
+    category: "nuts",
+    role: "supporting",
+    useFrequency: "medium",
+    pairsWith: ["couscous", "fruit", "caramel", "roast vegetables", "salads"],
+    bestMealStyles: ["finish", "breakfast", "salad"],
+    guidance: "Use as crunch, texture or a simple finishing ingredient.",
+  },
+  {
+    name: "Walnuts",
+    aliases: ["walnuts"],
+    category: "nuts",
+    role: "supporting",
+    useFrequency: "medium",
+    pairsWith: ["pesto", "farro", "lentils", "apples", "greens"],
+    bestMealStyles: ["finish", "salad", "grain bowl"],
+    guidance: "Use for earthy crunch and warmth.",
+  },
+  {
+    name: "Cashews",
+    aliases: ["cashews"],
+    category: "nuts",
+    role: "supporting",
+    useFrequency: "medium",
+    pairsWith: ["pesto", "gochujang", "rice", "vegetables", "creamy sauces"],
+    bestMealStyles: ["finish", "sauce", "bowl"],
+    guidance:
+      "Use for creaminess or crunch, especially in plant-forward meals.",
+  },
 ];
 
 function normaliseList(value: unknown, maxItems: number) {
@@ -314,6 +716,8 @@ function isSweetLedSelection(items: string[]) {
       item.includes("chocolate spread") ||
       item.includes("hazelnut spread") ||
       item.includes("cocoa spread") ||
+      item.includes("salted caramel") ||
+      item.includes("caramel sauce") ||
       item.includes("jam") ||
       item.includes("marmalade") ||
       item.includes("honey") ||
@@ -567,7 +971,7 @@ Very important:
 - Good directions include toast, crumpets, flatbreads, yoghurt bowls, fruit bowls, pancakes, crepes, or other quick snack and breakfast ideas.
 - Avoid cakes, brownies, cookies, pastries, celebration desserts, or anything that feels over-engineered.
 - Keep it practical, quick, and realistic for normal home use.
-- If chocolate spread, jam, honey, fruit, or yoghurt are present, let those ingredients genuinely shape the recipe.
+- If chocolate spread, salted caramel, jam, honey, fruit, or yoghurt are present, let those ingredients genuinely shape the recipe.
 - The result should still feel like something this shop would sensibly suggest to help someone use what they picked.
 `.trim();
 }
@@ -636,11 +1040,59 @@ Important:
 - Let flavour come from practical things such as lemon, herbs, paprika, cumin, coriander, chilli flakes, mustard, stock, yoghurt, butter, olive oil, nuts, or black pepper when they fit naturally.
 - A good meal can be bright, herby, warm, gently spiced, creamy, earthy, brothy, or softly smoky without becoming complicated.
 - Use one or two clear flavour moves rather than piling everything in.
-- Do not rely on pesto, harissa, or another jar every time. If a jar boost is not clearly provided for the day, do not invent one.
+- Do not rely on pesto, harissa, gochujang, or another jar every time. If a jar boost is not clearly provided for the day, do not invent one.
 - If the day has no shop boost, finish the meal with everyday flavour instead.
 - Keep the flavour direction leaning towards: ${flavourDirection}.
 ${flavourNotes.length > 0 ? `- Helpful flavour notes: ${flavourNotes.join(", ")}.` : ""}
 - The flavour should support the anchor ingredients rather than overpower them.
+`.trim();
+}
+
+function buildLanarkPantryInstruction(items: string[]) {
+  const lowerItems = items.map((item) => item.toLowerCase());
+
+  const matchedProducts = LANARK_PANTRY_PRODUCTS.filter((product) =>
+    product.aliases.some((alias) =>
+      lowerItems.some(
+        (item) =>
+          item.includes(alias.toLowerCase()) ||
+          alias.toLowerCase().includes(item),
+      ),
+    ),
+  );
+
+  if (matchedProducts.length === 0) {
+    return "";
+  }
+
+  const formattedProducts = matchedProducts
+    .map((product) =>
+      `
+- ${product.name}
+  Category: ${product.category}
+  Role: ${product.role}
+  Use frequency: ${product.useFrequency}
+  Natural pairings: ${product.pairsWith.join(", ")}
+  Best meal styles: ${product.bestMealStyles.join(", ")}
+  Guidance: ${product.guidance}
+`.trim(),
+    )
+    .join("\n\n");
+
+  return `
+The following items are part of The Lanark Pantry curated product range.
+
+Use this product intelligence to make the recipe feel connected to the shop pantry system:
+
+${formattedProducts}
+
+Important:
+- Treat hero products as flavour anchors only when they are provided or clearly relevant.
+- Do not force every recipe to use a jar, paste, pesto, harissa, gochujang, or sauce.
+- Structural pantry products such as pasta, grains, beans, lentils, tomatoes, and stock can appear more often.
+- Use stock concentrate as quiet background depth, not as the headline ingredient.
+- Keep recipes plant-forward, generous, modern, and practical.
+- The food should feel flavour-led and everyday, not restrictive, diet-coded, or overly chef-like.
 `.trim();
 }
 
@@ -701,7 +1153,7 @@ Keep this meal veg-first.
 
 Important:
 - Do not introduce meat or fish.
-- Let vegetables, grains, pulses, herbs, and pantry staples carry the week.
+- Let vegetables, grains, pulses, beans, lentils, rice, pasta, couscous, or similar pantry supports carry the week.
 `;
 
   return `
@@ -714,7 +1166,7 @@ Very important:
 - The veg box should feel like the foundation of the week.
 - Let grains, pulses, beans, lentils, rice, pasta, couscous, or similar pantry supports help the week feel complete.
 - Use jars, strong sauces, or special flavour products only occasionally.
-- Do not make everything pesto, harissa, or another strong jar-led flavour.
+- Do not make everything pesto, harissa, gochujang, or another strong jar-led flavour.
 - The week should feel varied across meal shape, vegetables, texture, and cooking method.
 - Keep the recipes practical, believable, and cookable for a normal week.
 - The result should help shape a basket from a veg box plus a few useful extras.
@@ -881,6 +1333,7 @@ async function requestRecipe(
     plannerIntent,
     weekPlanContext,
   );
+  const lanarkPantryInstruction = buildLanarkPantryInstruction(items);
   const previousRecipesInstruction = buildPreviousRecipesInstruction(
     weekPlanContext?.previousRecipes ?? [],
   );
@@ -929,6 +1382,7 @@ ${sweetIngredientInstruction}
 ${weekPlanInstruction}
 ${plannerIntentInstruction}
 ${flavourInstruction}
+${lanarkPantryInstruction}
 ${previousRecipeInstruction}
 ${previousRecipesInstruction}
 
