@@ -12,6 +12,7 @@ import {
 
 type WeekMood = "quick" | "balanced" | "comforting";
 type WeekFocus = "veg-heavy" | "low-waste" | "family-friendly";
+type ProteinStyle = "veg" | "flexible" | "high-protein";
 type PlannerStep = "choices" | "building" | "results";
 
 type GeneratedRecipe = {
@@ -64,6 +65,20 @@ type PlannerIntent = {
   flavourDirection: string;
   flavourNotes: string[];
   guidance: string[];
+};
+
+type GeneratePlannerMealArgs = {
+  mood: WeekMood;
+  focus: WeekFocus | null;
+  proteinStyle: ProteinStyle;
+  mealIndex: number;
+  totalMeals: number;
+  basketNames: string[];
+  previousMeals: PlannedMeal[];
+  swapRequest?: {
+    rejectedTitle: string;
+    rejectedIngredients: string[];
+  } | null;
 };
 
 const LOADING_MESSAGES = [
@@ -407,23 +422,34 @@ function pickAnchorVeg(args: {
   mealIndex: number;
   boxIngredients: string[];
   previousMeals: PlannedMeal[];
+  swapRequest?: GeneratePlannerMealArgs["swapRequest"];
 }) {
-  const { mood, mealIndex, boxIngredients, previousMeals } = args;
+  const { mood, mealIndex, boxIngredients, previousMeals, swapRequest } = args;
   const anchorPool = buildAnchorPool(mood, boxIngredients);
   const usedAnchors = buildUsedAnchorList(previousMeals);
+  const rejectedIngredients =
+    swapRequest?.rejectedIngredients.map((item) => normalise(item)) ?? [];
   const rotatedPool = rotateList(
     anchorPool,
-    mealIndex * 3 + previousMeals.length * 2,
+    mealIndex * 3 + previousMeals.length * 2 + (swapRequest ? 11 : 0),
   );
 
   const freshPick = rotatedPool.find((candidate) => {
     const key = normalise(candidate);
-    return !usedAnchors.some(
+
+    const wasUsed = usedAnchors.some(
       (used) => used.includes(key) || key.includes(used),
     );
+    const wasRejected = rejectedIngredients.some(
+      (rejected) => rejected.includes(key) || key.includes(rejected),
+    );
+
+    return !wasUsed && !wasRejected;
   });
 
-  return freshPick || pickFromList(rotatedPool, mealIndex);
+  return (
+    freshPick || pickFromList(rotatedPool, mealIndex + (swapRequest ? 5 : 0))
+  );
 }
 
 function buildSupportVeg(args: {
@@ -432,13 +458,23 @@ function buildSupportVeg(args: {
   mealIndex: number;
   previousMeals: PlannedMeal[];
   totalMeals: number;
+  swapRequest?: GeneratePlannerMealArgs["swapRequest"];
 }) {
-  const { boxIngredients, anchorVeg, mealIndex, previousMeals, totalMeals } =
-    args;
+  const {
+    boxIngredients,
+    anchorVeg,
+    mealIndex,
+    previousMeals,
+    totalMeals,
+    swapRequest,
+  } = args;
 
   const usedText = previousMeals
     .flatMap((meal) => meal.ingredients)
     .map((item) => normalise(item));
+
+  const rejectedText =
+    swapRequest?.rejectedIngredients.map((item) => normalise(item)) ?? [];
 
   const available = boxIngredients.filter((item) => {
     const key = normalise(item);
@@ -451,7 +487,11 @@ function buildSupportVeg(args: {
     const wasUsedOften =
       usedText.filter((used) => used.includes(key) || key.includes(used))
         .length >= 2;
-    return !wasUsedOften;
+    const wasRejected = rejectedText.some(
+      (rejected) => rejected.includes(key) || key.includes(rejected),
+    );
+
+    return !wasUsedOften && !wasRejected;
   });
 
   const nonRootFirst = [
@@ -459,24 +499,106 @@ function buildSupportVeg(args: {
     ...available.filter((item) => isRootOrAllium(item)),
   ];
 
-  const varied = pickVariedItems(nonRootFirst, mealIndex + totalMeals, 5);
+  const varied = pickVariedItems(
+    nonRootFirst,
+    mealIndex + totalMeals + (swapRequest ? 7 : 0),
+    5,
+  );
 
   return dedupeStrings(varied).slice(0, 4);
+}
+
+function proteinGuidance(proteinStyle: ProteinStyle) {
+  if (proteinStyle === "veg") {
+    return [
+      "Keep the plan vegetarian and produce-led.",
+      "Use beans, lentils, chickpeas, eggs, yoghurt, cheese, halloumi or tofu-style additions only where they fit naturally.",
+      "Do not introduce meat or fish.",
+    ];
+  }
+
+  if (proteinStyle === "high-protein") {
+    return [
+      "Make the meals feel more protein-balanced.",
+      "Use beans, lentils, chickpeas, eggs, yoghurt, tofu, halloumi, or optional chicken/fish suggestions where they fit.",
+      "Keep vegetables central rather than making the meal meat-led.",
+    ];
+  }
+
+  return [
+    "Keep the plan flexible for mixed households.",
+    "Meals may suggest optional chicken, fish, tofu, halloumi, eggs, beans or lentils, but the vegetables should still lead.",
+    "Do not make every recipe depend on meat.",
+  ];
+}
+
+function proteinItems(proteinStyle: ProteinStyle, mealIndex: number) {
+  if (proteinStyle === "veg") {
+    return pickVariedItems(
+      [
+        "chickpeas",
+        "butter beans",
+        "puy lentils",
+        "eggs",
+        "halloumi",
+        "tofu",
+        "yoghurt",
+      ],
+      mealIndex,
+      2,
+    );
+  }
+
+  if (proteinStyle === "high-protein") {
+    return pickVariedItems(
+      [
+        "chickpeas",
+        "butter beans",
+        "puy lentils",
+        "eggs",
+        "tofu",
+        "halloumi",
+        "chicken",
+        "fish",
+        "Greek yoghurt",
+      ],
+      mealIndex,
+      2,
+    );
+  }
+
+  return pickVariedItems(
+    [
+      "chickpeas",
+      "butter beans",
+      "puy lentils",
+      "eggs",
+      "tofu",
+      "halloumi",
+      "chicken",
+      "fish",
+    ],
+    mealIndex,
+    2,
+  );
 }
 
 function buildMealIntent(
   mood: WeekMood,
   focus: WeekFocus | null,
+  proteinStyle: ProteinStyle,
   mealIndex: number,
   totalMeals: number,
   boxIngredients: string[],
   previousMeals: PlannedMeal[],
+  swapRequest?: GeneratePlannerMealArgs["swapRequest"],
 ): PlannerIntent {
   const anchorVeg = pickAnchorVeg({
     mood,
     mealIndex,
     boxIngredients,
     previousMeals,
+    swapRequest,
   });
 
   const supportVeg = buildSupportVeg({
@@ -485,6 +607,7 @@ function buildMealIntent(
     mealIndex,
     previousMeals,
     totalMeals,
+    swapRequest,
   });
 
   const optionalVeg = supportVeg[0] ?? null;
@@ -521,8 +644,17 @@ function buildMealIntent(
     .flatMap((meal) => meal.ingredients.slice(0, 3))
     .filter((ingredient) => !isFruit(ingredient));
 
+  const swapGuidance = swapRequest
+    ? [
+        `The user rejected this meal: ${swapRequest.rejectedTitle}.`,
+        `Do not create a near-match to that rejected meal.`,
+        `Avoid these rejected ingredients as the main idea: ${swapRequest.rejectedIngredients.join(", ")}.`,
+        "Change the dish shape, hero vegetables, texture and title.",
+      ]
+    : [];
+
   return {
-    familyKey: mood,
+    familyKey: `${mood}-${proteinStyle}`,
     familyLabel:
       mood === "quick"
         ? "Quick and easy"
@@ -537,8 +669,9 @@ function buildMealIntent(
     shopBoostOptions,
     avoidHeroVeg: dedupeStrings([
       ...previousHeroVeg,
+      ...(swapRequest?.rejectedIngredients ?? []),
       ...(mealIndex > 0 ? ["potatoes", "carrots", "leeks", "onions"] : []),
-    ]).slice(0, 8),
+    ]).slice(0, 10),
     flavourDirection: moodDirection,
     flavourNotes:
       mood === "quick"
@@ -548,6 +681,8 @@ function buildMealIntent(
           : ["fresh", "colourful", "varied"],
     guidance: [
       ...focusGuidance,
+      ...proteinGuidance(proteinStyle),
+      ...swapGuidance,
       "Across the week, avoid repeating the same hero vegetables.",
       "Do not keep defaulting to potato, carrot, leek or onion-led meals.",
       "Use greens, brassicas, peppers, courgette, tomatoes, mushrooms, herbs, beans and grains to create variety.",
@@ -596,25 +731,29 @@ function fallbackMeal(day: string, index: number): PlannedMeal {
   };
 }
 
-async function generatePlannerMeal(args: {
-  mood: WeekMood;
-  focus: WeekFocus | null;
-  mealIndex: number;
-  totalMeals: number;
-  basketNames: string[];
-  previousMeals: PlannedMeal[];
-}) {
-  const { mood, focus, mealIndex, totalMeals, basketNames, previousMeals } =
-    args;
+async function generatePlannerMeal(args: GeneratePlannerMealArgs) {
+  const {
+    mood,
+    focus,
+    proteinStyle,
+    mealIndex,
+    totalMeals,
+    basketNames,
+    previousMeals,
+    swapRequest,
+  } = args;
+
   const day = DAY_NAMES[mealIndex] ?? `Meal ${mealIndex + 1}`;
   const boxIngredients = getBoxIngredients();
   const intent = buildMealIntent(
     mood,
     focus,
+    proteinStyle,
     mealIndex,
     totalMeals,
     boxIngredients,
     previousMeals,
+    swapRequest,
   );
 
   const previousHeroIngredients = previousMeals
@@ -628,6 +767,7 @@ async function generatePlannerMeal(args: {
     ...intent.supportVeg,
     ...intent.shopBaseOptions,
     ...intent.shopBoostOptions,
+    ...proteinItems(proteinStyle, mealIndex),
     ...basketNames,
   ]).slice(0, 20);
 
@@ -652,7 +792,7 @@ async function generatePlannerMeal(args: {
         mode: "plan-week",
         mealIndex,
         totalMeals,
-        includeMeatIdeas: false,
+        includeMeatIdeas: proteinStyle !== "veg",
         previousRecipes,
         familyKey: intent.familyKey,
         familyLabel: intent.familyLabel,
@@ -705,10 +845,12 @@ export default function PlannerPage() {
   const [nights, setNights] = useState(4);
   const [mood, setMood] = useState<WeekMood>("balanced");
   const [focus, setFocus] = useState<WeekFocus | null>(null);
+  const [proteinStyle, setProteinStyle] = useState<ProteinStyle>("veg");
   const [loadingIndex, setLoadingIndex] = useState(0);
   const [week, setWeek] = useState<PlannedMeal[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [plannerError, setPlannerError] = useState("");
+  const [swappingMealId, setSwappingMealId] = useState<string | null>(null);
 
   const totalBasketItems = useMemo(
     () => groupedCart.reduce((sum, entry) => sum + entry.quantity, 0),
@@ -764,6 +906,7 @@ export default function PlannerPage() {
     setLoadingIndex(0);
     setPlannerError("");
     setWeek([]);
+    setOpenDay(null);
 
     const loadingTimer = window.setInterval(() => {
       setLoadingIndex((current) => {
@@ -781,6 +924,7 @@ export default function PlannerPage() {
         const meal = await generatePlannerMeal({
           mood,
           focus,
+          proteinStyle,
           mealIndex: index,
           totalMeals: nights,
           basketNames,
@@ -791,7 +935,7 @@ export default function PlannerPage() {
         setWeek([...builtMeals]);
       }
 
-      setOpenDay(builtMeals[0]?.id ?? null);
+      setOpenDay(null);
       setStep("results");
     } catch {
       setPlannerError("Something went wrong while building your week.");
@@ -807,22 +951,37 @@ export default function PlannerPage() {
 
   async function handleSwapDay(dayId: string) {
     const mealIndex = week.findIndex((meal) => meal.id === dayId);
-    if (mealIndex < 0) return;
+    if (mealIndex < 0 || swappingMealId) return;
 
+    const currentMeal = week[mealIndex];
     const previousMeals = week.filter((meal) => meal.id !== dayId);
-    const replacement = await generatePlannerMeal({
-      mood,
-      focus,
-      mealIndex,
-      totalMeals: nights,
-      basketNames,
-      previousMeals,
-    });
 
-    setWeek((current) =>
-      current.map((meal) => (meal.id === dayId ? replacement : meal)),
-    );
-    setOpenDay(replacement.id);
+    setSwappingMealId(dayId);
+
+    try {
+      const replacement = await generatePlannerMeal({
+        mood,
+        focus,
+        proteinStyle,
+        mealIndex,
+        totalMeals: nights,
+        basketNames,
+        previousMeals,
+        swapRequest: {
+          rejectedTitle: currentMeal.title,
+          rejectedIngredients: currentMeal.ingredients,
+        },
+      });
+
+      setWeek((current) =>
+        current.map((meal) => (meal.id === dayId ? replacement : meal)),
+      );
+      setOpenDay(null);
+    } catch {
+      setPlannerError("That swap didn’t work. Try again in a moment.");
+    } finally {
+      setSwappingMealId(null);
+    }
   }
 
   function addProductByName(productName: string) {
@@ -932,6 +1091,34 @@ export default function PlannerPage() {
                         onClick={() => setMood("comforting")}
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-[#243328]">
+                      Eating style
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <ChoiceChip
+                        active={proteinStyle === "veg"}
+                        label="Veg-focused"
+                        onClick={() => setProteinStyle("veg")}
+                      />
+                      <ChoiceChip
+                        active={proteinStyle === "flexible"}
+                        label="Flexible"
+                        onClick={() => setProteinStyle("flexible")}
+                      />
+                      <ChoiceChip
+                        active={proteinStyle === "high-protein"}
+                        label="Higher protein"
+                        onClick={() => setProteinStyle("high-protein")}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-[#667164]">
+                      Flexible and higher protein meals can suggest optional
+                      additions like chicken, fish, tofu, halloumi, eggs, beans
+                      or lentils.
+                    </p>
                   </div>
 
                   <div>
@@ -1089,6 +1276,7 @@ export default function PlannerPage() {
               <div className="grid gap-5 lg:grid-cols-2">
                 {week.map((meal) => {
                   const isOpen = openDay === meal.id;
+                  const isSwapping = swappingMealId === meal.id;
 
                   return (
                     <article
@@ -1139,9 +1327,10 @@ export default function PlannerPage() {
                           <button
                             type="button"
                             onClick={() => void handleSwapDay(meal.id)}
-                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+                            disabled={Boolean(swappingMealId)}
+                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                           >
-                            Swap
+                            {isSwapping ? "Swapping..." : "Swap"}
                           </button>
                         </div>
 
