@@ -92,271 +92,53 @@ type PlannerIntent = {
 const API_VERSION = "recipe-route-clean-v4-2026-05-13";
 
 const quickStartPromptMap: Record<string, string> = {
-  "quick-tonight":
-    "Keep it especially quick and straightforward. Aim for something realistic for a weeknight, with minimal prep, a short ingredient list, and no unnecessary steps. Favour one-pan, one-pot, quick roast, quick boil, or quick assembly approaches.",
-  comforting:
-    "Lean into something warm, satisfying, and comforting. Favour softer textures, deeper warmth, and meals that feel generous and cooked through rather than sharp or austere.",
-  "use-what-ive-got":
-    "Prioritise making the most of the provided ingredients. Keep it flexible, forgiving, and practical, with as little waste and as few extra additions as possible.",
+  "quick-tonight": "Keep it especially quick and straightforward. Aim for something realistic for a weeknight, with minimal prep, a short ingredient list, and no unnecessary steps. Favour one-pan, one-pot, quick roast, quick boil, or quick assembly approaches.",
+  comforting: "Lean into something warm, satisfying, and comforting. Favour softer textures, deeper warmth, and meals that feel generous and cooked through rather than sharp or austere.",
+  "use-what-ive-got": "Prioritise making the most of the provided ingredients. Keep it flexible, forgiving, and practical, with as little waste and as few extra additions as possible.",
 };
 
 const SAVOURY_MEAL_DIRECTIONS: MealDirection[] = [
-  {
-    key: "roast-plate",
-    label: "roast plate",
-    instruction:
-      "Take it in the direction of a roasted plate or tray-led supper with strong contrast and a clear finishing touch.",
-  },
-  {
-    key: "warm-bowl",
-    label: "warm bowl",
-    instruction:
-      "Take it in the direction of a warm bowl with a clear base, a topping, and a spoonable or dolloped finish.",
-  },
-  {
-    key: "soup-stew",
-    label: "soup or brothy pot",
-    instruction:
-      "Take it in the direction of a soup, brothy pot, or light stew that still feels substantial enough for a meal.",
-  },
-  {
-    key: "pasta-grain",
-    label: "pasta or grain-led meal",
-    instruction:
-      "Take it in the direction of a pasta, orzo, couscous, rice, farro, or lentil-led meal with a strong sense of structure.",
-  },
-  {
-    key: "simple-pan",
-    label: "simple pan supper",
-    instruction:
-      "Take it in the direction of a simple pan-cooked supper with a clear main ingredient, a practical base, and a straightforward finish.",
-  },
-  {
-    key: "bake-gratin",
-    label: "bake or gratin",
-    instruction:
-      "Take it in the direction of a simple bake, gratin, or oven-finished dish that feels a little special but still realistic.",
-  },
+  { key: "roast-plate", label: "roast plate", instruction: "Take it in the direction of a roasted plate or tray-led supper with strong contrast and a clear finishing touch." },
+  { key: "warm-bowl", label: "warm bowl", instruction: "Take it in the direction of a warm bowl with a clear base, a topping, and a spoonable or dolloped finish." },
+  { key: "soup-stew", label: "soup or brothy pot", instruction: "Take it in the direction of a soup, brothy pot, or light stew that still feels substantial enough for a meal." },
+  { key: "pasta-grain", label: "pasta or grain-led meal", instruction: "Take it in the direction of a pasta, orzo, couscous, rice, farro, or lentil-led meal with a strong sense of structure." },
+  { key: "simple-pan", label: "simple pan supper", instruction: "Take it in the direction of a simple pan-cooked supper with a clear main ingredient, a practical base, and a straightforward finish." },
+  { key: "bake-gratin", label: "bake or gratin", instruction: "Take it in the direction of a simple bake, gratin, or oven-finished dish that feels a little special but still realistic." },
 ];
 
 const SWEET_MEAL_DIRECTIONS: MealDirection[] = [
-  {
-    key: "sweet-toast",
-    label: "sweet toast or simple assembly",
-    instruction:
-      "Take it in the direction of a simple, everyday sweet idea such as toast, flatbread, crumpets, or another quick assembled option with clear contrast and no unnecessary fuss.",
-  },
-  {
-    key: "fruit-bowl",
-    label: "fruit and yoghurt bowl",
-    instruction:
-      "Take it in the direction of a fruit-led bowl, yoghurt bowl, or spoonable breakfast or snack with a clear base and a simple topping or swirl.",
-  },
-  {
-    key: "pancake-crepe",
-    label: "pancake or crepe style idea",
-    instruction:
-      "Take it in the direction of pancakes, crepes, or another very simple pan-cooked sweet idea that feels realistic and everyday rather than like a baking project.",
-  },
+  { key: "sweet-toast", label: "sweet toast or simple assembly", instruction: "Take it in the direction of a simple, everyday sweet idea such as toast, flatbread, crumpets, or another quick assembled option with clear contrast and no unnecessary fuss." },
+  { key: "fruit-bowl", label: "fruit and yoghurt bowl", instruction: "Take it in the direction of a fruit-led bowl, yoghurt bowl, or spoonable breakfast or snack with a clear base and a simple topping or swirl." },
+  { key: "pancake-crepe", label: "pancake or crepe style idea", instruction: "Take it in the direction of pancakes, crepes, or another very simple pan-cooked sweet idea that feels realistic and everyday rather than like a baking project." },
 ];
 
 const PRODUCE_BOX_REFERENCE = {
   staples: [
-    "potatoes",
-    "carrots",
-    "garlic",
-    "onion",
-    "broccoli",
-    "peppers",
-    "cucumber",
-    "lettuce",
-    "spinach",
-    "banana",
-    "grapes",
-    "apple",
-    "oranges",
-    "kale",
-    "pineapple",
-    "melon",
-    "strawberry",
-    "raspberry",
-    "basil",
-    "coriander",
-    "thyme",
-    "rosemary",
+    "potatoes", "carrots", "garlic", "onion", "broccoli", "peppers", "cucumber", "lettuce", "spinach", "banana", "grapes", "apple", "oranges", "kale", "pineapple", "melon", "strawberry", "raspberry", "basil", "coriander", "thyme", "rosemary",
   ],
-  seasonal: [
-    "jerusalem artichoke",
-    "dragon fruit",
-    "pear",
-    "kiwi",
-    "lemons",
-    "lime",
-  ],
+  seasonal: ["jerusalem artichoke", "dragon fruit", "pear", "kiwi", "lemons", "lime"],
 };
 
 const COMMON_SUPPORT_INGREDIENTS = [
-  "salt",
-  "pepper",
-  "oil",
-  "olive oil",
-  "butter",
-  "water",
-  "flour",
-  "bread",
-  "toast",
-  "pasta",
-  "rice",
-  "orzo",
-  "couscous",
-  "lentils",
-  "beans",
-  "stock",
-  "yoghurt",
-  "yogurt",
-  "cream",
-  "cheese",
-  "eggs",
-  "lemon",
-  "lime",
-  "herbs",
-  "basil",
-  "parsley",
-  "mint",
-  "dill",
-  "coriander",
-  "thyme",
-  "rosemary",
-  "paprika",
-  "smoked paprika",
-  "cumin",
-  "ground cumin",
-  "coriander seeds",
-  "ground coriander",
-  "chilli",
-  "chilli flakes",
-  "mustard",
-  "vinegar",
-  "lemon zest",
-  "rose harissa",
-  "harissa",
-  "sorrel pesto",
-  "walnut pesto",
-  "pesto",
-  "gochujang",
-  "vegetable stock concentrate",
-  "stock concentrate",
-  "casarecce",
-  "bucatini",
-  "giant couscous",
-  "farro",
-  "polenta",
-  "risotto rice",
-  "arborio",
-  "carnaroli",
-  "butter beans",
-  "cannellini beans",
-  "white beans",
-  "chickpeas",
-  "puy lentils",
-  "whole tomatoes",
-  "san marzano tomatoes",
-  "tinned tomatoes",
-  "tomatoes",
-  "tahini",
-  "white miso",
-  "miso",
-  "almonds",
-  "walnuts",
-  "cashews",
-  "salted caramel",
-  "caramel sauce",
-  "chocolate hazelnut spread",
-  "chocolate spread",
-  "dark chocolate spread",
-  "hazelnut spread",
+  "salt", "pepper", "oil", "olive oil", "butter", "water", "flour", "bread", "toast", "pasta", "rice", "orzo", "couscous", "lentils", "beans", "stock", "yoghurt", "yogurt", "cream", "cheese", "eggs", "lemon", "lime", "herbs", "basil", "parsley", "mint", "dill", "coriander", "thyme", "rosemary", "paprika", "smoked paprika", "cumin", "ground cumin", "coriander seeds", "ground coriander", "chilli", "chilli flakes", "mustard", "vinegar", "lemon zest", "rose harissa", "harissa", "sorrel pesto", "walnut pesto", "pesto", "gochujang", "vegetable stock concentrate", "stock concentrate", "casarecce", "bucatini", "giant couscous", "farro", "polenta", "risotto rice", "arborio", "carnaroli", "butter beans", "cannellini beans", "white beans", "chickpeas", "puy lentils", "whole tomatoes", "san marzano tomatoes", "tinned tomatoes", "tomatoes", "tahini", "white miso", "miso", "almonds", "walnuts", "cashews", "salted caramel", "caramel sauce", "chocolate hazelnut spread", "chocolate spread", "dark chocolate spread", "hazelnut spread",
 ];
 
 const OVERUSED_BOX_DEFAULTS = ["apple", "carrot", "leek", "leeks", "onion"];
 
 const SWEET_SIGNAL_INGREDIENTS = [
-  "chocolate spread",
-  "cocoa spread",
-  "hazelnut spread",
-  "jam",
-  "marmalade",
-  "honey",
-  "fruit curd",
-  "lemon curd",
-  "sweet jar",
-  "sweet jars",
-  "salted caramel",
-  "caramel sauce",
-  "banana",
-  "berries",
-  "strawberry",
-  "strawberries",
-  "raspberry",
-  "raspberries",
-  "blueberry",
-  "blueberries",
-  "grapes",
-  "melon",
-  "pineapple",
-  "pear",
-  "kiwi",
-  "orange",
-  "oranges",
-  "apple",
-  "apples",
-  "yoghurt",
-  "yogurt",
+  "chocolate spread", "cocoa spread", "hazelnut spread", "jam", "marmalade", "honey", "fruit curd", "lemon curd", "sweet jar", "sweet jars", "salted caramel", "caramel sauce", "banana", "berries", "strawberry", "strawberries", "raspberry", "raspberries", "blueberry", "blueberries", "grapes", "melon", "pineapple", "pear", "kiwi", "orange", "oranges", "apple", "apples", "yoghurt", "yogurt",
 ];
 
 const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
   {
     name: "Seasonal Veg Box",
-    aliases: [
-      "veg box",
-      "vegetable box",
-      "seasonal veg box",
-      "produce box",
-      "fruit and veg box",
-      "fruit box",
-      "weekly box",
-      "weekly veg box",
-      "mixed box",
-      "mixed veg box",
-      "local box",
-    ],
+    aliases: ["veg box", "vegetable box", "seasonal veg box", "produce box", "fruit and veg box", "fruit box", "weekly box", "weekly veg box", "mixed box", "mixed veg box", "local box"],
     category: "produce box",
     role: "hero",
     useFrequency: "high",
-    pairsWith: [
-      "orzo",
-      "farro",
-      "puy lentils",
-      "butter beans",
-      "chickpeas",
-      "risotto rice",
-      "polenta",
-      "pesto",
-      "harissa",
-      "gochujang",
-      "white miso",
-      "tinned tomatoes",
-    ],
-    bestMealStyles: [
-      "traybake",
-      "warm bowl",
-      "soup",
-      "stew",
-      "pasta",
-      "grain bowl",
-      "roast plate",
-    ],
-    guidance:
-      "Use as the main seasonal foundation. Let the actual selected vegetables lead the recipe where available, and use pantry products to make the box feel like a complete meal.",
+    pairsWith: ["orzo", "farro", "puy lentils", "butter beans", "chickpeas", "risotto rice", "polenta", "pesto", "harissa", "gochujang", "white miso", "tinned tomatoes"],
+    bestMealStyles: ["traybake", "warm bowl", "soup", "stew", "pasta", "grain bowl", "roast plate"],
+    guidance: "Use as the main seasonal foundation. Let the actual selected vegetables lead the recipe where available, and use pantry products to make the box feel like a complete meal.",
   },
   {
     name: "Rose Harissa",
@@ -364,22 +146,9 @@ const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
     category: "flavour foundation",
     role: "hero",
     useFrequency: "medium",
-    pairsWith: [
-      "butter beans",
-      "chickpeas",
-      "tomatoes",
-      "couscous",
-      "orzo",
-      "farro",
-      "roast vegetables",
-      "carrots",
-      "peppers",
-      "aubergine",
-      "potatoes",
-    ],
+    pairsWith: ["butter beans", "chickpeas", "tomatoes", "couscous", "orzo", "farro", "roast vegetables", "carrots", "peppers", "aubergine", "potatoes"],
     bestMealStyles: ["warm bowl", "traybake", "beans", "pasta", "roast plate"],
-    guidance:
-      "Use as a bold flavour builder. It should bring smoky warmth and depth, but should not appear in every recipe.",
+    guidance: "Use as a bold flavour builder. It should bring smoky warmth and depth, but should not appear in every recipe.",
   },
   {
     name: "Sorrel & Walnut Pesto",
@@ -387,22 +156,9 @@ const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
     category: "flavour foundation",
     role: "hero",
     useFrequency: "medium",
-    pairsWith: [
-      "casarecce",
-      "bucatini",
-      "orzo",
-      "farro",
-      "potatoes",
-      "white beans",
-      "cannellini beans",
-      "greens",
-      "broccoli",
-      "peas",
-      "walnuts",
-    ],
+    pairsWith: ["casarecce", "bucatini", "orzo", "farro", "potatoes", "white beans", "cannellini beans", "greens", "broccoli", "peas", "walnuts"],
     bestMealStyles: ["pasta", "grain bowl", "warm salad", "potatoes"],
-    guidance:
-      "Use as a green, sharp, savoury lift. Keep it fresh and practical rather than making every pesto recipe feel like the same pasta dish.",
+    guidance: "Use as a green, sharp, savoury lift. Keep it fresh and practical rather than making every pesto recipe feel like the same pasta dish.",
   },
   {
     name: "Signature Gochujang",
@@ -410,28 +166,9 @@ const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
     category: "flavour foundation",
     role: "hero",
     useFrequency: "medium",
-    pairsWith: [
-      "rice",
-      "risotto rice",
-      "orzo",
-      "butter beans",
-      "chickpeas",
-      "puy lentils",
-      "roast carrots",
-      "broccoli",
-      "mushrooms",
-      "cabbage",
-      "noodles",
-    ],
-    bestMealStyles: [
-      "rice bowl",
-      "traybake",
-      "noodles",
-      "beans",
-      "roast vegetables",
-    ],
-    guidance:
-      "Use as a deep savoury chilli paste for everyday cooking. Keep it versatile, not aggressively hot or niche.",
+    pairsWith: ["rice", "risotto rice", "orzo", "butter beans", "chickpeas", "puy lentils", "roast carrots", "broccoli", "mushrooms", "cabbage", "noodles"],
+    bestMealStyles: ["rice bowl", "traybake", "noodles", "beans", "roast vegetables"],
+    guidance: "Use as a deep savoury chilli paste for everyday cooking. Keep it versatile, not aggressively hot or niche.",
   },
   {
     name: "Vegetable Stock Concentrate",
@@ -439,21 +176,9 @@ const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
     category: "flavour foundation",
     role: "hero",
     useFrequency: "high",
-    pairsWith: [
-      "risotto rice",
-      "orzo",
-      "puy lentils",
-      "farro",
-      "polenta",
-      "beans",
-      "tomatoes",
-      "soups",
-      "stews",
-      "grains",
-    ],
+    pairsWith: ["risotto rice", "orzo", "puy lentils", "farro", "polenta", "beans", "tomatoes", "soups", "stews", "grains"],
     bestMealStyles: ["soup", "stew", "risotto", "one-pot", "grains"],
-    guidance:
-      "Use as background depth. It should improve flavour without becoming the headline ingredient.",
+    guidance: "Use as background depth. It should improve flavour without becoming the headline ingredient.",
   },
   {
     name: "Salted Caramel Sauce",
@@ -461,18 +186,9 @@ const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
     category: "comfort sweet",
     role: "hero",
     useFrequency: "low",
-    pairsWith: [
-      "apples",
-      "bananas",
-      "pears",
-      "porridge",
-      "yoghurt",
-      "pancakes",
-      "toast",
-    ],
+    pairsWith: ["apples", "bananas", "pears", "porridge", "yoghurt", "pancakes", "toast"],
     bestMealStyles: ["breakfast", "snack", "simple sweet"],
-    guidance:
-      "Use for simple sweet ideas, breakfasts and low-effort puddings. Avoid complicated baking projects.",
+    guidance: "Use for simple sweet ideas, breakfasts and low-effort puddings. Avoid complicated baking projects.",
   },
   {
     name: "Dark Chocolate & Hazelnut Spread",
@@ -480,247 +196,32 @@ const LANARK_PANTRY_PRODUCTS: PantryProduct[] = [
     category: "comfort sweet",
     role: "hero",
     useFrequency: "low",
-    pairsWith: [
-      "banana",
-      "strawberries",
-      "raspberries",
-      "toast",
-      "crumpets",
-      "porridge",
-      "pancakes",
-    ],
+    pairsWith: ["banana", "strawberries", "raspberries", "toast", "crumpets", "porridge", "pancakes"],
     bestMealStyles: ["breakfast", "snack", "simple sweet"],
-    guidance:
-      "Use for simple, everyday sweet ideas. Keep it generous but not dessert-heavy.",
+    guidance: "Use for simple, everyday sweet ideas. Keep it generous but not dessert-heavy.",
   },
-  {
-    name: "Casarecce",
-    aliases: ["casarecce"],
-    category: "pasta",
-    role: "core",
-    useFrequency: "medium",
-    pairsWith: ["pesto", "tomatoes", "harissa", "greens", "beans"],
-    bestMealStyles: ["pasta"],
-    guidance: "Use for sauce-catching pasta dishes with texture and comfort.",
-  },
-  {
-    name: "Bucatini",
-    aliases: ["bucatini"],
-    category: "pasta",
-    role: "core",
-    useFrequency: "medium",
-    pairsWith: ["tomatoes", "harissa", "pesto", "olive oil", "chilli"],
-    bestMealStyles: ["pasta"],
-    guidance: "Use for slightly elevated but still simple pasta meals.",
-  },
-  {
-    name: "Orzo",
-    aliases: ["orzo"],
-    category: "pasta",
-    role: "core",
-    useFrequency: "high",
-    pairsWith: ["stock", "tomatoes", "greens", "beans", "pesto", "harissa"],
-    bestMealStyles: ["one-pot", "soup", "pasta-grain", "warm bowl"],
-    guidance:
-      "Use as a flexible quick base for one-pot meals, soups and warm bowls.",
-  },
-  {
-    name: "Giant Couscous",
-    aliases: ["giant couscous", "couscous"],
-    category: "grain base",
-    role: "core",
-    useFrequency: "high",
-    pairsWith: [
-      "harissa",
-      "pesto",
-      "roast vegetables",
-      "chickpeas",
-      "tahini",
-      "nuts",
-    ],
-    bestMealStyles: ["warm bowl", "traybake", "salad"],
-    guidance:
-      "Use for quick bowls and roast veg meals. Good for low-effort weeknight structure.",
-  },
-  {
-    name: "Farro",
-    aliases: ["farro"],
-    category: "grain base",
-    role: "core",
-    useFrequency: "medium",
-    pairsWith: ["pesto", "beans", "greens", "mushrooms", "walnuts", "stock"],
-    bestMealStyles: ["warm bowl", "salad", "grain pot"],
-    guidance: "Use for nutty, hearty bowls and seasonal salads.",
-  },
-  {
-    name: "Polenta",
-    aliases: ["polenta"],
-    category: "grain base",
-    role: "supporting",
-    useFrequency: "low",
-    pairsWith: ["mushrooms", "tomatoes", "greens", "harissa", "stock", "beans"],
-    bestMealStyles: ["comfort", "soft bowl", "bake"],
-    guidance:
-      "Use occasionally for cosy comfort meals. Keep instructions simple and approachable.",
-  },
-  {
-    name: "Risotto Rice",
-    aliases: ["risotto rice", "arborio", "carnaroli"],
-    category: "grain base",
-    role: "core",
-    useFrequency: "medium",
-    pairsWith: ["stock", "mushrooms", "greens", "pesto", "peas", "lemon"],
-    bestMealStyles: ["risotto", "one-pot", "comfort"],
-    guidance:
-      "Use for comforting rice dishes where stock concentrate can add depth.",
-  },
-  {
-    name: "Butter Beans",
-    aliases: ["butter beans", "jarred butter beans"],
-    category: "beans",
-    role: "core",
-    useFrequency: "high",
-    pairsWith: ["harissa", "tomatoes", "pesto", "stock", "greens", "tahini"],
-    bestMealStyles: ["beans", "stew", "warm bowl", "toast"],
-    guidance:
-      "Use as a creamy, satisfying protein base. Excellent for quick meals.",
-  },
-  {
-    name: "Cannellini Beans",
-    aliases: ["cannellini beans", "white beans"],
-    category: "beans",
-    role: "core",
-    useFrequency: "high",
-    pairsWith: [
-      "pesto",
-      "stock",
-      "tomatoes",
-      "greens",
-      "olive oil",
-      "rosemary",
-    ],
-    bestMealStyles: ["soup", "stew", "toast", "warm bowl"],
-    guidance: "Use for soft, creamy meals, soups and pesto-led dishes.",
-  },
-  {
-    name: "Chickpeas",
-    aliases: ["chickpeas", "jarred chickpeas"],
-    category: "beans",
-    role: "core",
-    useFrequency: "high",
-    pairsWith: [
-      "harissa",
-      "gochujang",
-      "couscous",
-      "tahini",
-      "tomatoes",
-      "roast vegetables",
-    ],
-    bestMealStyles: ["traybake", "bowl", "stew", "salad"],
-    guidance: "Use for texture, protein and quick filling meals.",
-  },
-  {
-    name: "Puy Lentils",
-    aliases: ["puy lentils", "lentils"],
-    category: "lentils",
-    role: "core",
-    useFrequency: "medium",
-    pairsWith: [
-      "stock",
-      "tomatoes",
-      "greens",
-      "carrots",
-      "mushrooms",
-      "walnuts",
-    ],
-    bestMealStyles: ["stew", "warm salad", "bowl"],
-    guidance:
-      "Use for earthy, substantial meals. Avoid making them feel worthy or bland.",
-  },
-  {
-    name: "Premium Whole Tomatoes",
-    aliases: [
-      "tomatoes",
-      "whole tomatoes",
-      "san marzano tomatoes",
-      "tinned tomatoes",
-    ],
-    category: "cooking foundation",
-    role: "core",
-    useFrequency: "high",
-    pairsWith: ["bucatini", "casarecce", "orzo", "harissa", "beans", "stock"],
-    bestMealStyles: ["pasta", "stew", "sauce", "bake"],
-    guidance:
-      "Use as a foundational sauce ingredient. Especially useful with pasta, beans and harissa.",
-  },
-  {
-    name: "Tahini",
-    aliases: ["tahini"],
-    category: "flavour boost",
-    role: "core",
-    useFrequency: "medium",
-    pairsWith: [
-      "chickpeas",
-      "couscous",
-      "roast vegetables",
-      "carrots",
-      "greens",
-      "lemon",
-    ],
-    bestMealStyles: ["bowl", "dressing", "traybake"],
-    guidance:
-      "Use as a creamy, nutty dressing or sauce base. Keep it bright with lemon or vinegar.",
-  },
-  {
-    name: "White Miso",
-    aliases: ["white miso", "miso"],
-    category: "flavour boost",
-    role: "supporting",
-    useFrequency: "medium",
-    pairsWith: ["stock", "mushrooms", "greens", "rice", "orzo", "beans"],
-    bestMealStyles: ["soup", "broth", "glaze", "one-pot"],
-    guidance:
-      "Use for savoury depth. Avoid making recipes too specialist or overly Japanese unless the ingredients support it.",
-  },
-  {
-    name: "Almonds",
-    aliases: ["almonds"],
-    category: "nuts",
-    role: "supporting",
-    useFrequency: "medium",
-    pairsWith: ["couscous", "fruit", "caramel", "roast vegetables", "salads"],
-    bestMealStyles: ["finish", "breakfast", "salad"],
-    guidance: "Use as crunch, texture or a simple finishing ingredient.",
-  },
-  {
-    name: "Walnuts",
-    aliases: ["walnuts"],
-    category: "nuts",
-    role: "supporting",
-    useFrequency: "medium",
-    pairsWith: ["pesto", "farro", "lentils", "apples", "greens"],
-    bestMealStyles: ["finish", "salad", "grain bowl"],
-    guidance: "Use for earthy crunch and warmth.",
-  },
-  {
-    name: "Cashews",
-    aliases: ["cashews"],
-    category: "nuts",
-    role: "supporting",
-    useFrequency: "medium",
-    pairsWith: ["pesto", "gochujang", "rice", "vegetables", "creamy sauces"],
-    bestMealStyles: ["finish", "sauce", "bowl"],
-    guidance:
-      "Use for creaminess or crunch, especially in plant-forward meals.",
-  },
+  { name: "Casarecce", aliases: ["casarecce"], category: "pasta", role: "core", useFrequency: "medium", pairsWith: ["pesto", "tomatoes", "harissa", "greens", "beans"], bestMealStyles: ["pasta"], guidance: "Use for sauce-catching pasta dishes with texture and comfort." },
+  { name: "Bucatini", aliases: ["bucatini"], category: "pasta", role: "core", useFrequency: "medium", pairsWith: ["tomatoes", "harissa", "pesto", "olive oil", "chilli"], bestMealStyles: ["pasta"], guidance: "Use for slightly elevated but still simple pasta meals." },
+  { name: "Orzo", aliases: ["orzo"], category: "pasta", role: "core", useFrequency: "high", pairsWith: ["stock", "tomatoes", "greens", "beans", "pesto", "harissa"], bestMealStyles: ["one-pot", "soup", "pasta-grain", "warm bowl"], guidance: "Use as a flexible quick base for one-pot meals, soups and warm bowls." },
+  { name: "Giant Couscous", aliases: ["giant couscous", "couscous"], category: "grain base", role: "core", useFrequency: "high", pairsWith: ["harissa", "pesto", "roast vegetables", "chickpeas", "tahini", "nuts"], bestMealStyles: ["warm bowl", "traybake", "salad"], guidance: "Use for quick bowls and roast veg meals. Good for low-effort weeknight structure." },
+  { name: "Farro", aliases: ["farro"], category: "grain base", role: "core", useFrequency: "medium", pairsWith: ["pesto", "beans", "greens", "mushrooms", "walnuts", "stock"], bestMealStyles: ["warm bowl", "salad", "grain pot"], guidance: "Use for nutty, hearty bowls and seasonal salads." },
+  { name: "Polenta", aliases: ["polenta"], category: "grain base", role: "supporting", useFrequency: "low", pairsWith: ["mushrooms", "tomatoes", "greens", "harissa", "stock", "beans"], bestMealStyles: ["comfort", "soft bowl", "bake"], guidance: "Use occasionally for cosy comfort meals. Keep instructions simple and approachable." },
+  { name: "Risotto Rice", aliases: ["risotto rice", "arborio", "carnaroli"], category: "grain base", role: "core", useFrequency: "medium", pairsWith: ["stock", "mushrooms", "greens", "pesto", "peas", "lemon"], bestMealStyles: ["risotto", "one-pot", "comfort"], guidance: "Use for comforting rice dishes where stock concentrate can add depth." },
+  { name: "Butter Beans", aliases: ["butter beans", "jarred butter beans"], category: "beans", role: "core", useFrequency: "high", pairsWith: ["harissa", "tomatoes", "pesto", "stock", "greens", "tahini"], bestMealStyles: ["beans", "stew", "warm bowl", "toast"], guidance: "Use as a creamy, satisfying protein base. Excellent for quick meals." },
+  { name: "Cannellini Beans", aliases: ["cannellini beans", "white beans"], category: "beans", role: "core", useFrequency: "high", pairsWith: ["pesto", "stock", "tomatoes", "greens", "olive oil", "rosemary"], bestMealStyles: ["soup", "stew", "toast", "warm bowl"], guidance: "Use for soft, creamy meals, soups and pesto-led dishes." },
+  { name: "Chickpeas", aliases: ["chickpeas", "jarred chickpeas"], category: "beans", role: "core", useFrequency: "high", pairsWith: ["harissa", "gochujang", "couscous", "tahini", "tomatoes", "roast vegetables"], bestMealStyles: ["traybake", "bowl", "stew", "salad"], guidance: "Use for texture, protein and quick filling meals." },
+  { name: "Puy Lentils", aliases: ["puy lentils", "lentils"], category: "lentils", role: "core", useFrequency: "medium", pairsWith: ["stock", "tomatoes", "greens", "carrots", "mushrooms", "walnuts"], bestMealStyles: ["stew", "warm salad", "bowl"], guidance: "Use for earthy, substantial meals. Avoid making them feel worthy or bland." },
+  { name: "Premium Whole Tomatoes", aliases: ["tomatoes", "whole tomatoes", "san marzano tomatoes", "tinned tomatoes"], category: "cooking foundation", role: "core", useFrequency: "high", pairsWith: ["bucatini", "casarecce", "orzo", "harissa", "beans", "stock"], bestMealStyles: ["pasta", "stew", "sauce", "bake"], guidance: "Use as a foundational sauce ingredient. Especially useful with pasta, beans and harissa." },
+  { name: "Tahini", aliases: ["tahini"], category: "flavour boost", role: "core", useFrequency: "medium", pairsWith: ["chickpeas", "couscous", "roast vegetables", "carrots", "greens", "lemon"], bestMealStyles: ["bowl", "dressing", "traybake"], guidance: "Use as a creamy, nutty dressing or sauce base. Keep it bright with lemon or vinegar." },
+  { name: "White Miso", aliases: ["white miso", "miso"], category: "flavour boost", role: "supporting", useFrequency: "medium", pairsWith: ["stock", "mushrooms", "greens", "rice", "orzo", "beans"], bestMealStyles: ["soup", "broth", "glaze", "one-pot"], guidance: "Use for savoury depth. Avoid making recipes too specialist or overly Japanese unless the ingredients support it." },
+  { name: "Almonds", aliases: ["almonds"], category: "nuts", role: "supporting", useFrequency: "medium", pairsWith: ["couscous", "fruit", "caramel", "roast vegetables", "salads"], bestMealStyles: ["finish", "breakfast", "salad"], guidance: "Use as crunch, texture or a simple finishing ingredient." },
+  { name: "Walnuts", aliases: ["walnuts"], category: "nuts", role: "supporting", useFrequency: "medium", pairsWith: ["pesto", "farro", "lentils", "apples", "greens"], bestMealStyles: ["finish", "salad", "grain bowl"], guidance: "Use for earthy crunch and warmth." },
+  { name: "Cashews", aliases: ["cashews"], category: "nuts", role: "supporting", useFrequency: "medium", pairsWith: ["pesto", "gochujang", "rice", "vegetables", "creamy sauces"], bestMealStyles: ["finish", "sauce", "bowl"], guidance: "Use for creaminess or crunch, especially in plant-forward meals." },
 ];
 
 function normaliseList(value: unknown, maxItems: number) {
   if (!Array.isArray(value)) return [];
-  return value
-    .map((item) => String(item).trim())
-    .filter(Boolean)
-    .slice(0, maxItems);
+  return value.map((item) => String(item).trim()).filter(Boolean).slice(0, maxItems);
 }
 
 function uniqueStrings(values: string[]) {
@@ -757,12 +258,8 @@ function safeParseRecipe(outputText: string): GeneratedRecipe | null {
     return {
       title: parsed.title.trim(),
       description: parsed.description.trim(),
-      ingredientsUsed: parsed.ingredientsUsed
-        .map((item) => String(item).trim())
-        .filter(Boolean),
-      pantryStaples: parsed.pantryStaples
-        .map((item) => String(item).trim())
-        .filter(Boolean),
+      ingredientsUsed: parsed.ingredientsUsed.map((item) => String(item).trim()).filter(Boolean),
+      pantryStaples: parsed.pantryStaples.map((item) => String(item).trim()).filter(Boolean),
       steps: parsed.steps.map((item) => String(item).trim()).filter(Boolean),
     };
   } catch {
@@ -774,9 +271,7 @@ function isSweetLedSelection(items: string[]) {
   const lowerItems = items.map((item) => item.toLowerCase());
 
   const sweetSignalMatches = lowerItems.filter((item) =>
-    SWEET_SIGNAL_INGREDIENTS.some(
-      (signal) => item.includes(signal) || signal.includes(item),
-    ),
+    SWEET_SIGNAL_INGREDIENTS.some((signal) => item.includes(signal) || signal.includes(item)),
   ).length;
 
   const hasExplicitSweetSpread = lowerItems.some(
@@ -816,86 +311,27 @@ function isSweetLedSelection(items: string[]) {
 function inferPreviousDirection(previousRecipe?: PreviousRecipe | null) {
   if (!previousRecipe) return null;
 
-  const text = [
-    previousRecipe.title,
-    previousRecipe.description,
-    ...(previousRecipe.ingredientsUsed ?? []),
-  ]
-    .join(" ")
-    .toLowerCase();
+  const text = [previousRecipe.title, previousRecipe.description, ...(previousRecipe.ingredientsUsed ?? [])].join(" ").toLowerCase();
 
-  if (
-    text.includes("toast") ||
-    text.includes("crumpet") ||
-    text.includes("flatbread") ||
-    text.includes("chocolate spread")
-  )
-    return "sweet-toast";
-  if (
-    text.includes("yoghurt") ||
-    text.includes("yogurt bowl") ||
-    text.includes("fruit bowl") ||
-    text.includes("granola")
-  )
-    return "fruit-bowl";
-  if (
-    text.includes("pancake") ||
-    text.includes("crepe") ||
-    text.includes("drop scone")
-  )
-    return "pancake-crepe";
-  if (text.includes("soup") || text.includes("broth") || text.includes("stew"))
-    return "soup-stew";
-  if (
-    text.includes("bake") ||
-    text.includes("gratin") ||
-    text.includes("crumb")
-  )
-    return "bake-gratin";
-  if (
-    text.includes("pasta") ||
-    text.includes("orzo") ||
-    text.includes("rice") ||
-    text.includes("farro") ||
-    text.includes("couscous") ||
-    text.includes("lentil")
-  )
-    return "pasta-grain";
-  if (
-    text.includes("bowl") ||
-    text.includes("beans") ||
-    text.includes("warm salad")
-  )
-    return "warm-bowl";
-  if (
-    text.includes("roast") ||
-    text.includes("tray") ||
-    text.includes("crispy")
-  )
-    return "roast-plate";
+  if (text.includes("toast") || text.includes("crumpet") || text.includes("flatbread") || text.includes("chocolate spread")) return "sweet-toast";
+  if (text.includes("yoghurt") || text.includes("yogurt bowl") || text.includes("fruit bowl") || text.includes("granola")) return "fruit-bowl";
+  if (text.includes("pancake") || text.includes("crepe") || text.includes("drop scone")) return "pancake-crepe";
+  if (text.includes("soup") || text.includes("broth") || text.includes("stew")) return "soup-stew";
+  if (text.includes("bake") || text.includes("gratin") || text.includes("crumb")) return "bake-gratin";
+  if (text.includes("pasta") || text.includes("orzo") || text.includes("rice") || text.includes("farro") || text.includes("couscous") || text.includes("lentil")) return "pasta-grain";
+  if (text.includes("bowl") || text.includes("beans") || text.includes("warm salad")) return "warm-bowl";
+  if (text.includes("roast") || text.includes("tray") || text.includes("crispy")) return "roast-plate";
 
   return null;
 }
 
-function pickMealDirection(
-  items: string[],
-  quickStart: string,
-  previousRecipe?: PreviousRecipe | null,
-  weekPlanContext?: WeekPlanContext | null,
-) {
+function pickMealDirection(items: string[], quickStart: string, previousRecipe?: PreviousRecipe | null, weekPlanContext?: WeekPlanContext | null) {
   const previousDirection = inferPreviousDirection(previousRecipe);
-  const directionPool = isSweetLedSelection(items)
-    ? SWEET_MEAL_DIRECTIONS
-    : SAVOURY_MEAL_DIRECTIONS;
-  const pool = directionPool.filter(
-    (direction) => direction.key !== previousDirection,
-  );
+  const directionPool = isSweetLedSelection(items) ? SWEET_MEAL_DIRECTIONS : SAVOURY_MEAL_DIRECTIONS;
+  const pool = directionPool.filter((direction) => direction.key !== previousDirection);
   const finalPool = pool.length > 0 ? pool : directionPool;
 
-  const weekSeed =
-    weekPlanContext?.mode === "plan-week"
-      ? `${weekPlanContext.mealIndex}-${weekPlanContext.totalMeals}`
-      : "single";
+  const weekSeed = weekPlanContext?.mode === "plan-week" ? `${weekPlanContext.mealIndex}-${weekPlanContext.totalMeals}` : "single";
   const seedSource = `${items.join("|")}::${quickStart}::${weekSeed}::${Date.now()}::${Math.random()}`;
   let seed = 0;
 
@@ -906,28 +342,14 @@ function pickMealDirection(
 
 function buildProduceBoxInstruction(items: string[]) {
   const lowerItems = items.map((item) => item.toLowerCase());
-  const produceBoxSignals = [
-    "veg box",
-    "vegetable box",
-    "produce box",
-    "fruit and veg box",
-    "fruit box",
-    "weekly box",
-    "mixed box",
-    "local box",
-  ];
+  const produceBoxSignals = ["veg box", "vegetable box", "produce box", "fruit and veg box", "fruit box", "weekly box", "mixed box", "local box"];
 
   const matchedKnownProduceCount = PRODUCE_BOX_REFERENCE.staples
     .concat(PRODUCE_BOX_REFERENCE.seasonal)
-    .filter((ingredient) =>
-      lowerItems.some((item) => item.includes(ingredient.toLowerCase())),
-    ).length;
+    .filter((ingredient) => lowerItems.some((item) => item.includes(ingredient.toLowerCase()))).length;
 
-  const mentionsProduceBox = lowerItems.some((item) =>
-    produceBoxSignals.some((signal) => item.includes(signal)),
-  );
-  const looksLikeMixedProduceSelection =
-    matchedKnownProduceCount >= 4 || lowerItems.length >= 6;
+  const mentionsProduceBox = lowerItems.some((item) => produceBoxSignals.some((signal) => item.includes(signal)));
+  const looksLikeMixedProduceSelection = matchedKnownProduceCount >= 4 || lowerItems.length >= 6;
 
   if (!mentionsProduceBox && !looksLikeMixedProduceSelection) return "";
 
@@ -950,9 +372,7 @@ function buildProduceBoxInstruction(items: string[]) {
 
 function buildIngredientPriorityInstruction(items: string[], isRetry: boolean) {
   const lowerItems = items.map((item) => item.toLowerCase());
-  const userIncludedOverusedDefaults = OVERUSED_BOX_DEFAULTS.filter(
-    (ingredient) => lowerItems.some((item) => item.includes(ingredient)),
-  );
+  const userIncludedOverusedDefaults = OVERUSED_BOX_DEFAULTS.filter((ingredient) => lowerItems.some((item) => item.includes(ingredient)));
 
   const lines = [
     `The provided ingredients are the anchor for this recipe: ${items.join(", ")}.`,
@@ -968,18 +388,12 @@ function buildIngredientPriorityInstruction(items: string[], isRetry: boolean) {
   ];
 
   if (userIncludedOverusedDefaults.length === 0) {
-    lines.push(
-      "- Do not introduce apple, carrot, leek, or onion as the lead idea when they were not provided.",
-    );
-    lines.push(
-      "- Do not let apple, carrot, or leek hijack the recipe just because they are common in a produce box.",
-    );
+    lines.push("- Do not introduce apple, carrot, leek, or onion as the lead idea when they were not provided.");
+    lines.push("- Do not let apple, carrot, or leek hijack the recipe just because they are common in a produce box.");
   }
 
   if (isRetry) {
-    lines.push(
-      "- This is a retry. Stay much closer to the supplied ingredients and avoid generic veg-box defaults.",
-    );
+    lines.push("- This is a retry. Stay much closer to the supplied ingredients and avoid generic veg-box defaults.");
   }
 
   return lines.join("\n");
@@ -999,17 +413,11 @@ function buildSweetIngredientInstruction(items: string[]) {
   ].join("\n");
 }
 
-function buildPlannerIntentInstruction(
-  plannerIntent: PlannerIntent | null | undefined,
-) {
+function buildPlannerIntentInstruction(plannerIntent: PlannerIntent | null | undefined) {
   if (!plannerIntent) return "";
 
-  const guidance = Array.isArray(plannerIntent.guidance)
-    ? plannerIntent.guidance.filter(Boolean)
-    : [];
-  const avoidLead = Array.isArray(plannerIntent.avoidHeroVeg)
-    ? plannerIntent.avoidHeroVeg.filter(Boolean).join(", ")
-    : "";
+  const guidance = Array.isArray(plannerIntent.guidance) ? plannerIntent.guidance.filter(Boolean) : [];
+  const avoidLead = Array.isArray(plannerIntent.avoidHeroVeg) ? plannerIntent.avoidHeroVeg.filter(Boolean).join(", ") : "";
 
   const lines = [
     "Planner intent:",
@@ -1025,33 +433,15 @@ function buildPlannerIntentInstruction(
     "- Treat shop bases and shop boosts as useful options, not mandatory ingredients.",
   ];
 
-  if (avoidLead)
-    lines.push(`- Never make these the lead ingredient: ${avoidLead}.`);
+  if (avoidLead) lines.push(`- Never make these the lead ingredient: ${avoidLead}.`);
   guidance.forEach((item) => lines.push(`- ${item}`));
 
   return lines.join("\n");
 }
 
-function buildFlavourInstruction(
-  items: string[],
-  quickStart: string,
-  plannerIntent?: PlannerIntent | null,
-  weekPlanContext?: WeekPlanContext | null,
-) {
-  const flavourDirection =
-    plannerIntent?.flavourDirection ||
-    weekPlanContext?.flavourDirection ||
-    (quickStart === "comforting"
-      ? "warm and savoury"
-      : quickStart === "quick-tonight"
-        ? "bright and lively"
-        : "simple and well-seasoned");
-  const flavourNotes = uniqueStrings(
-    [
-      ...(plannerIntent?.flavourNotes ?? []),
-      ...(weekPlanContext?.flavourNotes ?? []),
-    ].filter(Boolean),
-  ).slice(0, 4);
+function buildFlavourInstruction(items: string[], quickStart: string, plannerIntent?: PlannerIntent | null, weekPlanContext?: WeekPlanContext | null) {
+  const flavourDirection = plannerIntent?.flavourDirection || weekPlanContext?.flavourDirection || (quickStart === "comforting" ? "warm and savoury" : quickStart === "quick-tonight" ? "bright and lively" : "simple and well-seasoned");
+  const flavourNotes = uniqueStrings([...(plannerIntent?.flavourNotes ?? []), ...(weekPlanContext?.flavourNotes ?? [])].filter(Boolean)).slice(0, 4);
 
   const lines = [
     "Use flavour confidently but simply.",
@@ -1063,8 +453,7 @@ function buildFlavourInstruction(
     `- Keep the flavour direction leaning towards: ${flavourDirection}.`,
   ];
 
-  if (flavourNotes.length > 0)
-    lines.push(`- Helpful flavour notes: ${flavourNotes.join(", ")}.`);
+  if (flavourNotes.length > 0) lines.push(`- Helpful flavour notes: ${flavourNotes.join(", ")}.`);
 
   return lines.join("\n");
 }
@@ -1073,13 +462,7 @@ function buildLanarkPantryInstruction(items: string[]) {
   const lowerItems = items.map((item) => item.toLowerCase());
 
   const matchedProducts = LANARK_PANTRY_PRODUCTS.filter((product) =>
-    product.aliases.some((alias) =>
-      lowerItems.some(
-        (item) =>
-          item.includes(alias.toLowerCase()) ||
-          alias.toLowerCase().includes(item),
-      ),
-    ),
+    product.aliases.some((alias) => lowerItems.some((item) => item.includes(alias.toLowerCase()) || alias.toLowerCase().includes(item))),
   );
 
   if (matchedProducts.length === 0) return "";
@@ -1137,9 +520,7 @@ function buildDietaryInstruction(preferences: string[]) {
   ].join("\n");
 }
 
-function buildWeekPlanInstruction(
-  weekPlanContext: WeekPlanContext | null | undefined,
-) {
+function buildWeekPlanInstruction(weekPlanContext: WeekPlanContext | null | undefined) {
   if (!weekPlanContext || weekPlanContext.mode !== "plan-week") return "";
 
   const meatLines = weekPlanContext.includeMeatIdeas
@@ -1172,12 +553,7 @@ function buildPreviousRecipesInstruction(previousRecipes: PreviousRecipe[]) {
 
   const formatted = previousRecipes
     .map((recipe, index) => {
-      return [
-        `Previous meal ${index + 1}:`,
-        `Title: ${recipe.title}`,
-        `Description: ${recipe.description}`,
-        `Ingredients: ${recipe.ingredientsUsed.join(", ")}`,
-      ].join("\n");
+      return [`Previous meal ${index + 1}:`, `Title: ${recipe.title}`, `Description: ${recipe.description}`, `Ingredients: ${recipe.ingredientsUsed.join(", ")}`].join("\n");
     })
     .join("\n\n");
 
@@ -1201,9 +577,7 @@ function isIngredientMatch(usedIngredient: string, providedItems: string[]) {
 
 function isCommonSupportIngredient(usedIngredient: string) {
   const used = usedIngredient.toLowerCase().trim();
-  return COMMON_SUPPORT_INGREDIENTS.some(
-    (support) => support.includes(used) || used.includes(support),
-  );
+  return COMMON_SUPPORT_INGREDIENTS.some((support) => support.includes(used) || used.includes(support));
 }
 
 function recipeOverusesDefaults(recipe: GeneratedRecipe, items: string[]) {
@@ -1211,32 +585,20 @@ function recipeOverusesDefaults(recipe: GeneratedRecipe, items: string[]) {
 
   const overusedNotProvided = recipe.ingredientsUsed.filter((ingredient) => {
     const lowerIngredient = ingredient.toLowerCase();
-    const isOverusedDefault = OVERUSED_BOX_DEFAULTS.some(
-      (defaultItem) =>
-        lowerIngredient.includes(defaultItem) ||
-        defaultItem.includes(lowerIngredient),
-    );
+    const isOverusedDefault = OVERUSED_BOX_DEFAULTS.some((defaultItem) => lowerIngredient.includes(defaultItem) || defaultItem.includes(lowerIngredient));
     if (!isOverusedDefault) return false;
-    return !providedItems.some(
-      (item) =>
-        item.includes(lowerIngredient) || lowerIngredient.includes(item),
-    );
+    return !providedItems.some((item) => item.includes(lowerIngredient) || lowerIngredient.includes(item));
   });
 
-  const titleAndDescription =
-    `${recipe.title} ${recipe.description}`.toLowerCase();
-  const titleLeadsWithDefault = OVERUSED_BOX_DEFAULTS.some((ingredient) =>
-    titleAndDescription.includes(ingredient),
-  );
+  const titleAndDescription = `${recipe.title} ${recipe.description}`.toLowerCase();
+  const titleLeadsWithDefault = OVERUSED_BOX_DEFAULTS.some((ingredient) => titleAndDescription.includes(ingredient));
 
   return overusedNotProvided.length >= 2 || titleLeadsWithDefault;
 }
 
 function isRecipeGroundedInItems(recipe: GeneratedRecipe, items: string[]) {
   const providedItems = items.map((item) => item.toLowerCase());
-  const recipeIngredients = recipe.ingredientsUsed.map((item) =>
-    item.toLowerCase(),
-  );
+  const recipeIngredients = recipe.ingredientsUsed.map((item) => item.toLowerCase());
 
   let directMatches = 0;
   let unsupportedIngredients = 0;
@@ -1250,20 +612,12 @@ function isRecipeGroundedInItems(recipe: GeneratedRecipe, items: string[]) {
     if (!isCommonSupportIngredient(usedIngredient)) unsupportedIngredients += 1;
   }
 
-  const titleAndDescription =
-    `${recipe.title} ${recipe.description}`.toLowerCase();
-  const mentionsProvidedIngredient = providedItems.some(
-    (item) => item.length > 2 && titleAndDescription.includes(item),
-  );
+  const titleAndDescription = `${recipe.title} ${recipe.description}`.toLowerCase();
+  const mentionsProvidedIngredient = providedItems.some((item) => item.length > 2 && titleAndDescription.includes(item));
 
   if (recipeOverusesDefaults(recipe, items)) return false;
 
-  if (providedItems.length <= 4)
-    return (
-      directMatches >= 2 &&
-      unsupportedIngredients <= 1 &&
-      mentionsProvidedIngredient
-    );
+  if (providedItems.length <= 4) return directMatches >= 2 && unsupportedIngredients <= 1 && mentionsProvidedIngredient;
 
   return directMatches >= 3 && unsupportedIngredients <= 2;
 }
@@ -1279,16 +633,8 @@ async function requestRecipe(
   plannerIntent?: PlannerIntent | null,
 ) {
   const quickStartInstruction = quickStartPromptMap[quickStart] ?? "";
-  const preferencesInstruction =
-    preferences.length > 0
-      ? `Respect these user preferences where reasonably possible: ${preferences.join(", ")}.`
-      : "";
-  const mealDirection = pickMealDirection(
-    items,
-    quickStart,
-    previousRecipe,
-    weekPlanContext,
-  );
+  const preferencesInstruction = preferences.length > 0 ? `Respect these user preferences where reasonably possible: ${preferences.join(", ")}.` : "";
+  const mealDirection = pickMealDirection(items, quickStart, previousRecipe, weekPlanContext);
 
   const previousRecipeInstruction = previousRecipe
     ? [
@@ -1359,13 +705,7 @@ async function requestRecipe(
             pantryStaples: { type: "array", items: { type: "string" } },
             steps: { type: "array", items: { type: "string" } },
           },
-          required: [
-            "title",
-            "description",
-            "ingredientsUsed",
-            "pantryStaples",
-            "steps",
-          ],
+          required: ["title", "description", "ingredientsUsed", "pantryStaples", "steps"],
         },
       },
     },
@@ -1386,36 +726,13 @@ async function generateRecipe(
   weekPlanContext?: WeekPlanContext | null,
   plannerIntent?: PlannerIntent | null,
 ) {
-  const first = await requestRecipe(
-    client,
-    items,
-    quickStart,
-    preferences,
-    previousRecipe,
-    false,
-    weekPlanContext,
-    plannerIntent,
-  );
+  const first = await requestRecipe(client, items, quickStart, preferences, previousRecipe, false, weekPlanContext, plannerIntent);
 
   if (isRecipeGroundedInItems(first.recipe, items)) {
-    return {
-      recipe: first.recipe,
-      attempts: 1,
-      grounded: true,
-      mealDirection: first.mealDirection,
-    };
+    return { recipe: first.recipe, attempts: 1, grounded: true, mealDirection: first.mealDirection };
   }
 
-  const retry = await requestRecipe(
-    client,
-    items,
-    quickStart,
-    preferences,
-    previousRecipe,
-    true,
-    weekPlanContext,
-    plannerIntent,
-  );
+  const retry = await requestRecipe(client, items, quickStart, preferences, previousRecipe, true, weekPlanContext, plannerIntent);
 
   return {
     recipe: retry.recipe,
@@ -1425,27 +742,15 @@ async function generateRecipe(
   };
 }
 
-async function generateRecipeImage(
-  client: OpenAI,
-  recipe: GeneratedRecipe,
-  providedItems: string[],
-  preferences: string[],
-) {
-  const visibleIngredients = uniqueStrings([
-    ...recipe.ingredientsUsed,
-    ...providedItems,
-  ]).slice(0, 12);
+async function generateRecipeImage(client: OpenAI, recipe: GeneratedRecipe, providedItems: string[], preferences: string[]) {
+  const visibleIngredients = uniqueStrings([...recipe.ingredientsUsed, ...providedItems]).slice(0, 12);
   const lowerPreferences = preferences.map((item) => item.toLowerCase());
   const isVegan = lowerPreferences.includes("vegan");
   const isNoDairy = lowerPreferences.includes("no dairy");
 
   const dietaryImageRules = [
-    isVegan
-      ? "The image must look fully vegan: no meat, fish, eggs, cheese, cream, yoghurt, butter, or honey."
-      : "",
-    !isVegan && isNoDairy
-      ? "The image must not show dairy: no cheese, cream, butter, yoghurt, or milky sauces."
-      : "",
+    isVegan ? "The image must look fully vegan: no meat, fish, eggs, cheese, cream, yoghurt, butter, or honey." : "",
+    !isVegan && isNoDairy ? "The image must not show dairy: no cheese, cream, butter, yoghurt, or milky sauces." : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -1491,11 +796,7 @@ async function generateRecipeImage(
     return {
       imageUrl: null,
       imageGenerated: false,
-      imageError:
-        error?.message ||
-        error?.error?.message ||
-        error?.code ||
-        "Unknown image generation error",
+      imageError: error?.message || error?.error?.message || error?.code || "Unknown image generation error",
     };
   }
 }
@@ -1518,8 +819,7 @@ export async function POST(request: Request) {
     if (!apiKey) {
       return NextResponse.json(
         {
-          error:
-            "OPENAI_API_KEY is missing. Add it in your Vercel project environment variables.",
+          error: "OPENAI_API_KEY is missing. Add it in your Vercel project environment variables.",
           apiVersion: API_VERSION,
           startedAt,
         },
@@ -1530,11 +830,8 @@ export async function POST(request: Request) {
     const client = new OpenAI({ apiKey });
     const body = await request.json();
 
-    const cleanedItems = Array.from(
-      new Set(normaliseList(body.items, 20)),
-    ).slice(0, 20);
-    const quickStart =
-      typeof body.quickStart === "string" ? body.quickStart : "";
+    const cleanedItems = Array.from(new Set(normaliseList(body.items, 20))).slice(0, 20);
+    const quickStart = typeof body.quickStart === "string" ? body.quickStart : "";
     const preferences = normaliseList(body.preferences, 8);
 
     const previousRecipe =
@@ -1545,10 +842,7 @@ export async function POST(request: Request) {
         ? {
             title: body.previousRecipe.title.trim(),
             description: body.previousRecipe.description.trim(),
-            ingredientsUsed: normaliseList(
-              body.previousRecipe.ingredientsUsed,
-              12,
-            ),
+            ingredientsUsed: normaliseList(body.previousRecipe.ingredientsUsed, 12),
           }
         : null;
 
@@ -1565,10 +859,7 @@ export async function POST(request: Request) {
             .map((item: unknown) => ({
               title: String((item as PreviousRecipe).title).trim(),
               description: String((item as PreviousRecipe).description).trim(),
-              ingredientsUsed: normaliseList(
-                (item as PreviousRecipe).ingredientsUsed,
-                12,
-              ),
+              ingredientsUsed: normaliseList((item as PreviousRecipe).ingredientsUsed, 12),
             }))
             .slice(0, 8)
         : [];
@@ -1576,44 +867,17 @@ export async function POST(request: Request) {
     const plannerIntent: PlannerIntent | null =
       body.plannerIntent && typeof body.plannerIntent === "object"
         ? {
-            mode:
-              typeof body.plannerIntent.mode === "string"
-                ? body.plannerIntent.mode
-                : undefined,
-            familyKey:
-              typeof body.plannerIntent.familyKey === "string"
-                ? body.plannerIntent.familyKey
-                : undefined,
-            familyLabel:
-              typeof body.plannerIntent.familyLabel === "string"
-                ? body.plannerIntent.familyLabel
-                : undefined,
-            anchorVeg:
-              typeof body.plannerIntent.anchorVeg === "string"
-                ? body.plannerIntent.anchorVeg
-                : undefined,
-            optionalVeg:
-              typeof body.plannerIntent.optionalVeg === "string"
-                ? body.plannerIntent.optionalVeg
-                : null,
+            mode: typeof body.plannerIntent.mode === "string" ? body.plannerIntent.mode : undefined,
+            familyKey: typeof body.plannerIntent.familyKey === "string" ? body.plannerIntent.familyKey : undefined,
+            familyLabel: typeof body.plannerIntent.familyLabel === "string" ? body.plannerIntent.familyLabel : undefined,
+            anchorVeg: typeof body.plannerIntent.anchorVeg === "string" ? body.plannerIntent.anchorVeg : undefined,
+            optionalVeg: typeof body.plannerIntent.optionalVeg === "string" ? body.plannerIntent.optionalVeg : null,
             supportVeg: normaliseList(body.plannerIntent.supportVeg, 6),
-            everydayBaseOptions: normaliseList(
-              body.plannerIntent.everydayBaseOptions,
-              6,
-            ),
-            shopBaseOptions: normaliseList(
-              body.plannerIntent.shopBaseOptions,
-              6,
-            ),
-            shopBoostOptions: normaliseList(
-              body.plannerIntent.shopBoostOptions,
-              4,
-            ),
+            everydayBaseOptions: normaliseList(body.plannerIntent.everydayBaseOptions, 6),
+            shopBaseOptions: normaliseList(body.plannerIntent.shopBaseOptions, 6),
+            shopBoostOptions: normaliseList(body.plannerIntent.shopBoostOptions, 4),
             avoidHeroVeg: normaliseList(body.plannerIntent.avoidHeroVeg, 6),
-            flavourDirection:
-              typeof body.plannerIntent.flavourDirection === "string"
-                ? body.plannerIntent.flavourDirection
-                : undefined,
+            flavourDirection: typeof body.plannerIntent.flavourDirection === "string" ? body.plannerIntent.flavourDirection : undefined,
             flavourNotes: normaliseList(body.plannerIntent.flavourNotes, 6),
             guidance: normaliseList(body.plannerIntent.guidance, 12),
           }
@@ -1631,43 +895,16 @@ export async function POST(request: Request) {
             totalMeals: body.weekPlanContext.totalMeals,
             includeMeatIdeas: Boolean(body.weekPlanContext.includeMeatIdeas),
             previousRecipes,
-            familyKey:
-              typeof body.weekPlanContext.familyKey === "string"
-                ? body.weekPlanContext.familyKey
-                : undefined,
-            familyLabel:
-              typeof body.weekPlanContext.familyLabel === "string"
-                ? body.weekPlanContext.familyLabel
-                : undefined,
-            anchorVeg:
-              typeof body.weekPlanContext.anchorVeg === "string"
-                ? body.weekPlanContext.anchorVeg
-                : undefined,
-            optionalVeg:
-              typeof body.weekPlanContext.optionalVeg === "string"
-                ? body.weekPlanContext.optionalVeg
-                : null,
+            familyKey: typeof body.weekPlanContext.familyKey === "string" ? body.weekPlanContext.familyKey : undefined,
+            familyLabel: typeof body.weekPlanContext.familyLabel === "string" ? body.weekPlanContext.familyLabel : undefined,
+            anchorVeg: typeof body.weekPlanContext.anchorVeg === "string" ? body.weekPlanContext.anchorVeg : undefined,
+            optionalVeg: typeof body.weekPlanContext.optionalVeg === "string" ? body.weekPlanContext.optionalVeg : null,
             supportVeg: normaliseList(body.weekPlanContext.supportVeg, 6),
-            intro:
-              typeof body.weekPlanContext.intro === "string"
-                ? body.weekPlanContext.intro
-                : undefined,
-            everydayBaseOptions: normaliseList(
-              body.weekPlanContext.everydayBaseOptions,
-              6,
-            ),
-            shopBaseOptions: normaliseList(
-              body.weekPlanContext.shopBaseOptions,
-              6,
-            ),
-            shopBoostOptions: normaliseList(
-              body.weekPlanContext.shopBoostOptions,
-              4,
-            ),
-            flavourDirection:
-              typeof body.weekPlanContext.flavourDirection === "string"
-                ? body.weekPlanContext.flavourDirection
-                : undefined,
+            intro: typeof body.weekPlanContext.intro === "string" ? body.weekPlanContext.intro : undefined,
+            everydayBaseOptions: normaliseList(body.weekPlanContext.everydayBaseOptions, 6),
+            shopBaseOptions: normaliseList(body.weekPlanContext.shopBaseOptions, 6),
+            shopBoostOptions: normaliseList(body.weekPlanContext.shopBoostOptions, 4),
+            flavourDirection: typeof body.weekPlanContext.flavourDirection === "string" ? body.weekPlanContext.flavourDirection : undefined,
             flavourNotes: normaliseList(body.weekPlanContext.flavourNotes, 6),
           }
         : null;
@@ -1693,21 +930,8 @@ export async function POST(request: Request) {
       hasWeekPlanContext: Boolean(weekPlanContext),
     });
 
-    const generation = await generateRecipe(
-      client,
-      cleanedItems,
-      quickStart,
-      preferences,
-      previousRecipe,
-      weekPlanContext,
-      plannerIntent,
-    );
-    const imageResult = await generateRecipeImage(
-      client,
-      generation.recipe,
-      cleanedItems,
-      preferences,
-    );
+    const generation = await generateRecipe(client, cleanedItems, quickStart, preferences, previousRecipe, weekPlanContext, plannerIntent);
+    const imageResult = await generateRecipeImage(client, generation.recipe, cleanedItems, preferences);
 
     console.log("RECIPE API RESULT", {
       apiVersion: API_VERSION,
@@ -1743,8 +967,7 @@ export async function POST(request: Request) {
     if (error?.status === 429 || error?.code === "insufficient_quota") {
       return NextResponse.json(
         {
-          error:
-            "Your AI recipe feature is connected, but your OpenAI API account does not currently have available quota or billing set up yet.",
+          error: "Your AI recipe feature is connected, but your OpenAI API account does not currently have available quota or billing set up yet.",
           apiVersion: API_VERSION,
           startedAt,
           detail: error?.message || null,
@@ -1756,8 +979,7 @@ export async function POST(request: Request) {
     if (error?.status === 401) {
       return NextResponse.json(
         {
-          error:
-            "Your OpenAI API key was rejected. Check that the key is correct in your Vercel environment variables.",
+          error: "Your OpenAI API key was rejected. Check that the key is correct in your Vercel environment variables.",
           apiVersion: API_VERSION,
           startedAt,
           detail: error?.message || null,
