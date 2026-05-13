@@ -81,39 +81,84 @@ const DAY_NAMES = [
   "Thursday",
   "Friday",
   "Saturday",
+  "Sunday",
 ] as const;
 
-const FALLBACK_IMAGE = "/hero.jpg";
-
 const DEFAULT_BOX_INGREDIENTS = [
-  "potatoes",
-  "onions",
-  "garlic",
-  "carrots",
-  "celery",
-  "sweet potato",
+  "broccoli",
+  "spinach",
   "peppers",
   "courgette",
-  "ginger",
-  "leeks",
-  "lettuce",
-  "cucumber",
   "tomatoes",
-  "spinach",
+  "cucumber",
+  "lettuce",
+  "aubergine",
+  "mushrooms",
+  "cauliflower",
+  "green beans",
+  "peas",
+  "fennel",
+  "beetroot",
+  "cabbage",
+  "kale",
+  "radishes",
+  "spring onions",
+  "fresh herbs",
   "basil",
-  "rosemary",
-  "thyme",
   "coriander",
+  "parsley",
+  "thyme",
+  "rosemary",
   "avocado",
-  "broccoli",
+  "ginger",
+  "potatoes",
+  "carrots",
+  "onions",
+  "garlic",
+  "leeks",
+  "celery",
+  "sweet potato",
+  "squash",
+  "Jerusalem artichokes",
   "bananas",
   "apples",
   "oranges",
   "strawberries",
   "grapes",
   "melon",
-  "seasonal extras",
-  "occasional specials like lychees, dragon fruit, Jerusalem artichokes or pineapple",
+  "pineapple",
+  "kiwi",
+  "pear",
+  "lychees",
+  "dragon fruit",
+];
+
+const ROOT_AND_ALLIUM_WORDS = [
+  "potato",
+  "potatoes",
+  "carrot",
+  "carrots",
+  "onion",
+  "onions",
+  "leek",
+  "leeks",
+  "garlic",
+  "celery",
+  "sweet potato",
+];
+
+const FRUIT_WORDS = [
+  "banana",
+  "apple",
+  "orange",
+  "strawberry",
+  "grape",
+  "melon",
+  "pineapple",
+  "kiwi",
+  "pear",
+  "lychee",
+  "dragon fruit",
 ];
 
 const SHOP_BASES = [
@@ -144,29 +189,46 @@ const SHOP_BOOSTS = [
 
 const QUICK_ANCHORS = [
   "spinach",
-  "tomatoes",
   "broccoli",
   "peppers",
-  "potatoes",
+  "courgette",
+  "tomatoes",
   "cucumber",
+  "lettuce",
+  "green beans",
+  "fresh herbs",
+  "radishes",
+  "spring onions",
 ];
 
 const BALANCED_ANCHORS = [
-  "potatoes",
-  "tomatoes",
-  "greens",
   "broccoli",
+  "spinach",
   "peppers",
-  "carrots",
+  "tomatoes",
+  "cauliflower",
+  "aubergine",
+  "courgette",
+  "kale",
+  "fennel",
+  "beetroot",
+  "cabbage",
+  "mushrooms",
 ];
 
 const COMFORTING_ANCHORS = [
-  "potatoes",
   "mushrooms",
-  "roots",
-  "greens",
+  "cauliflower",
+  "aubergine",
+  "cabbage",
+  "beetroot",
+  "Jerusalem artichokes",
+  "kale",
+  "broccoli",
   "tomatoes",
-  "carrots",
+  "squash",
+  "fennel",
+  "green beans",
 ];
 
 function ChoiceChip({ active, label, onClick }: ChoiceChipProps) {
@@ -246,11 +308,26 @@ function dedupeStrings(values: string[]) {
   return result;
 }
 
+function containsAny(value: string, words: string[]) {
+  const text = normalise(value);
+  return words.some((word) => text.includes(normalise(word)));
+}
+
+function isRootOrAllium(value: string) {
+  return containsAny(value, ROOT_AND_ALLIUM_WORDS);
+}
+
+function isFruit(value: string) {
+  return containsAny(value, FRUIT_WORDS);
+}
+
 function getBoxIngredients() {
   const firstBox = produceBoxes[0];
 
   if (firstBox?.weeklyIncludes && firstBox.weeklyIncludes.length > 0) {
-    return firstBox.weeklyIncludes.map((item) => item.trim()).filter(Boolean);
+    return dedupeStrings(
+      firstBox.weeklyIncludes.map((item) => item.trim()).filter(Boolean),
+    );
   }
 
   return DEFAULT_BOX_INGREDIENTS;
@@ -258,7 +335,133 @@ function getBoxIngredients() {
 
 function pickFromList(values: string[], index: number) {
   if (values.length === 0) return "";
-  return values[index % values.length];
+  const safeIndex = ((index % values.length) + values.length) % values.length;
+  return values[safeIndex];
+}
+
+function rotateList(values: string[], offset: number) {
+  if (values.length === 0) return [];
+  const normalisedOffset =
+    ((offset % values.length) + values.length) % values.length;
+  return [
+    ...values.slice(normalisedOffset),
+    ...values.slice(0, normalisedOffset),
+  ];
+}
+
+function pickVariedItems(values: string[], mealIndex: number, count: number) {
+  const cleanValues = dedupeStrings(values);
+  if (cleanValues.length === 0) return [];
+
+  const picks: string[] = [];
+  const steps = [2, 5, 9, 13, 17, 23, 29];
+  const offset = mealIndex * 4 + mealIndex * mealIndex;
+
+  for (let i = 0; i < count; i += 1) {
+    const index =
+      (offset + i * steps[(mealIndex + i) % steps.length]) % cleanValues.length;
+    picks.push(cleanValues[index]);
+  }
+
+  return dedupeStrings(picks);
+}
+
+function buildAnchorPool(mood: WeekMood, boxIngredients: string[]) {
+  const moodAnchors =
+    mood === "quick"
+      ? QUICK_ANCHORS
+      : mood === "comforting"
+        ? COMFORTING_ANCHORS
+        : BALANCED_ANCHORS;
+
+  const nonFruitBoxIngredients = boxIngredients.filter(
+    (item) => !isFruit(item),
+  );
+  const nonRootBoxIngredients = nonFruitBoxIngredients.filter(
+    (item) => !isRootOrAllium(item),
+  );
+
+  const directMoodMatches = moodAnchors.filter((anchor) =>
+    boxIngredients.some((item) => normalise(item).includes(normalise(anchor))),
+  );
+
+  const expandedPool = dedupeStrings([
+    ...directMoodMatches,
+    ...moodAnchors,
+    ...nonRootBoxIngredients,
+    ...nonFruitBoxIngredients,
+  ]);
+
+  return expandedPool.length > 0 ? expandedPool : moodAnchors;
+}
+
+function buildUsedAnchorList(previousMeals: PlannedMeal[]) {
+  return previousMeals
+    .flatMap((meal) => meal.ingredients)
+    .filter((ingredient) => !isFruit(ingredient))
+    .map((ingredient) => normalise(ingredient));
+}
+
+function pickAnchorVeg(args: {
+  mood: WeekMood;
+  mealIndex: number;
+  boxIngredients: string[];
+  previousMeals: PlannedMeal[];
+}) {
+  const { mood, mealIndex, boxIngredients, previousMeals } = args;
+  const anchorPool = buildAnchorPool(mood, boxIngredients);
+  const usedAnchors = buildUsedAnchorList(previousMeals);
+  const rotatedPool = rotateList(
+    anchorPool,
+    mealIndex * 3 + previousMeals.length * 2,
+  );
+
+  const freshPick = rotatedPool.find((candidate) => {
+    const key = normalise(candidate);
+    return !usedAnchors.some(
+      (used) => used.includes(key) || key.includes(used),
+    );
+  });
+
+  return freshPick || pickFromList(rotatedPool, mealIndex);
+}
+
+function buildSupportVeg(args: {
+  boxIngredients: string[];
+  anchorVeg: string;
+  mealIndex: number;
+  previousMeals: PlannedMeal[];
+  totalMeals: number;
+}) {
+  const { boxIngredients, anchorVeg, mealIndex, previousMeals, totalMeals } =
+    args;
+
+  const usedText = previousMeals
+    .flatMap((meal) => meal.ingredients)
+    .map((item) => normalise(item));
+
+  const available = boxIngredients.filter((item) => {
+    const key = normalise(item);
+    const anchorKey = normalise(anchorVeg);
+
+    if (!key) return false;
+    if (key.includes(anchorKey) || anchorKey.includes(key)) return false;
+    if (isFruit(item)) return false;
+
+    const wasUsedOften =
+      usedText.filter((used) => used.includes(key) || key.includes(used))
+        .length >= 2;
+    return !wasUsedOften;
+  });
+
+  const nonRootFirst = [
+    ...available.filter((item) => !isRootOrAllium(item)),
+    ...available.filter((item) => isRootOrAllium(item)),
+  ];
+
+  const varied = pickVariedItems(nonRootFirst, mealIndex + totalMeals, 5);
+
+  return dedupeStrings(varied).slice(0, 4);
 }
 
 function buildMealIntent(
@@ -267,37 +470,36 @@ function buildMealIntent(
   mealIndex: number,
   totalMeals: number,
   boxIngredients: string[],
+  previousMeals: PlannedMeal[],
 ): PlannerIntent {
-  const anchors =
-    mood === "quick"
-      ? QUICK_ANCHORS
-      : mood === "comforting"
-        ? COMFORTING_ANCHORS
-        : BALANCED_ANCHORS;
+  const anchorVeg = pickAnchorVeg({
+    mood,
+    mealIndex,
+    boxIngredients,
+    previousMeals,
+  });
 
-  const boxMatches = anchors.filter((anchor) =>
-    boxIngredients.some((item) => normalise(item).includes(normalise(anchor))),
-  );
+  const supportVeg = buildSupportVeg({
+    boxIngredients,
+    anchorVeg,
+    mealIndex,
+    previousMeals,
+    totalMeals,
+  });
 
-  const anchorPool = boxMatches.length > 0 ? boxMatches : anchors;
-  const anchorVeg = pickFromList(anchorPool, mealIndex);
+  const optionalVeg = supportVeg[0] ?? null;
 
-  const optionalVeg = pickFromList(
-    boxIngredients.filter(
-      (item) => !normalise(item).includes(normalise(anchorVeg)),
-    ),
-    mealIndex + 2,
-  );
-
-  const shopBaseOptions = [
-    pickFromList(SHOP_BASES, mealIndex),
-    pickFromList(SHOP_BASES, mealIndex + 3),
-  ].filter(Boolean);
+  const shopBaseOptions = dedupeStrings([
+    pickFromList(SHOP_BASES, mealIndex * 2),
+    pickFromList(SHOP_BASES, mealIndex * 2 + 5),
+  ]).filter(Boolean);
 
   const shopBoostOptions =
-    mealIndex % 2 === 0
-      ? [pickFromList(SHOP_BOOSTS, mealIndex)]
-      : [pickFromList(SHOP_BOOSTS, mealIndex + 2)];
+    mealIndex % 3 === 0
+      ? [pickFromList(SHOP_BOOSTS, mealIndex + 1)]
+      : mealIndex % 3 === 1
+        ? [pickFromList(SHOP_BOOSTS, mealIndex + 4)]
+        : [];
 
   const focusGuidance =
     focus === "family-friendly"
@@ -315,6 +517,10 @@ function buildMealIntent(
         ? "warm, generous, soft-edged and comforting"
         : "balanced, colourful, useful and varied";
 
+  const previousHeroVeg = previousMeals
+    .flatMap((meal) => meal.ingredients.slice(0, 3))
+    .filter((ingredient) => !isFruit(ingredient));
+
   return {
     familyKey: mood,
     familyLabel:
@@ -324,13 +530,15 @@ function buildMealIntent(
           ? "Comforting"
           : "Balanced",
     anchorVeg,
-    optionalVeg: optionalVeg || null,
-    supportVeg: boxIngredients.slice(mealIndex, mealIndex + 4),
+    optionalVeg,
+    supportVeg,
     everydayBaseOptions: ["rice", "bread", "eggs", "yoghurt", "lemon", "herbs"],
     shopBaseOptions,
     shopBoostOptions,
-    avoidHeroVeg:
-      mealIndex > 0 ? [pickFromList(anchorPool, mealIndex - 1)] : [],
+    avoidHeroVeg: dedupeStrings([
+      ...previousHeroVeg,
+      ...(mealIndex > 0 ? ["potatoes", "carrots", "leeks", "onions"] : []),
+    ]).slice(0, 8),
     flavourDirection: moodDirection,
     flavourNotes:
       mood === "quick"
@@ -338,7 +546,12 @@ function buildMealIntent(
         : mood === "comforting"
           ? ["warm", "soft", "savoury"]
           : ["fresh", "colourful", "varied"],
-    guidance: focusGuidance,
+    guidance: [
+      ...focusGuidance,
+      "Across the week, avoid repeating the same hero vegetables.",
+      "Do not keep defaulting to potato, carrot, leek or onion-led meals.",
+      "Use greens, brassicas, peppers, courgette, tomatoes, mushrooms, herbs, beans and grains to create variety.",
+    ],
   };
 }
 
@@ -401,7 +614,12 @@ async function generatePlannerMeal(args: {
     mealIndex,
     totalMeals,
     boxIngredients,
+    previousMeals,
   );
+
+  const previousHeroIngredients = previousMeals
+    .flatMap((meal) => meal.ingredients.slice(0, 4))
+    .filter(Boolean);
 
   const items = dedupeStrings([
     "Weekly Produce Box",
@@ -447,7 +665,15 @@ async function generatePlannerMeal(args: {
         flavourDirection: intent.flavourDirection,
         flavourNotes: intent.flavourNotes,
       },
-      plannerIntent: intent,
+      plannerIntent: {
+        ...intent,
+        guidance: [
+          ...intent.guidance,
+          previousHeroIngredients.length > 0
+            ? `Already used earlier this week: ${previousHeroIngredients.join(", ")}. Make this meal clearly different.`
+            : "Make this meal distinct from a standard carrot, leek or potato supper.",
+        ],
+      },
     }),
   });
 
@@ -525,29 +751,12 @@ export default function PlannerPage() {
     const ingredientSet = new Set<string>();
     week.forEach((meal) => {
       meal.ingredients.forEach((ingredient) => {
-        const lower = ingredient.toLowerCase();
-        if (
-          [
-            "carrots",
-            "potatoes",
-            "greens",
-            "tomatoes",
-            "peppers",
-            "courgette",
-            "mushrooms",
-            "roots",
-            "squash",
-            "cauliflower",
-            "beetroot",
-            "broccoli",
-            "spinach",
-          ].includes(lower)
-        ) {
+        if (!isFruit(ingredient) && !isRootOrAllium(ingredient)) {
           ingredientSet.add(ingredient);
         }
       });
     });
-    return Array.from(ingredientSet);
+    return Array.from(ingredientSet).slice(0, 12);
   }, [week]);
 
   async function buildAiWeek() {
@@ -675,7 +884,7 @@ export default function PlannerPage() {
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
                 A few quick choices, then we’ll build your meals for the week
-                ahead using the AI recipe generator.
+                ahead.
               </p>
 
               {plannerError ? (
@@ -691,7 +900,7 @@ export default function PlannerPage() {
                       How many nights?
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {[3, 4, 5, 6].map((value) => (
+                      {[3, 4, 5, 6, 7].map((value) => (
                         <ChoiceChip
                           key={value}
                           active={nights === value}
@@ -790,9 +999,9 @@ export default function PlannerPage() {
                   </h2>
 
                   <p className="mt-3 max-w-xl text-sm leading-6 text-[#667164]">
-                    Building a week that works together — balanced meals,
-                    gorgeous ingredients, and straightforward cooking for the
-                    days ahead.
+                    Planning your meals around seasonal produce, practical
+                    cooking, and the kind of week that still feels manageable on
+                    busy days.
                   </p>
 
                   <div className="mt-5 h-2 overflow-hidden rounded-full bg-[rgba(221,212,200,0.95)]">
