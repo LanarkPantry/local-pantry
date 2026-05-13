@@ -12,7 +12,7 @@ import {
 
 type WeekMood = "quick" | "balanced" | "comforting";
 type WeekFocus = "veg-heavy" | "low-waste" | "family-friendly";
-type ProteinStyle = "veg" | "flexible" | "high-protein";
+type EatingStyle = "veg" | "balanced" | "protein";
 type PlannerStep = "choices" | "building" | "results";
 
 type GeneratedRecipe = {
@@ -70,7 +70,7 @@ type PlannerIntent = {
 type GeneratePlannerMealArgs = {
   mood: WeekMood;
   focus: WeekFocus | null;
-  proteinStyle: ProteinStyle;
+  eatingStyle: EatingStyle;
   mealIndex: number;
   totalMeals: number;
   basketNames: string[];
@@ -118,10 +118,11 @@ const DEFAULT_BOX_INGREDIENTS = [
   "kale",
   "radishes",
   "spring onions",
-  "fresh herbs",
   "basil",
   "coriander",
   "parsley",
+  "mint",
+  "dill",
   "thyme",
   "rosemary",
   "avocado",
@@ -191,16 +192,86 @@ const SHOP_BASES = [
   "Premium Whole Tomatoes",
 ];
 
-const SHOP_BOOSTS = [
+const PLANNED_BOOST_CYCLE = [
   "Rose Harissa",
-  "Sorrel & Walnut Pesto",
-  "Signature Gochujang",
-  "Vegetable Stock Concentrate",
-  "Tahini",
+  null,
   "White Miso",
-  "Salted Caramel Sauce",
-  "Dark Chocolate & Hazelnut Spread",
-];
+  null,
+  "Signature Gochujang",
+  "Sorrel & Walnut Pesto",
+  null,
+] as const;
+
+const HERB_CYCLE = [
+  "basil",
+  "coriander",
+  "parsley",
+  "mint",
+  "dill",
+  "thyme",
+  "rosemary",
+] as const;
+
+const ACID_CYCLE = [
+  "lemon",
+  "lime",
+  "vinegar",
+  "yoghurt",
+  "pickled onions",
+  "mustard",
+  "orange zest",
+] as const;
+
+const TEXTURE_CYCLE = [
+  "crispy edges",
+  "soft and spoonable",
+  "charred finish",
+  "cool creamy contrast",
+  "crunchy topping",
+  "jammy roasted tomatoes",
+  "silky sauce with a fresh finish",
+] as const;
+
+const MEAL_SHAPE_CYCLE = [
+  "pasta",
+  "traybake",
+  "warm bowl",
+  "brothy pot",
+  "grain salad",
+  "toast or flatbread",
+  "orzo or risotto-style pot",
+] as const;
+
+const FLAVOUR_PROFILE_CYCLE = [
+  {
+    label: "warm and smoky",
+    notes: ["rose harissa", "cumin", "roasted garlic"],
+  },
+  {
+    label: "bright and herby",
+    notes: ["lemon", "parsley", "mint"],
+  },
+  {
+    label: "deep and savoury",
+    notes: ["white miso", "mushrooms", "black pepper"],
+  },
+  {
+    label: "green and fresh",
+    notes: ["basil", "olive oil", "leafy greens"],
+  },
+  {
+    label: "sweet heat",
+    notes: ["gochujang", "lime", "gentle sweetness"],
+  },
+  {
+    label: "earthy and nutty",
+    notes: ["farro", "walnuts", "roasted vegetables"],
+  },
+  {
+    label: "tomato-rich and generous",
+    notes: ["whole tomatoes", "garlic", "herbs"],
+  },
+] as const;
 
 const QUICK_ANCHORS = [
   "spinach",
@@ -211,7 +282,7 @@ const QUICK_ANCHORS = [
   "cucumber",
   "lettuce",
   "green beans",
-  "fresh herbs",
+  "basil",
   "radishes",
   "spring onions",
 ];
@@ -508,48 +579,42 @@ function buildSupportVeg(args: {
   return dedupeStrings(varied).slice(0, 4);
 }
 
-function proteinGuidance(proteinStyle: ProteinStyle) {
-  if (proteinStyle === "veg") {
+function eatingStyleGuidance(eatingStyle: EatingStyle) {
+  if (eatingStyle === "veg") {
     return [
       "Keep the plan vegetarian and produce-led.",
-      "Use beans, lentils, chickpeas, eggs, yoghurt, cheese, halloumi or tofu-style additions only where they fit naturally.",
+      "Use beans, lentils, chickpeas, eggs, yoghurt, tofu or cheese only where they fit naturally.",
+      "Avoid using halloumi more than once in a week.",
       "Do not introduce meat or fish.",
     ];
   }
 
-  if (proteinStyle === "high-protein") {
+  if (eatingStyle === "protein") {
     return [
-      "Make the meals feel more protein-balanced.",
-      "Use beans, lentils, chickpeas, eggs, yoghurt, tofu, halloumi, or optional chicken/fish suggestions where they fit.",
+      "Make the meals protein-led without making them heavy or gym-coded.",
+      "Use beans, lentils, chickpeas, eggs, yoghurt, tofu, occasional halloumi, or optional chicken/fish suggestions where they fit.",
       "Keep vegetables central rather than making the meal meat-led.",
     ];
   }
 
   return [
-    "Keep the plan flexible for mixed households.",
-    "Meals may suggest optional chicken, fish, tofu, halloumi, eggs, beans or lentils, but the vegetables should still lead.",
+    "Keep the plan balanced for mixed households.",
+    "Meals may suggest optional chicken, fish, tofu, eggs, beans or lentils, but the vegetables should still lead.",
+    "Use halloumi only occasionally, not as a default protein.",
     "Do not make every recipe depend on meat.",
   ];
 }
 
-function proteinItems(proteinStyle: ProteinStyle, mealIndex: number) {
-  if (proteinStyle === "veg") {
+function proteinItems(eatingStyle: EatingStyle, mealIndex: number) {
+  if (eatingStyle === "veg") {
     return pickVariedItems(
-      [
-        "chickpeas",
-        "butter beans",
-        "puy lentils",
-        "eggs",
-        "halloumi",
-        "tofu",
-        "yoghurt",
-      ],
+      ["chickpeas", "butter beans", "puy lentils", "eggs", "tofu", "yoghurt"],
       mealIndex,
       2,
     );
   }
 
-  if (proteinStyle === "high-protein") {
+  if (eatingStyle === "protein") {
     return pickVariedItems(
       [
         "chickpeas",
@@ -557,10 +622,10 @@ function proteinItems(proteinStyle: ProteinStyle, mealIndex: number) {
         "puy lentils",
         "eggs",
         "tofu",
-        "halloumi",
         "chicken",
         "fish",
         "Greek yoghurt",
+        ...(mealIndex % 5 === 0 ? ["halloumi"] : []),
       ],
       mealIndex,
       2,
@@ -574,19 +639,45 @@ function proteinItems(proteinStyle: ProteinStyle, mealIndex: number) {
       "puy lentils",
       "eggs",
       "tofu",
-      "halloumi",
       "chicken",
       "fish",
+      ...(mealIndex % 5 === 0 ? ["halloumi"] : []),
     ],
     mealIndex,
     2,
   );
 }
 
+function flavourContext(mealIndex: number, totalMeals: number) {
+  const profile =
+    FLAVOUR_PROFILE_CYCLE[mealIndex % FLAVOUR_PROFILE_CYCLE.length];
+  const herb = HERB_CYCLE[mealIndex % HERB_CYCLE.length];
+  const acid = ACID_CYCLE[mealIndex % ACID_CYCLE.length];
+  const texture = TEXTURE_CYCLE[mealIndex % TEXTURE_CYCLE.length];
+  const mealShape = MEAL_SHAPE_CYCLE[mealIndex % MEAL_SHAPE_CYCLE.length];
+  const plannedBoost =
+    PLANNED_BOOST_CYCLE[mealIndex % PLANNED_BOOST_CYCLE.length];
+
+  const leftoversNote =
+    totalMeals >= 5 && mealIndex === totalMeals - 2
+      ? "Make this a useful low-waste or leftovers-friendly meal that can absorb mixed veg."
+      : "";
+
+  return {
+    profile,
+    herb,
+    acid,
+    texture,
+    mealShape,
+    plannedBoost,
+    leftoversNote,
+  };
+}
+
 function buildMealIntent(
   mood: WeekMood,
   focus: WeekFocus | null,
-  proteinStyle: ProteinStyle,
+  eatingStyle: EatingStyle,
   mealIndex: number,
   totalMeals: number,
   boxIngredients: string[],
@@ -611,18 +702,14 @@ function buildMealIntent(
   });
 
   const optionalVeg = supportVeg[0] ?? null;
+  const flavour = flavourContext(mealIndex, totalMeals);
 
   const shopBaseOptions = dedupeStrings([
     pickFromList(SHOP_BASES, mealIndex * 2),
     pickFromList(SHOP_BASES, mealIndex * 2 + 5),
   ]).filter(Boolean);
 
-  const shopBoostOptions =
-    mealIndex % 3 === 0
-      ? [pickFromList(SHOP_BOOSTS, mealIndex + 1)]
-      : mealIndex % 3 === 1
-        ? [pickFromList(SHOP_BOOSTS, mealIndex + 4)]
-        : [];
+  const shopBoostOptions = flavour.plannedBoost ? [flavour.plannedBoost] : [];
 
   const focusGuidance =
     focus === "family-friendly"
@@ -647,14 +734,14 @@ function buildMealIntent(
   const swapGuidance = swapRequest
     ? [
         `The user rejected this meal: ${swapRequest.rejectedTitle}.`,
-        `Do not create a near-match to that rejected meal.`,
+        "Do not create a near-match to that rejected meal.",
         `Avoid these rejected ingredients as the main idea: ${swapRequest.rejectedIngredients.join(", ")}.`,
         "Change the dish shape, hero vegetables, texture and title.",
       ]
     : [];
 
   return {
-    familyKey: `${mood}-${proteinStyle}`,
+    familyKey: `${mood}-${eatingStyle}`,
     familyLabel:
       mood === "quick"
         ? "Quick and easy"
@@ -664,7 +751,17 @@ function buildMealIntent(
     anchorVeg,
     optionalVeg,
     supportVeg,
-    everydayBaseOptions: ["rice", "bread", "eggs", "yoghurt", "lemon", "herbs"],
+    everydayBaseOptions: [
+      "rice",
+      "bread",
+      "eggs",
+      "yoghurt",
+      "lemon",
+      "lime",
+      "vinegar",
+      flavour.herb,
+      flavour.acid,
+    ],
     shopBaseOptions,
     shopBoostOptions,
     avoidHeroVeg: dedupeStrings([
@@ -672,21 +769,33 @@ function buildMealIntent(
       ...(swapRequest?.rejectedIngredients ?? []),
       ...(mealIndex > 0 ? ["potatoes", "carrots", "leeks", "onions"] : []),
     ]).slice(0, 10),
-    flavourDirection: moodDirection,
-    flavourNotes:
-      mood === "quick"
-        ? ["bright", "simple", "minimal prep"]
-        : mood === "comforting"
-          ? ["warm", "soft", "savoury"]
-          : ["fresh", "colourful", "varied"],
+    flavourDirection: `${moodDirection}; ${flavour.profile.label}; ${flavour.mealShape}; ${flavour.texture}; brightness from ${flavour.acid}`,
+    flavourNotes: dedupeStrings([
+      ...flavour.profile.notes,
+      flavour.herb,
+      flavour.acid,
+      flavour.texture,
+      flavour.mealShape,
+    ]),
     guidance: [
       ...focusGuidance,
-      ...proteinGuidance(proteinStyle),
+      ...eatingStyleGuidance(eatingStyle),
       ...swapGuidance,
+      "Every meal must have a clear flavour direction, not just vegetables plus a base.",
+      `Use this meal shape: ${flavour.mealShape}.`,
+      `Use this flavour profile: ${flavour.profile.label}.`,
+      `Use ${flavour.herb} as a real flavour ingredient where it fits, not only as garnish.`,
+      `Include a brightness or acid element such as ${flavour.acid}.`,
+      `Include texture contrast: ${flavour.texture}.`,
+      flavour.plannedBoost
+        ? `This meal may use ${flavour.plannedBoost}, but it should still feel balanced and not jar-led.`
+        : "Do not use pesto, harissa, gochujang or miso in this meal unless truly necessary.",
+      flavour.leftoversNote,
       "Across the week, avoid repeating the same hero vegetables.",
       "Do not keep defaulting to potato, carrot, leek or onion-led meals.",
+      "Do not overuse pesto or halloumi.",
       "Use greens, brassicas, peppers, courgette, tomatoes, mushrooms, herbs, beans and grains to create variety.",
-    ],
+    ].filter(Boolean),
   };
 }
 
@@ -735,7 +844,7 @@ async function generatePlannerMeal(args: GeneratePlannerMealArgs) {
   const {
     mood,
     focus,
-    proteinStyle,
+    eatingStyle,
     mealIndex,
     totalMeals,
     basketNames,
@@ -748,13 +857,15 @@ async function generatePlannerMeal(args: GeneratePlannerMealArgs) {
   const intent = buildMealIntent(
     mood,
     focus,
-    proteinStyle,
+    eatingStyle,
     mealIndex,
     totalMeals,
     boxIngredients,
     previousMeals,
     swapRequest,
   );
+
+  const flavour = flavourContext(mealIndex, totalMeals);
 
   const previousHeroIngredients = previousMeals
     .flatMap((meal) => meal.ingredients.slice(0, 4))
@@ -767,7 +878,10 @@ async function generatePlannerMeal(args: GeneratePlannerMealArgs) {
     ...intent.supportVeg,
     ...intent.shopBaseOptions,
     ...intent.shopBoostOptions,
-    ...proteinItems(proteinStyle, mealIndex),
+    ...proteinItems(eatingStyle, mealIndex),
+    flavour.herb,
+    flavour.acid,
+    ...flavour.profile.notes,
     ...basketNames,
   ]).slice(0, 20);
 
@@ -792,7 +906,7 @@ async function generatePlannerMeal(args: GeneratePlannerMealArgs) {
         mode: "plan-week",
         mealIndex,
         totalMeals,
-        includeMeatIdeas: proteinStyle !== "veg",
+        includeMeatIdeas: eatingStyle !== "veg",
         previousRecipes,
         familyKey: intent.familyKey,
         familyLabel: intent.familyLabel,
@@ -845,7 +959,7 @@ export default function PlannerPage() {
   const [nights, setNights] = useState(4);
   const [mood, setMood] = useState<WeekMood>("balanced");
   const [focus, setFocus] = useState<WeekFocus | null>(null);
-  const [proteinStyle, setProteinStyle] = useState<ProteinStyle>("veg");
+  const [eatingStyle, setEatingStyle] = useState<EatingStyle>("balanced");
   const [loadingIndex, setLoadingIndex] = useState(0);
   const [week, setWeek] = useState<PlannedMeal[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(null);
@@ -924,7 +1038,7 @@ export default function PlannerPage() {
         const meal = await generatePlannerMeal({
           mood,
           focus,
-          proteinStyle,
+          eatingStyle,
           mealIndex: index,
           totalMeals: nights,
           basketNames,
@@ -962,7 +1076,7 @@ export default function PlannerPage() {
       const replacement = await generatePlannerMeal({
         mood,
         focus,
-        proteinStyle,
+        eatingStyle,
         mealIndex,
         totalMeals: nights,
         basketNames,
@@ -1099,25 +1213,25 @@ export default function PlannerPage() {
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <ChoiceChip
-                        active={proteinStyle === "veg"}
+                        active={eatingStyle === "veg"}
                         label="Veg-focused"
-                        onClick={() => setProteinStyle("veg")}
+                        onClick={() => setEatingStyle("veg")}
                       />
                       <ChoiceChip
-                        active={proteinStyle === "flexible"}
-                        label="Flexible"
-                        onClick={() => setProteinStyle("flexible")}
+                        active={eatingStyle === "balanced"}
+                        label="Balanced"
+                        onClick={() => setEatingStyle("balanced")}
                       />
                       <ChoiceChip
-                        active={proteinStyle === "high-protein"}
-                        label="Higher protein"
-                        onClick={() => setProteinStyle("high-protein")}
+                        active={eatingStyle === "protein"}
+                        label="Protein-led"
+                        onClick={() => setEatingStyle("protein")}
                       />
                     </div>
                     <p className="mt-2 text-xs leading-5 text-[#667164]">
-                      Flexible and higher protein meals can suggest optional
-                      additions like chicken, fish, tofu, halloumi, eggs, beans
-                      or lentils.
+                      Balanced and protein-led meals can suggest optional
+                      additions like chicken, fish, tofu, eggs, beans or
+                      lentils.
                     </p>
                   </div>
 
