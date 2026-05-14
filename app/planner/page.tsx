@@ -1,5 +1,6 @@
 "use client";
 
+import AccountNav from "../account-nav";
 import PlannerAuthGuard from "../planner-auth-guard";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -1140,9 +1141,12 @@ export default function PlannerPage() {
               <Link href="/shop" className="text-sm text-[#5f675c]">
                 Shop
               </Link>
+
               <Link href="/basket" className="text-sm text-[#243328]">
                 Basket{totalBasketItems > 0 ? ` (${totalBasketItems})` : ""}
               </Link>
+
+              <AccountNav />
             </div>
           </div>
 
