@@ -29,13 +29,19 @@ export default function HomePage() {
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Shop
-            </Link>
             <Link
-              href="/planner"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Planner
-            </Link>
+  href="/recipes"
+  className="text-sm text-[#4f5e52] hover:text-[#243328]"
+>
+  Recipes
+</Link>
+
+<Link
+  href="/planner"
+  className="text-sm text-[#4f5e52] hover:text-[#243328]"
+>
+  Planner
+</Link>
             <Link
               href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
