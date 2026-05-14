@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import Link from "next/link";
 import { useMemo } from "react";
 import { useCart } from "./cart-context";
@@ -12,7 +10,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
-      {/* HEADER */}
       <header className="sticky top-0 z-30 border-b border-[rgba(230,221,210,0.92)] bg-[rgba(244,239,233,0.86)] backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 md:px-10">
           <Link
@@ -26,28 +23,24 @@ export default function HomePage() {
             <Link href="/" className="text-sm underline underline-offset-4">
               Home
             </Link>
-
             <Link
               href="/shop"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Shop
             </Link>
-
             <Link
               href="/recipes"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Recipes
             </Link>
-
             <Link
               href="/planner"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Planner
             </Link>
-
             <Link
               href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
@@ -60,12 +53,11 @@ export default function HomePage() {
             href="/planner"
             className="rounded-full bg-[#243328] px-4 py-2 text-sm text-white"
           >
-            Plan my week
+            Preview planner
           </Link>
         </div>
       </header>
 
-      {/* HERO */}
       <section className="relative overflow-hidden">
         <img
           src="/hero.jpg"
@@ -82,11 +74,13 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-4 text-lg text-white/90">
-              Planned around real food. Delivered locally.
+              Preview a weekly meal plan built around seasonal produce, pantry
+              staples and real recipes.
             </p>
 
             <p className="mt-3 text-sm text-white/80">
-              The part of your shop that makes the week work.
+              Weekly box subscribers unlock adjustable planning, swaps, saved
+              weeks and basket-aware recipes.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -94,7 +88,7 @@ export default function HomePage() {
                 href="/planner"
                 className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328]"
               >
-                Plan my week
+                Preview the planner
               </Link>
 
               <Link
@@ -108,7 +102,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FIRST SCROLL */}
       <section
         id="how"
         className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6"
@@ -121,20 +114,24 @@ export default function HomePage() {
 
         <div className="mt-10 grid gap-10 md:grid-cols-3">
           <div>
-            <p className="text-lg font-medium">We plan your week</p>
+            <p className="text-lg font-medium">Preview the week</p>
             <p className="mt-2 text-sm text-[#667164]">
-              Built around real food.
+              Choose your mood, nights and eating style.
             </p>
           </div>
 
           <div>
-            <p className="text-lg font-medium">You get your basket</p>
-            <p className="mt-2 text-sm text-[#667164]">Just what you need.</p>
+            <p className="text-lg font-medium">Start a weekly box</p>
+            <p className="mt-2 text-sm text-[#667164]">
+              The produce box gives the plan its base.
+            </p>
           </div>
 
           <div>
-            <p className="text-lg font-medium">Delivered locally</p>
-            <p className="mt-2 text-sm text-[#667164]">One drop each week.</p>
+            <p className="text-lg font-medium">Unlock the full planner</p>
+            <p className="mt-2 text-sm text-[#667164]">
+              Subscribers get swaps, saved weeks and basket-aware planning.
+            </p>
           </div>
         </div>
 
@@ -142,18 +139,15 @@ export default function HomePage() {
           href="/planner"
           className="mt-12 inline-block text-sm underline underline-offset-4"
         >
-          Plan my week →
+          Preview the planner →
         </Link>
       </section>
 
-      {/* VISION */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
         <div className="mb-6 text-center">
           <p className="text-sm text-[#667164]">
-            This is the shop we’re building locally.
-          </p>
-          <p className="mt-1 text-sm text-[#667164]">
-            Starting online first — and growing it from here.
+            This is the local pantry model: seasonal produce, useful pantry
+            goods and calmer weekly cooking.
           </p>
         </div>
 
@@ -166,11 +160,10 @@ export default function HomePage() {
         </div>
 
         <p className="mt-6 text-center text-sm text-[#667164]">
-          What a local pantry could feel like.
+          Built online first — with local delivery at the centre.
         </p>
       </section>
 
-      {/* LAUNCH */}
       <section className="bg-[#243328] py-16 text-center text-white">
         <div className="mx-auto max-w-xl px-4">
           <h2 className="font-serif text-3xl">Starting small, on purpose</h2>
@@ -183,7 +176,7 @@ export default function HomePage() {
             href="/planner"
             className="mt-6 inline-block rounded-full bg-white px-6 py-3 text-sm text-[#243328]"
           >
-            Plan my week
+            Preview the planner
           </Link>
         </div>
       </section>
