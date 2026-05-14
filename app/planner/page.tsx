@@ -1,5 +1,6 @@
 "use client";
 
+import PlannerAuthGuard from "../planner-auth-guard";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCart } from "../cart-context";
