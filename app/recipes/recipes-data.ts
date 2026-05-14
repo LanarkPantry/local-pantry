@@ -25,7 +25,7 @@ export const recipes: Recipe[] = [
   {
     slug: "charred-courgette-bucatini-pesto",
     title: "Charred Courgette Bucatini with Sorrel-Walnut Pesto",
-    image: "/images/recipes/charred-courgette-bucatini.jpg",
+    image: "/images/recipes/bucatini-courgette-pesto.jpg",
     alt: "Bucatini pasta with charred courgette and green pesto",
     intro:
       "Silky bucatini, sweet charred courgettes, and a sharp green pesto that makes the whole bowl feel fresh, rich, and properly useful.",
@@ -57,7 +57,7 @@ export const recipes: Recipe[] = [
   {
     slug: "harissa-butter-beans-roast-peppers",
     title: "Harissa Butter Beans with Roast Peppers & Herby Couscous",
-    image: "/images/recipes/harissa-butter-beans-peppers.jpg",
+    image: "/images/recipes/harissa-butterbeans-peppers-couscous.jpg",
     alt: "Rose harissa butter beans with roast peppers and couscous",
     intro:
       "Creamy butter beans, smoky rose harissa, sweet roast peppers, and herbs over couscous for a warm bowl that feels generous without being heavy.",
