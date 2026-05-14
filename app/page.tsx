@@ -1,8 +1,10 @@
 "use client";
 
+"use client";
+
 import Link from "next/link";
-import { useCart } from "./cart-context";
 import { useMemo } from "react";
+import { useCart } from "./cart-context";
 
 export default function HomePage() {
   const { cart } = useCart();
@@ -24,24 +26,28 @@ export default function HomePage() {
             <Link href="/" className="text-sm underline underline-offset-4">
               Home
             </Link>
+
             <Link
               href="/shop"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
             >
               Shop
-            <Link
-  href="/recipes"
-  className="text-sm text-[#4f5e52] hover:text-[#243328]"
->
-  Recipes
-</Link>
+            </Link>
 
-<Link
-  href="/planner"
-  className="text-sm text-[#4f5e52] hover:text-[#243328]"
->
-  Planner
-</Link>
+            <Link
+              href="/recipes"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Recipes
+            </Link>
+
+            <Link
+              href="/planner"
+              className="text-sm text-[#4f5e52] hover:text-[#243328]"
+            >
+              Planner
+            </Link>
+
             <Link
               href="/basket"
               className="text-sm text-[#4f5e52] hover:text-[#243328]"
@@ -67,7 +73,6 @@ export default function HomePage() {
           className="absolute inset-0 h-full w-full object-cover"
         />
 
-        {/* LIGHTER GRADIENT OVERLAY */}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.45)_100%)]" />
 
         <div className="relative z-10 mx-auto flex min-h-[70vh] max-w-7xl items-end px-4 pb-10 sm:px-6 md:px-10">
@@ -116,19 +121,19 @@ export default function HomePage() {
 
         <div className="mt-10 grid gap-10 md:grid-cols-3">
           <div>
-            <p className="font-medium text-lg">We plan your week</p>
+            <p className="text-lg font-medium">We plan your week</p>
             <p className="mt-2 text-sm text-[#667164]">
               Built around real food.
             </p>
           </div>
 
           <div>
-            <p className="font-medium text-lg">You get your basket</p>
+            <p className="text-lg font-medium">You get your basket</p>
             <p className="mt-2 text-sm text-[#667164]">Just what you need.</p>
           </div>
 
           <div>
-            <p className="font-medium text-lg">Delivered locally</p>
+            <p className="text-lg font-medium">Delivered locally</p>
             <p className="mt-2 text-sm text-[#667164]">One drop each week.</p>
           </div>
         </div>
