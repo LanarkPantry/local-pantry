@@ -25,10 +25,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Bucatini", "Courgette", "Green pesto", "Lemon", "Parmesan"],
     matchedProducts: ["Bucatini", "Sorrel & Walnut Pesto"],
     steps: [
-      "Prepare the bucatini and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the bucatini until properly al dente, saving a mug of pasta water before draining.",
+      "Char the courgette hard in a hot pan so the edges catch and the middle softens.",
+      "Loosen the pesto with a splash of pasta water, then toss through the bucatini and courgette until glossy.",
+      "Finish with lemon zest, black pepper and parmesan.",
     ],
   },
 
@@ -51,10 +51,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["Butter Beans", "Giant Couscous", "Rose Harissa"],
     steps: [
-      "Prepare the butter beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the giant couscous until tender, then dress it with olive oil and lemon while warm.",
+      "Warm the butter beans with rose harissa, a splash of water and the roasted peppers until the sauce turns glossy.",
+      "Fold the couscous through the beans so it catches the harissa dressing.",
+      "Finish with parsley, yoghurt and a little extra lemon.",
     ],
   },
 
@@ -71,10 +71,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Mushrooms", "Farro", "Greens", "White miso", "Garlic"],
     matchedProducts: ["Farro", "White Miso"],
     steps: [
-      "Prepare the mushrooms and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the farro until chewy but tender, then drain well.",
+      "Fry the mushrooms in a hot pan until deeply browned and concentrated.",
+      "Stir in garlic, white miso and a splash of water to make a savoury glaze.",
+      "Fold through the greens until just wilted, then spoon over the farro.",
     ],
   },
 
@@ -91,10 +91,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Orzo", "Chickpeas", "Tomatoes", "Garlic", "Basil"],
     matchedProducts: ["Orzo", "Chickpeas", "Premium Whole Tomatoes"],
     steps: [
-      "Prepare the orzo and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Soften garlic in olive oil until fragrant but not browned.",
+      "Add tomatoes, chickpeas and orzo with enough water or stock to cook gently.",
+      "Simmer until the orzo is tender and the sauce looks glossy rather than wet.",
+      "Finish with basil, black pepper and a final drizzle of olive oil.",
     ],
   },
 
@@ -111,10 +111,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Broccoli", "Rice", "Gochujang", "Cucumber", "Spring onions"],
     matchedProducts: ["Signature Gochujang"],
     steps: [
-      "Prepare the broccoli and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice until fluffy and season lightly while warm.",
+      "Char the broccoli in a hot pan or roasting tray until the tips catch.",
+      "Toss the broccoli with gochujang, lime and a little sweetness until sticky.",
+      "Serve over rice with cucumber, spring onions and sesame if using.",
     ],
   },
 
@@ -131,10 +131,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Cauliflower", "Puy lentils", "Polenta", "Thyme", "Garlic"],
     matchedProducts: ["Puy Lentils", "Polenta"],
     steps: [
-      "Prepare the cauliflower and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast the cauliflower with oil, salt and thyme until golden at the edges.",
+      "Warm the puy lentils with garlic, olive oil and a splash of stock or water.",
+      "Cook the polenta slowly until soft, creamy and spoonable.",
+      "Spoon the lentils and cauliflower over the polenta and finish with pepper.",
     ],
   },
 
@@ -157,10 +157,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["Cannellini Beans", "Premium Whole Tomatoes"],
     steps: [
-      "Prepare the aubergine and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the aubergine in olive oil until soft, golden and collapsing.",
+      "Add garlic and tomatoes, then simmer until the sauce thickens.",
+      "Fold through the cannellini beans and warm gently so they stay whole.",
+      "Finish with parsley and serve with bread, rice or couscous.",
     ],
   },
 
@@ -177,10 +177,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Beetroot", "Farro", "Parsley", "Lemon", "Walnuts"],
     matchedProducts: ["Farro"],
     steps: [
-      "Prepare the beetroot and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the farro until chewy, then dress it while warm with lemon, oil and salt.",
+      "Slice the beetroot and toss it through the grains so the colour bleeds slightly.",
+      "Fold through parsley and walnuts for freshness and crunch.",
+      "Finish with extra lemon and goat’s cheese if liked.",
     ],
   },
 
@@ -197,10 +197,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Risotto rice", "Green beans", "Lemon", "Parmesan", "Mint"],
     matchedProducts: ["Risotto Rice"],
     steps: [
-      "Prepare the risotto rice and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Soften the base of the risotto gently before stirring in the rice.",
+      "Add hot stock gradually, stirring until the rice turns creamy.",
+      "Add the green beans near the end so they stay bright.",
+      "Finish off the heat with lemon zest, parmesan, mint and black pepper.",
     ],
   },
 
@@ -217,10 +217,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Eggs", "Peppers", "Potatoes", "Parsley", "Onion"],
     matchedProducts: [],
     steps: [
-      "Prepare the eggs and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the sliced potatoes until tender and lightly golden.",
+      "Soften the peppers and onion in the same pan until sweet.",
+      "Pour in seasoned eggs and cook gently until the edges begin to set.",
+      "Finish under the grill, then scatter with parsley before serving.",
     ],
   },
 
@@ -237,10 +237,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Salmon", "Potatoes", "Dill", "Lemon", "Green beans"],
     matchedProducts: [],
     steps: [
-      "Prepare the salmon and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Boil the potatoes until tender, then lightly crush them on a tray.",
+      "Roast the crushed potatoes until crisp at the edges.",
+      "Add salmon and green beans for the final stretch so the fish stays soft.",
+      "Finish with lemon, dill and a spoon of yoghurt if liked.",
     ],
   },
 
@@ -257,10 +257,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Chicken", "Rice", "Gochujang", "Cucumber", "Spring onions"],
     matchedProducts: ["Signature Gochujang"],
     steps: [
-      "Prepare the chicken and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice until fluffy and keep warm.",
+      "Pan-fry the chicken until golden and cooked through.",
+      "Toss the chicken with gochujang, lime and a little sweetness until sticky.",
+      "Serve with cucumber, spring onions and sesame over the rice.",
     ],
   },
 
@@ -276,10 +276,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Broccoli", "Rice noodles", "Cashews", "Lime", "Coriander"],
     matchedProducts: [],
     steps: [
-      "Prepare the broccoli and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the noodles until just tender, then rinse or toss lightly so they do not clump.",
+      "Char the broccoli until smoky at the edges but still green.",
+      "Stir cashew butter or blended cashews with lime, soy and warm water into a loose sauce.",
+      "Toss everything together and finish with coriander and extra lime.",
     ],
   },
 
@@ -296,10 +296,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Tofu", "Rice", "Peanut sauce", "Cucumber", "Carrots"],
     matchedProducts: [],
     steps: [
-      "Prepare the tofu and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Press and cube the tofu, then fry until crisp and golden.",
+      "Cook the rice until fluffy and season lightly.",
+      "Mix peanut sauce with lime, soy and warm water until spoonable.",
+      "Serve tofu over rice with cucumber, carrots and plenty of sauce.",
     ],
   },
 
@@ -322,10 +322,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["Casarecce Pasta"],
     steps: [
-      "Prepare the casarecce pasta and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the casarecce until al dente, saving some pasta water.",
+      "Blend roasted peppers with soaked cashews, garlic and seasoning until silky.",
+      "Warm the sauce gently and loosen it with pasta water.",
+      "Toss through the pasta and finish with basil and black pepper.",
     ],
   },
 
@@ -342,10 +342,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Chicken", "Giant couscous", "Lemon", "Parsley", "Courgette"],
     matchedProducts: ["Giant Couscous"],
     steps: [
-      "Prepare the chicken and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the giant couscous until tender, then dress with lemon and olive oil.",
+      "Season the chicken and pan-fry until golden and cooked through.",
+      "Char the courgette or seasonal vegetables in the same pan.",
+      "Slice the chicken over the couscous and finish with parsley and lemon.",
     ],
   },
 
@@ -362,10 +362,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Salmon", "Peas", "Potatoes", "Mint", "Lemon"],
     matchedProducts: [],
     steps: [
-      "Prepare the salmon and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Boil the potatoes until tender, then toss with olive oil and herbs.",
+      "Cook the salmon gently until just flaky.",
+      "Crush the peas with mint, lemon, salt and a little olive oil.",
+      "Serve the salmon with herby potatoes and the bright crushed peas.",
     ],
   },
 
@@ -382,10 +382,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Fennel", "Tomatoes", "Burrata", "Sourdough", "Basil"],
     matchedProducts: [],
     steps: [
-      "Prepare the fennel and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast fennel and tomatoes until soft, sweet and slightly jammy.",
+      "Toast the sourdough until crisp enough to hold the topping.",
+      "Pile the roasted vegetables over the toast while still warm.",
+      "Tear over burrata and finish with basil, olive oil and black pepper.",
     ],
   },
 
@@ -402,10 +402,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Peppers", "Spinach", "Ricotta", "Herbs", "Rice"],
     matchedProducts: [],
     steps: [
-      "Prepare the peppers and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Halve the peppers and roast until beginning to soften.",
+      "Mix cooked rice with spinach, ricotta, herbs and seasoning.",
+      "Fill the peppers generously and bake until the tops turn golden.",
+      "Serve with extra herbs and a simple green salad.",
     ],
   },
 
@@ -422,10 +422,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Chicken", "Rice", "Greens", "Soy", "Ginger"],
     matchedProducts: [],
     steps: [
-      "Prepare the chicken and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice until fluffy and keep warm.",
+      "Pan-fry the chicken until golden on the outside.",
+      "Add soy, ginger and a little sweetness to make a glossy glaze.",
+      "Serve with quickly wilted greens and a sharp squeeze of lime.",
     ],
   },
 
@@ -442,10 +442,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Butter beans", "Greens", "Cream", "Garlic", "Parmesan"],
     matchedProducts: ["Butter Beans"],
     steps: [
-      "Prepare the butter beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Warm garlic gently in olive oil until fragrant.",
+      "Add butter beans, cream and a splash of water, then simmer until glossy.",
+      "Fold through the greens until just wilted.",
+      "Finish with parmesan, herbs and black pepper.",
     ],
   },
 
@@ -461,10 +461,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Orzo", "Courgette", "Feta", "Lemon", "Mint"],
     matchedProducts: ["Orzo"],
     steps: [
-      "Prepare the orzo and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the orzo until tender, then drain and dress with lemon.",
+      "Char the courgette hard so the edges brown and soften.",
+      "Whip or mash feta with lemon and olive oil until creamy.",
+      "Serve the orzo with courgette, mint and spoonfuls of whipped feta.",
     ],
   },
 
@@ -480,10 +480,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Tofu", "Greens", "Coconut milk", "Lime", "Rice"],
     matchedProducts: [],
     steps: [
-      "Prepare the tofu and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice until fluffy.",
+      "Fry the tofu until crisp and golden on the edges.",
+      "Simmer the greens briefly with coconut milk, lime and seasoning.",
+      "Serve the tofu over rice with coconut greens and extra lime.",
     ],
   },
 
@@ -499,10 +499,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Gnocchi", "Tomatoes", "Burrata", "Basil", "Garlic"],
     matchedProducts: [],
     steps: [
-      "Prepare the gnocchi and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast tomatoes with garlic, olive oil and salt until they collapse.",
+      "Pan-fry or bake the gnocchi until golden and crisp-edged.",
+      "Toss the gnocchi through the roasted tomato juices.",
+      "Finish with torn burrata, basil and black pepper.",
     ],
   },
 
@@ -525,10 +525,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["Giant Couscous"],
     steps: [
-      "Prepare the halloumi and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the giant couscous until tender, then dress with lemon and olive oil.",
+      "Pan-fry the halloumi until deeply golden on both sides.",
+      "Toss cucumber and mint through the couscous for freshness.",
+      "Drizzle the halloumi with hot honey and serve over the herby couscous.",
     ],
   },
 
@@ -550,10 +550,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: [],
     steps: [
-      "Prepare the sweet potato and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast sweet potato with smoky spices until soft and caramelised.",
+      "Warm the black beans with lime, garlic and seasoning.",
+      "Cook the rice until fluffy.",
+      "Serve with avocado yoghurt, coriander and extra lime.",
     ],
   },
 
@@ -570,10 +570,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Casarecce Pasta", "Chicken", "Leeks", "Mustard", "Cream"],
     matchedProducts: ["Casarecce Pasta"],
     steps: [
-      "Prepare the casarecce pasta and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the casarecce until al dente, saving a splash of pasta water.",
+      "Soften the leeks slowly until sweet and silky.",
+      "Add cooked chicken, mustard and cream, then loosen with pasta water.",
+      "Toss through the pasta and finish with black pepper.",
     ],
   },
 
@@ -590,10 +590,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Carrots", "Labneh", "Sourdough", "Dukkah", "Parsley"],
     matchedProducts: [],
     steps: [
-      "Prepare the carrots and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast the carrots until tender, browned and sweet at the edges.",
+      "Toast the sourdough until crisp.",
+      "Spread thick labneh over the toast.",
+      "Top with carrots, parsley, dukkah and a drizzle of olive oil.",
     ],
   },
 
@@ -615,10 +615,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: [],
     steps: [
-      "Prepare the rice noodles and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice noodles until tender, then rinse lightly so they stay separate.",
+      "Wilt the greens quickly in a hot pan.",
+      "Mix peanut sauce with lime and warm water until loose and glossy.",
+      "Toss noodles and greens with the sauce, then finish with coriander.",
     ],
   },
 
@@ -635,10 +635,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Feta", "Butter beans", "Greens", "Tomatoes", "Toast"],
     matchedProducts: ["Butter Beans"],
     steps: [
-      "Prepare the feta and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Bake feta with tomatoes, olive oil and black pepper until soft and blistered.",
+      "Add butter beans and return to the oven until bubbling.",
+      "Fold through greens while everything is still hot.",
+      "Serve with toast for scooping up the sauce.",
     ],
   },
 
@@ -654,10 +654,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Chickpeas", "Tomatoes", "Coconut milk", "Greens", "Rice"],
     matchedProducts: ["Chickpeas", "Premium Whole Tomatoes"],
     steps: [
-      "Prepare the chickpeas and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice until fluffy.",
+      "Simmer tomatoes, chickpeas and coconut milk until the sauce thickens.",
+      "Fold through greens near the end so they stay bright.",
+      "Finish with coriander and lime before serving over rice.",
     ],
   },
 
@@ -674,10 +674,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Cannellini beans", "Greens", "Parmesan", "Garlic", "Toast"],
     matchedProducts: ["Cannellini Beans"],
     steps: [
-      "Prepare the cannellini beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Warm garlic in olive oil until fragrant.",
+      "Add cannellini beans and stock or water, then simmer until the broth tastes rounded.",
+      "Fold through greens at the end so they keep their colour.",
+      "Finish with parmesan, black pepper and crisp toasts.",
     ],
   },
 
@@ -700,10 +700,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["Chickpeas", "Rose Harissa"],
     steps: [
-      "Prepare the chickpeas and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Warm chickpeas with rose harissa and olive oil until glossy.",
+      "Toast or warm the flatbreads until soft with crisp edges.",
+      "Spoon over yoghurt, cucumber and the warm chickpeas.",
+      "Finish with herbs, lemon and a little extra harissa.",
     ],
   },
 
@@ -726,10 +726,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: [],
     steps: [
-      "Prepare the green lentils and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Simmer the green lentils until tender.",
+      "Add coconut milk and gentle spices, then cook until creamy.",
+      "Fold through the greens near the end.",
+      "Serve with rice, coriander and lime.",
     ],
   },
 
@@ -746,10 +746,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Bucatini", "Kale", "Lemon", "Parmesan", "Garlic"],
     matchedProducts: ["Bucatini"],
     steps: [
-      "Prepare the bucatini and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the bucatini until al dente, saving pasta water.",
+      "Soften garlic and kale in olive oil until the kale darkens and relaxes.",
+      "Toss pasta with kale, lemon and enough pasta water to coat.",
+      "Finish with parmesan, black pepper and extra lemon zest.",
     ],
   },
 
@@ -766,10 +766,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Farro", "Roast vegetables", "Walnuts", "Parsley", "Lemon"],
     matchedProducts: ["Farro"],
     steps: [
-      "Prepare the farro and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast the vegetables until golden and caramelised at the edges.",
+      "Cook the farro until chewy but tender.",
+      "Toss the warm farro with herbs, lemon and olive oil.",
+      "Fold through the roast vegetables and finish with walnuts.",
     ],
   },
 
@@ -786,10 +786,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Greens", "Chickpeas", "Tahini", "Yoghurt", "Lemon"],
     matchedProducts: ["Chickpeas"],
     steps: [
-      "Prepare the greens and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast or fry the chickpeas until crisp and deeply golden.",
+      "Char the greens in a hot pan until smoky at the edges.",
+      "Mix tahini, yoghurt, lemon and salt into a creamy sauce.",
+      "Spoon the sauce under the greens and scatter chickpeas over the top.",
     ],
   },
 
@@ -806,10 +806,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Squash", "Puy lentils", "Parsley", "Lemon", "Yoghurt"],
     matchedProducts: ["Puy Lentils"],
     steps: [
-      "Prepare the squash and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast the squash until soft, sweet and caramelised.",
+      "Warm the puy lentils with olive oil, lemon and seasoning.",
+      "Toss lentils with parsley while still warm.",
+      "Serve with squash and yoghurt if liked.",
     ],
   },
 
@@ -826,10 +826,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Halloumi", "Giant couscous", "Orange", "Cucumber", "Mint"],
     matchedProducts: ["Giant Couscous"],
     steps: [
-      "Prepare the halloumi and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the giant couscous until tender, then dress with citrus juice.",
+      "Pan-fry the halloumi until golden and crisp-edged.",
+      "Fold cucumber, mint and orange through the couscous.",
+      "Top with halloumi and extra citrus dressing.",
     ],
   },
 
@@ -845,10 +845,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Tofu", "Rice", "Greens", "Korma sauce", "Coriander"],
     matchedProducts: [],
     steps: [
-      "Prepare the tofu and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice until fluffy.",
+      "Fry tofu until lightly golden on the edges.",
+      "Warm the korma sauce with greens until the leaves soften.",
+      "Serve tofu and sauce over rice with coriander.",
     ],
   },
 
@@ -865,10 +865,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Salmon", "Greens", "Potatoes", "Mustard yoghurt", "Dill"],
     matchedProducts: [],
     steps: [
-      "Prepare the salmon and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast the potatoes first until golden and crisp at the edges.",
+      "Add salmon and greens for the final stretch so the fish stays flaky.",
+      "Mix yoghurt, mustard, lemon and dill into a sharp spooning sauce.",
+      "Serve everything from the tray with the sauce on the side.",
     ],
   },
 
@@ -885,10 +885,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Butter beans", "Roast tomatoes", "Herbs", "Garlic", "Toast"],
     matchedProducts: ["Butter Beans"],
     steps: [
-      "Prepare the butter beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast or blister the tomatoes until they turn soft and jammy.",
+      "Warm butter beans in a skillet with garlic, olive oil and herbs.",
+      "Fold the tomatoes through the beans so their juices become the sauce.",
+      "Serve with toast and extra parsley.",
     ],
   },
 
@@ -905,10 +905,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Lentils", "Tomatoes", "Paprika", "Parsley", "Garlic"],
     matchedProducts: ["Premium Whole Tomatoes"],
     steps: [
-      "Prepare the lentils and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Soften garlic and onion slowly until sweet.",
+      "Add smoked paprika and tomatoes, then let the sauce darken slightly.",
+      "Simmer lentils until tender and the stew thickens naturally.",
+      "Finish with parsley, olive oil and a squeeze of lemon.",
     ],
   },
 
@@ -925,10 +925,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Tomatoes", "Bread", "Basil", "Garlic", "Olive oil"],
     matchedProducts: ["Premium Whole Tomatoes"],
     steps: [
-      "Prepare the tomatoes and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast the tomatoes and garlic until collapsed and sweet.",
+      "Blend or crush with stock and torn bread until thick and rustic.",
+      "Simmer gently until the bread softens into the soup.",
+      "Finish with basil, parmesan if liked and olive oil.",
     ],
   },
 
@@ -945,10 +945,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Risotto rice", "Courgette", "Peas", "Lemon", "Mint"],
     matchedProducts: ["Risotto Rice"],
     steps: [
-      "Prepare the risotto rice and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Soften the risotto base gently before stirring in the rice.",
+      "Add hot stock gradually until the rice turns creamy.",
+      "Stir in courgette and peas near the end so they stay green.",
+      "Finish with lemon zest, mint and parmesan if using.",
     ],
   },
 
@@ -965,10 +965,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Butter beans", "Rosemary", "Garlic", "Tomatoes", "Greens"],
     matchedProducts: ["Butter Beans"],
     steps: [
-      "Prepare the butter beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook garlic and rosemary gently in olive oil until fragrant.",
+      "Add tomatoes and butter beans, then simmer until thick and soft.",
+      "Fold through greens near the end so they wilt into the stew.",
+      "Serve with toast and a final drizzle of olive oil.",
     ],
   },
 
@@ -985,10 +985,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Potatoes", "Eggs", "Parsley", "Yoghurt", "Spring onions"],
     matchedProducts: [],
     steps: [
-      "Prepare the potatoes and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Boil the potatoes until tender, then dress while still warm.",
+      "Soft-boil the eggs, cool slightly and halve.",
+      "Blend yoghurt, herbs, lemon and spring onions into a green dressing.",
+      "Toss potatoes through the dressing and top with eggs.",
     ],
   },
 
@@ -1005,10 +1005,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Peppers", "Chickpeas", "Tomatoes", "Garlic", "Parsley"],
     matchedProducts: ["Chickpeas", "Premium Whole Tomatoes"],
     steps: [
-      "Prepare the peppers and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast the peppers until soft and slightly charred.",
+      "Simmer tomatoes and garlic until the sauce thickens.",
+      "Add chickpeas and roasted peppers, then warm through gently.",
+      "Finish with parsley, lemon and olive oil.",
     ],
   },
 
@@ -1025,10 +1025,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Carrots", "Coconut milk", "Ginger", "Rice", "Lime"],
     matchedProducts: [],
     steps: [
-      "Prepare the carrots and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook carrots and ginger until the carrots are fully soft.",
+      "Blend with coconut milk until silky and bright.",
+      "Cook rice separately until fluffy.",
+      "Serve the soup with rice, lime and coriander.",
     ],
   },
 
@@ -1045,10 +1045,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["White beans", "Tomatoes", "Parsley", "Garlic", "Olive oil"],
     matchedProducts: ["Cannellini Beans", "Premium Whole Tomatoes"],
     steps: [
-      "Prepare the white beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Combine white beans, tomatoes, garlic and olive oil in a baking dish.",
+      "Bake until bubbling at the edges and slightly thickened.",
+      "Let it sit briefly so the sauce settles around the beans.",
+      "Finish with parsley and serve with toast.",
     ],
   },
 
@@ -1065,10 +1065,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Corn", "Black beans", "Rice", "Lime", "Coriander"],
     matchedProducts: [],
     steps: [
-      "Prepare the corn and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Char the corn in a hot pan until smoky and sweet.",
+      "Warm black beans with lime, garlic and seasoning.",
+      "Cook the rice until fluffy.",
+      "Build the bowls with coriander, yoghurt and extra lime.",
     ],
   },
 
@@ -1085,10 +1085,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Aubergine", "Yoghurt", "Parsley", "Garlic", "Lemon"],
     matchedProducts: [],
     steps: [
-      "Prepare the aubergine and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Bake the aubergine until soft, smoky and collapsing.",
+      "Mix yoghurt with lemon, garlic and salt.",
+      "Spread the yoghurt over plates and top with warm aubergine.",
+      "Finish with parsley, olive oil and any crunchy seeds or nuts.",
     ],
   },
 
@@ -1105,10 +1105,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Mushrooms", "Barley", "Cream", "Thyme", "Garlic"],
     matchedProducts: [],
     steps: [
-      "Prepare the mushrooms and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook mushrooms in a hot pan until deeply browned.",
+      "Simmer barley in stock until chewy and tender.",
+      "Stir in cream, thyme and garlic until the pot turns glossy.",
+      "Finish with black pepper and herbs.",
     ],
   },
 
@@ -1125,10 +1125,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Greens", "White beans", "Parmesan", "Garlic", "Herbs"],
     matchedProducts: ["Cannellini Beans"],
     steps: [
-      "Prepare the greens and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Warm garlic and herbs in olive oil to start the broth.",
+      "Add beans and stock, then simmer until the flavour rounds out.",
+      "Fold through greens right at the end.",
+      "Finish with parmesan, black pepper and toast.",
     ],
   },
 
@@ -1145,10 +1145,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Squash", "Red lentils", "Coconut milk", "Coriander", "Rice"],
     matchedProducts: [],
     steps: [
-      "Prepare the squash and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast squash until golden and sweet at the edges.",
+      "Simmer red lentils until soft and creamy.",
+      "Stir in coconut milk and fold through the roasted squash.",
+      "Finish with coriander, lime and chilli oil if liked.",
     ],
   },
 
@@ -1165,10 +1165,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Potatoes", "Green beans", "Parsley", "Mustard", "Lemon"],
     matchedProducts: [],
     steps: [
-      "Prepare the potatoes and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Boil potatoes until tender, then halve while warm.",
+      "Cook green beans briefly so they keep some snap.",
+      "Whisk mustard, lemon, olive oil and herbs into a sharp dressing.",
+      "Toss everything together while warm so the potatoes absorb the flavour.",
     ],
   },
 
@@ -1185,10 +1185,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Polenta", "Tomatoes", "Greens", "Garlic", "Parmesan"],
     matchedProducts: ["Polenta"],
     steps: [
-      "Prepare the polenta and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast tomatoes until jammy and slightly collapsed.",
+      "Cook polenta slowly until creamy and spoonable.",
+      "Wilt the greens with garlic and olive oil.",
+      "Spoon tomatoes and greens over the polenta and finish with parmesan.",
     ],
   },
 
@@ -1205,10 +1205,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Broad beans", "Ricotta", "Mint", "Lemon", "Sourdough"],
     matchedProducts: [],
     steps: [
-      "Prepare the broad beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Blanch the broad beans briefly, then season with lemon and herbs.",
+      "Toast the sourdough until crisp and golden.",
+      "Spread ricotta generously over the toast.",
+      "Pile on broad beans and finish with mint, olive oil and black pepper.",
     ],
   },
 
@@ -1225,10 +1225,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Runner beans", "Chickpeas", "Tahini", "Yoghurt", "Lemon"],
     matchedProducts: ["Chickpeas"],
     steps: [
-      "Prepare the runner beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Roast chickpeas until crisp and golden.",
+      "Cook runner beans until tender but still bright.",
+      "Mix tahini, yoghurt, lemon and water into a creamy dressing.",
+      "Toss the beans with dressing and finish with chickpeas.",
     ],
   },
 
@@ -1245,10 +1245,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Asparagus", "Orzo", "Lemon", "Parmesan", "Parsley"],
     matchedProducts: ["Orzo"],
     steps: [
-      "Prepare the asparagus and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the orzo until tender, saving a little cooking water.",
+      "Sauté asparagus quickly so it stays green and snappy.",
+      "Toss orzo with lemon, parmesan and enough water to make it glossy.",
+      "Fold through asparagus and finish with parsley.",
     ],
   },
 
@@ -1271,10 +1271,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["Signature Gochujang"],
     steps: [
-      "Prepare the tenderstem broccoli and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the rice until fluffy.",
+      "Char tenderstem broccoli until the stems soften and tips catch.",
+      "Toss with gochujang, lime and a little sweetness until sticky.",
+      "Serve with cucumber, spring onions and sesame.",
     ],
   },
 
@@ -1297,10 +1297,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: [],
     steps: [
-      "Prepare the spinach and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Simmer red lentils until soft and creamy.",
+      "Stir in coconut milk and cook until silky.",
+      "Fold through spinach at the end so it stays bright.",
+      "Finish with lime, coriander and chilli if liked.",
     ],
   },
 
@@ -1317,10 +1317,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Watercress", "Potatoes", "Parsley", "Chives", "Mustard"],
     matchedProducts: [],
     steps: [
-      "Prepare the watercress and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Boil potatoes until tender, then dress while warm.",
+      "Roughly chop watercress and herbs.",
+      "Whisk mustard, lemon and olive oil into a bright dressing.",
+      "Fold everything together gently and serve with extra herbs.",
     ],
   },
 
@@ -1337,10 +1337,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Rocket", "Pear", "Farro", "Walnuts", "Lemon"],
     matchedProducts: ["Farro"],
     steps: [
-      "Prepare the rocket and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the farro until chewy, then cool slightly.",
+      "Dress the farro with lemon, olive oil and salt while still warm.",
+      "Fold through rocket, pear slices and walnuts just before serving.",
+      "Finish with black pepper and cheese if liked.",
     ],
   },
 
@@ -1357,10 +1357,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Apple", "Cabbage", "Grains", "Mustard", "Parsley"],
     matchedProducts: [],
     steps: [
-      "Prepare the apple and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook the grains until tender and dress while warm.",
+      "Shred cabbage finely and toss with mustard, lemon and salt.",
+      "Fold in apple slices and herbs for crunch.",
+      "Serve as bowls with extra dressing spooned over.",
     ],
   },
 
@@ -1383,10 +1383,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: [],
     steps: [
-      "Prepare the tenderstem broccoli and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook noodles until tender, then toss lightly so they do not clump.",
+      "Char or steam tenderstem until bright and just tender.",
+      "Mix sesame, lime and soy into a loose dressing.",
+      "Toss together and finish with cashews and spring onions.",
     ],
   },
 
@@ -1403,10 +1403,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Broad beans", "Giant couscous", "Mint", "Lemon", "Feta"],
     matchedProducts: ["Giant Couscous"],
     steps: [
-      "Prepare the broad beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook giant couscous until tender, then dress with lemon and olive oil.",
+      "Blanch broad beans briefly and season with salt.",
+      "Fold beans, mint and feta through the couscous.",
+      "Finish with extra lemon zest and black pepper.",
     ],
   },
 
@@ -1423,10 +1423,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Spinach", "Yoghurt", "Flatbreads", "Herbs", "Lemon"],
     matchedProducts: [],
     steps: [
-      "Prepare the spinach and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Warm the flatbreads until soft with lightly crisped edges.",
+      "Wilt spinach quickly, then mix with yoghurt, lemon and herbs.",
+      "Spoon the spinach yoghurt over the flatbreads.",
+      "Finish with olive oil, black pepper and extra herbs.",
     ],
   },
 
@@ -1443,10 +1443,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Pear", "Gorgonzola", "Walnuts", "Leaves", "Honey"],
     matchedProducts: [],
     steps: [
-      "Prepare the pear and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Slice the pear just before serving so it stays fresh.",
+      "Toss leaves with a sharp honey-mustard dressing.",
+      "Layer pear, gorgonzola and walnuts through the salad.",
+      "Finish with black pepper and a final drizzle of dressing.",
     ],
   },
 
@@ -1463,10 +1463,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Apple", "Lentils", "Rosemary", "Greens", "Mustard"],
     matchedProducts: [],
     steps: [
-      "Prepare the apple and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Warm lentils with rosemary, olive oil and a little mustard.",
+      "Wilt greens briefly so they stay vibrant.",
+      "Fold in crisp apple slices for sweetness and crunch.",
+      "Finish with lemon and extra rosemary.",
     ],
   },
 
@@ -1483,10 +1483,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Watercress", "Peas", "Mint", "Potatoes", "Yoghurt"],
     matchedProducts: [],
     steps: [
-      "Prepare the watercress and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook potatoes and peas until tender.",
+      "Add watercress and herbs at the end so the soup stays green.",
+      "Blend until smooth and season with lemon.",
+      "Finish with yoghurt, peas and olive oil.",
     ],
   },
 
@@ -1503,10 +1503,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Asparagus", "Potatoes", "Dill", "Yoghurt", "Lemon"],
     matchedProducts: [],
     steps: [
-      "Prepare the asparagus and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Boil potatoes until tender, then halve while warm.",
+      "Cook asparagus briefly so it stays bright with a little bite.",
+      "Mix yoghurt, dill, lemon and salt into a creamy dressing.",
+      "Toss gently and finish with extra dill.",
     ],
   },
 
@@ -1523,10 +1523,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Broad beans", "Labneh", "Mint", "Lemon", "Toast"],
     matchedProducts: [],
     steps: [
-      "Prepare the broad beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Blanch broad beans briefly and toss with mint, lemon and olive oil.",
+      "Toast the bread until crisp and sturdy.",
+      "Spread thick labneh over the toast.",
+      "Pile on broad beans and finish with black pepper.",
     ],
   },
 
@@ -1549,10 +1549,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: [],
     steps: [
-      "Prepare the tenderstem broccoli and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Char tenderstem and greens quickly in a hot pan.",
+      "Warm ginger, sesame and soy into a glossy dressing.",
+      "Toss the greens through the dressing while still hot.",
+      "Serve with rice, spring onions and sesame seeds.",
     ],
   },
 
@@ -1569,10 +1569,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Asparagus", "White beans", "Lemon", "Parsley", "Garlic"],
     matchedProducts: ["Cannellini Beans"],
     steps: [
-      "Prepare the asparagus and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Sauté asparagus quickly so it stays green and snappy.",
+      "Warm white beans with garlic, lemon and olive oil.",
+      "Fold the asparagus through the beans until glossy.",
+      "Finish with parsley, black pepper and extra lemon.",
     ],
   },
 
@@ -1589,10 +1589,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Runner beans", "Walnuts", "Parsley", "Lemon", "Yoghurt"],
     matchedProducts: [],
     steps: [
-      "Prepare the runner beans and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Cook runner beans until tender but still bright.",
+      "Toast walnuts with crumbs, garlic and herbs until fragrant.",
+      "Toss the beans with lemon and yoghurt or olive oil.",
+      "Scatter the walnut herb crumbs over the top just before serving.",
     ],
   },
 
@@ -1609,10 +1609,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Rocket", "Pear", "Blue cheese", "Flatbreads", "Walnuts"],
     matchedProducts: [],
     steps: [
-      "Prepare the rocket and any vegetables.",
-      "Cook the base or main element until tender.",
-      "Bring everything together with the sauce, herbs and seasoning.",
-      "Taste, finish with lemon or olive oil, and serve.",
+      "Warm flatbreads until soft with crisp edges.",
+      "Layer on pear slices and blue cheese, then heat briefly until the cheese softens.",
+      "Top with rocket after baking so it stays peppery and fresh.",
+      "Finish with walnuts, honey and black pepper.",
     ],
   },
 
@@ -1628,10 +1628,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Salmon", "Greens", "Rice", "White miso", "Sesame"],
     matchedProducts: ["White Miso"],
     steps: [
-      "Cook rice until fluffy.",
-      "Brush salmon with white miso, lime and a little oil.",
-      "Roast or pan-cook the salmon until just done.",
-      "Serve with greens, sesame and rice.",
+      "Cook the rice until fluffy, then fold through sesame seeds and a little salt.",
+      "Brush the salmon with white miso, lime and a small splash of oil until glossy.",
+      "Roast or pan-cook the salmon until just flaky, keeping the centre soft.",
+      "Wilt the greens quickly and serve everything with lime and spring onions.",
     ],
   },
 
@@ -1647,10 +1647,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Chicken mince", "Orzo", "Tomatoes", "Basil", "Parmesan"],
     matchedProducts: ["Orzo", "Premium Whole Tomatoes"],
     steps: [
-      "Shape seasoned chicken mince into small meatballs.",
-      "Brown the meatballs in a pan.",
-      "Add tomatoes, orzo and enough water to cook gently.",
-      "Finish with basil, parmesan and black pepper.",
+      "Season chicken mince and shape into small meatballs.",
+      "Brown the meatballs in olive oil until golden on the outside.",
+      "Add tomatoes, orzo and enough water or stock to simmer gently.",
+      "Finish with basil, parmesan and black pepper once the orzo is tender.",
     ],
   },
 
@@ -1666,10 +1666,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Tofu", "Noodles", "Peanut sauce", "Cucumber", "Coriander"],
     matchedProducts: [],
     steps: [
-      "Press and cube tofu, then fry until crisp.",
-      "Cook noodles until tender.",
-      "Mix peanut sauce with lime, soy and warm water.",
-      "Serve tofu and noodles with crunchy vegetables and herbs.",
+      "Press and cube the tofu, then fry until crisp and deeply golden.",
+      "Cook the noodles until tender and toss lightly to prevent sticking.",
+      "Mix peanut sauce with lime, soy and warm water until creamy.",
+      "Serve with crunchy vegetables, coriander and plenty of satay sauce.",
     ],
   },
 
@@ -1685,9 +1685,9 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Chicken", "Cannellini beans", "Lemon", "Greens", "Parsley"],
     matchedProducts: ["Cannellini Beans"],
     steps: [
-      "Brown chicken pieces in a wide pan.",
-      "Add cannellini beans, lemon, garlic and a splash of water or stock.",
-      "Simmer until the chicken is cooked through.",
+      "Brown chicken pieces in a wide pan until golden.",
+      "Add cannellini beans, garlic, lemon and a splash of stock or water.",
+      "Simmer until the chicken is cooked through and the beans are glossy.",
       "Fold through greens and finish with parsley.",
     ],
   },
@@ -1704,10 +1704,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Turkey mince", "Rice", "Ginger", "Greens", "Spring onions"],
     matchedProducts: [],
     steps: [
-      "Cook rice until fluffy.",
-      "Fry turkey mince with ginger, garlic and soy.",
-      "Add greens and cook until just wilted.",
-      "Serve with rice, cucumber and spring onions.",
+      "Cook the rice until fluffy and keep warm.",
+      "Fry turkey mince with ginger, garlic and soy until savoury and browned.",
+      "Add greens and cook just until wilted.",
+      "Serve with rice, cucumber, spring onions and sesame.",
     ],
   },
 
@@ -1729,10 +1729,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["Chickpeas", "Rose Harissa"],
     steps: [
-      "Warm chickpeas and roast peppers with rose harissa.",
-      "Nestle cod into the pan.",
+      "Warm chickpeas and roast peppers with rose harissa and olive oil.",
+      "Nestle the cod into the pan and spoon some sauce over the top.",
       "Cook gently until the fish flakes easily.",
-      "Finish with parsley, lemon and olive oil.",
+      "Finish with parsley, lemon and a drizzle of olive oil.",
     ],
   },
 
@@ -1748,10 +1748,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Eggs", "Lentils", "Greens", "Tahini", "Parsley"],
     matchedProducts: [],
     steps: [
-      "Boil eggs until jammy, then cool and peel.",
-      "Warm lentils with olive oil and seasoning.",
-      "Fold through greens and herbs.",
-      "Serve with tahini dressing and halved eggs.",
+      "Boil the eggs until jammy, then cool, peel and halve.",
+      "Warm lentils with olive oil, lemon and seasoning.",
+      "Fold through greens and herbs until just wilted.",
+      "Serve with green tahini dressing and the halved eggs.",
     ],
   },
 
@@ -1773,8 +1773,8 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ],
     matchedProducts: ["White Miso"],
     steps: [
-      "Cook rice until fluffy.",
-      "Pan-fry chicken until golden.",
+      "Cook the rice until fluffy.",
+      "Pan-fry the chicken until golden and almost cooked through.",
       "Add white miso, soy and a little sweetness to make a sticky glaze.",
       "Serve with tenderstem broccoli, sesame and rice.",
     ],
@@ -1793,9 +1793,9 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     matchedProducts: ["Butter Beans"],
     steps: [
       "Brown chicken pieces in a pan or baking dish.",
-      "Add butter beans, cream, garlic and herbs.",
+      "Add butter beans, cream, garlic and herbs around the chicken.",
       "Bake until bubbling and the chicken is cooked through.",
-      "Fold through greens before serving.",
+      "Fold through greens and finish with black pepper.",
     ],
   },
 
@@ -1811,10 +1811,10 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     ingredients: ["Salmon", "Rice", "Coconut milk", "Greens", "Lime"],
     matchedProducts: [],
     steps: [
-      "Cook rice until fluffy.",
-      "Cook salmon until just flaky.",
+      "Cook the rice until fluffy.",
+      "Cook the salmon until just flaky and still soft in the centre.",
       "Simmer greens briefly with coconut milk and lime.",
-      "Serve salmon over rice with coconut greens and herbs.",
+      "Serve the salmon over rice with coconut greens and coriander.",
     ],
   },
 ];
