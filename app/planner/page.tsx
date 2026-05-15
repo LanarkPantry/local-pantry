@@ -2,7 +2,7 @@
 
 import AccountNav from "../account-nav";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCart } from "../cart-context";
 import {
   produceBoxes,
@@ -11,6 +11,7 @@ import {
   type ShopDisplayItem,
 } from "../shop/shop-data";
 import { staticPlannerRecipes } from "./static-planner-recipes";
+import { getUser } from "../lib/authClient";
 
 type WeekMood = "quick" | "balanced" | "comforting";
 type WeekFocus = "veg-heavy" | "low-waste" | "family-friendly";
@@ -150,6 +151,18 @@ export default function PlannerPage() {
   const [openDay, setOpenDay] = useState<string | null>(null);
 
   const [plannerError, setPlannerError] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    async function checkUser() {
+      const user = await getUser();
+      setIsLoggedIn(Boolean(user));
+      setAuthChecked(true);
+    }
+
+    void checkUser();
+  }, []);
 
   const totalBasketItems = useMemo(
     () => groupedCart.reduce((sum, entry) => sum + entry.quantity, 0),
@@ -264,8 +277,9 @@ export default function PlannerPage() {
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
-                Try a curated preview week built from real recipes and seasonal
-                produce.
+                {isLoggedIn
+                  ? "You are signed in. Preview a curated week while subscription access is being connected."
+                  : "Try a curated preview week built from real recipes and seasonal produce."}
               </p>
 
               {plannerError ? (
@@ -389,9 +403,10 @@ export default function PlannerPage() {
                     <button
                       type="button"
                       onClick={handleBuildWeek}
-                      className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                      disabled={!authChecked}
+                      className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Preview my week
+                      {authChecked ? "Preview my week" : "Checking account..."}
                     </button>
 
                     <Link
@@ -456,12 +471,15 @@ export default function PlannerPage() {
               </p>
 
               <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                This is a curated sample week.
+                {isLoggedIn
+                  ? "You are signed in. This is still the preview planner."
+                  : "This is a curated sample week."}
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5f675c]">
-                The full adjustable planner is included with a weekly veg box
-                subscription.
+                {isLoggedIn
+                  ? "The next step is subscription access. Once that is connected, signed-in weekly box subscribers can unlock swaps, saved weeks and the full adjustable planner."
+                  : "The full adjustable planner is included with a weekly veg box subscription."}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-3">
@@ -469,15 +487,19 @@ export default function PlannerPage() {
                   href="/shop"
                   className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
                 >
-                  Start a weekly veg box
+                  {isLoggedIn
+                    ? "Choose a weekly veg box"
+                    : "Start a weekly veg box"}
                 </Link>
 
-                <Link
-                  href="/login"
-                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
-                >
-                  Create account
-                </Link>
+                {!isLoggedIn ? (
+                  <Link
+                    href="/login"
+                    className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
+                  >
+                    Create account
+                  </Link>
+                ) : null}
               </div>
             </div>
 
