@@ -12,6 +12,8 @@ import {
 } from "../shop/shop-data";
 import { getUser } from "../lib/authClient";
 import { generateWeek, type PlannerStyle } from "../lib/planner";
+import { getSwapOptions } from "../lib/getSwapOptions";
+import { recipes, type Recipe } from "../recipes/recipes-data";
 
 type PlannerStep = "choices" | "results";
 
@@ -25,6 +27,7 @@ type EatingStyle =
 type PlannedMeal = {
   id: string;
   day: string;
+  recipeSlug: string;
   title: string;
   description: string;
   imageUrl: string | null;
@@ -109,6 +112,24 @@ function buildCookingSteps(body: string) {
     .map((step) => (step.endsWith(".") ? step : `${step}.`));
 }
 
+function recipeToPlannedMeal(
+  recipe: Recipe,
+  index: number,
+  existingDay?: string,
+) {
+  return {
+    id: `${recipe.slug}-${index}`,
+    day: existingDay ?? DAY_NAMES[index] ?? `Meal ${index + 1}`,
+    recipeSlug: recipe.slug,
+    title: recipe.title,
+    description: recipe.intro,
+    imageUrl: recipe.image,
+    ingredients: recipe.mainIngredients,
+    matchedProducts: recipe.pantryMatches,
+    steps: buildCookingSteps(recipe.body),
+  };
+}
+
 function getStyleLabel(style: EatingStyle) {
   switch (style) {
     case "mixed":
@@ -126,6 +147,10 @@ function getStyleLabel(style: EatingStyle) {
   }
 }
 
+function getRecipeBySlug(slug: string) {
+  return recipes.find((recipe) => recipe.slug === slug) ?? null;
+}
+
 export default function PlannerPage() {
   const { groupedCart, addToCart } = useCart();
 
@@ -134,6 +159,7 @@ export default function PlannerPage() {
   const [eatingStyle, setEatingStyle] = useState<EatingStyle>("mixed");
   const [week, setWeek] = useState<PlannedMeal[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(null);
+  const [swapMealId, setSwapMealId] = useState<string | null>(null);
   const [plannerError, setPlannerError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -172,6 +198,32 @@ export default function PlannerPage() {
     produceBoxes.find((item) => item.name === "Family Produce Box") ??
     produceBoxes[1];
 
+  const currentWeekSlugs = useMemo(
+    () => week.map((meal) => meal.recipeSlug),
+    [week],
+  );
+
+  const selectedSwapMeal = useMemo(
+    () => week.find((meal) => meal.id === swapMealId) ?? null,
+    [swapMealId, week],
+  );
+
+  const selectedSwapRecipe = useMemo(() => {
+    if (!selectedSwapMeal) return null;
+
+    return getRecipeBySlug(selectedSwapMeal.recipeSlug);
+  }, [selectedSwapMeal]);
+
+  const swapOptions = useMemo(() => {
+    if (!selectedSwapRecipe) return [];
+
+    return getSwapOptions({
+      currentRecipe: selectedSwapRecipe,
+      allRecipes: recipes,
+      currentWeekSlugs,
+    });
+  }, [currentWeekSlugs, selectedSwapRecipe]);
+
   const recommendedAddOns = useMemo(() => {
     const names = new Set<string>();
 
@@ -186,6 +238,7 @@ export default function PlannerPage() {
 
   function handleBuildWeek() {
     setPlannerError("");
+    setSwapMealId(null);
 
     const generatedRecipes = generateWeek(eatingStyle as PlannerStyle).slice(
       0,
@@ -199,22 +252,30 @@ export default function PlannerPage() {
       return;
     }
 
-    const plannedWeek: PlannedMeal[] = generatedRecipes.map(
-      (recipe, index) => ({
-        id: `${recipe.slug}-${index}`,
-        day: DAY_NAMES[index] ?? `Meal ${index + 1}`,
-        title: recipe.title,
-        description: recipe.intro,
-        imageUrl: recipe.image,
-        ingredients: recipe.mainIngredients,
-        matchedProducts: recipe.pantryMatches,
-        steps: buildCookingSteps(recipe.body),
-      }),
+    const plannedWeek: PlannedMeal[] = generatedRecipes.map((recipe, index) =>
+      recipeToPlannedMeal(recipe, index),
     );
 
     setWeek(plannedWeek);
     setOpenDay(null);
     setStep("results");
+  }
+
+  function handleSwapMeal(replacementRecipe: Recipe) {
+    if (!selectedSwapMeal) return;
+
+    setWeek((currentWeek) =>
+      currentWeek.map((meal, index) => {
+        if (meal.id !== selectedSwapMeal.id) {
+          return meal;
+        }
+
+        return recipeToPlannedMeal(replacementRecipe, index, meal.day);
+      }),
+    );
+
+    setOpenDay(null);
+    setSwapMealId(null);
   }
 
   function addProductByName(productName: string) {
@@ -388,7 +449,10 @@ export default function PlannerPage() {
                 <div className="mt-8 flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={() => setStep("choices")}
+                    onClick={() => {
+                      setStep("choices");
+                      setSwapMealId(null);
+                    }}
                     className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
                   >
                     Preview another week
@@ -518,14 +582,99 @@ export default function PlannerPage() {
               </div>
             ) : null}
 
+            {selectedSwapMeal ? (
+              <section className="mb-6 rounded-[26px] border border-[#d8cbbd] bg-[#fbf6f0] p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)] md:p-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                      Swap meal
+                    </p>
+
+                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
+                      Swap {selectedSwapMeal.day}: {selectedSwapMeal.title}
+                    </h3>
+
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
+                      These options keep the same meal style, avoid duplicates,
+                      stay close on effort, and move the flavour in a different
+                      direction.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setSwapMealId(null)}
+                    className="rounded-full border border-[#d6cec2] bg-white/80 px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
+                  >
+                    Close
+                  </button>
+                </div>
+
+                {swapOptions.length > 0 ? (
+                  <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {swapOptions.map((recipe) => (
+                      <article
+                        key={recipe.slug}
+                        className="overflow-hidden rounded-[22px] border border-[#e2d8cc] bg-white/88 shadow-[0_8px_20px_rgba(36,51,40,0.04)]"
+                      >
+                        <img
+                          src={recipe.image}
+                          alt={recipe.alt}
+                          className="h-36 w-full object-cover"
+                        />
+
+                        <div className="p-4">
+                          <div className="flex flex-wrap gap-1.5">
+                            <span className="rounded-full bg-[#f4efe9] px-2.5 py-1 text-[11px] text-[#5f675c]">
+                              {recipe.time}
+                            </span>
+
+                            <span className="rounded-full bg-[#f4efe9] px-2.5 py-1 text-[11px] text-[#5f675c]">
+                              {recipe.mealType.replace("-", " ")}
+                            </span>
+                          </div>
+
+                          <h4 className="mt-3 font-serif text-xl leading-tight text-[#243328]">
+                            {recipe.title}
+                          </h4>
+
+                          <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#667164]">
+                            {recipe.intro}
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={() => handleSwapMeal(recipe)}
+                            className="mt-4 w-full rounded-full bg-[#243328] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+                          >
+                            Choose this meal
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-5 rounded-[20px] border border-[#e4d8cb] bg-white/72 p-4 text-sm leading-6 text-[#667164]">
+                    No suitable swaps found yet for this meal. Add more recipes
+                    with the same meal type and dietary style to improve this.
+                  </div>
+                )}
+              </section>
+            ) : null}
+
             <div className="grid gap-5 lg:grid-cols-2">
               {week.map((meal) => {
                 const isOpen = openDay === meal.id;
+                const isSwapActive = swapMealId === meal.id;
 
                 return (
                   <article
                     key={meal.id}
-                    className="overflow-hidden rounded-[26px] border border-[rgba(221,212,200,0.95)] bg-[rgba(255,255,255,0.86)] shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
+                    className={`overflow-hidden rounded-[26px] border bg-[rgba(255,255,255,0.86)] shadow-[0_10px_24px_rgba(36,51,40,0.05)] ${
+                      isSwapActive
+                        ? "border-[#b8a58f] ring-2 ring-[#d8cbbd]"
+                        : "border-[rgba(221,212,200,0.95)]"
+                    }`}
                   >
                     <img
                       src={meal.imageUrl ?? ""}
@@ -549,12 +698,26 @@ export default function PlannerPage() {
                           </p>
                         </div>
 
-                        <button
-                          type="button"
-                          className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328]"
-                        >
-                          Save to My Regulars
-                        </button>
+                        <div className="flex shrink-0 flex-col gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSwapMealId((current) =>
+                                current === meal.id ? null : meal.id,
+                              )
+                            }
+                            className="rounded-full border border-[#d6cec2] bg-[#243328] px-3.5 py-1.5 text-xs font-medium text-white transition hover:opacity-90"
+                          >
+                            Swap meal
+                          </button>
+
+                          <button
+                            type="button"
+                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328]"
+                          >
+                            Save to My Regulars
+                          </button>
+                        </div>
                       </div>
 
                       <div className="mt-4 flex flex-wrap gap-2">
