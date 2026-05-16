@@ -7,19 +7,28 @@ import { useCart } from "./cart-context";
 const weeklyMeals = [
   {
     day: "Monday",
-    meal: "Harissa Butter Beans with Herby Couscous",
+    meal: "Harissa Butter Beans & Couscous",
+    image: "/images/recipes/harissa-butterbeans-peppers-couscous.jpg",
   },
   {
     day: "Tuesday",
-    meal: "Miso Mushroom Orzo with Crispy Greens",
+    meal: "Miso Mushroom Orzo",
+    image: "/images/recipes/miso-mushroom-orzo.jpg",
   },
   {
     day: "Wednesday",
-    meal: "Jammy Tomato Casarecce",
+    meal: "Roast Salmon with Greens & Potatoes",
+    image: "/images/recipes/salmon-greens-potatoes.jpg",
   },
   {
     day: "Thursday",
-    meal: "Gochujang Broccoli & Sticky Chickpeas",
+    meal: "Gochujang Broccoli & Chickpeas",
+    image: "/images/recipes/gochujang-broccoli-chickpeas.jpg",
+  },
+  {
+    day: "Friday",
+    meal: "Courgette Bucatini with Pesto",
+    image: "/images/recipes/bucatini-courgette-pesto.jpg",
   },
 ];
 
@@ -320,19 +329,32 @@ export default function HomePage() {
               {weeklyMeals.map((item) => (
                 <article
                   key={item.day}
-                  className="flex items-center justify-between rounded-[24px] border border-white/10 bg-white/5 px-6 py-5 backdrop-blur"
+                  className="flex items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur transition hover:bg-white/[0.07]"
                 >
-                  <div>
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[18px] border border-white/10 bg-white/5">
+                    <img
+                      src={item.image}
+                      alt={item.meal}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm uppercase tracking-[0.12em] text-white/50">
                       {item.day}
                     </p>
 
-                    <h3 className="mt-1 font-serif text-2xl text-white">
+                    <h3 className="mt-1 font-serif text-2xl leading-tight text-white">
                       {item.meal}
                     </h3>
+
+                    <p className="mt-2 text-sm leading-6 text-white/65">
+                      Simple weeknight cooking built around the week’s
+                      ingredients.
+                    </p>
                   </div>
 
-                  <button className="rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10">
+                  <button className="shrink-0 rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10">
                     Save
                   </button>
                 </article>
