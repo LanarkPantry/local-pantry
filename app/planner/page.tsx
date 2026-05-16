@@ -2,7 +2,7 @@
 
 import AccountNav from "../account-nav";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "../cart-context";
 import {
   produceBoxes,
@@ -152,6 +152,7 @@ function getStyleLabel(style: EatingStyle) {
 
 export default function PlannerPage() {
   const { groupedCart, addToCart } = useCart();
+  const swapSectionRef = useRef<HTMLElement | null>(null);
 
   const [step, setStep] = useState<PlannerStep>("choices");
   const [nights, setNights] = useState(5);
@@ -257,6 +258,17 @@ export default function PlannerPage() {
     setWeek(plannedWeek);
     setOpenDay(null);
     setStep("results");
+  }
+
+  function handleOpenSwapOptions(mealId: string) {
+    setSwapMealId((current) => (current === mealId ? null : mealId));
+
+    window.setTimeout(() => {
+      swapSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 80);
   }
 
   function handleSwapMeal(replacementRecipe: Recipe) {
@@ -581,7 +593,10 @@ export default function PlannerPage() {
             ) : null}
 
             {selectedSwapMeal ? (
-              <section className="mb-6 rounded-[26px] border border-[#d8cbbd] bg-[#fbf6f0] p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)] md:p-6">
+              <section
+                ref={swapSectionRef}
+                className="scroll-mt-6 mb-6 rounded-[26px] border border-[#d8cbbd] bg-[#fbf6f0] p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)] md:p-6"
+              >
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div>
                     <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
@@ -699,11 +714,7 @@ export default function PlannerPage() {
                         <div className="flex shrink-0 flex-col gap-2">
                           <button
                             type="button"
-                            onClick={() =>
-                              setSwapMealId((current) =>
-                                current === meal.id ? null : meal.id,
-                              )
-                            }
+                            onClick={() => handleOpenSwapOptions(meal.id)}
                             className="rounded-full border border-[#d6cec2] bg-[#243328] px-3.5 py-1.5 text-xs font-medium text-white transition hover:opacity-90"
                           >
                             Swap meal
