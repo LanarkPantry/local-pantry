@@ -10,13 +10,17 @@ import {
   cupboardItems,
   type ShopDisplayItem,
 } from "../shop/shop-data";
-import { staticPlannerRecipes } from "./static-planner-recipes";
 import { getUser } from "../lib/authClient";
+import { generateWeek, type PlannerStyle } from "../lib/planner";
 
-type WeekMood = "quick" | "balanced" | "comforting";
-type WeekFocus = "veg-heavy" | "low-waste" | "family-friendly";
-type EatingStyle = "veg" | "balanced" | "protein";
 type PlannerStep = "choices" | "results";
+
+type EatingStyle =
+  | "mixed"
+  | "mostly-veggie"
+  | "vegan"
+  | "gluten-free"
+  | "quick";
 
 type PlannedMeal = {
   id: string;
@@ -97,59 +101,39 @@ function compactCardItem(item: ShopDisplayItem, onAdd: () => void) {
   );
 }
 
-function buildStaticPreviewWeek(args: {
-  nights: number;
-  mood: WeekMood;
-  focus: WeekFocus | null;
-  eatingStyle: EatingStyle;
-}) {
-  const { nights, mood, focus, eatingStyle } = args;
+function buildCookingSteps(body: string) {
+  return body
+    .split(". ")
+    .map((step) => step.trim())
+    .filter(Boolean)
+    .map((step) => (step.endsWith(".") ? step : `${step}.`));
+}
 
-  const filtered = staticPlannerRecipes.filter((recipe) => {
-    const moodMatch = recipe.mood === mood || recipe.mood === "balanced";
-
-    const eatingMatch =
-      eatingStyle === "balanced"
-        ? true
-        : recipe.eatingStyle === eatingStyle ||
-          recipe.eatingStyle === "balanced";
-
-    const focusMatch = !focus || recipe.focusTags.includes(focus);
-
-    return moodMatch && eatingMatch && focusMatch;
-  });
-
-  const pool = filtered.length >= nights ? filtered : staticPlannerRecipes;
-
-  return pool.slice(0, nights).map((recipe, index) => ({
-    id: `${recipe.id}-${index}`,
-    day: DAY_NAMES[index] ?? `Meal ${index + 1}`,
-    title: recipe.title,
-    description: recipe.description,
-    imageUrl: recipe.imageUrl,
-    ingredients: recipe.ingredients,
-    matchedProducts: recipe.matchedProducts,
-    steps: recipe.steps,
-  }));
+function getStyleLabel(style: EatingStyle) {
+  switch (style) {
+    case "mixed":
+      return "Mixed week";
+    case "mostly-veggie":
+      return "Mostly veggie week";
+    case "vegan":
+      return "Vegan week";
+    case "gluten-free":
+      return "Gluten-free friendly week";
+    case "quick":
+      return "Quick dinners";
+    default:
+      return "Weekly plan";
+  }
 }
 
 export default function PlannerPage() {
   const { groupedCart, addToCart } = useCart();
 
   const [step, setStep] = useState<PlannerStep>("choices");
-
-  const [nights, setNights] = useState(4);
-
-  const [mood, setMood] = useState<WeekMood>("balanced");
-
-  const [focus, setFocus] = useState<WeekFocus | null>(null);
-
-  const [eatingStyle, setEatingStyle] = useState<EatingStyle>("balanced");
-
+  const [nights, setNights] = useState(5);
+  const [eatingStyle, setEatingStyle] = useState<EatingStyle>("mixed");
   const [week, setWeek] = useState<PlannedMeal[]>([]);
-
   const [openDay, setOpenDay] = useState<string | null>(null);
-
   const [plannerError, setPlannerError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -203,14 +187,32 @@ export default function PlannerPage() {
   function handleBuildWeek() {
     setPlannerError("");
 
-    const previewWeek = buildStaticPreviewWeek({
+    const generatedRecipes = generateWeek(eatingStyle as PlannerStyle).slice(
+      0,
       nights,
-      mood,
-      focus,
-      eatingStyle,
-    });
+    );
 
-    setWeek(previewWeek);
+    if (generatedRecipes.length === 0) {
+      setPlannerError(
+        "No meals matched that choice yet. Try Mixed, Mostly veggie, or Quick dinners while more recipes are being tagged.",
+      );
+      return;
+    }
+
+    const plannedWeek: PlannedMeal[] = generatedRecipes.map(
+      (recipe, index) => ({
+        id: `${recipe.slug}-${index}`,
+        day: DAY_NAMES[index] ?? `Meal ${index + 1}`,
+        title: recipe.title,
+        description: recipe.intro,
+        imageUrl: recipe.image,
+        ingredients: recipe.mainIngredients,
+        matchedProducts: recipe.pantryMatches,
+        steps: buildCookingSteps(recipe.body),
+      }),
+    );
+
+    setWeek(plannedWeek);
     setOpenDay(null);
     setStep("results");
   }
@@ -231,16 +233,18 @@ export default function PlannerPage() {
     });
   }
 
-  function addAllAddOns() {
-    recommendedAddOns.forEach((item) => {
-      addToCart({
-        name: item.name,
-        price: item.price,
-        image: item.image,
-        category: item.category,
-        checkoutType: item.checkoutType,
-      });
+  function addDisplayItem(item: ShopDisplayItem) {
+    addToCart({
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      category: item.category,
+      checkoutType: item.checkoutType,
     });
+  }
+
+  function addAllAddOns() {
+    recommendedAddOns.forEach((item) => addDisplayItem(item));
   }
 
   return (
@@ -314,89 +318,52 @@ export default function PlannerPage() {
 
                     <div className="flex flex-wrap gap-2">
                       <ChoiceChip
-                        active={mood === "quick"}
-                        label="Quick & easy"
-                        onClick={() => setMood("quick")}
+                        active={eatingStyle === "mixed"}
+                        label="Mixed"
+                        onClick={() => setEatingStyle("mixed")}
                       />
 
                       <ChoiceChip
-                        active={mood === "balanced"}
-                        label="Balanced"
-                        onClick={() => setMood("balanced")}
+                        active={eatingStyle === "mostly-veggie"}
+                        label="Mostly veggie"
+                        onClick={() => setEatingStyle("mostly-veggie")}
                       />
 
                       <ChoiceChip
-                        active={mood === "comforting"}
-                        label="Comforting"
-                        onClick={() => setMood("comforting")}
+                        active={eatingStyle === "vegan"}
+                        label="Vegan"
+                        onClick={() => setEatingStyle("vegan")}
+                      />
+
+                      <ChoiceChip
+                        active={eatingStyle === "gluten-free"}
+                        label="Gluten-free"
+                        onClick={() => setEatingStyle("gluten-free")}
+                      />
+
+                      <ChoiceChip
+                        active={eatingStyle === "quick"}
+                        label="Quick dinners"
+                        onClick={() => setEatingStyle("quick")}
                       />
                     </div>
+
+                    <p className="mt-3 max-w-2xl text-xs leading-5 text-[#667164]">
+                      This uses your saved recipe library rather than expensive
+                      live recipe generation. It keeps the planner useful,
+                      predictable and affordable to run.
+                    </p>
                   </div>
 
-                  <div>
-                    <p className="mb-3 text-sm font-medium text-[#243328]">
-                      Eating style
+                  <div className="rounded-[22px] border border-[#ddd4c8] bg-white/65 p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      This is a curated preview
                     </p>
 
-                    <div className="flex flex-wrap gap-2">
-                      <ChoiceChip
-                        active={eatingStyle === "veg"}
-                        label="Veg-focused"
-                        onClick={() => setEatingStyle("veg")}
-                      />
-
-                      <ChoiceChip
-                        active={eatingStyle === "balanced"}
-                        label="Balanced"
-                        onClick={() => setEatingStyle("balanced")}
-                      />
-
-                      <ChoiceChip
-                        active={eatingStyle === "protein"}
-                        label="Protein-led"
-                        onClick={() => setEatingStyle("protein")}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="mb-3 text-sm font-medium text-[#243328]">
-                      Anything to lean into?
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      The full subscriber planner will include swaps, saved
+                      weeks, My Regulars and basket-aware planning.
                     </p>
-
-                    <div className="flex flex-wrap gap-2">
-                      <ChoiceChip
-                        active={focus === "veg-heavy"}
-                        label="Veg-heavy"
-                        onClick={() =>
-                          setFocus((current) =>
-                            current === "veg-heavy" ? null : "veg-heavy",
-                          )
-                        }
-                      />
-
-                      <ChoiceChip
-                        active={focus === "low-waste"}
-                        label="Low waste"
-                        onClick={() =>
-                          setFocus((current) =>
-                            current === "low-waste" ? null : "low-waste",
-                          )
-                        }
-                      />
-
-                      <ChoiceChip
-                        active={focus === "family-friendly"}
-                        label="Family-friendly"
-                        onClick={() =>
-                          setFocus((current) =>
-                            current === "family-friendly"
-                              ? null
-                              : "family-friendly",
-                          )
-                        }
-                      />
-                    </div>
                   </div>
 
                   <div className="flex flex-wrap gap-3 pt-1">
@@ -426,6 +393,13 @@ export default function PlannerPage() {
                   >
                     Preview another week
                   </button>
+
+                  <Link
+                    href="/shop"
+                    className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+                  >
+                    Browse the shop
+                  </Link>
                 </div>
               )}
             </article>
@@ -451,8 +425,8 @@ export default function PlannerPage() {
                     </h2>
 
                     <p className="mt-3 text-sm leading-6 text-white/86">
-                      Subscribers unlock adjustable planning, swaps and saved
-                      weeks.
+                      A veg box that comes with a plan: meals, pantry ideas and
+                      a calmer way to organise the week.
                     </p>
                   </div>
                 </div>
@@ -471,15 +445,13 @@ export default function PlannerPage() {
               </p>
 
               <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                {isLoggedIn
-                  ? "You are signed in. This is still the preview planner."
-                  : "This is a curated sample week."}
+                {getStyleLabel(eatingStyle)}
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5f675c]">
                 {isLoggedIn
-                  ? "The next step is subscription access. Once that is connected, signed-in weekly box subscribers can unlock swaps, saved weeks and the full adjustable planner."
-                  : "The full adjustable planner is included with a weekly veg box subscription."}
+                  ? "You are signed in. This is still the preview planner. The next step is connecting active weekly box subscription access."
+                  : "This is a curated sample week. The full adjustable planner is included with a weekly veg box subscription."}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-3">
@@ -502,6 +474,49 @@ export default function PlannerPage() {
                 ) : null}
               </div>
             </div>
+
+            {!hasProduceBox ? (
+              <div className="mb-6 rounded-[24px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                      Start with the box
+                    </p>
+
+                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
+                      Add a weekly produce box as your base
+                    </h3>
+
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
+                      The planner works best when the produce box gives the week
+                      its starting point.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    {weeklyProduceBox ? (
+                      <button
+                        type="button"
+                        onClick={() => addDisplayItem(weeklyProduceBox)}
+                        className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
+                      >
+                        Add weekly box
+                      </button>
+                    ) : null}
+
+                    {familyProduceBox ? (
+                      <button
+                        type="button"
+                        onClick={() => addDisplayItem(familyProduceBox)}
+                        className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
+                      >
+                        Add family box
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             <div className="grid gap-5 lg:grid-cols-2">
               {week.map((meal) => {
@@ -538,7 +553,7 @@ export default function PlannerPage() {
                           type="button"
                           className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328]"
                         >
-                          Unlock swaps
+                          Save to My Regulars
                         </button>
                       </div>
 
@@ -552,6 +567,21 @@ export default function PlannerPage() {
                           </span>
                         ))}
                       </div>
+
+                      {meal.matchedProducts.length > 0 ? (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {meal.matchedProducts.map((product) => (
+                            <button
+                              key={product}
+                              type="button"
+                              onClick={() => addProductByName(product)}
+                              className="rounded-full border border-[#d6cec2] bg-white/80 px-3 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+                            >
+                              Add {product}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
 
                       <div className="mt-5 rounded-[20px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.78)] p-4">
                         <button
@@ -594,6 +624,41 @@ export default function PlannerPage() {
                 );
               })}
             </div>
+
+            {recommendedAddOns.length > 0 ? (
+              <section className="mt-8 rounded-[26px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                      Matched pantry extras
+                    </p>
+
+                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
+                      Useful add-ons for this week
+                    </h3>
+
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
+                      These are pulled from the meals in your plan so the basket
+                      starts to build around what you are actually cooking.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addAllAddOns}
+                    className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
+                  >
+                    Add all suggested extras
+                  </button>
+                </div>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {recommendedAddOns.map((item) =>
+                    compactCardItem(item, () => addDisplayItem(item)),
+                  )}
+                </div>
+              </section>
+            ) : null}
           </div>
         </section>
       ) : null}
