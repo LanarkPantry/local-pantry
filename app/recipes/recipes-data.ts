@@ -1,3 +1,27 @@
+export type DietaryTag =
+  | "veggie"
+  | "vegan"
+  | "gluten-free"
+  | "fish"
+  | "chicken"
+  | "meat";
+
+export type MealType =
+  | "pasta"
+  | "rice-bowl"
+  | "grain-bowl"
+  | "traybake"
+  | "soup"
+  | "salad"
+  | "beans"
+  | "quick-pan"
+  | "one-pot"
+  | "sweet"
+  | "breakfast"
+  | "snack";
+
+export type Difficulty = "easy" | "medium";
+
 export type RecipeProduct = {
   name: string;
   price: number;
@@ -19,6 +43,18 @@ export type Recipe = {
   category: "savoury" | "sweet";
   time: string;
   tags: string[];
+
+  dietary: DietaryTag[];
+  mealType: MealType;
+  difficulty: Difficulty;
+  cookingMinutes: number;
+
+  protein: string[];
+  mainIngredients: string[];
+  pantryMatches: string[];
+  flavourProfile: string[];
+
+  isQuick: boolean;
 };
 
 export const recipes: Recipe[] = [
@@ -53,6 +89,16 @@ export const recipes: Recipe[] = [
     category: "savoury",
     time: "25 mins",
     tags: ["pasta", "herby", "weeknight"],
+
+    dietary: ["veggie"],
+    mealType: "pasta",
+    difficulty: "easy",
+    cookingMinutes: 25,
+    protein: ["walnuts"],
+    mainIngredients: ["courgette", "bucatini", "pesto"],
+    pantryMatches: ["Sorrel & Walnut Pesto", "Bucatini", "Walnuts"],
+    flavourProfile: ["fresh", "herby", "bright"],
+    isQuick: true,
   },
   {
     slug: "harissa-butter-beans-roast-peppers",
@@ -85,6 +131,16 @@ export const recipes: Recipe[] = [
     category: "savoury",
     time: "30 mins",
     tags: ["beans", "warming", "bowl"],
+
+    dietary: ["vegan", "veggie"],
+    mealType: "grain-bowl",
+    difficulty: "easy",
+    cookingMinutes: 30,
+    protein: ["butter beans"],
+    mainIngredients: ["butter beans", "peppers", "couscous"],
+    pantryMatches: ["Rose Harissa", "Butter Beans", "Giant Couscous"],
+    flavourProfile: ["warming", "spiced", "comforting"],
+    isQuick: true,
   },
   {
     slug: "miso-mushroom-orzo-crispy-greens",
@@ -117,6 +173,16 @@ export const recipes: Recipe[] = [
     category: "savoury",
     time: "30 mins",
     tags: ["orzo", "savoury", "comforting"],
+
+    dietary: ["veggie"],
+    mealType: "one-pot",
+    difficulty: "easy",
+    cookingMinutes: 30,
+    protein: ["mushrooms"],
+    mainIngredients: ["mushrooms", "orzo", "greens"],
+    pantryMatches: ["White Miso", "Orzo", "Vegetable Stock Concentrate"],
+    flavourProfile: ["savoury", "comforting", "umami"],
+    isQuick: true,
   },
   {
     slug: "gochujang-broccoli-sticky-chickpeas",
@@ -149,6 +215,16 @@ export const recipes: Recipe[] = [
     category: "savoury",
     time: "30 mins",
     tags: ["punchy", "traybake", "rice bowl"],
+
+    dietary: ["vegan", "veggie"],
+    mealType: "traybake",
+    difficulty: "easy",
+    cookingMinutes: 30,
+    protein: ["chickpeas"],
+    mainIngredients: ["broccoli", "chickpeas", "rice"],
+    pantryMatches: ["Signature Gochujang", "Chickpeas", "Risotto Rice"],
+    flavourProfile: ["punchy", "spicy", "sticky"],
+    isQuick: true,
   },
   {
     slug: "jammy-tomato-casarecce-basil-oil",
@@ -181,6 +257,16 @@ export const recipes: Recipe[] = [
     category: "savoury",
     time: "35 mins",
     tags: ["pasta", "tomato", "family-friendly"],
+
+    dietary: ["veggie"],
+    mealType: "pasta",
+    difficulty: "easy",
+    cookingMinutes: 35,
+    protein: ["almonds"],
+    mainIngredients: ["tomatoes", "casarecce", "basil"],
+    pantryMatches: ["Premium Whole Tomatoes", "Casarecce Pasta", "Almonds"],
+    flavourProfile: ["comforting", "tomatoey", "family-friendly"],
+    isQuick: false,
   },
   {
     slug: "beetroot-farro-walnuts-dill",
@@ -213,6 +299,16 @@ export const recipes: Recipe[] = [
     category: "savoury",
     time: "40 mins",
     tags: ["grain bowl", "herby", "make-ahead"],
+
+    dietary: ["veggie"],
+    mealType: "grain-bowl",
+    difficulty: "easy",
+    cookingMinutes: 40,
+    protein: ["walnuts"],
+    mainIngredients: ["beetroot", "farro", "dill"],
+    pantryMatches: ["Farro", "Walnuts", "Tahini"],
+    flavourProfile: ["earthy", "fresh", "nutty"],
+    isQuick: false,
   },
   {
     slug: "salted-caramel-pear-toast-almonds",
@@ -240,6 +336,16 @@ export const recipes: Recipe[] = [
     category: "sweet",
     time: "10 mins",
     tags: ["sweet", "toast", "quick"],
+
+    dietary: ["veggie"],
+    mealType: "snack",
+    difficulty: "easy",
+    cookingMinutes: 10,
+    protein: ["almonds"],
+    mainIngredients: ["pear", "toast", "salted caramel", "almonds"],
+    pantryMatches: ["Salted Caramel Sauce", "Almonds"],
+    flavourProfile: ["sweet", "buttery", "quick"],
+    isQuick: true,
   },
   {
     slug: "dark-chocolate-raspberry-yoghurt-bowls",
@@ -272,6 +378,16 @@ export const recipes: Recipe[] = [
     category: "sweet",
     time: "10 mins",
     tags: ["sweet", "no-fuss", "yoghurt"],
+
+    dietary: ["veggie", "gluten-free"],
+    mealType: "breakfast",
+    difficulty: "easy",
+    cookingMinutes: 10,
+    protein: ["yoghurt", "nuts"],
+    mainIngredients: ["yoghurt", "raspberries", "dark chocolate spread"],
+    pantryMatches: ["Dark Chocolate & Hazelnut Spread", "Cashews", "Almonds"],
+    flavourProfile: ["sweet", "creamy", "fresh"],
+    isQuick: true,
   },
 ];
 
