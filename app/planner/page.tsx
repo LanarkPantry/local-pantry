@@ -14,6 +14,10 @@ import { getUser } from "../lib/authClient";
 import { generateWeek, type PlannerStyle } from "../lib/planner";
 import { getSwapOptions } from "../lib/getSwapOptions";
 import { getPlannerInsights } from "../lib/getPlannerInsights";
+import {
+  getSavedRecipeSlugs,
+  saveRecipeToRegulars,
+} from "../lib/savedRegulars";
 import { recipes, type Recipe } from "../recipes/recipes-data";
 
 type PlannerStep = "choices" | "results";
@@ -161,14 +165,24 @@ export default function PlannerPage() {
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [swapMealId, setSwapMealId] = useState<string | null>(null);
   const [plannerError, setPlannerError] = useState("");
+  const [regularsMessage, setRegularsMessage] = useState("");
+  const [savedRecipeSlugs, setSavedRecipeSlugs] = useState<string[]>([]);
+  const [savingRecipeSlug, setSavingRecipeSlug] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     async function checkUser() {
       const user = await getUser();
-      setIsLoggedIn(Boolean(user));
+      const signedIn = Boolean(user);
+
+      setIsLoggedIn(signedIn);
       setAuthChecked(true);
+
+      if (signedIn) {
+        const { slugs } = await getSavedRecipeSlugs();
+        setSavedRecipeSlugs(slugs);
+      }
     }
 
     void checkUser();
@@ -271,6 +285,33 @@ export default function PlannerPage() {
     }, 80);
   }
 
+  async function handleSaveToRegulars(recipe: Recipe) {
+    setRegularsMessage("");
+
+    if (!isLoggedIn) {
+      setRegularsMessage(
+        "Sign in or create an account to save meals to My Regulars.",
+      );
+      return;
+    }
+
+    setSavingRecipeSlug(recipe.slug);
+
+    const result = await saveRecipeToRegulars(recipe);
+
+    setSavingRecipeSlug(null);
+
+    if (!result.success) {
+      setRegularsMessage(result.error ?? "Could not save this meal yet.");
+      return;
+    }
+
+    setSavedRecipeSlugs((current) =>
+      current.includes(recipe.slug) ? current : [...current, recipe.slug],
+    );
+    setRegularsMessage(`${recipe.title} saved to My Regulars.`);
+  }
+
   function handleSwapMeal(replacementRecipe: Recipe) {
     if (!selectedSwapMeal) return;
 
@@ -337,6 +378,10 @@ export default function PlannerPage() {
                 {totalBasketItems > 0 ? ` (${totalBasketItems})` : ""}
               </Link>
 
+              <Link href="/regulars" className="text-sm text-[#5f675c]">
+                My Regulars
+              </Link>
+
               <AccountNav />
             </div>
           </div>
@@ -360,6 +405,12 @@ export default function PlannerPage() {
               {plannerError ? (
                 <div className="mt-5 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
                   {plannerError}
+                </div>
+              ) : null}
+
+              {regularsMessage ? (
+                <div className="mt-5 rounded-[18px] border border-[#d8cbbd] bg-white/78 px-4 py-3 text-sm text-[#4f5e52]">
+                  {regularsMessage}
                 </div>
               ) : null}
 
@@ -722,9 +773,18 @@ export default function PlannerPage() {
 
                           <button
                             type="button"
-                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328]"
+                            onClick={() => handleSaveToRegulars(meal.recipe)}
+                            disabled={
+                              savingRecipeSlug === meal.recipeSlug ||
+                              savedRecipeSlugs.includes(meal.recipeSlug)
+                            }
+                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white disabled:cursor-default disabled:opacity-70"
                           >
-                            Save to My Regulars
+                            {savingRecipeSlug === meal.recipeSlug
+                              ? "Saving..."
+                              : savedRecipeSlugs.includes(meal.recipeSlug)
+                                ? "Saved"
+                                : "Save to My Regulars"}
                           </button>
                         </div>
                       </div>
