@@ -19,6 +19,8 @@ import {
   saveRecipeToRegulars,
 } from "../lib/savedRegulars";
 import { recipes, type Recipe } from "../recipes/recipes-data";
+import { getSavedRecipes } from "../lib/getSavedRecipes";
+import { generateRegularsWeek } from "../lib/generateRegularsWeek";
 
 type PlannerStep = "choices" | "results";
 
@@ -27,7 +29,8 @@ type EatingStyle =
   | "mostly-veggie"
   | "vegan"
   | "gluten-free"
-  | "quick";
+  | "quick"
+  | "my-regulars";
 
 type PlannedMeal = {
   id: string;
@@ -249,14 +252,25 @@ export default function PlannerPage() {
     return allAddOns.filter((item) => names.has(item.name)).slice(0, 6);
   }, [week]);
 
-  function handleBuildWeek() {
+  async function handleBuildWeek() {
     setPlannerError("");
     setSwapMealId(null);
 
-    const generatedRecipes = generateWeek(eatingStyle as PlannerStyle).slice(
-      0,
-      nights,
-    );
+    let generatedRecipes = [];
+
+    if (eatingStyle === "my-regulars") {
+      const regularRecipes = await getSavedRecipes();
+
+      generatedRecipes = generateRegularsWeek({
+        regularRecipes,
+        mealCount: nights,
+      });
+    } else {
+      generatedRecipes = generateWeek(eatingStyle as PlannerStyle).slice(
+        0,
+        nights,
+      );
+    }
 
     if (generatedRecipes.length === 0) {
       setPlannerError(
@@ -467,6 +481,12 @@ export default function PlannerPage() {
                         active={eatingStyle === "quick"}
                         label="Quick dinners"
                         onClick={() => setEatingStyle("quick")}
+                      />
+
+                      <ChoiceChip
+                        active={eatingStyle === "my-regulars"}
+                        label="My regulars"
+                        onClick={() => setEatingStyle("my-regulars")}
                       />
                     </div>
 
