@@ -17,8 +17,8 @@ const weeklyMeals = [
   },
   {
     day: "Wednesday",
-    meal: "Roast Salmon with Greens & Potatoes",
-    image: "/images/recipes/salmon-greens-potatoes.jpg",
+    meal: "Jammy Tomato Casarecce",
+    image: "/images/recipes/jammy-tomato-casarecce.jpg",
   },
   {
     day: "Thursday",
