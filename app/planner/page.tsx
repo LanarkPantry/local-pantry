@@ -13,6 +13,7 @@ import {
 import { getUser } from "../lib/authClient";
 import { generateWeek, type PlannerStyle } from "../lib/planner";
 import { getSwapOptions } from "../lib/getSwapOptions";
+import { getPlannerInsights } from "../lib/getPlannerInsights";
 import { recipes, type Recipe } from "../recipes/recipes-data";
 
 type PlannerStep = "choices" | "results";
@@ -27,6 +28,7 @@ type EatingStyle =
 type PlannedMeal = {
   id: string;
   day: string;
+  recipe: Recipe;
   recipeSlug: string;
   title: string;
   description: string;
@@ -120,6 +122,7 @@ function recipeToPlannedMeal(
   return {
     id: `${recipe.slug}-${index}`,
     day: existingDay ?? DAY_NAMES[index] ?? `Meal ${index + 1}`,
+    recipe,
     recipeSlug: recipe.slug,
     title: recipe.title,
     description: recipe.intro,
@@ -145,10 +148,6 @@ function getStyleLabel(style: EatingStyle) {
     default:
       return "Weekly plan";
   }
-}
-
-function getRecipeBySlug(slug: string) {
-  return recipes.find((recipe) => recipe.slug === slug) ?? null;
 }
 
 export default function PlannerPage() {
@@ -208,21 +207,20 @@ export default function PlannerPage() {
     [swapMealId, week],
   );
 
-  const selectedSwapRecipe = useMemo(() => {
-    if (!selectedSwapMeal) return null;
-
-    return getRecipeBySlug(selectedSwapMeal.recipeSlug);
-  }, [selectedSwapMeal]);
-
   const swapOptions = useMemo(() => {
-    if (!selectedSwapRecipe) return [];
+    if (!selectedSwapMeal) return [];
 
     return getSwapOptions({
-      currentRecipe: selectedSwapRecipe,
+      currentRecipe: selectedSwapMeal.recipe,
       allRecipes: recipes,
       currentWeekSlugs,
     });
-  }, [currentWeekSlugs, selectedSwapRecipe]);
+  }, [currentWeekSlugs, selectedSwapMeal]);
+
+  const plannerInsights = useMemo(
+    () => getPlannerInsights(week.map((meal) => meal.recipe)),
+    [week],
+  );
 
   const recommendedAddOns = useMemo(() => {
     const names = new Set<string>();
@@ -787,6 +785,59 @@ export default function PlannerPage() {
                 );
               })}
             </div>
+
+            {week.length > 0 ? (
+              <section className="mt-8 rounded-[26px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-6">
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="max-w-3xl">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                      Planner intelligence
+                    </p>
+
+                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
+                      Why this week works
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      The planner is reading the full week, not just individual
+                      recipes. It looks for ingredient reuse, pantry efficiency,
+                      meal variety and effort balance.
+                    </p>
+                  </div>
+
+                  <div className="rounded-[24px] border border-[#ded3c6] bg-[#f7f2eb] p-5 text-center shadow-[0_8px_18px_rgba(36,51,40,0.04)]">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                      Waste efficiency
+                    </p>
+
+                    <p className="mt-2 font-serif text-4xl text-[#243328]">
+                      {plannerInsights.score}%
+                    </p>
+
+                    <p className="mt-1 text-xs text-[#667164]">
+                      {plannerInsights.summary}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {plannerInsights.insights.map((insight) => (
+                    <article
+                      key={insight.label}
+                      className="rounded-[22px] border border-[#e4dbcf] bg-[#fbf8f3] p-4"
+                    >
+                      <p className="text-sm font-medium text-[#243328]">
+                        {insight.label}
+                      </p>
+
+                      <p className="mt-2 text-sm leading-6 text-[#667164]">
+                        {insight.text}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             {recommendedAddOns.length > 0 ? (
               <section className="mt-8 rounded-[26px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-6">
