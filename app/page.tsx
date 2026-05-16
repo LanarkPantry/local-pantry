@@ -12,23 +12,23 @@ const weeklyMeals = [
   },
   {
     day: "Tuesday",
-    meal: "Miso Mushroom Orzo",
-    image: "/images/recipes/miso-mushroom-orzo.jpg",
+    meal: "Sticky Miso Chicken & Tenderstem Rice",
+    image: "/images/recipes/sticky-miso-chicken-tenderstem-rice.jpg",
   },
   {
     day: "Wednesday",
-    meal: "Jammy Tomato Casarecce",
-    image: "/images/recipes/jammy-tomato-casarecce.jpg",
+    meal: "Hot Honey Halloumi Couscous",
+    image: "/images/recipes/hot-honey-halloumi-couscous.jpg",
   },
   {
     day: "Thursday",
-    meal: "Gochujang Broccoli & Chickpeas",
-    image: "/images/recipes/gochujang-broccoli-chickpeas.jpg",
+    meal: "Courgette Bucatini with Pesto",
+    image: "/images/recipes/bucatini-courgette-pesto.jpg",
   },
   {
     day: "Friday",
-    meal: "Courgette Bucatini with Pesto",
-    image: "/images/recipes/bucatini-courgette-pesto.jpg",
+    meal: "Citrus Herb Halloumi Couscous Salad",
+    image: "/images/recipes/citrus-herb-halloumi-couscous-salad.jpg",
   },
 ];
 
