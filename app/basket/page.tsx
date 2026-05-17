@@ -278,16 +278,6 @@ Thanks!`,
             />
           </div>
         </div>
-
-        <div className="mb-5 block md:hidden">
-          <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
-            <img
-              src="/images/home/local-delivery.jpg"
-              alt="Basket"
-              className="h-44 w-full object-cover"
-            />
-          </div>
-        </div>
         <header className="mb-6 border-b border-[rgba(221,212,200,0.9)] pb-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <Link
