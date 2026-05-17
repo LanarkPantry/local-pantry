@@ -21,6 +21,7 @@ import {
 import { recipes, type Recipe } from "../recipes/recipes-data";
 import { getSavedRecipes } from "../lib/getSavedRecipes";
 import { generateRegularsWeek } from "../lib/generateRegularsWeek";
+import { saveCookedRecipe } from "../lib/saveCookedRecipe";
 
 type PlannerStep = "choices" | "results";
 
@@ -372,7 +373,16 @@ export default function PlannerPage() {
   function addAllAddOns() {
     recommendedAddOns.forEach((item) => addDisplayItem(item));
   }
+  async function handleCookedThis(recipeSlug: string) {
+    const result = await saveCookedRecipe(recipeSlug);
 
+    if (!result.success) {
+      console.error(result.error);
+      return;
+    }
+
+    alert("Saved to recently cooked.");
+  }
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
@@ -805,6 +815,14 @@ export default function PlannerPage() {
                               : savedRecipeSlugs.includes(meal.recipeSlug)
                                 ? "Saved"
                                 : "Save to My Regulars"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleCookedThis(meal.recipeSlug)}
+                            className="rounded-full border border-[#d6cec2] bg-white/80 px-3.5 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+                          >
+                            Cooked this
                           </button>
                         </div>
                       </div>
