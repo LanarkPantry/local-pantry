@@ -112,8 +112,8 @@ export default function HomePage() {
               How it works
             </p>
 
-            <h2 className="mt-3 font-serif text-[2.1rem] leading-tight text-[#243328] md:text-[3rem]">
-              A calmer weekly food system.
+            <h2 className="mt-3 font-serif text-[1.8rem] leading-tight text-[#243328] md:text-[2.5rem]">
+              Weekly food planning built around real cooking.
             </h2>
 
             <div className="mt-7 grid gap-5 md:grid-cols-3">
@@ -228,6 +228,66 @@ export default function HomePage() {
 
       <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
         <div className="mx-auto max-w-7xl">
+          <section className="overflow-hidden rounded-[32px] border border-[#d9d0c4] bg-[#efe7db] shadow-[0_10px_28px_rgba(36,51,40,0.05)]">
+            <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
+              <div className="p-6 md:p-10">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                  Local delivery
+                </p>
+
+                <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+                  Currently available in ML11.
+                </h2>
+
+                <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+                  The Local Pantry is currently delivering weekly produce boxes
+                  and pantry staples across the ML11 postcode area while the
+                  service is refined and expanded carefully.
+                </p>
+
+                <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-white/65 p-5">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Early local rollout
+                  </p>
+
+                  <p className="mt-2 text-sm leading-7 text-[#667164]">
+                    Starting locally helps keep deliveries practical, flexible
+                    and personal while the planner and weekly subscription
+                    system continue to evolve.
+                  </p>
+                </div>
+
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <Link
+                    href="/shop"
+                    className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Browse weekly boxes
+                  </Link>
+
+                  <Link
+                    href="/planner"
+                    className="rounded-full border border-[#d3cabd] bg-white/70 px-6 py-3 text-sm text-[#243328] transition hover:bg-white"
+                  >
+                    Explore the planner
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative min-h-[320px] overflow-hidden">
+                <img
+                  src="/images/home/local-delivery.jpg"
+                  alt="Local produce delivery"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
+        <div className="mx-auto max-w-7xl">
           <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
             <article className="rounded-[30px] border border-[#ddd4c8] bg-white/78 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
@@ -235,13 +295,14 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.6rem]">
-                Use the planner freely.
+                Try the planner freely.
               </h2>
 
               <p className="mt-4 text-sm leading-7 text-[#667164] md:text-base">
-                Anyone can explore the planner and build baskets. Create a free
-                account to save weeks, regular meals and pantry habits over
-                time.
+                Anyone can explore the planner and build a basket. Full planner
+                functionality — including saved weeks, meal swaps, regular meals
+                and pause-a-week controls — comes with a weekly produce box
+                subscription.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
