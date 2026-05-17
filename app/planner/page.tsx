@@ -25,6 +25,8 @@ import { saveCookedRecipe } from "../lib/saveCookedRecipe";
 import { getRecentlyCookedSlugs } from "../lib/getRecentlyCookedSlugs";
 import { saveWeek } from "../lib/saveWeek";
 import SiteHeader from "../components/SiteHeader";
+import { getPlannerBasketSuggestions } from "../lib/getPlannerBasketSuggestions";
+import { allShopItems } from "../shop/shop-data";
 
 type PlannerStep = "choices" | "results";
 
@@ -459,6 +461,17 @@ export default function PlannerPage() {
 
     alert("Week saved.");
   }
+
+  const suggestedProducts = useMemo(() => {
+    const plannerText = week.flatMap((meal) => [
+      meal.title,
+      meal.description,
+      ...(meal.ingredients ?? []),
+    ]);
+
+    return getPlannerBasketSuggestions(plannerText);
+  }, [week]);
+
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
@@ -1055,6 +1068,68 @@ export default function PlannerPage() {
           </div>
         </section>
       ) : null}
+      <section className="mt-12 rounded-[28px] border border-[#ddd4c8] bg-white/78 p-5 shadow-[0_10px_26px_rgba(36,51,40,0.05)] md:p-7">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+              Planner pantry
+            </p>
+
+            <h2 className="mt-2 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.3rem]">
+              Suggested pantry additions
+            </h2>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
+              Based on the meals in your planner this week.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {suggestedProducts.map((item) => (
+            <article
+              key={item.name}
+              className="rounded-[22px] border border-[#e2d8cb] bg-[#f8f4ee]/82 p-4"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-20 w-20 items-center justify-center rounded-[18px] bg-white/90 p-3">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="max-h-full object-contain"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-[#243328]">
+                    {item.name}
+                  </h3>
+
+                  <p className="mt-1 text-sm text-[#5f675c]">
+                    £{item.price.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  addToCart({
+                    name: item.name,
+                    price: item.price,
+                    image: item.image,
+                    category: item.category,
+                    checkoutType: item.checkoutType,
+                  })
+                }
+                className="mt-4 w-full rounded-full bg-[#243328] px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Add to basket
+              </button>
+            </article>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
