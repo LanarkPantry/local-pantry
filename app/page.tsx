@@ -4,11 +4,31 @@ import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 
 const sampleWeek = [
-  "Harissa Butter Beans & Couscous",
-  "Sticky Miso Greens & Rice",
-  "Hot Honey Halloumi Couscous",
-  "Courgette Bucatini with Pesto",
-  "Tomato Chickpeas & Soft Herbs",
+  {
+    day: "Monday",
+    meal: "Harissa Butter Beans & Couscous",
+    image: "/images/recipes/harissa-butterbeans-peppers-couscous.jpg",
+  },
+  {
+    day: "Tuesday",
+    meal: "Sticky Miso Greens & Rice",
+    image: "/images/recipes/sticky-miso-chicken-tenderstem-rice.jpg",
+  },
+  {
+    day: "Wednesday",
+    meal: "Hot Honey Halloumi Couscous",
+    image: "/images/recipes/hot-honey-halloumi-couscous.jpg",
+  },
+  {
+    day: "Thursday",
+    meal: "Courgette Bucatini with Pesto",
+    image: "/images/recipes/bucatini-courgette-pesto.jpg",
+  },
+  {
+    day: "Friday",
+    meal: "Tomato Chickpeas & Soft Herbs",
+    image: "/images/recipes/citrus-herb-halloumi-couscous-salad.jpg",
+  },
 ];
 
 export default function HomePage() {
@@ -23,11 +43,11 @@ export default function HomePage() {
           className="absolute inset-0 h-full w-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.22)_0%,rgba(0,0,0,0.42)_55%,rgba(0,0,0,0.68)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.25)_52%,rgba(0,0,0,0.5)_100%)]" />
 
         <div className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-end px-4 pb-12 pt-16 sm:px-6 md:px-10 md:pb-16">
           <div className="max-w-4xl text-white">
-            <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white/90 backdrop-blur">
+            <p className="inline-flex rounded-full border border-white/35 bg-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur">
               Weekly produce boxes + meal planning
             </p>
 
@@ -39,7 +59,7 @@ export default function HomePage() {
               Cook more easily.
             </h1>
 
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/88 md:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-8 text-white/92 md:text-lg">
               The Local Pantry combines weekly produce boxes, pantry staples and
               intelligent meal planning to help you decide what to cook — then
               build the basket around it.
@@ -60,67 +80,6 @@ export default function HomePage() {
                 Browse produce boxes
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#243328] px-4 py-14 text-white sm:px-6 md:px-10 md:py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/55">
-              Sample planner week
-            </p>
-
-            <h2 className="mt-3 max-w-xl font-serif text-[2.3rem] leading-tight md:text-[4rem]">
-              An example week from the planner.
-            </h2>
-
-            <p className="mt-5 max-w-2xl text-base leading-8 text-white/75">
-              This is just a sample. Your own planner can build different weeks,
-              swap meals, save regulars, avoid recently cooked dishes and
-              suggest pantry extras for your basket.
-            </p>
-
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/planner"
-                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
-              >
-                Create your own plan
-              </Link>
-
-              <Link
-                href="/saved-weeks"
-                className="rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-              >
-                View saved weeks
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid gap-4">
-            {sampleWeek.map((meal, index) => (
-              <article
-                key={meal}
-                className="rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur transition hover:bg-white/[0.09]"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-sm font-medium text-[#243328]">
-                    {index + 1}
-                  </div>
-
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/45">
-                      Sample meal
-                    </p>
-
-                    <h3 className="mt-1 font-serif text-2xl leading-tight text-white">
-                      {meal}
-                    </h3>
-                  </div>
-                </div>
-              </article>
-            ))}
           </div>
         </div>
       </section>
@@ -173,8 +132,92 @@ export default function HomePage() {
               ))}
             </div>
           </section>
+        </div>
+      </section>
 
-          <section className="mt-12 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+      <section className="bg-[#243328] px-4 py-14 text-white sm:px-6 md:px-10 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div>
+              <p className="text-sm uppercase tracking-[0.18em] text-white/60">
+                Sample week
+              </p>
+
+              <h2 className="mt-3 font-serif text-3xl md:text-5xl">
+                An example week from the planner.
+              </h2>
+
+              <p className="mt-5 text-base leading-8 text-white/80">
+                This is only a sample. You can create your own weekly plans,
+                swap meals, save regulars, avoid recently cooked dishes and
+                build baskets around the meals you actually want to cook.
+              </p>
+
+              <div className="mt-7 rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur">
+                <p className="text-sm font-medium text-white">
+                  Your week will be different
+                </p>
+
+                <p className="mt-2 text-sm leading-7 text-white/70">
+                  Use the planner to generate meals around your style, your
+                  saved regulars and the pantry staples you want to use.
+                </p>
+              </div>
+
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  href="/planner"
+                  className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
+                >
+                  Create your own plan
+                </Link>
+
+                <Link
+                  href="/shop"
+                  className="rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+                >
+                  Browse pantry staples
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              {sampleWeek.map((item) => (
+                <article
+                  key={item.day}
+                  className="flex items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur transition hover:bg-white/[0.07]"
+                >
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[18px] border border-white/10 bg-white/5">
+                    <img
+                      src={item.image}
+                      alt={item.meal}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm uppercase tracking-[0.12em] text-white/50">
+                      {item.day}
+                    </p>
+
+                    <h3 className="mt-1 font-serif text-2xl leading-tight text-white">
+                      {item.meal}
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-6 text-white/65">
+                      Example planner meal — replace it with your own choices.
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
+        <div className="mx-auto max-w-7xl">
+          <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
             <article className="rounded-[30px] border border-[#ddd4c8] bg-white/78 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                 Free planner access
