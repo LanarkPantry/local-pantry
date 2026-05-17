@@ -23,6 +23,7 @@ import { getSavedRecipes } from "../lib/getSavedRecipes";
 import { generateRegularsWeek } from "../lib/generateRegularsWeek";
 import { saveCookedRecipe } from "../lib/saveCookedRecipe";
 import { getRecentlyCookedSlugs } from "../lib/getRecentlyCookedSlugs";
+import { saveWeek } from "../lib/saveWeek";
 
 type PlannerStep = "choices" | "results";
 
@@ -154,6 +155,8 @@ function getStyleLabel(style: EatingStyle) {
       return "Gluten-free friendly week";
     case "quick":
       return "Quick dinners";
+    case "my-regulars":
+      return "My Regulars week";
     default:
       return "Weekly plan";
   }
@@ -386,6 +389,25 @@ export default function PlannerPage() {
 
     alert("Saved to recently cooked.");
   }
+
+  async function handleSaveWeek() {
+    const result = await saveWeek({
+      name: `${getStyleLabel(eatingStyle)} ${new Date().toLocaleDateString()}`,
+      plannerStyle: eatingStyle,
+      nights,
+      meals: week.map((meal) => ({
+        day: meal.day,
+        recipeSlug: meal.recipeSlug,
+      })),
+    });
+
+    if (!result.success) {
+      console.error(result.error);
+      return;
+    }
+
+    alert("Week saved.");
+  }
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
@@ -608,7 +630,7 @@ export default function PlannerPage() {
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5f675c]">
                 {isLoggedIn
-                  ? "You are signed in. This is still the preview planner. The next step is connecting active weekly box subscription access."
+                  ? "You are signed in. This planner avoids meals you have marked as cooked in the last 14 days."
                   : "This is a curated sample week. The full adjustable planner is included with a weekly veg box subscription."}
               </p>
 
@@ -621,6 +643,15 @@ export default function PlannerPage() {
                     ? "Choose a weekly veg box"
                     : "Start a weekly veg box"}
                 </Link>
+
+                <button
+                  type="button"
+                  onClick={handleSaveWeek}
+                  disabled={!isLoggedIn || week.length === 0}
+                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Save this week
+                </button>
 
                 {!isLoggedIn ? (
                   <Link
