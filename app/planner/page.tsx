@@ -214,17 +214,17 @@ export default function PlannerPage() {
         }[];
       };
 
-      const loadedMeals = (parsed.meals ?? [])
-        .map((meal, index) => {
+      const loadedMeals: PlannedMeal[] = (parsed.meals ?? []).flatMap(
+        (meal, index) => {
           const recipe = recipes.find((item) => item.slug === meal.recipeSlug);
 
           if (!recipe) {
-            return null;
+            return [];
           }
 
-          return recipeToPlannedMeal(recipe, index, meal.day);
-        })
-        .filter((meal): meal is PlannedMeal => Boolean(meal));
+          return [recipeToPlannedMeal(recipe, index, meal.day)];
+        },
+      );
 
       if (loadedMeals.length > 0) {
         setWeek(loadedMeals);

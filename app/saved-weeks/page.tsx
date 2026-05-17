@@ -69,70 +69,115 @@ export default function SavedWeeksPage() {
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [deletingWeekId, setDeletingWeekId] = useState<string | null>(null);
 
   const totalBasketItems = useMemo(
     () => groupedCart.reduce((sum, entry) => sum + entry.quantity, 0),
     [groupedCart],
   );
 
-  useEffect(() => {
-    async function loadSavedWeeks() {
-      setLoading(true);
-      setPageError("");
+  async function loadSavedWeeks() {
+    setLoading(true);
+    setPageError("");
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      if (!user) {
-        setIsLoggedIn(false);
-        setSavedWeeks([]);
-        setLoading(false);
-        return;
-      }
-
-      setIsLoggedIn(true);
-
-      const { data, error } = await supabase
-        .from("saved_weeks")
-        .select(
-          `
-          id,
-          name,
-          planner_style,
-          nights,
-          created_at,
-          saved_week_meals (
-            id,
-            day_label,
-            recipe_slug,
-            position
-          )
-        `,
-        )
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        setPageError(error.message);
-        setSavedWeeks([]);
-        setLoading(false);
-        return;
-      }
-
-      const weeks = (data ?? []).map((week) => ({
-        ...week,
-        saved_week_meals: [...(week.saved_week_meals ?? [])].sort(
-          (a, b) => a.position - b.position,
-        ),
-      })) as SavedWeekRow[];
-
-      setSavedWeeks(weeks);
+    if (!user) {
+      setIsLoggedIn(false);
+      setSavedWeeks([]);
       setLoading(false);
+      return;
     }
 
+    setIsLoggedIn(true);
+
+    const { data, error } = await supabase
+      .from("saved_weeks")
+      .select(
+        `
+        id,
+        name,
+        planner_style,
+        nights,
+        created_at,
+        saved_week_meals (
+          id,
+          day_label,
+          recipe_slug,
+          position
+        )
+      `,
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setPageError(error.message);
+      setSavedWeeks([]);
+      setLoading(false);
+      return;
+    }
+
+    const weeks = (data ?? []).map((week) => ({
+      ...week,
+      saved_week_meals: [...(week.saved_week_meals ?? [])].sort(
+        (a, b) => a.position - b.position,
+      ),
+    })) as SavedWeekRow[];
+
+    setSavedWeeks(weeks);
+    setLoading(false);
+  }
+
+  useEffect(() => {
     void loadSavedWeeks();
   }, []);
+
+  function handleLoadWeek(week: SavedWeekRow) {
+    window.localStorage.setItem(
+      "local-pantry-loaded-week",
+      JSON.stringify({
+        id: week.id,
+        name: week.name,
+        meals: week.saved_week_meals.map((meal) => ({
+          day: meal.day_label,
+          recipeSlug: meal.recipe_slug,
+          position: meal.position,
+        })),
+      }),
+    );
+
+    window.location.href = "/planner";
+  }
+
+  async function handleDeleteWeek(weekId: string) {
+    const confirmDelete = window.confirm(
+      "Delete this saved week? This cannot be undone.",
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    setDeletingWeekId(weekId);
+    setPageError("");
+
+    const { error } = await supabase
+      .from("saved_weeks")
+      .delete()
+      .eq("id", weekId);
+
+    setDeletingWeekId(null);
+
+    if (error) {
+      setPageError(error.message);
+      return;
+    }
+
+    setSavedWeeks((current) => current.filter((week) => week.id !== weekId));
+  }
 
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
@@ -154,6 +199,10 @@ export default function SavedWeeksPage() {
 
               <Link href="/regulars" className="text-sm text-[#5f675c]">
                 My Regulars
+              </Link>
+
+              <Link href="/saved-weeks" className="text-sm text-[#243328]">
+                Saved Weeks
               </Link>
 
               <Link href="/basket" className="text-sm text-[#243328]">
@@ -245,7 +294,7 @@ export default function SavedWeeksPage() {
           ) : null}
 
           {pageError ? (
-            <div className="rounded-[24px] border border-[#e4d8cb] bg-[#fbf6f0] p-6 text-sm text-[#6a5c4f]">
+            <div className="mb-6 rounded-[24px] border border-[#e4d8cb] bg-[#fbf6f0] p-6 text-sm text-[#6a5c4f]">
               {pageError}
             </div>
           ) : null}
@@ -298,6 +347,25 @@ export default function SavedWeeksPage() {
                         {week.saved_week_meals.length} meal
                         {week.saved_week_meals.length === 1 ? "" : "s"}
                       </div>
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleLoadWeek(week)}
+                        className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
+                      >
+                        Load into planner
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteWeek(week.id)}
+                        disabled={deletingWeekId === week.id}
+                        className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {deletingWeekId === week.id ? "Deleting..." : "Delete"}
+                      </button>
                     </div>
                   </div>
 
