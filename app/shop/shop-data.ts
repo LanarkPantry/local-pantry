@@ -92,6 +92,80 @@ export const pantryItems: ShopDisplayItem[] = [
 
 export const cupboardItems: ShopDisplayItem[] = [
   {
+    name: "Bold Bean Co Queen Butter Beans",
+    price: 3.95,
+    image: "/images/shop/butter-beans.png",
+    category: "cupboard",
+    checkoutType: "one-off",
+    weight: "540g",
+    description:
+      "Large soft butter beans in a rich stock. Ideal for fast dinners, traybakes and creamy bean dishes.",
+    details:
+      "A strong planner staple for tomato braises, harissa beans, roast vegetable bowls and quick pantry dinners.",
+    bestFor:
+      "Perfect for rose harissa beans, tomato braises and crispy roasted bean dinners.",
+    note: "Usually added as a one-off",
+  },
+  {
+    name: "Bold Bean Co Queen Chickpeas",
+    price: 3.95,
+    image: "/images/shop/chickpeas.png",
+    category: "cupboard",
+    checkoutType: "one-off",
+    weight: "540g",
+    description:
+      "Tender jarred chickpeas with a softer texture and richer flavour than standard canned versions.",
+    details:
+      "Useful for stews, crispy traybakes, hummus-style bowls and quick weeknight meals.",
+    bestFor:
+      "Excellent with harissa, tomatoes, herbs, couscous, roast vegetables and tahini.",
+    note: "Usually added as a one-off",
+  },
+  {
+    name: "Bold Bean Co Queen White Beans",
+    price: 3.95,
+    image: "/images/shop/white-beans.png",
+    category: "cupboard",
+    checkoutType: "one-off",
+    weight: "540g",
+    description:
+      "Creamy white beans for soups, tomato dishes and simple pantry meals.",
+    details:
+      "A flexible cupboard base for garlic greens, miso beans, lemony bowls and slow tomato sauces.",
+    bestFor: "Great with greens, garlic, lemon, miso and tomato-based dinners.",
+    note: "Usually added as a one-off",
+  },
+  {
+    name: "Mutti Polpa Tomatoes",
+    price: 2.25,
+    image: "/images/shop/mutti-polpa.png",
+    category: "cupboard",
+    checkoutType: "one-off",
+    weight: "400g",
+    description:
+      "Finely chopped Italian tomatoes with a bright sweet flavour and rich texture.",
+    details:
+      "One of the most useful cupboard bases for sauces, beans, pasta and quick one-pan meals.",
+    bestFor:
+      "Perfect for pasta sauces, beans, shakshuka and slow simmered dishes.",
+    note: "Usually added as a one-off",
+  },
+  {
+    name: "Bucatini",
+    price: 3.5,
+    image: "/images/shop/bucatini.png",
+    category: "cupboard",
+    checkoutType: "one-off",
+    weight: "500g",
+    description:
+      "Traditional hollow pasta with extra bite and excellent sauce coverage.",
+    details:
+      "A useful pasta shape when you want something more satisfying than spaghetti but still easy to cook.",
+    bestFor:
+      "Perfect for tomato sauces, chilli butter, pesto and creamy pasta dishes.",
+    note: "Usually added as a one-off",
+  },
+  {
     name: "Casarecce Pasta",
     price: 4.95,
     image: "/images/cupboard/casarecce.jpg",
