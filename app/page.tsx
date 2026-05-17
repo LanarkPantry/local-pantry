@@ -8,55 +8,57 @@ export default function HomePage() {
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
 
-      <section className="px-4 pb-10 pt-8 sm:px-6 md:px-10 md:pb-16 md:pt-12">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
-            <article className="rounded-[34px] border border-[#ddd4c8] bg-[#f7f2eb]/88 p-6 shadow-[0_12px_32px_rgba(36,51,40,0.06)] md:p-10">
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[#6b776c]">
-                Weekly produce boxes + meal planning
-              </p>
+      <section className="relative min-h-[82vh] overflow-hidden">
+        <img
+          src="/hero.jpg"
+          alt="The Local Pantry weekly food planning"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
 
-              <h1 className="mt-5 max-w-4xl font-serif text-[2.7rem] leading-[0.98] tracking-tight text-[#243328] md:text-[5.3rem]">
-                Plan your week.
-                <br />
-                Build your basket.
-                <br />
-                Cook more easily.
-              </h1>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.22)_0%,rgba(0,0,0,0.42)_55%,rgba(0,0,0,0.68)_100%)]" />
 
-              <p className="mt-6 max-w-2xl text-base leading-8 text-[#667164] md:text-lg">
-                The Local Pantry combines weekly produce boxes, pantry staples
-                and intelligent meal planning to help you decide what to cook —
-                then build the basket around it.
-              </p>
+        <div className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-end px-4 pb-12 pt-16 sm:px-6 md:px-10 md:pb-16">
+          <div className="max-w-4xl text-white">
+            <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white/90 backdrop-blur">
+              Weekly produce boxes + meal planning
+            </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/planner"
-                  className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Start planning your week
-                </Link>
+            <h1 className="mt-6 font-serif text-[3rem] leading-[0.98] tracking-tight md:text-[6rem]">
+              Plan your week.
+              <br />
+              Build your basket.
+              <br />
+              Cook more easily.
+            </h1>
 
-                <Link
-                  href="/shop"
-                  className="rounded-full border border-[#d6cec2] bg-white/85 px-6 py-3 text-sm text-[#243328] transition hover:bg-white"
-                >
-                  Browse produce boxes
-                </Link>
-              </div>
-            </article>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-white/88 md:text-lg">
+              The Local Pantry combines weekly produce boxes, pantry staples and
+              intelligent meal planning to help you decide what to cook — then
+              build the basket around it.
+            </p>
 
-            <article className="overflow-hidden rounded-[34px] border border-[#ddd4c8] bg-white/80 shadow-[0_12px_32px_rgba(36,51,40,0.05)]">
-              <img
-                src="/hero.jpg"
-                alt="The Local Pantry weekly food planning"
-                className="h-full min-h-[360px] w-full object-cover"
-              />
-            </article>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/planner"
+                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
+              >
+                Start planning your week
+              </Link>
+
+              <Link
+                href="/shop"
+                className="rounded-full border border-white/45 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+              >
+                Browse produce boxes
+              </Link>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <section className="mt-12 rounded-[32px] border border-[#ddd4c8] bg-white/78 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
+      <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
+        <div className="mx-auto max-w-7xl">
+          <section className="rounded-[32px] border border-[#ddd4c8] bg-white/78 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
               How it works
             </p>
