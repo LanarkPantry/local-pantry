@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
-
+import PostcodeChecker from "./components/PostcodeChecker";
 const sampleWeek = [
   {
     day: "Monday",
@@ -285,7 +285,7 @@ export default function HomePage() {
           </section>
         </div>
       </section>
-
+      <PostcodeChecker />
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
         <div className="mx-auto max-w-7xl">
           <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
