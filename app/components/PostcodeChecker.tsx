@@ -64,7 +64,7 @@ export default function PostcodeChecker() {
     }
   };
 
-  const registerInterest = () => {
+  const registerInterest = async () => {
     setInterestStatus("idle");
     setInterestMessage("");
 
@@ -82,28 +82,32 @@ export default function PostcodeChecker() {
       return;
     }
 
-    const subject = encodeURIComponent(
-      `Register interest: ${formattedPostcode || "New area"}`,
-    );
+    try {
+      const response = await fetch("/api/register-interest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: interestEmail.trim(),
+          postcode: formattedPostcode,
+          outwardCode,
+        }),
+      });
 
-    const body = encodeURIComponent(`Hello The Local Pantry,
+      if (!response.ok) {
+        throw new Error("Failed to register interest.");
+      }
 
-I'd like to register interest for delivery in my area.
-
-Postcode: ${formattedPostcode}
-Outward code: ${outwardCode}
-Email: ${interestEmail.trim()}
-
-Please let me know if delivery opens here.
-
-Thank you.`);
-
-    window.location.href = `mailto:hello@thelocalpantry.co.uk?subject=${subject}&body=${body}`;
-
-    setInterestStatus("success");
-    setInterestMessage(
-      "Thanks — your email app should open so you can send your interest through.",
-    );
+      setInterestStatus("success");
+      setInterestMessage(
+        "Thanks — we've added your area to our expansion list.",
+      );
+      setInterestEmail("");
+    } catch {
+      setInterestStatus("error");
+      setInterestMessage("Sorry, something went wrong. Please try again.");
+    }
   };
 
   return (
