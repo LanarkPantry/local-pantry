@@ -31,6 +31,27 @@ const sampleWeek = [
   },
 ];
 
+const howItWorks = [
+  {
+    number: "1",
+    title: "Plan your week",
+    text: "Generate a flexible weekly meal plan built around practical pantry cooking.",
+    image: "/images/home/plan-your-week.jpg",
+  },
+  {
+    number: "2",
+    title: "Build your basket",
+    text: "Add produce boxes, pantry staples and suggested extras directly from your planner.",
+    image: "/images/home/build-your-basket.jpg",
+  },
+  {
+    number: "3",
+    title: "Save your regulars",
+    text: "Save favourite weeks, repeat meals and build a more useful weekly routine over time.",
+    image: "/images/home/save-your-regulars.jpg",
+  },
+];
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
@@ -86,7 +107,7 @@ export default function HomePage() {
 
       <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
         <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] border border-[#ddd4c8] bg-white/78 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
+          <section className="rounded-[32px] border border-[#ddd4c8] bg-white/78 p-5 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
               How it works
             </p>
@@ -95,33 +116,23 @@ export default function HomePage() {
               A calmer weekly food system.
             </h2>
 
-            <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {[
-                {
-                  number: "1",
-                  title: "Plan your week",
-                  text: "Generate a flexible weekly meal plan built around practical pantry cooking.",
-                },
-                {
-                  number: "2",
-                  title: "Build your basket",
-                  text: "Add produce boxes, pantry staples and suggested extras directly from your planner.",
-                },
-                {
-                  number: "3",
-                  title: "Save your regulars",
-                  text: "Save favourite weeks, repeat meals and build a more useful weekly routine over time.",
-                },
-              ].map((step) => (
+            <div className="mt-7 grid gap-5 md:grid-cols-3">
+              {howItWorks.map((step) => (
                 <article
                   key={step.number}
-                  className="rounded-[26px] border border-[#e5dccf] bg-[#f8f4ee]/85 p-5"
+                  className="rounded-[24px] border border-[#e5dccf] bg-[#f8f4ee]/85 p-4"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#243328] text-sm font-medium text-white">
+                  <img
+                    src={step.image}
+                    alt={step.title}
+                    className="h-36 w-full rounded-[18px] object-cover sm:h-40 md:h-36 lg:h-40"
+                  />
+
+                  <div className="mt-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#243328] text-sm font-medium text-white">
                     {step.number}
                   </div>
 
-                  <h3 className="mt-5 font-serif text-[1.5rem] text-[#243328]">
+                  <h3 className="mt-4 font-serif text-[1.45rem] leading-tight text-[#243328]">
                     {step.title}
                   </h3>
 
