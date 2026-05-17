@@ -196,6 +196,56 @@ export default function PlannerPage() {
     void checkUser();
   }, []);
 
+  useEffect(() => {
+    const savedWeekPayload = window.localStorage.getItem(
+      "local-pantry-loaded-week",
+    );
+
+    if (!savedWeekPayload) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedWeekPayload) as {
+        name?: string;
+        meals?: {
+          day: string;
+          recipeSlug: string;
+        }[];
+      };
+
+      const loadedMeals = (parsed.meals ?? [])
+        .map((meal, index) => {
+          const recipe = recipes.find((item) => item.slug === meal.recipeSlug);
+
+          if (!recipe) {
+            return null;
+          }
+
+          return recipeToPlannedMeal(recipe, index, meal.day);
+        })
+        .filter((meal): meal is PlannedMeal => Boolean(meal));
+
+      if (loadedMeals.length > 0) {
+        setWeek(loadedMeals);
+        setNights(loadedMeals.length);
+        setStep("results");
+        setOpenDay(null);
+        setSwapMealId(null);
+        setPlannerError("");
+        setRegularsMessage(
+          parsed.name
+            ? `${parsed.name} loaded into your planner.`
+            : "Saved week loaded into your planner.",
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      window.localStorage.removeItem("local-pantry-loaded-week");
+    }
+  }, []);
+
   const totalBasketItems = useMemo(
     () => groupedCart.reduce((sum, entry) => sum + entry.quantity, 0),
     [groupedCart],
@@ -431,6 +481,10 @@ export default function PlannerPage() {
                 My Regulars
               </Link>
 
+              <Link href="/saved-weeks" className="text-sm text-[#5f675c]">
+                Saved Weeks
+              </Link>
+
               <AccountNav />
             </div>
           </div>
@@ -652,6 +706,13 @@ export default function PlannerPage() {
                 >
                   Save this week
                 </button>
+
+                <Link
+                  href="/saved-weeks"
+                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
+                >
+                  View saved weeks
+                </Link>
 
                 {!isLoggedIn ? (
                   <Link
