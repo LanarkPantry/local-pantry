@@ -1030,41 +1030,6 @@ export default function PlannerPage() {
                 </div>
               </section>
             ) : null}
-
-            {recommendedAddOns.length > 0 ? (
-              <section className="mt-8 rounded-[26px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-6">
-                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                      Matched pantry extras
-                    </p>
-
-                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                      Useful add-ons for this week
-                    </h3>
-
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      These are pulled from the meals in your plan so the basket
-                      starts to build around what you are actually cooking.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={addAllAddOns}
-                    className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
-                  >
-                    Add all suggested extras
-                  </button>
-                </div>
-
-                <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {recommendedAddOns.map((item) =>
-                    compactCardItem(item, () => addDisplayItem(item)),
-                  )}
-                </div>
-              </section>
-            ) : null}
           </div>
         </section>
       ) : null}
