@@ -3,6 +3,14 @@
 import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 
+const sampleWeek = [
+  "Harissa Butter Beans & Couscous",
+  "Sticky Miso Greens & Rice",
+  "Hot Honey Halloumi Couscous",
+  "Courgette Bucatini with Pesto",
+  "Tomato Chickpeas & Soft Herbs",
+];
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
@@ -52,6 +60,67 @@ export default function HomePage() {
                 Browse produce boxes
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#243328] px-4 py-14 text-white sm:px-6 md:px-10 md:py-20">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/55">
+              Sample planner week
+            </p>
+
+            <h2 className="mt-3 max-w-xl font-serif text-[2.3rem] leading-tight md:text-[4rem]">
+              An example week from the planner.
+            </h2>
+
+            <p className="mt-5 max-w-2xl text-base leading-8 text-white/75">
+              This is just a sample. Your own planner can build different weeks,
+              swap meals, save regulars, avoid recently cooked dishes and
+              suggest pantry extras for your basket.
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/planner"
+                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
+              >
+                Create your own plan
+              </Link>
+
+              <Link
+                href="/saved-weeks"
+                className="rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+              >
+                View saved weeks
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            {sampleWeek.map((meal, index) => (
+              <article
+                key={meal}
+                className="rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur transition hover:bg-white/[0.09]"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-sm font-medium text-[#243328]">
+                    {index + 1}
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.14em] text-white/45">
+                      Sample meal
+                    </p>
+
+                    <h3 className="mt-1 font-serif text-2xl leading-tight text-white">
+                      {meal}
+                    </h3>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
