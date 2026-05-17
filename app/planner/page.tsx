@@ -24,6 +24,7 @@ import { generateRegularsWeek } from "../lib/generateRegularsWeek";
 import { saveCookedRecipe } from "../lib/saveCookedRecipe";
 import { getRecentlyCookedSlugs } from "../lib/getRecentlyCookedSlugs";
 import { saveWeek } from "../lib/saveWeek";
+import SiteHeader from "../components/SiteHeader";
 
 type PlannerStep = "choices" | "results";
 
@@ -462,33 +463,6 @@ export default function PlannerPage() {
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-4 flex items-center justify-between border-b border-[rgba(221,212,200,0.9)] pb-4">
-            <Link href="/" className="text-sm tracking-[0.35em] text-[#60705f]">
-              THE LOCAL PANTRY
-            </Link>
-
-            <div className="flex items-center gap-3">
-              <Link href="/shop" className="text-sm text-[#5f675c]">
-                Shop
-              </Link>
-
-              <Link href="/basket" className="text-sm text-[#243328]">
-                Basket
-                {totalBasketItems > 0 ? ` (${totalBasketItems})` : ""}
-              </Link>
-
-              <Link href="/regulars" className="text-sm text-[#5f675c]">
-                My Regulars
-              </Link>
-
-              <Link href="/saved-weeks" className="text-sm text-[#5f675c]">
-                Saved Weeks
-              </Link>
-
-              <AccountNav />
-            </div>
-          </div>
-
           <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
             <article className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">

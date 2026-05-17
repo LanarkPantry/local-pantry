@@ -1,11 +1,10 @@
 "use client";
 
-import AccountNav from "../account-nav";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { recipes } from "../recipes/recipes-data";
-import { useCart } from "../cart-context";
+import SiteHeader from "../components/SiteHeader";
 
 type SavedWeekMealRow = {
   id: string;
@@ -63,18 +62,11 @@ function getPlannerStyleLabel(style: string | null) {
 }
 
 export default function SavedWeeksPage() {
-  const { groupedCart } = useCart();
-
   const [savedWeeks, setSavedWeeks] = useState<SavedWeekRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [deletingWeekId, setDeletingWeekId] = useState<string | null>(null);
-
-  const totalBasketItems = useMemo(
-    () => groupedCart.reduce((sum, entry) => sum + entry.quantity, 0),
-    [groupedCart],
-  );
 
   async function loadSavedWeeks() {
     setLoading(true);
@@ -181,39 +173,10 @@ export default function SavedWeeksPage() {
 
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
+      <SiteHeader />
+
       <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-4 flex items-center justify-between border-b border-[rgba(221,212,200,0.9)] pb-4">
-            <Link href="/" className="text-sm tracking-[0.35em] text-[#60705f]">
-              THE LOCAL PANTRY
-            </Link>
-
-            <div className="flex items-center gap-3">
-              <Link href="/shop" className="text-sm text-[#5f675c]">
-                Shop
-              </Link>
-
-              <Link href="/planner" className="text-sm text-[#5f675c]">
-                Planner
-              </Link>
-
-              <Link href="/regulars" className="text-sm text-[#5f675c]">
-                My Regulars
-              </Link>
-
-              <Link href="/saved-weeks" className="text-sm text-[#243328]">
-                Saved Weeks
-              </Link>
-
-              <Link href="/basket" className="text-sm text-[#243328]">
-                Basket
-                {totalBasketItems > 0 ? ` (${totalBasketItems})` : ""}
-              </Link>
-
-              <AccountNav />
-            </div>
-          </div>
-
           <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
             <article className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">

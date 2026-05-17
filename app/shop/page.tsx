@@ -11,6 +11,7 @@ import {
   pantryItems,
   produceBoxes,
 } from "./shop-data";
+import SiteHeader from "../components/SiteHeader";
 
 const INSTALL_PROMPT_DISMISSED_KEY = "tlp_home_screen_prompt_dismissed";
 
@@ -529,23 +530,9 @@ export default function ShopPage() {
 
   return (
     <main className="min-h-screen px-4 py-4 text-[#243328] sm:px-5 md:px-10 md:py-8">
+      <SiteHeader />
+
       <div className="mx-auto max-w-6xl pb-32 md:pb-12">
-        <div className="mb-4 flex items-center justify-between border-b border-[rgba(221,212,200,0.9)] pb-4">
-          <Link
-            href="/"
-            className="cursor-pointer text-sm tracking-[0.35em] text-[#60705f]"
-          >
-            THE LOCAL PANTRY
-          </Link>
-
-          <Link
-            href="/basket"
-            className="cursor-pointer text-sm text-[#243328]"
-          >
-            Basket{totalItems > 0 ? ` (${totalItems})` : ""}
-          </Link>
-        </div>
-
         <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md sm:rounded-[28px] sm:p-5 md:p-6">
             <p className="text-[11px] uppercase tracking-[0.2em] text-[#6b776c] sm:text-sm">
