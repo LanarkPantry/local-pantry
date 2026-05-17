@@ -22,6 +22,7 @@ import { recipes, type Recipe } from "../recipes/recipes-data";
 import { getSavedRecipes } from "../lib/getSavedRecipes";
 import { generateRegularsWeek } from "../lib/generateRegularsWeek";
 import { saveCookedRecipe } from "../lib/saveCookedRecipe";
+import { getRecentlyCookedSlugs } from "../lib/getRecentlyCookedSlugs";
 
 type PlannerStep = "choices" | "results";
 
@@ -257,20 +258,22 @@ export default function PlannerPage() {
     setPlannerError("");
     setSwapMealId(null);
 
-    let generatedRecipes = [];
+    let generatedRecipes: Recipe[] = [];
+    const recentlyCookedSlugs = await getRecentlyCookedSlugs(14);
 
     if (eatingStyle === "my-regulars") {
       const regularRecipes = await getSavedRecipes();
 
       generatedRecipes = generateRegularsWeek({
-        regularRecipes,
+        regularRecipes: regularRecipes.filter(
+          (recipe) => !recentlyCookedSlugs.includes(recipe.slug),
+        ),
         mealCount: nights,
       });
     } else {
-      generatedRecipes = generateWeek(eatingStyle as PlannerStyle).slice(
-        0,
-        nights,
-      );
+      generatedRecipes = generateWeek(eatingStyle as PlannerStyle)
+        .filter((recipe) => !recentlyCookedSlugs.includes(recipe.slug))
+        .slice(0, nights);
     }
 
     if (generatedRecipes.length === 0) {
