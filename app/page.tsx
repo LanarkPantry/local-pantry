@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useCart } from "./cart-context";
+import SiteHeader from "./components/SiteHeader";
 
 const weeklyMeals = [
   {
@@ -76,62 +75,9 @@ const includedGroups = [
 ];
 
 export default function HomePage() {
-  const { cart } = useCart();
-  const totalItems = useMemo(() => cart.length, [cart]);
-
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
-      <header className="sticky top-0 z-40 border-b border-[rgba(230,221,210,0.92)] bg-[rgba(244,239,233,0.88)] backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 md:px-10">
-          <Link
-            href="/"
-            className="text-[11px] tracking-[0.28em] text-[#60705f] hover:text-[#243328] sm:text-sm"
-          >
-            THE LOCAL PANTRY
-          </Link>
-
-          <nav className="hidden items-center gap-6 md:flex">
-            <Link href="/" className="text-sm underline underline-offset-4">
-              Home
-            </Link>
-
-            <Link
-              href="/shop"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Shop
-            </Link>
-
-            <Link
-              href="/recipes"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Recipes
-            </Link>
-
-            <Link
-              href="/planner"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Planner
-            </Link>
-
-            <Link
-              href="/basket"
-              className="text-sm text-[#4f5e52] hover:text-[#243328]"
-            >
-              Basket{totalItems > 0 ? ` (${totalItems})` : ""}
-            </Link>
-          </nav>
-
-          <Link
-            href="/planner"
-            className="rounded-full bg-[#243328] px-4 py-2 text-sm text-white transition hover:opacity-90"
-          >
-            Start your week
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <section className="relative overflow-hidden">
         <img
@@ -176,10 +122,10 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/recipes"
+                href="/planner"
                 className="rounded-full border border-white/40 px-6 py-3 text-sm text-white"
               >
-                Explore meals
+                Explore meal plans
               </Link>
             </div>
           </div>
