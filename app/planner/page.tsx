@@ -461,6 +461,7 @@ export default function PlannerPage() {
   }
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
+      <SiteHeader />
       <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
