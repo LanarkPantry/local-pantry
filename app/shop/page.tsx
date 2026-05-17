@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo } from "react";
 import { useCart } from "../cart-context";
-import ShopRecipeCard from "./shop-recipe-card";
+import SiteHeader from "../components/SiteHeader";
 import {
   type ShopDisplayItem,
   cupboardItems,
@@ -11,206 +11,13 @@ import {
   pantryItems,
   produceBoxes,
 } from "./shop-data";
-import SiteHeader from "../components/SiteHeader";
 
-const INSTALL_PROMPT_DISMISSED_KEY = "tlp_home_screen_prompt_dismissed";
-
-const SAVED_FAVOURITES_KEY = "tlp_saved_favourite_recipes";
-const PLANNER_RECIPES_KEY = "tlp_planner_recipes";
-const WEEKLY_MEALS_KEY = "tlp_weekly_planner_meals";
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-type BasketMatchLike = {
-  id?: string;
-  name?: string;
-  title?: string;
-  quantity?: number;
-};
-
-type RecipeLike = {
-  id: string;
-  title: string;
-  basketMatches?: BasketMatchLike[];
-};
-
-type WeeklyMeals = Record<string, string | null>;
-
-type PlannedSuggestion = {
-  item: ShopDisplayItem;
-  quantity: number;
-  matchedMeals: string[];
-  matchSource: string;
-};
-
-function safeRead<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function toId(value: unknown, fallback: string) {
-  if (typeof value === "string" && value.trim()) return value;
-  return fallback;
-}
-
-function toTitle(recipe: any, index: number) {
-  const title =
-    recipe?.title ||
-    recipe?.name ||
-    recipe?.recipeTitle ||
-    recipe?.label ||
-    recipe?.prompt;
-
-  if (typeof title === "string" && title.trim()) return title.trim();
-  return `Saved recipe ${index + 1}`;
-}
-
-function normalizeRecipe(recipe: any, index: number): RecipeLike {
-  const title = toTitle(recipe, index);
-
-  return {
-    ...recipe,
-    id: toId(recipe?.id, `${title}-${index}`),
-    title,
-    basketMatches: Array.isArray(recipe?.basketMatches)
-      ? recipe.basketMatches
-      : [],
-  };
-}
-
-function normaliseText(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, "and")
-    .replace(/['’]/g, "")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ");
-}
-
-function buildSearchCandidates(match: BasketMatchLike) {
-  const values = [match.name, match.title, match.id]
-    .filter(
-      (value): value is string => typeof value === "string" && !!value.trim(),
-    )
-    .map((value) => value.trim());
-
-  return Array.from(new Set(values));
-}
-
-function findMatchingShopItem(
-  match: BasketMatchLike,
-  allShopItems: ShopDisplayItem[],
-) {
-  const candidates = buildSearchCandidates(match);
-
-  if (candidates.length === 0) return null;
-
-  for (const candidate of candidates) {
-    const normalisedCandidate = normaliseText(candidate);
-
-    const exact = allShopItems.find(
-      (item) => normaliseText(item.name) === normalisedCandidate,
-    );
-
-    if (exact) return { item: exact, source: candidate };
-  }
-
-  for (const candidate of candidates) {
-    const normalisedCandidate = normaliseText(candidate);
-
-    const contains = allShopItems.find((item) => {
-      const itemName = normaliseText(item.name);
-      return (
-        itemName.includes(normalisedCandidate) ||
-        normalisedCandidate.includes(itemName)
-      );
-    });
-
-    if (contains) return { item: contains, source: candidate };
-  }
-
-  return null;
+function formatPrice(value: number) {
+  return `£${value.toFixed(2)}`;
 }
 
 export default function ShopPage() {
-  const { cart, groupedCart, addToCart, addManyToCart, removeOneFromCart } =
-    useCart();
-
-  const [showInstallCard, setShowInstallCard] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [plannerRecipes, setPlannerRecipes] = useState<RecipeLike[]>([]);
-  const [savedRecipes, setSavedRecipes] = useState<RecipeLike[]>([]);
-  const [weeklyMeals, setWeeklyMeals] = useState<WeeklyMeals>({});
-  const [plannerBridgeMessage, setPlannerBridgeMessage] = useState("");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const dismissed =
-      localStorage.getItem(INSTALL_PROMPT_DISMISSED_KEY) === "1";
-
-    const standalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      // @ts-expect-error - iOS Safari standalone property
-      window.navigator.standalone === true;
-
-    setIsStandalone(standalone);
-
-    if (!dismissed && !standalone) {
-      setShowInstallCard(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const rawSaved = safeRead<any[]>(SAVED_FAVOURITES_KEY, []);
-    const rawPlanner = safeRead<any[]>(PLANNER_RECIPES_KEY, []);
-    const rawWeekly = safeRead<WeeklyMeals>(WEEKLY_MEALS_KEY, {});
-
-    const normalisedSaved = Array.isArray(rawSaved)
-      ? rawSaved.map((item, index) => normalizeRecipe(item, index))
-      : [];
-
-    const normalisedPlanner = Array.isArray(rawPlanner)
-      ? rawPlanner.map((item, index) => normalizeRecipe(item, index))
-      : [];
-
-    setSavedRecipes(normalisedSaved);
-    setPlannerRecipes(normalisedPlanner);
-    setWeeklyMeals(rawWeekly && typeof rawWeekly === "object" ? rawWeekly : {});
-  }, []);
-
-  useEffect(() => {
-    if (!plannerBridgeMessage) return;
-
-    const timer = window.setTimeout(() => {
-      setPlannerBridgeMessage("");
-    }, 1800);
-
-    return () => window.clearTimeout(timer);
-  }, [plannerBridgeMessage]);
-
-  const dismissInstallCard = () => {
-    setShowInstallCard(false);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, "1");
-    }
-  };
+  const { cart, groupedCart, addToCart, removeOneFromCart } = useCart();
 
   const totalItems = useMemo(() => cart.length, [cart]);
 
@@ -221,115 +28,21 @@ export default function ShopPage() {
     }, {});
   }, [groupedCart]);
 
-  const weeklyProduceBox = useMemo(() => {
-    return (
-      produceBoxes.find((item) => item.name === "Weekly Produce Box") ??
-      produceBoxes[0] ??
-      null
-    );
-  }, []);
+  const weeklyProduceBox =
+    produceBoxes.find((item) => item.name === "Weekly Produce Box") ??
+    produceBoxes[0] ??
+    null;
 
-  const familyProduceBox = useMemo(() => {
-    return (
-      produceBoxes.find((item) => item.name === "Family Produce Box") ??
-      produceBoxes.find((item) => item.name !== weeklyProduceBox?.name) ??
-      null
-    );
-  }, [weeklyProduceBox]);
+  const familyProduceBox =
+    produceBoxes.find((item) => item.name === "Family Produce Box") ??
+    produceBoxes.find((item) => item.name !== weeklyProduceBox?.name) ??
+    null;
 
-  const featuredProduceBox = weeklyProduceBox;
+  function getQuantity(itemName: string) {
+    return quantityByName[itemName] ?? 0;
+  }
 
-  const allShopItems = useMemo(() => {
-    return [...produceBoxes, ...pantryItems, ...cupboardItems, ...extraItems];
-  }, []);
-
-  const recipesById = useMemo(() => {
-    const map = new Map<string, RecipeLike>();
-
-    for (const recipe of savedRecipes) {
-      map.set(recipe.id, recipe);
-    }
-
-    for (const recipe of plannerRecipes) {
-      map.set(recipe.id, recipe);
-    }
-
-    return map;
-  }, [savedRecipes, plannerRecipes]);
-
-  const plannedMeals = useMemo(() => {
-    return DAYS.map((day) => {
-      const recipeId = weeklyMeals?.[day];
-      if (!recipeId) return null;
-
-      const recipe = recipesById.get(recipeId);
-      if (!recipe) return null;
-
-      return { day, recipe };
-    }).filter((entry): entry is { day: string; recipe: RecipeLike } =>
-      Boolean(entry),
-    );
-  }, [weeklyMeals, recipesById]);
-
-  const plannedSuggestions = useMemo(() => {
-    const suggestionMap = new Map<string, PlannedSuggestion>();
-
-    for (const meal of plannedMeals) {
-      const matches = Array.isArray(meal.recipe.basketMatches)
-        ? meal.recipe.basketMatches
-        : [];
-
-      for (const match of matches) {
-        const found = findMatchingShopItem(match, allShopItems);
-        if (!found) continue;
-
-        const quantity =
-          typeof match.quantity === "number" && match.quantity > 0
-            ? match.quantity
-            : 1;
-
-        const existing = suggestionMap.get(found.item.name);
-
-        if (existing) {
-          existing.quantity += quantity;
-          if (!existing.matchedMeals.includes(meal.recipe.title)) {
-            existing.matchedMeals.push(meal.recipe.title);
-          }
-        } else {
-          suggestionMap.set(found.item.name, {
-            item: found.item,
-            quantity,
-            matchedMeals: [meal.recipe.title],
-            matchSource: found.source,
-          });
-        }
-      }
-    }
-
-    return Array.from(suggestionMap.values()).sort((a, b) => {
-      if (b.quantity !== a.quantity) return b.quantity - a.quantity;
-      return a.item.name.localeCompare(b.item.name);
-    });
-  }, [plannedMeals, allShopItems]);
-
-  const plannedItemsToAdd = useMemo(() => {
-    return plannedSuggestions.flatMap((suggestion) =>
-      Array.from({ length: suggestion.quantity }, () => ({
-        name: suggestion.item.name,
-        price: suggestion.item.price,
-        image: suggestion.item.image,
-        category: suggestion.item.category,
-        checkoutType: suggestion.item.checkoutType,
-      })),
-    );
-  }, [plannedSuggestions]);
-
-  const plannedSuggestionsCount = plannedSuggestions.length;
-  const plannedMealsCount = plannedMeals.length;
-
-  const getQuantity = (itemName: string) => quantityByName[itemName] ?? 0;
-
-  const addDisplayItemToCart = (item: ShopDisplayItem) => {
+  function addDisplayItemToCart(item: ShopDisplayItem) {
     addToCart({
       name: item.name,
       price: item.price,
@@ -337,49 +50,25 @@ export default function ShopPage() {
       category: item.category,
       checkoutType: item.checkoutType,
     });
-  };
+  }
 
-  const addPlannedSuggestion = (suggestion: PlannedSuggestion) => {
-    const items = Array.from({ length: suggestion.quantity }, () => ({
-      name: suggestion.item.name,
-      price: suggestion.item.price,
-      image: suggestion.item.image,
-      category: suggestion.item.category,
-      checkoutType: suggestion.item.checkoutType,
-    }));
-
-    addManyToCart(items);
-    setPlannerBridgeMessage(`${suggestion.item.name} added from your plan`);
-  };
-
-  const addAllPlannedSuggestions = () => {
-    if (plannedItemsToAdd.length === 0) return;
-    addManyToCart(plannedItemsToAdd);
-    setPlannerBridgeMessage("Suggested items added from your plan");
-  };
-
-  const handleStartWeeklyBox = () => {
-    if (!featuredProduceBox) return;
-    addDisplayItemToCart(featuredProduceBox);
-  };
-
-  const renderOrderBadge = (item: ShopDisplayItem) => {
+  function renderOrderBadge(item: ShopDisplayItem) {
     if (item.checkoutType === "subscription") {
       return (
-        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
-          Weekly starter
+        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+          Weekly box
         </div>
       );
     }
 
     return (
-      <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.86)] px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
+      <div className="inline-flex rounded-full border border-[#d9d1c5] bg-white/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.08em] text-[#5f675c]">
         One-off add-on
       </div>
     );
-  };
+  }
 
-  const renderAddControls = (item: ShopDisplayItem) => {
+  function renderAddControls(item: ShopDisplayItem) {
     const quantity = getQuantity(item.name);
 
     if (quantity === 0) {
@@ -387,7 +76,7 @@ export default function ShopPage() {
         <button
           type="button"
           onClick={() => addDisplayItemToCart(item)}
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
         >
           {item.buttonLabel ?? "Add to basket"}
         </button>
@@ -396,7 +85,7 @@ export default function ShopPage() {
 
     return (
       <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="inline-flex items-center self-start rounded-full border border-[#d8d0c4] bg-[rgba(255,255,255,0.88)]">
+        <div className="inline-flex items-center self-start overflow-hidden rounded-full border border-[#d8d0c4] bg-white/88">
           <button
             type="button"
             onClick={() => removeOneFromCart(item.name)}
@@ -418,70 +107,93 @@ export default function ShopPage() {
           </button>
         </div>
 
-        <span className="text-sm text-[#5f675c]">
-          {quantity} added to basket
-        </span>
+        <span className="text-sm text-[#5f675c]">{quantity} in basket</span>
       </div>
     );
-  };
+  }
 
-  const renderCompactCard = (
-    item: ShopDisplayItem,
-    label: string,
-    helperText?: string,
-  ) => {
+  function ProductCard({
+    item,
+    label,
+    helperText,
+  }: {
+    item: ShopDisplayItem;
+    label: string;
+    helperText?: string;
+  }) {
     return (
-      <article
-        key={item.name}
-        className="overflow-hidden rounded-[22px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.74)] shadow-[0_10px_24px_rgba(36,51,40,0.05)] backdrop-blur-md sm:rounded-[24px]"
-      >
-        <div className="flex flex-col sm:flex-row">
-          <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.72)] p-4 sm:w-[170px] sm:shrink-0 sm:border-b-0 sm:border-r md:w-[220px]">
-            <div className="flex h-full items-center justify-center rounded-[18px] bg-[rgba(248,244,238,0.82)] p-4 sm:rounded-[20px]">
+      <article className="overflow-hidden rounded-[26px] border border-[#ddd4c8] bg-white/78 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
+        <div className="grid gap-0 sm:grid-cols-[210px_1fr]">
+          <div className="border-b border-[#e9dfd2] bg-[#eee7dc]/70 p-5 sm:border-b-0 sm:border-r">
+            <div className="flex h-full min-h-[190px] items-center justify-center rounded-[22px] bg-[#f8f4ee]/90 p-5">
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-24 w-full object-contain sm:h-32 md:h-36"
+                className="max-h-[170px] w-full object-contain"
               />
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 md:p-6">
+          <div className="flex flex-col justify-between p-5 md:p-6">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-sm">
-                {label}
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                  {label}
+                </p>
 
-              <h3 className="mt-2 font-serif text-[1.45rem] leading-tight text-[#243328] sm:text-[1.6rem] md:text-[1.75rem]">
+                {item.weight ? (
+                  <span className="rounded-full border border-[#e0d6ca] bg-[#f7f2eb] px-2.5 py-1 text-xs text-[#5f675c]">
+                    {item.weight}
+                  </span>
+                ) : null}
+              </div>
+
+              <h3 className="mt-3 font-serif text-[1.55rem] leading-tight text-[#243328] md:text-[1.9rem]">
                 {item.name}
               </h3>
 
-              <div className="mt-3 rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-4 py-2 text-sm">
-                £{item.price.toFixed(2)}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-[#ddd4c8] bg-white/88 px-4 py-2 text-sm font-medium text-[#243328]">
+                  {formatPrice(item.price)}
+                </span>
+
+                {renderOrderBadge(item)}
               </div>
 
-              <div className="mt-3">{renderOrderBadge(item)}</div>
-
-              <p className="mt-3 text-sm leading-6 text-[#667164]">
+              <p className="mt-4 text-sm leading-6 text-[#667164]">
                 {item.description}
               </p>
 
-              {helperText ? (
-                <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
-                  {helperText}
+              {item.details ? (
+                <p className="mt-2 text-sm leading-6 text-[#5f675c]">
+                  {item.details}
                 </p>
               ) : null}
 
               {item.bestFor ? (
-                <p className="mt-2.5 text-sm leading-6 text-[#5f675c]">
+                <p className="mt-3 text-sm leading-6 text-[#5f675c]">
+                  <span className="font-medium text-[#243328]">Best for: </span>
                   {item.bestFor}
                 </p>
               ) : null}
 
-              {item.note ? (
+              {helperText ? (
                 <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                  {item.note}
+                  {helperText}
                 </p>
+              ) : null}
+
+              {item.weeklyIncludes && item.weeklyIncludes.length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {item.weeklyIncludes.map((included) => (
+                    <span
+                      key={included}
+                      className="rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1.5 text-xs text-[#4f5e52]"
+                    >
+                      {included}
+                    </span>
+                  ))}
+                </div>
               ) : null}
             </div>
 
@@ -490,422 +202,201 @@ export default function ShopPage() {
         </div>
       </article>
     );
-  };
+  }
 
-  const renderSection = (
-    title: string,
-    id: string,
-    items: ShopDisplayItem[],
-    label: string,
-    description = "Useful additions for the week ahead.",
-  ) => {
+  function ProductSection({
+    title,
+    eyebrow,
+    description,
+    items,
+    label,
+  }: {
+    title: string;
+    eyebrow: string;
+    description: string;
+    items: ShopDisplayItem[];
+    label: string;
+  }) {
     if (items.length === 0) return null;
 
     return (
-      <section id={id} className="mt-8 sm:mt-10">
-        <div className="flex items-end justify-between gap-4">
+      <section className="mt-10">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="font-serif text-[1.7rem] text-[#243328] sm:text-2xl">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+              {eyebrow}
+            </p>
+
+            <h2 className="mt-2 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.4rem]">
               {title}
             </h2>
-            <p className="mt-1.5 text-sm leading-6 text-[#667164]">
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
               {description}
             </p>
           </div>
 
           <Link
             href="/basket"
-            className="hidden cursor-pointer text-sm text-[#5f675c] underline md:block"
+            className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
           >
             Review basket
           </Link>
         </div>
 
-        <div className="mt-3 grid gap-4 md:grid-cols-2">
-          {items.map((item) => renderCompactCard(item, label))}
+        <div className="mt-5 grid gap-5 lg:grid-cols-2">
+          {items.map((item) => (
+            <ProductCard key={item.name} item={item} label={label} />
+          ))}
         </div>
       </section>
     );
-  };
+  }
 
   return (
-    <main className="min-h-screen px-4 py-4 text-[#243328] sm:px-5 md:px-10 md:py-8">
+    <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
 
-      <div className="mx-auto max-w-6xl pb-32 md:pb-12">
-        <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.78)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md sm:rounded-[28px] sm:p-5 md:p-6">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-[#6b776c] sm:text-sm">
-              Shop
-            </p>
-
-            <h1 className="mt-2.5 font-serif text-[1.85rem] leading-tight md:text-[2.5rem]">
-              Local weekly food for ML11, built around what you want to cook
-            </h1>
-
-            <p className="mt-3 max-w-xl text-sm leading-6 text-[#667164]">
-              Start with the veg box or a few good things, get an idea for what
-              to make, then build the rest of the basket around the week.
-            </p>
-
-            {plannerBridgeMessage ? (
-              <div className="mt-4 inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1.5 text-xs font-medium text-[#5f675c]">
-                {plannerBridgeMessage}
-              </div>
-            ) : null}
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-                Weekly delivery across ML11
-              </div>
-              <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-                Built from a real local kitchen
-              </div>
-            </div>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {weeklyProduceBox ? (
-                <div className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4 sm:rounded-[22px]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
-                        Smaller box
-                      </p>
-                      <h2 className="mt-2 font-serif text-lg leading-tight text-[#243328] sm:text-xl">
-                        {weeklyProduceBox.name}
-                      </h2>
-                    </div>
-
-                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
-                      £{weeklyProduceBox.price.toFixed(2)}
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex items-start gap-3">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-[rgba(247,242,235,0.9)] p-2">
-                      <img
-                        src={weeklyProduceBox.image}
-                        alt={weeklyProduceBox.name}
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-
-                    <div className="min-w-0">
-                      <p className="text-sm leading-6 text-[#667164]">
-                        {weeklyProduceBox.description}
-                      </p>
-
-                      {weeklyProduceBox.bestFor ? (
-                        <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                          {weeklyProduceBox.bestFor}
-                        </p>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    {renderAddControls(weeklyProduceBox)}
-                  </div>
-                </div>
-              ) : null}
-
-              {familyProduceBox ? (
-                <div className="rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.74)] p-4 sm:rounded-[22px]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
-                        Larger box
-                      </p>
-                      <h2 className="mt-2 font-serif text-lg leading-tight text-[#243328] sm:text-xl">
-                        {familyProduceBox.name}
-                      </h2>
-                    </div>
-
-                    <div className="rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 text-sm text-[#243328]">
-                      £{familyProduceBox.price.toFixed(2)}
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex items-start gap-3">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-[rgba(247,242,235,0.9)] p-2">
-                      <img
-                        src={familyProduceBox.image}
-                        alt={familyProduceBox.name}
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-
-                    <div className="min-w-0">
-                      <p className="text-sm leading-6 text-[#667164]">
-                        {familyProduceBox.description}
-                      </p>
-
-                      {familyProduceBox.bestFor ? (
-                        <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-                          {familyProduceBox.bestFor}
-                        </p>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    {renderAddControls(familyProduceBox)}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-            <div className="mt-4 rounded-[18px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4 sm:rounded-[20px]">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm text-[#5f675c]">Your basket</p>
-                  <p className="mt-1.5 text-[1.65rem] font-serif leading-tight text-[#243328] sm:text-2xl">
-                    {totalItems > 0
-                      ? `${totalItems} item${totalItems === 1 ? "" : "s"}`
-                      : "Empty"}
-                  </p>
-                </div>
-
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-[rgba(247,242,235,0.9)] p-2">
-                  <img
-                    src="/weekly-harvest-box.png"
-                    alt="Basket"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-              </div>
-
-              <p className="mt-2 text-sm leading-6 text-[#667164]">
-                Start with a box, add a few useful extras, then review the whole
-                week.
-              </p>
-              <Link
-                href="/basket"
-                className="mt-3 inline-block cursor-pointer text-sm underline"
-              >
-                Review basket
-              </Link>
-            </div>
-          </div>
-
-          <ShopRecipeCard
-            starterBox={featuredProduceBox}
-            onStartWeeklyBox={handleStartWeeklyBox}
-          />
-        </section>
-
-        <section className="mt-6 rounded-[24px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md sm:mt-8 sm:rounded-[28px] sm:p-5 md:p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c] sm:text-sm">
-                Build from your plan
-              </p>
-              <h2 className="mt-2 font-serif text-[1.65rem] leading-tight text-[#243328] md:text-[2.2rem]">
-                Use your planned meals to shape the weekly shop
-              </h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
-                We’ve picked out items that match the meals you’ve already added
-                to your planner.
-              </p>
-            </div>
-
-            {plannedSuggestionsCount > 0 ? (
-              <button
-                type="button"
-                onClick={addAllPlannedSuggestions}
-                className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                Add suggested items
-              </button>
-            ) : null}
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-              {plannedMealsCount} planned meal
-              {plannedMealsCount === 1 ? "" : "s"}
-            </div>
-
-            <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(255,255,255,0.82)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-              {plannedSuggestionsCount} matched shop item
-              {plannedSuggestionsCount === 1 ? "" : "s"}
-            </div>
-          </div>
-
-          {plannedSuggestionsCount === 0 ? (
-            <div className="mt-4 rounded-[20px] border border-dashed border-[#ddd4c8] bg-[rgba(255,255,255,0.76)] p-4 sm:rounded-[24px] sm:p-5">
-              <p className="text-base font-medium text-[#243328]">
-                No suggested items yet
-              </p>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                Plan a few meals first, and matched ingredients or extras will
-                show up here to help you build the weekly basket more quickly.
+      <section className="px-4 py-8 sm:px-6 md:px-10 md:py-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+            <article className="rounded-[30px] border border-[#ddd4c8] bg-[#f7f2eb]/84 p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#6b776c]">
+                Shop
               </p>
 
-              <div className="mt-4">
+              <h1 className="mt-3 max-w-3xl font-serif text-[2.35rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4rem]">
+                Build a better weekly basket.
+              </h1>
+
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-[#667164] md:text-base">
+                Start with a produce box, then add the pantry staples that make
+                your planner meals easier: beans, tomatoes, pasta, grains and
+                flavour jars.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href="#weekly-boxes"
+                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                >
+                  Choose a box
+                </a>
+
+                <a
+                  href="#pantry-staples"
+                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+                >
+                  Browse pantry
+                </a>
+
                 <Link
                   href="/planner"
-                  className="inline-flex rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
+                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
                 >
                   Open planner
                 </Link>
               </div>
-            </div>
-          ) : (
-            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {plannedSuggestions.map((suggestion) => {
-                const quantityInCart = getQuantity(suggestion.item.name);
+            </article>
 
-                return (
-                  <article
-                    key={suggestion.item.name}
-                    className="overflow-hidden rounded-[20px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] sm:rounded-[24px]"
-                  >
-                    <div className="border-b border-[#e9dfd2] bg-[rgba(238,231,220,0.62)] p-4">
-                      <div className="flex items-center gap-3.5">
-                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-[rgba(248,244,238,0.82)] p-3 sm:h-20 sm:w-20 sm:rounded-[18px]">
-                          <img
-                            src={suggestion.item.image}
-                            alt={suggestion.item.name}
-                            className="h-full w-full object-contain"
-                          />
-                        </div>
-
-                        <div className="min-w-0">
-                          <p className="text-[11px] uppercase tracking-[0.14em] text-[#6b776c] sm:text-xs">
-                            Suggested from planner
-                          </p>
-                          <h3 className="mt-1 font-serif text-lg leading-tight text-[#243328] sm:text-xl">
-                            {suggestion.item.name}
-                          </h3>
-                          <p className="mt-1.5 text-sm text-[#5f675c]">
-                            £{suggestion.item.price.toFixed(2)} each
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      <div className="flex flex-wrap gap-2">
-                        <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-                          Suggested qty: {suggestion.quantity}
-                        </div>
-
-                        {quantityInCart > 0 ? (
-                          <div className="inline-flex rounded-full border border-[#d9d1c5] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-xs font-medium text-[#5f675c]">
-                            In basket: {quantityInCart}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <p className="mt-3 text-sm leading-6 text-[#667164]">
-                        Matched from {suggestion.matchedMeals.join(", ")}.
-                      </p>
-
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => addPlannedSuggestion(suggestion)}
-                          className="inline-flex items-center justify-center rounded-full bg-[#2f4635] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
-                        >
-                          Add suggested amount
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => addDisplayItemToCart(suggestion.item)}
-                          className="inline-flex items-center justify-center rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-4 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
-                        >
-                          Add one
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        <section id="weekly-fruit-and-veg-boxes" className="mt-8 sm:mt-10">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="font-serif text-[1.7rem] text-[#243328] sm:text-2xl">
-                Weekly Fruit and Veg Boxes
-              </h2>
-              <p className="mt-1.5 text-sm leading-6 text-[#667164]">
-                Start with your weekly base, then add a few useful extras around
-                it.
+            <article className="rounded-[30px] border border-[#ddd4c8] bg-white/78 p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] md:p-7">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                Your basket
               </p>
-            </div>
+
+              <h2 className="mt-3 font-serif text-3xl leading-tight text-[#243328]">
+                {totalItems > 0
+                  ? `${totalItems} item${totalItems === 1 ? "" : "s"} selected`
+                  : "Your basket is empty"}
+              </h2>
+
+              <p className="mt-3 text-sm leading-7 text-[#667164]">
+                Use the planner to decide the week, then build your basket from
+                a smaller set of useful ingredients.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href="/basket"
+                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                >
+                  Review basket
+                </Link>
+
+                <Link
+                  href="/saved-weeks"
+                  className="rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+                >
+                  Saved weeks
+                </Link>
+              </div>
+            </article>
           </div>
 
-          <div className="mt-3 grid gap-4 md:grid-cols-2">
-            {produceBoxes.map((item) =>
-              renderCompactCard(
-                item,
-                item.checkoutType === "subscription"
-                  ? "Weekly starter"
-                  : "Produce box",
-                item.checkoutType === "subscription"
-                  ? "A simple base for the week."
-                  : undefined,
-              ),
-            )}
-          </div>
-        </section>
-
-        {renderSection(
-          "Pantry Staples",
-          "pantry-staples",
-          cupboardItems,
-          "Pantry staple",
-          "Flexible cupboard basics for easy weekly cooking.",
-        )}
-
-        {renderSection(
-          "Gourmet Jars",
-          "gourmet-jars",
-          pantryItems,
-          "Gourmet jar",
-          "Small flavour-led additions to build meals around.",
-        )}
-
-        {renderSection(
-          "Nuts",
-          "nuts",
-          extraItems,
-          "Nut",
-          "A few useful extras to keep on hand through the week.",
-        )}
-      </div>
-
-      {showInstallCard && !isStandalone && totalItems > 0 ? (
-        <div className="fixed bottom-20 left-0 right-0 z-40 px-4">
-          <div className="mx-auto max-w-md rounded-[18px] border border-[rgba(221,212,200,0.9)] bg-[rgba(247,242,235,0.92)] px-4 py-3 shadow-[0_10px_25px_rgba(36,51,40,0.08)] backdrop-blur-md">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs text-[#6b776c]">Add to home screen</p>
-                <p className="mt-0.5 text-sm text-[#243328]">
-                  Makes it easier to come back each week
+          <section id="weekly-boxes" className="mt-10">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                  Weekly base
                 </p>
-                <p className="mt-1 text-xs text-[#5f675c]">
-                  Use your browser menu to choose “Add to Home screen”.
+
+                <h2 className="mt-2 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.4rem]">
+                  Weekly fruit and veg boxes
+                </h2>
+
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
+                  A practical starting point for the week. Add pantry staples
+                  around the meals you plan to cook.
                 </p>
               </div>
-
-              <button
-                type="button"
-                onClick={dismissInstallCard}
-                className="shrink-0 text-sm text-[#5f675c]"
-                aria-label="Dismiss"
-              >
-                ×
-              </button>
             </div>
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-2">
+              {weeklyProduceBox ? (
+                <ProductCard
+                  item={weeklyProduceBox}
+                  label="Smaller weekly box"
+                  helperText="Best if you want a lighter weekly base."
+                />
+              ) : null}
+
+              {familyProduceBox ? (
+                <ProductCard
+                  item={familyProduceBox}
+                  label="Larger weekly box"
+                  helperText="Best for families or fuller weekly cooking."
+                />
+              ) : null}
+            </div>
+          </section>
+
+          <div id="pantry-staples">
+            <ProductSection
+              title="Cupboard staples"
+              eyebrow="Pantry infrastructure"
+              description="The core ingredients that make the planner useful: beans, tomatoes, pasta, grains and reliable meal bases."
+              items={cupboardItems}
+              label="Cupboard staple"
+            />
           </div>
+
+          <ProductSection
+            title="Flavour jars"
+            eyebrow="Sauces and jars"
+            description="Small flavour-led additions that turn simple vegetables, beans and grains into proper dinners."
+            items={pantryItems}
+            label="Flavour jar"
+          />
+
+          <ProductSection
+            title="Extras"
+            eyebrow="Useful add-ons"
+            description="Small extras for texture, richness and quick upgrades through the week."
+            items={extraItems}
+            label="Extra"
+          />
         </div>
-      ) : null}
+      </section>
     </main>
   );
 }
