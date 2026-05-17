@@ -256,6 +256,15 @@ export default function ShopPage() {
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
+      <div className="px-4 pt-4 sm:px-6 md:hidden">
+        <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
+          <img
+            src="/images/home/local-delivery.jpg"
+            alt="Shop pantry staples"
+            className="h-44 w-full object-cover"
+          />
+        </div>
+      </div>
 
       <section className="px-4 py-8 sm:px-6 md:px-10 md:py-10">
         <div className="mx-auto max-w-7xl">

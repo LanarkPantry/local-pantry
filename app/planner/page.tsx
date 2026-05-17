@@ -475,6 +475,16 @@ export default function PlannerPage() {
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
+
+      <div className="px-4 pt-4 sm:px-6 md:hidden">
+        <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
+          <img
+            src="/images/home/plan-your-week.jpg"
+            alt="Plan your week"
+            className="h-44 w-full object-cover"
+          />
+        </div>
+      </div>
       <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
