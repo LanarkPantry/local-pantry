@@ -93,7 +93,7 @@ export const pantryItems: ShopDisplayItem[] = [
 export const cupboardItems: ShopDisplayItem[] = [
   {
     name: "Bold Bean Co Queen Butter Beans",
-    price: 3.95,
+    price: 3.5,
     image: "/images/shop/butter-beans.png",
     category: "cupboard",
     checkoutType: "one-off",
@@ -108,7 +108,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Bold Bean Co Queen Chickpeas",
-    price: 3.95,
+    price: 3.5,
     image: "/images/shop/chickpeas.png",
     category: "cupboard",
     checkoutType: "one-off",
@@ -123,7 +123,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Bold Bean Co Queen White Beans",
-    price: 3.95,
+    price: 3.5,
     image: "/images/shop/white-beans.png",
     category: "cupboard",
     checkoutType: "one-off",
@@ -137,7 +137,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Mutti Polpa Tomatoes",
-    price: 2.25,
+    price: 1.5,
     image: "/images/shop/mutti-polpa.png",
     category: "cupboard",
     checkoutType: "one-off",
@@ -167,7 +167,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Casarecce Pasta",
-    price: 4.95,
+    price: 2.95,
     image: "/images/cupboard/casarecce.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -180,7 +180,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Orzo Pasta",
-    price: 4.5,
+    price: 2.75,
     image: "/images/cupboard/orzo.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -193,7 +193,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Giant Couscous",
-    price: 4.75,
+    price: 3.75,
     image: "/images/cupboard/giant-couscous.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -205,7 +205,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Polenta",
-    price: 4.25,
+    price: 4.0,
     image: "/images/cupboard/polenta.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -218,7 +218,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Puy Lentils",
-    price: 4.95,
+    price: 4.5,
     image: "/images/cupboard/puy-lentils.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -293,7 +293,7 @@ export const extraItems: ShopDisplayItem[] = [
   },
   {
     name: "Cashews",
-    price: 5.25,
+    price: 4.25,
     image: "/images/extras/cashews.jpg",
     category: "extras",
     checkoutType: "one-off",
