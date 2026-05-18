@@ -499,8 +499,8 @@ export default function PlannerPage() {
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
                 {isLoggedIn
-                  ? "You are signed in. Preview a curated week while subscription access is being connected."
-                  : "Try a curated preview week built from real recipes and seasonal produce."}
+                  ? "You are signed in. Preview a week while subscription access is being connected."
+                  : "Preview a week built from real recipes and seasonal produce."}
               </p>
 
               {plannerError ? (
@@ -580,7 +580,7 @@ export default function PlannerPage() {
 
                   <div className="rounded-[22px] border border-[#ddd4c8] bg-white/65 p-4">
                     <p className="text-sm font-medium text-[#243328]">
-                      This is a curated preview
+                      Flexible weekly planning
                     </p>
 
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
