@@ -920,17 +920,6 @@ export default function PlannerPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {meal.ingredients.map((ingredient) => (
-                          <span
-                            key={ingredient}
-                            className="rounded-full border border-[#ddd4c8] bg-[rgba(247,242,235,0.82)] px-3 py-1.5 text-xs font-medium text-[#4f5e52]"
-                          >
-                            {ingredient}
-                          </span>
-                        ))}
-                      </div>
-
                       {meal.matchedProducts.length > 0 ? (
                         <div className="mt-4 flex flex-wrap gap-2">
                           {meal.matchedProducts.map((product) => (
