@@ -576,12 +576,6 @@ export default function PlannerPage() {
                         onClick={() => setEatingStyle("my-regulars")}
                       />
                     </div>
-
-                    <p className="mt-3 max-w-2xl text-xs leading-5 text-[#667164]">
-                      This uses your saved recipe library rather than expensive
-                      live recipe generation. It keeps the planner useful,
-                      predictable and affordable to run.
-                    </p>
                   </div>
 
                   <div className="rounded-[22px] border border-[#ddd4c8] bg-white/65 p-4">
@@ -590,8 +584,8 @@ export default function PlannerPage() {
                     </p>
 
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      The full subscriber planner will include swaps, saved
-                      weeks, My Regulars and basket-aware planning.
+                      Weekly delivery members unlock saved weeks, My Regulars
+                      and deeper planner features.
                     </p>
                   </div>
 
@@ -682,8 +676,8 @@ export default function PlannerPage() {
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5f675c]">
                 {isLoggedIn
-                  ? "You are signed in. This planner avoids meals you have marked as cooked in the last 14 days."
-                  : "This is a curated sample week. The full adjustable planner is included with a weekly veg box subscription."}
+                  ? "This planner avoids meals you have marked as cooked recently."
+                  : "Build flexible weekly plans around produce boxes, pantry staples and repeat meals."}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-3">
@@ -736,8 +730,7 @@ export default function PlannerPage() {
                     </h3>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      The planner works best when the produce box gives the week
-                      its starting point.
+                      Choose a weekly produce box to build the week around.
                     </p>
                   </div>
 
@@ -990,9 +983,8 @@ export default function PlannerPage() {
                     </h3>
 
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      The planner is reading the full week, not just individual
-                      recipes. It looks for ingredient reuse, pantry efficiency,
-                      meal variety and effort balance.
+                      Balanced around ingredient reuse, variety and practical
+                      weeknight cooking.
                     </p>
                   </div>
 
