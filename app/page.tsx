@@ -3,6 +3,7 @@
 import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import PostcodeChecker from "./components/PostcodeChecker";
+
 const sampleWeek = [
   {
     day: "Monday",
@@ -34,20 +35,20 @@ const sampleWeek = [
 const howItWorks = [
   {
     number: "1",
-    title: "Plan your week",
-    text: "Generate a flexible weekly meal plan built around practical pantry cooking.",
+    title: "Choose your meals",
+    text: "Build a flexible weekly plan around the meals you actually want to cook.",
     image: "/images/home/plan-your-week.jpg",
   },
   {
     number: "2",
     title: "Build your basket",
-    text: "Add produce boxes, pantry staples and suggested extras directly from your planner.",
+    text: "Add pantry staples, produce boxes and suggested ingredients directly from your planner.",
     image: "/images/home/build-your-basket.jpg",
   },
   {
     number: "3",
-    title: "Save your regulars",
-    text: "Save favourite weeks, repeat meals and build a more useful weekly routine over time.",
+    title: "Get ingredients delivered",
+    text: "Receive practical weekly groceries designed for calmer, easier home cooking.",
     image: "/images/home/save-your-regulars.jpg",
   },
 ];
@@ -60,31 +61,38 @@ export default function HomePage() {
       <section className="relative min-h-[82vh] overflow-hidden">
         <img
           src="/hero.jpg"
-          alt="The Local Pantry weekly food planning"
+          alt="Weekly grocery planning and delivery"
           className="absolute inset-0 h-full w-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.25)_52%,rgba(0,0,0,0.5)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.28)_52%,rgba(0,0,0,0.56)_100%)]" />
 
         <div className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-end px-4 pb-12 pt-16 sm:px-6 md:px-10 md:pb-16">
           <div className="max-w-4xl text-white">
             <p className="inline-flex rounded-full border border-white/35 bg-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur">
-              Weekly produce boxes + meal planning
+              Weekly grocery delivery + meal planning
             </p>
 
             <h1 className="mt-6 font-serif text-[3rem] leading-[0.98] tracking-tight md:text-[6rem]">
-              Plan your week.
+              Plan your meals.
               <br />
-              Build your basket.
+              Get ingredients delivered.
               <br />
               Cook more easily.
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/92 md:text-lg">
-              The Local Pantry combines weekly produce boxes, pantry staples and
-              intelligent meal planning to help you decide what to cook — then
-              build the basket around it.
+              The Local Pantry combines flexible meal planning with local
+              grocery delivery — helping you choose meals, build a practical
+              weekly basket and cook with less stress.
             </p>
+
+            <div className="mt-5 rounded-[22px] border border-white/15 bg-white/10 p-4 backdrop-blur">
+              <p className="text-sm leading-7 text-white/90">
+                Not recipe kits. Choose your own meals, pantry staples and
+                produce boxes each week.
+              </p>
+            </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -98,7 +106,7 @@ export default function HomePage() {
                 href="/shop"
                 className="rounded-full border border-white/45 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
               >
-                Browse produce boxes
+                Browse pantry staples
               </Link>
             </div>
           </div>
@@ -113,7 +121,7 @@ export default function HomePage() {
             </p>
 
             <h2 className="mt-3 font-serif text-[1.8rem] leading-tight text-[#243328] md:text-[2.5rem]">
-              Weekly food planning built around real cooking.
+              Flexible weekly groceries built around real cooking.
             </h2>
 
             <div className="mt-7 grid gap-5 md:grid-cols-3">
@@ -155,23 +163,24 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-3 font-serif text-3xl md:text-5xl">
-                An example week from the planner.
+                A flexible week from the planner.
               </h2>
 
               <p className="mt-5 text-base leading-8 text-white/80">
-                This is only a sample. You can create your own weekly plans,
-                swap meals, save regulars, avoid recently cooked dishes and
-                build baskets around the meals you actually want to cook.
+                Build your own weekly rhythm around practical meals, pantry
+                staples and seasonal produce — then save favourite weeks and
+                repeat them easily.
               </p>
 
               <div className="mt-7 rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur">
                 <p className="text-sm font-medium text-white">
-                  Your week will be different
+                  Designed for normal home cooking
                 </p>
 
                 <p className="mt-2 text-sm leading-7 text-white/70">
-                  Use the planner to generate meals around your style, your
-                  saved regulars and the pantry staples you want to use.
+                  Flexible meals, repeat ingredients and practical pantry
+                  staples help reduce food waste and decision fatigue through
+                  the week.
                 </p>
               </div>
 
@@ -187,7 +196,7 @@ export default function HomePage() {
                   href="/shop"
                   className="rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
                 >
-                  Browse pantry staples
+                  Browse the pantry
                 </Link>
               </div>
             </div>
@@ -216,7 +225,8 @@ export default function HomePage() {
                     </h3>
 
                     <p className="mt-2 text-sm leading-6 text-white/65">
-                      Example planner meal — replace it with your own choices.
+                      Example planner meal — swap, save and repeat your own
+                      versions.
                     </p>
                   </div>
                 </article>
@@ -236,24 +246,24 @@ export default function HomePage() {
                 </p>
 
                 <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                  Currently available in ML11.
+                  Grocery delivery currently available in ML11.
                 </h2>
 
                 <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-                  The Local Pantry is currently delivering weekly produce boxes
-                  and pantry staples across the ML11 postcode area while the
-                  service is refined and expanded carefully.
+                  The Local Pantry is currently testing local weekly delivery of
+                  produce boxes and pantry staples across ML11 and nearby areas
+                  while the service grows carefully.
                 </p>
 
                 <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-white/65 p-5">
                   <p className="text-sm font-medium text-[#243328]">
-                    Early local rollout
+                    Small local rollout
                   </p>
 
                   <p className="mt-2 text-sm leading-7 text-[#667164]">
-                    Starting locally helps keep deliveries practical, flexible
-                    and personal while the planner and weekly subscription
-                    system continue to evolve.
+                    Starting locally keeps deliveries practical, flexible and
+                    personal while the planner and subscription system continue
+                    to evolve.
                   </p>
                 </div>
 
@@ -262,7 +272,7 @@ export default function HomePage() {
                     href="/shop"
                     className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
                   >
-                    Browse weekly boxes
+                    Browse weekly groceries
                   </Link>
 
                   <Link
@@ -277,7 +287,7 @@ export default function HomePage() {
               <div className="relative min-h-[320px] overflow-hidden">
                 <img
                   src="/images/home/local-delivery.jpg"
-                  alt="Local produce delivery"
+                  alt="Local grocery delivery"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
@@ -285,24 +295,25 @@ export default function HomePage() {
           </section>
         </div>
       </section>
+
       <PostcodeChecker />
+
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
         <div className="mx-auto max-w-7xl">
           <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
             <article className="rounded-[30px] border border-[#ddd4c8] bg-white/78 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Free planner access
+                Planner access
               </p>
 
               <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.6rem]">
-                Try the planner freely.
+                Explore the planner freely.
               </h2>
 
               <p className="mt-4 text-sm leading-7 text-[#667164] md:text-base">
-                Anyone can explore the planner and build a basket. Full planner
-                functionality — including saved weeks, meal swaps, regular meals
-                and pause-a-week controls — comes with a weekly produce box
-                subscription.
+                Try meal planning, browse pantry staples and build baskets
+                freely. Save weeks, regular meals and subscription tools unlock
+                with weekly delivery membership.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
@@ -324,16 +335,16 @@ export default function HomePage() {
 
             <article className="rounded-[30px] border border-[#ddd4c8] bg-[#f7f2eb]/84 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Weekly produce delivery
+                Flexible groceries
               </p>
 
               <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.6rem]">
-                Weekly produce boxes.
+                Pantry staples + produce boxes.
               </h2>
 
               <p className="mt-4 text-sm leading-7 text-[#667164] md:text-base">
-                Choose a smaller or larger weekly box, then build flexible meals
-                around seasonal ingredients and pantry staples.
+                Build your own weekly basket around practical ingredients,
+                repeat meals and calmer everyday cooking.
               </p>
 
               <div className="mt-7">
