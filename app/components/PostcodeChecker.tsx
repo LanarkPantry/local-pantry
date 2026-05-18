@@ -203,7 +203,8 @@ export default function PostcodeChecker() {
               Register your interest so we know which areas to open next.
             </p>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]">
+            <div className="mt-5 flex flex-col gap-3 sm:grid sm:grid-cols-[1fr_auto]">
+              {" "}
               <input
                 type="email"
                 inputMode="email"
@@ -220,11 +221,10 @@ export default function PostcodeChecker() {
                 placeholder="Enter your email"
                 className="rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm text-[#243328] outline-none placeholder:text-[#8b8b7c]"
               />
-
               <button
                 type="button"
                 onClick={registerInterest}
-                className="rounded-full border border-[#243328] bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f5f1ea]"
+                className="w-full sm:w-auto rounded-full border border-[#243328] bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f5f1ea]"
               >
                 Register interest
               </button>
