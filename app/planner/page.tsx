@@ -870,8 +870,8 @@ export default function PlannerPage() {
                     />
 
                     <div className="p-5 md:p-6">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
+                      <div className="space-y-4">
+                        <div className="min-w-0">
                           <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
                             {meal.day}
                           </p>
@@ -885,11 +885,11 @@ export default function PlannerPage() {
                           </p>
                         </div>
 
-                        <div className="flex shrink-0 flex-col gap-2">
+                        <div className="grid gap-2 sm:flex sm:flex-wrap">
                           <button
                             type="button"
                             onClick={() => handleOpenSwapOptions(meal.id)}
-                            className="rounded-full border border-[#d6cec2] bg-[#243328] px-3.5 py-1.5 text-xs font-medium text-white transition hover:opacity-90"
+                            className="rounded-full border border-[#d6cec2] bg-[#243328] px-3.5 py-2 text-xs font-medium text-white transition hover:opacity-90"
                           >
                             Swap meal
                           </button>
@@ -901,7 +901,7 @@ export default function PlannerPage() {
                               savingRecipeSlug === meal.recipeSlug ||
                               savedRecipeSlugs.includes(meal.recipeSlug)
                             }
-                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white disabled:cursor-default disabled:opacity-70"
+                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-2 text-xs font-medium text-[#243328] transition hover:bg-white disabled:cursor-default disabled:opacity-70"
                           >
                             {savingRecipeSlug === meal.recipeSlug
                               ? "Saving..."
@@ -913,7 +913,7 @@ export default function PlannerPage() {
                           <button
                             type="button"
                             onClick={() => handleCookedThis(meal.recipeSlug)}
-                            className="rounded-full border border-[#d6cec2] bg-white/80 px-3.5 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+                            className="rounded-full border border-[#d6cec2] bg-white/80 px-3.5 py-2 text-xs font-medium text-[#243328] transition hover:bg-white"
                           >
                             Cooked this
                           </button>
