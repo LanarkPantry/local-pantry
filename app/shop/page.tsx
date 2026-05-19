@@ -11,6 +11,7 @@ import {
   pantryItems,
   produceBoxes,
 } from "./shop-data";
+import SiteFooter from "../components/SiteFooter";
 
 function formatPrice(value: number) {
   return `£${value.toFixed(2)}`;
@@ -406,6 +407,7 @@ export default function ShopPage() {
           />
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
+import SiteFooter from "../components/SiteFooter";
 
 const DELIVERY_FEE = 2.5;
 const FREE_DELIVERY_THRESHOLD = 30;
@@ -830,6 +831,7 @@ Thanks!`,
           </div>
         </div>
       )}
+      <SiteFooter />
     </main>
   );
 }

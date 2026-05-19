@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { recipes } from "../recipes/recipes-data";
 import SiteHeader from "../components/SiteHeader";
+import SiteFooter from "../components/SiteFooter";
 
 type SavedWeekMealRow = {
   id: string;
@@ -382,6 +383,7 @@ export default function SavedWeeksPage() {
           ) : null}
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }

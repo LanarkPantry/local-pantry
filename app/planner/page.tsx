@@ -27,7 +27,7 @@ import { saveWeek } from "../lib/saveWeek";
 import SiteHeader from "../components/SiteHeader";
 import { getPlannerBasketSuggestions } from "../lib/getPlannerBasketSuggestions";
 import { allShopItems } from "../shop/shop-data";
-
+import SiteFooter from "../components/SiteFooter";
 type PlannerStep = "choices" | "results";
 
 type EatingStyle =
@@ -1086,6 +1086,7 @@ export default function PlannerPage() {
           ))}
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }

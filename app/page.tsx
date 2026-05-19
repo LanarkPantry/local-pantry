@@ -3,6 +3,7 @@
 import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import PostcodeChecker from "./components/PostcodeChecker";
+import SiteFooter from "./components/SiteFooter";
 
 const sampleWeek = [
   {
@@ -359,6 +360,7 @@ export default function HomePage() {
           </section>
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }
