@@ -159,7 +159,7 @@ export default function HomePage() {
             </p>
 
             <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.6rem]">
-              A flexible food rhythm, not a recipe box.
+              Local groceries for normal home cooking.
             </h2>
 
             <p className="mt-4 max-w-3xl text-sm leading-7 text-[#667164] md:text-base">
@@ -171,7 +171,7 @@ export default function HomePage() {
             <div className="mt-7 grid gap-4 md:grid-cols-3">
               <article className="rounded-[24px] border border-[#ddd4c8] bg-white/70 p-5">
                 <p className="text-sm font-medium text-[#243328]">
-                  Choose your rhythm
+                  Choose your frequency
                 </p>
 
                 <p className="mt-2 text-sm leading-7 text-[#667164]">
@@ -186,8 +186,7 @@ export default function HomePage() {
                 </p>
 
                 <p className="mt-2 text-sm leading-7 text-[#667164]">
-                  Keep favourite meals, pantry staples and repeat baskets in one
-                  place so future weeks are easier.
+                  Build your own collection of saved meals and week plans.
                 </p>
               </article>
 
