@@ -74,7 +74,7 @@ export default function HomePage() {
               Weekly grocery delivery + meal planning
             </p>
 
-            <h1 className="mt-6 font-serif text-[2.9rem] leading-[1.02] tracking-tight md:text-[4.6rem]">
+            <h1 className="mt-6 font-serif text-[2.35rem] leading-[1.02] tracking-tight md:text-[4.6rem]">
               Plan your meals.
               <br />
               Get ingredients delivered.
