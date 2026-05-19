@@ -83,17 +83,9 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/92 md:text-lg">
-              Flexible meal planning paired with local grocery delivery. Choose
-              meals, add ingredients and build a weekly or fortnightly pantry
-              plan around how you actually cook.
+              Flexible meal planning paired with local grocery delivery. Build
+              weekly or fortnightly baskets around the way you actually cook.
             </p>
-
-            <div className="mt-5 rounded-[22px] border border-white/15 bg-white/10 p-4 backdrop-blur">
-              <p className="text-sm leading-7 text-white/90">
-                Choose your own meals, pantry staples and produce boxes — with
-                flexible local delivery built around real home cooking.
-              </p>
-            </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -107,13 +99,13 @@ export default function HomePage() {
                 href="/shop"
                 className="rounded-full border border-white/45 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
               >
-                Browse pantry staples
+                Build your basket
               </Link>
             </div>
 
             <p className="mt-4 text-xs leading-6 text-white/70">
-              Free to explore. Save plans, regulars and delivery tools unlock
-              with Local Pantry membership.
+              Free to explore. Save meals and flexible delivery plans with Local
+              Pantry membership.
             </p>
           </div>
         </div>
@@ -159,7 +151,76 @@ export default function HomePage() {
           </section>
         </div>
       </section>
+      <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
+        <div className="mx-auto max-w-7xl">
+          <section className="rounded-[32px] border border-[#d9d0c4] bg-[#efe7db] p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+              Pantry membership
+            </p>
 
+            <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.6rem]">
+              A flexible food rhythm, not a recipe box.
+            </h2>
+
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-[#667164] md:text-base">
+              Local Pantry membership lets you save meals, repeat favourite
+              baskets and choose weekly or fortnightly grocery delivery around
+              the way you actually cook.
+            </p>
+
+            <div className="mt-7 grid gap-4 md:grid-cols-3">
+              <article className="rounded-[24px] border border-[#ddd4c8] bg-white/70 p-5">
+                <p className="text-sm font-medium text-[#243328]">
+                  Choose your rhythm
+                </p>
+
+                <p className="mt-2 text-sm leading-7 text-[#667164]">
+                  Pick weekly or fortnightly delivery, then build your plan
+                  around the meals and ingredients you want.
+                </p>
+              </article>
+
+              <article className="rounded-[24px] border border-[#ddd4c8] bg-white/70 p-5">
+                <p className="text-sm font-medium text-[#243328]">
+                  Save your regulars
+                </p>
+
+                <p className="mt-2 text-sm leading-7 text-[#667164]">
+                  Keep favourite meals, pantry staples and repeat baskets in one
+                  place so future weeks are easier.
+                </p>
+              </article>
+
+              <article className="rounded-[24px] border border-[#ddd4c8] bg-white/70 p-5">
+                <p className="text-sm font-medium text-[#243328]">
+                  Local delivery
+                </p>
+
+                <p className="mt-2 text-sm leading-7 text-[#667164]">
+                  Starting with a small local rollout keeps delivery practical,
+                  personal and easier to manage well.
+                </p>
+              </article>
+            </div>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/planner"
+                className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Explore the planner
+              </Link>
+
+              <Link
+                href="/shop"
+                className="rounded-full border border-[#d3cabd] bg-white/70 px-6 py-3 text-sm text-[#243328] transition hover:bg-white"
+              >
+                Build your basket
+              </Link>
+            </div>
+          </section>
+        </div>
+      </section>
       <section className="bg-[#243328] px-4 py-14 text-white sm:px-6 md:px-10 md:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
