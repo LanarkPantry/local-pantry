@@ -310,13 +310,12 @@ export default function HomePage() {
 
                 <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-white/65 p-5">
                   <p className="text-sm font-medium text-[#243328]">
-                    Small local rollout
+                    Local first
                   </p>
 
                   <p className="mt-2 text-sm leading-7 text-[#667164]">
-                    Starting locally keeps deliveries practical, flexible and
-                    personal while the planner and subscription system continue
-                    to evolve.
+                    Starting locally helps keep deliveries reliable, produce
+                    fresher and the service more personal.
                   </p>
                 </div>
 
