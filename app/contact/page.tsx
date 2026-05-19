@@ -29,21 +29,10 @@ export default function ContactPage() {
 
               <a
                 href="mailto:hello@thelocalpantry.shop"
-                className="mt-2 block font-serif text-2xl text-[#243328] underline decoration-[#c8bba8] underline-offset-4"
+                className="mt-2 block break-words font-serif text-2xl text-[#243328] underline decoration-[#c8bba8] underline-offset-4 md:text-3xl"
               >
                 hello@thelocalpantry.shop
               </a>
-
-              <div className="mt-8 rounded-[26px] border border-[#ddd4c8] bg-[#f8f4ee] p-5 md:p-6">
-                <p className="text-sm font-medium text-[#243328]">Email</p>
-
-                <a
-                  href="mailto:hello@thelocalpantry.shop"
-                  className="mt-2 block font-serif text-2xl text-[#243328] underline decoration-[#c8bba8] underline-offset-4"
-                >
-                  hello@thelocalpantry.shop
-                </a>
-              </div>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -87,7 +76,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter hideContactEmail />
     </main>
   );
 }

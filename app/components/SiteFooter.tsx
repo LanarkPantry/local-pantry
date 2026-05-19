@@ -1,6 +1,12 @@
 import Link from "next/link";
 
-export default function SiteFooter() {
+type SiteFooterProps = {
+  hideContactEmail?: boolean;
+};
+
+export default function SiteFooter({
+  hideContactEmail = false,
+}: SiteFooterProps) {
   return (
     <footer className="border-t border-[#ddd4c8] bg-[#243328] px-4 py-10 text-white sm:px-6 md:px-10">
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
@@ -24,15 +30,19 @@ export default function SiteFooter() {
             <Link href="/planner" className="hover:text-white">
               Planner
             </Link>
+
             <Link href="/shop" className="hover:text-white">
               Shop
             </Link>
+
             <Link href="/saved-weeks" className="hover:text-white">
               Saved Weeks
             </Link>
+
             <Link href="/regulars" className="hover:text-white">
               My Regulars
             </Link>
+
             <Link href="/basket" className="hover:text-white">
               Basket
             </Link>
@@ -43,12 +53,14 @@ export default function SiteFooter() {
           <p className="text-sm font-medium text-white">Contact</p>
 
           <div className="mt-4 flex flex-col gap-2 text-sm text-white/70">
-            <a
-              href="mailto:hello@thelocalpantry.shop"
-              className="hover:text-white"
-            >
-              hello@thelocalpantry.shop
-            </a>
+            {!hideContactEmail ? (
+              <a
+                href="mailto:hello@thelocalpantry.shop"
+                className="hover:text-white"
+              >
+                hello@thelocalpantry.shop
+              </a>
+            ) : null}
 
             <Link href="/contact" className="hover:text-white">
               Contact page
@@ -68,9 +80,11 @@ export default function SiteFooter() {
           <Link href="/privacy" className="hover:text-white">
             Privacy
           </Link>
+
           <Link href="/terms" className="hover:text-white">
             Terms
           </Link>
+
           <Link href="/delivery" className="hover:text-white">
             Delivery
           </Link>
