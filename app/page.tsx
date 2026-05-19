@@ -163,9 +163,9 @@ export default function HomePage() {
             </h2>
 
             <p className="mt-4 max-w-3xl text-sm leading-7 text-[#667164] md:text-base">
-              Local Pantry membership lets you save meals, repeat favourite
-              baskets and choose weekly or fortnightly grocery delivery around
-              the way you actually cook.
+              Local Pantry membership lets you save meals, repeat full weeks and
+              choose weekly or fortnightly grocery delivery around the way you
+              actually cook.
             </p>
 
             <div className="mt-7 grid gap-4 md:grid-cols-3">
@@ -192,12 +192,12 @@ export default function HomePage() {
 
               <article className="rounded-[24px] border border-[#ddd4c8] bg-white/70 p-5">
                 <p className="text-sm font-medium text-[#243328]">
-                  Local delivery
+                  Local produce
                 </p>
 
                 <p className="mt-2 text-sm leading-7 text-[#667164]">
-                  Starting with a small local rollout keeps delivery practical,
-                  personal and easier to manage well.
+                  Seasonal produce boxes and practical pantry staples designed
+                  for everyday home cooking.
                 </p>
               </article>
             </div>
