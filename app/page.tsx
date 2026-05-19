@@ -233,22 +233,10 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-5 text-base leading-8 text-white/80">
-                Build your own weekly rhythm around practical meals, pantry
+                Build your own weekly meal plan around practical recipes, pantry
                 staples and seasonal produce — then save favourite weeks and
                 repeat them easily.
               </p>
-
-              <div className="mt-7 rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur">
-                <p className="text-sm font-medium text-white">
-                  Designed for normal home cooking
-                </p>
-
-                <p className="mt-2 text-sm leading-7 text-white/70">
-                  Flexible meals, repeat ingredients and practical pantry
-                  staples help reduce food waste and decision fatigue through
-                  the week.
-                </p>
-              </div>
 
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
