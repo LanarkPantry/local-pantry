@@ -304,9 +304,8 @@ export default function HomePage() {
                 </h2>
 
                 <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-                  The Local Pantry is currently testing local weekly delivery of
-                  produce boxes and pantry staples across ML11 and nearby areas
-                  while the service grows carefully.
+                  Seasonal produce boxes, pantry staples and practical weekly
+                  groceries delivered across ML11 and nearby areas.
                 </p>
 
                 <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-white/65 p-5">
