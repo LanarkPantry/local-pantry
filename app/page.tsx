@@ -37,19 +37,19 @@ const howItWorks = [
   {
     number: "1",
     title: "Choose your meals",
-    text: "Build a flexible weekly plan around the meals you actually want to cook.",
+    text: "Choose meals for the week ahead.",
     image: "/images/home/plan-your-week.jpg",
   },
   {
     number: "2",
     title: "Build your basket",
-    text: "Add pantry staples, produce boxes and suggested ingredients directly from your planner.",
+    text: "Add ingredients, pantry staples and produce boxes to your basket.",
     image: "/images/home/build-your-basket.jpg",
   },
   {
     number: "3",
     title: "Get ingredients delivered",
-    text: "Receive practical weekly groceries designed for calmer, easier home cooking.",
+    text: "Get flexible weekly or fortnightly local delivery.",
     image: "/images/home/save-your-regulars.jpg",
   },
 ];
@@ -77,21 +77,21 @@ export default function HomePage() {
             <h1 className="mt-6 font-serif text-[2.35rem] leading-[1.02] tracking-tight md:text-[4.6rem]">
               Plan your meals.
               <br />
-              Get ingredients delivered.
+              Build your basket.
               <br />
-              Cook more easily.
+              Get local delivery.
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/92 md:text-lg">
-              The Local Pantry combines flexible meal planning with local
-              grocery delivery — helping you choose meals, build a practical
-              weekly basket and cook with less stress.
+              Flexible meal planning paired with local grocery delivery. Choose
+              meals, add ingredients and build a weekly or fortnightly pantry
+              plan around how you actually cook.
             </p>
 
             <div className="mt-5 rounded-[22px] border border-white/15 bg-white/10 p-4 backdrop-blur">
               <p className="text-sm leading-7 text-white/90">
-                Not recipe kits. Choose your own meals, pantry staples and
-                produce boxes each week.
+                Choose your own meals, pantry staples and produce boxes — with
+                flexible local delivery built around real home cooking.
               </p>
             </div>
 
@@ -100,7 +100,7 @@ export default function HomePage() {
                 href="/planner"
                 className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
               >
-                Start planning your week
+                Explore the planner
               </Link>
 
               <Link
@@ -110,6 +110,11 @@ export default function HomePage() {
                 Browse pantry staples
               </Link>
             </div>
+
+            <p className="mt-4 text-xs leading-6 text-white/70">
+              Free to explore. Save plans, regulars and delivery tools unlock
+              with Local Pantry membership.
+            </p>
           </div>
         </div>
       </section>
