@@ -63,9 +63,12 @@ export default function HomePage() {
 
         <div className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-end px-4 pb-12 pt-16 sm:px-6 md:px-10 md:pb-16">
           <div className="max-w-4xl text-white">
-            <p className="inline-flex rounded-full border border-white/35 bg-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur">
+            <a
+              href="#membership"
+              className="inline-flex rounded-full border border-white/35 bg-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur transition hover:bg-white/20"
+            >
               LOCAL PANTRY MEMBERSHIP
-            </p>
+            </a>
 
             <h1 className="mt-6 font-serif text-[2.35rem] leading-[1.02] tracking-tight md:text-[4.6rem]">
               Plan your meals.
@@ -146,21 +149,22 @@ export default function HomePage() {
       </section>
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
         <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] border border-[#d9d0c4] bg-[#efe7db] p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
+          <section
+            id="membership"
+            className="rounded-[32px] border border-[#d9d0c4] bg-[#efe7db] p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8"
+          >
+            {" "}
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
               Pantry membership
             </p>
-
             <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.6rem]">
               Local groceries for normal home cooking.
             </h2>
-
             <p className="mt-4 max-w-3xl text-sm leading-7 text-[#667164] md:text-base">
               Local Pantry membership lets you save meals, repeat full weeks and
               choose weekly or fortnightly grocery delivery around the way you
               actually cook.
             </p>
-
             <div className="mt-7 grid gap-4 md:grid-cols-3">
               <article className="rounded-[24px] border border-[#ddd4c8] bg-white/70 p-5">
                 <p className="text-sm font-medium text-[#243328]">
@@ -194,7 +198,6 @@ export default function HomePage() {
                 </p>
               </article>
             </div>
-
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href="/planner"
