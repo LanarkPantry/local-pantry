@@ -42,8 +42,7 @@ export default function ContactPage() {
                 </p>
 
                 <p className="mt-2 text-sm leading-7 text-[#667164]">
-                  Currently testing deliveries in ML11 and nearby Lanarkshire
-                  areas.
+                  Currently delivering throughout ML8 and ML11.
                 </p>
               </div>
 

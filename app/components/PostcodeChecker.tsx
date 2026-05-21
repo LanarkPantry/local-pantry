@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-const DELIVERY_OUTWARD_CODES = ["ML11"];
+const DELIVERY_OUTWARD_CODES = ["ML8", "ML11"];
 
 type PostcodeStatus = "idle" | "available" | "unavailable" | "invalid";
 type RegisterInterestStatus = "idle" | "success" | "error";
@@ -47,21 +47,16 @@ export default function PostcodeChecker() {
     setInterestStatus("idle");
     setInterestMessage("");
 
-    if (!postcode.trim()) {
+    if (!postcode.trim() || !isValidUkPostcode(postcode)) {
       setPostcodeStatus("invalid");
       return;
     }
 
-    if (!isValidUkPostcode(postcode)) {
-      setPostcodeStatus("invalid");
-      return;
-    }
-
-    if (DELIVERY_OUTWARD_CODES.includes(outwardCode)) {
-      setPostcodeStatus("available");
-    } else {
-      setPostcodeStatus("unavailable");
-    }
+    setPostcodeStatus(
+      DELIVERY_OUTWARD_CODES.includes(outwardCode)
+        ? "available"
+        : "unavailable",
+    );
   };
 
   const registerInterest = async () => {
@@ -101,7 +96,7 @@ export default function PostcodeChecker() {
 
       setInterestStatus("success");
       setInterestMessage(
-        "Thanks — we've added your area to our expansion list.",
+        "Thanks — we’ll let you know when delivery opens in your area.",
       );
       setInterestEmail("");
     } catch {
@@ -125,9 +120,9 @@ export default function PostcodeChecker() {
         </h2>
 
         <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
-          Planning works wherever you are. Ordering is available across the
-          Lanark area for now, with delivery areas expanding over time. Enter
-          your postcode to see whether delivery is available where you are.
+          Planning works wherever you are. Grocery delivery is currently
+          available across ML8 and ML11. Enter your postcode to check
+          availability.
         </p>
 
         <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
@@ -170,8 +165,8 @@ export default function PostcodeChecker() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#4f6b55]">
-              You&apos;re within our delivery area, so you can now shop produce
-              boxes and pantry essentials.
+              You&apos;re within our current delivery area for produce boxes,
+              pantry staples and weekly groceries.
             </p>
 
             <div className="mt-4 flex flex-wrap gap-3">
@@ -186,7 +181,7 @@ export default function PostcodeChecker() {
                 href="/planner"
                 className="inline-flex rounded-full border border-[#c8d3c4] bg-white px-5 py-3 text-sm font-medium text-[#2f4635] transition hover:bg-[#f7fbf5]"
               >
-                Continue planning
+                Explore the planner
               </Link>
             </div>
           </div>
@@ -199,12 +194,12 @@ export default function PostcodeChecker() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-              We&apos;re expanding delivery gradually based on local demand.
-              Register your interest so we know which areas to open next.
+              Local Pantry is currently delivering in ML8 and ML11 only.
+              Register your interest and we&apos;ll let you know when delivery
+              opens in your area.
             </p>
 
-            <div className="mt-5 flex flex-col gap-3 sm:grid sm:grid-cols-[1fr_auto]">
-              {" "}
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <input
                 type="email"
                 inputMode="email"
@@ -221,19 +216,15 @@ export default function PostcodeChecker() {
                 placeholder="Enter your email"
                 className="rounded-full border border-[#d6cec2] bg-white px-5 py-3 text-sm text-[#243328] outline-none placeholder:text-[#8b8b7c]"
               />
+
               <button
                 type="button"
                 onClick={registerInterest}
-                className="w-full sm:w-auto rounded-full border border-[#243328] bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f5f1ea]"
+                className="w-full rounded-full border border-[#243328] bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f5f1ea] sm:w-auto"
               >
                 Register interest
               </button>
             </div>
-
-            <p className="mt-3 text-xs leading-6 text-[#7a7267]">
-              Leave your postcode and email, and we&apos;ll use this to help
-              decide where delivery opens next.
-            </p>
 
             {interestMessage && (
               <p
@@ -250,7 +241,7 @@ export default function PostcodeChecker() {
                 href="/planner"
                 className="inline-flex rounded-full border border-[#d9d1c4] bg-white px-5 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f5f1ea]"
               >
-                Continue planning your week
+                Explore the planner
               </Link>
             </div>
           </div>

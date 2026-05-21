@@ -291,12 +291,12 @@ export default function HomePage() {
                 </p>
 
                 <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                  Grocery delivery currently available in ML11.
+                  Grocery delivery currently available in Ml8 and ML11.
                 </h2>
 
                 <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
                   Seasonal produce boxes, pantry staples and practical weekly
-                  groceries delivered across ML11 and nearby areas.
+                  groceries delivered across ML8 and ML11.
                 </p>
 
                 <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-white/65 p-5">
