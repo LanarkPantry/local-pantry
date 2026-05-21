@@ -10,26 +10,19 @@ const sampleWeek = [
     day: "Monday",
     meal: "Harissa Butter Beans & Couscous",
     image: "/images/recipes/harissa-butterbeans-peppers-couscous.jpg",
-  },
-  {
-    day: "Tuesday",
-    meal: "Sticky Miso Greens & Rice",
-    image: "/images/recipes/sticky-miso-chicken-tenderstem-rice.jpg",
+    note: "Fast pantry dinner with couscous, peppers and herbs.",
   },
   {
     day: "Wednesday",
-    meal: "Hot Honey Halloumi Couscous",
-    image: "/images/recipes/hot-honey-halloumi-couscous.jpg",
-  },
-  {
-    day: "Thursday",
     meal: "Courgette Bucatini with Pesto",
     image: "/images/recipes/bucatini-courgette-pesto.jpg",
+    note: "Simple midweek pasta using pantry staples and greens.",
   },
   {
     day: "Friday",
-    meal: "Tomato Chickpeas & Soft Herbs",
-    image: "/images/recipes/citrus-herb-halloumi-couscous-salad.jpg",
+    meal: "Hot Honey Halloumi Couscous",
+    image: "/images/recipes/hot-honey-halloumi-couscous.jpg",
+    note: "Flexible Friday meal with herbs, grains and vegetables.",
   },
 ];
 
@@ -71,7 +64,7 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-end px-4 pb-12 pt-16 sm:px-6 md:px-10 md:pb-16">
           <div className="max-w-4xl text-white">
             <p className="inline-flex rounded-full border border-white/35 bg-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur">
-              Weekly grocery delivery + meal planning
+              LOCAL PANTRY MEMBERSHIP
             </p>
 
             <h1 className="mt-6 font-serif text-[2.35rem] leading-[1.02] tracking-tight md:text-[4.6rem]">
@@ -233,9 +226,8 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-5 text-base leading-8 text-white/80">
-                Build your own weekly meal plan around practical recipes, pantry
-                staples and seasonal produce — then save favourite weeks and
-                repeat them easily.
+                Example meals from the planner using practical ingredients,
+                pantry staples and seasonal produce for everyday home cooking.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
@@ -279,8 +271,7 @@ export default function HomePage() {
                     </h3>
 
                     <p className="mt-2 text-sm leading-6 text-white/65">
-                      Example planner meal — swap, save and repeat your own
-                      versions.
+                      {item.note}
                     </p>
                   </div>
                 </article>
@@ -310,12 +301,12 @@ export default function HomePage() {
 
                 <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-white/65 p-5">
                   <p className="text-sm font-medium text-[#243328]">
-                    Local first
+                    Everyday groceries
                   </p>
 
                   <p className="mt-2 text-sm leading-7 text-[#667164]">
-                    Starting locally helps keep deliveries reliable, produce
-                    fresher and the service more personal.
+                    Build weekly or fortnightly plans around practical
+                    ingredients, repeat meals and calmer everyday cooking.
                   </p>
                 </div>
 
@@ -350,67 +341,6 @@ export default function HomePage() {
 
       <PostcodeChecker />
 
-      <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
-        <div className="mx-auto max-w-7xl">
-          <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-            <article className="rounded-[30px] border border-[#ddd4c8] bg-white/78 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Planner access
-              </p>
-
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.6rem]">
-                Explore the planner freely.
-              </h2>
-
-              <p className="mt-4 text-sm leading-7 text-[#667164] md:text-base">
-                Try meal planning, browse pantry staples and build baskets
-                freely. Save weeks, regular meals and subscription tools unlock
-                with weekly delivery membership.
-              </p>
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/planner"
-                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Open planner
-                </Link>
-
-                <Link
-                  href="/saved-weeks"
-                  className="rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
-                >
-                  Saved weeks
-                </Link>
-              </div>
-            </article>
-
-            <article className="rounded-[30px] border border-[#ddd4c8] bg-[#f7f2eb]/84 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Flexible groceries
-              </p>
-
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.6rem]">
-                Pantry staples + produce boxes.
-              </h2>
-
-              <p className="mt-4 text-sm leading-7 text-[#667164] md:text-base">
-                Build your own weekly basket around practical ingredients,
-                repeat meals and calmer everyday cooking.
-              </p>
-
-              <div className="mt-7">
-                <Link
-                  href="/shop"
-                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Browse the shop
-                </Link>
-              </div>
-            </article>
-          </section>
-        </div>
-      </section>
       <SiteFooter />
     </main>
   );
