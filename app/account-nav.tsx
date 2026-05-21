@@ -39,9 +39,12 @@ export default function AccountNav() {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="hidden max-w-[180px] truncate text-xs text-[#667164] md:block">
-        {userEmail}
-      </span>
+      <Link
+        href="/saved-weeks"
+        className="hidden text-sm text-[#4f5e52] transition hover:text-[#243328] md:block"
+      >
+        My Pantry
+      </Link>
 
       <button
         type="button"

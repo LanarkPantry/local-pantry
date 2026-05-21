@@ -83,8 +83,8 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/92 md:text-lg">
-              Flexible meal planning paired with local grocery delivery. Build
-              weekly or fortnightly baskets around the way you actually cook.
+              Meal planning paired with local grocery delivery for normal home
+              cooking.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
