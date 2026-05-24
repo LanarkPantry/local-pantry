@@ -1,270 +1,209 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
-const steps = [
+const selectedMeals = [
   {
-    label: "Step 1",
-    title: "Choose your weekly box",
-    text: "Your fruit and veg box is the regular part of the order.",
+    name: "Rose Harissa Butter Beans",
+    image: "/images/demo/rose-harissa.png",
   },
   {
-    label: "Step 2",
-    title: "Add pantry extras",
-    text: "Gochujang, stock paste, beans, pasta and jars stay one-off.",
-  },
-  {
-    label: "Step 3",
-    title: "Your basket separates them",
-    text: "Only the box repeats. Add-ons are flexible.",
+    name: "Sorrel Walnut Bucatini",
+    image: "/images/demo/sorrel-walnut-pesto.png",
   },
 ];
 
-const addOns = [
-  { name: "Gochujang", price: "£4.95" },
-  { name: "Vegetable stock paste", price: "£5.50" },
-  { name: "Rose harissa", price: "£5.25" },
+const pantryItems = [
+  {
+    name: "Casarecce",
+    image: "/images/demo/casarecce.jpg",
+  },
+  {
+    name: "Giant Couscous",
+    image: "/images/demo/giant-couscous.jpg",
+  },
+  {
+    name: "Rose Harissa",
+    image: "/images/demo/rose-harissa.png",
+  },
+  {
+    name: "Sorrel Walnut Pesto",
+    image: "/images/demo/sorrel-walnut-pesto.png",
+  },
 ];
 
 export default function SubscriptionFlowDemo() {
-  const [step, setStep] = useState(0);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setStep((current) => (current + 1) % steps.length);
-    }, 2300);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const showAddOns = step >= 1;
-  const showSummary = step >= 2;
-
   return (
-    <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
-      <div className="mx-auto max-w-7xl">
-        <section className="overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-white/80 shadow-[0_12px_34px_rgba(36,51,40,0.06)]">
-          <div className="grid gap-0 lg:grid-cols-[0.92fr_1.08fr]">
-            <div className="p-6 md:p-10">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                How it works
-              </p>
+    <section className="overflow-hidden rounded-[32px] border border-[#d8d2c8] bg-[#f8f5ef] p-6 md:p-10">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10 max-w-2xl">
+          <p className="mb-3 text-sm uppercase tracking-[0.2em] text-[#7b7b6f]">
+            How it works
+          </p>
 
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                A weekly fruit & veg box, with flexible pantry add-ons.
-              </h2>
+          <h2 className="mb-4 text-3xl font-medium tracking-tight text-[#243328] md:text-5xl">
+            Build meals. We build the pantry.
+          </h2>
 
-              <p className="mt-5 max-w-xl text-sm leading-8 text-[#667164] md:text-base">
-                Keep your fresh produce coming regularly, then add the extras
-                you need that week. Your basket keeps the repeat box separate
-                from the one-off items.
-              </p>
+          <p className="text-base leading-relaxed text-[#4e5a51] md:text-lg">
+            Choose recipes for the week and your basket updates automatically
+            with the pantry ingredients and fresh produce you need.
+          </p>
+        </div>
 
-              <div className="mt-7 space-y-3">
-                {steps.map((item, index) => {
-                  const active = step === index;
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* STEP 1 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="rounded-[28px] bg-white p-5 shadow-sm"
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <span className="text-sm font-medium text-[#7a7a6d]">Step 1</span>
 
-                  return (
-                    <button
-                      key={item.title}
-                      type="button"
-                      onClick={() => setStep(index)}
-                      className={`w-full rounded-2xl border p-4 text-left transition ${
-                        active
-                          ? "border-[#243328] bg-[#f8f4ee]"
-                          : "border-[#e5dccf] bg-white/70 hover:bg-[#fbf8f4]"
-                      }`}
-                    >
-                      <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                        {item.label}
-                      </p>
-
-                      <p className="mt-1 font-serif text-xl text-[#243328]">
-                        {item.title}
-                      </p>
-
-                      <p className="mt-2 text-sm leading-6 text-[#667164]">
-                        {item.text}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/shop"
-                  className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Build your basket
-                </Link>
-
-                <Link
-                  href="/planner"
-                  className="rounded-full border border-[#d3cabd] bg-white/70 px-6 py-3 text-sm text-[#243328] transition hover:bg-white"
-                >
-                  Explore recipes
-                </Link>
+              <div className="rounded-full bg-[#edf2eb] px-3 py-1 text-xs font-medium text-[#243328]">
+                Choose meals
               </div>
             </div>
 
-            <div className="bg-[#f4efe9] p-5 md:p-8">
-              <div className="mx-auto max-w-md rounded-[30px] border border-[#ddd4c8] bg-white p-5 shadow-[0_18px_40px_rgba(36,51,40,0.08)]">
-                <div className="flex items-center justify-between gap-4 border-b border-[#eee6dc] pb-4">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                      Your basket
-                    </p>
-                    <h3 className="mt-1 font-serif text-2xl text-[#243328]">
-                      Week ahead
-                    </h3>
-                  </div>
-
-                  <motion.div
-                    key={step}
-                    initial={{ scale: 0.94, opacity: 0.6 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.22 }}
-                    className="rounded-full bg-[#243328] px-3 py-1 text-xs text-white"
-                  >
-                    {showSummary ? "Ready" : "Building"}
-                  </motion.div>
-                </div>
-
-                <div className="mt-5">
-                  <p className="text-sm font-medium text-[#243328]">
-                    Repeating box
-                  </p>
-
-                  <motion.div
-                    layout
-                    className="mt-3 rounded-2xl border border-[#d8cfbf] bg-[#f8f4ee] p-4"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="font-serif text-xl text-[#243328]">
-                          Weekly Produce Box
-                        </p>
-                        <p className="mt-1 text-sm leading-6 text-[#667164]">
-                          Fruit and veg for normal weekly cooking.
-                        </p>
-                      </div>
-
-                      <span className="shrink-0 rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
-                        repeats
-                      </span>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {["Potatoes", "Carrots", "Apples", "Greens"].map(
-                        (item) => (
-                          <span
-                            key={item}
-                            className="rounded-full border border-[#ddd4c8] bg-white px-3 py-1 text-xs text-[#5f675c]"
-                          >
-                            {item}
-                          </span>
-                        ),
-                      )}
-                    </div>
-                  </motion.div>
-                </div>
-
-                <div className="mt-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-medium text-[#243328]">
-                      One-off add-ons
-                    </p>
-
-                    <AnimatePresence>
-                      {showAddOns && (
-                        <motion.span
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 6 }}
-                          className="rounded-full border border-[#ddd4c8] bg-white px-3 py-1 text-xs text-[#5f675c]"
-                        >
-                          added this week only
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  <div className="mt-3 space-y-3">
-                    <AnimatePresence>
-                      {showAddOns ? (
-                        addOns.map((item, index) => (
-                          <motion.div
-                            key={item.name}
-                            initial={{ opacity: 0, x: 18 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 18 }}
-                            transition={{ duration: 0.25, delay: index * 0.08 }}
-                            className="flex items-center justify-between gap-4 rounded-2xl border border-[#e7dfd3] bg-white p-4"
-                          >
-                            <div>
-                              <p className="text-sm font-medium text-[#243328]">
-                                {item.name}
-                              </p>
-                              <p className="mt-1 text-xs text-[#667164]">
-                                One-off pantry extra
-                              </p>
-                            </div>
-
-                            <p className="text-sm font-medium text-[#243328]">
-                              {item.price}
-                            </p>
-                          </motion.div>
-                        ))
-                      ) : (
-                        <motion.div
-                          key="empty-addons"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="rounded-2xl border border-dashed border-[#d8cfbf] bg-white/60 p-4 text-sm leading-6 text-[#667164]"
-                        >
-                          Add jars, pastes, beans or cupboard staples only when
-                          you want them.
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
+            <div className="space-y-4">
+              {selectedMeals.map((meal, index) => (
                 <motion.div
-                  layout
-                  className="mt-6 rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4"
+                  key={meal.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: index * 0.2,
+                    duration: 0.45,
+                  }}
+                  viewport={{ once: true }}
+                  className="flex items-center gap-4 rounded-2xl border border-[#ece7dd] bg-[#faf8f4] p-3"
                 >
-                  <div className="flex items-center justify-between text-sm text-[#667164]">
-                    <span>Repeating</span>
-                    <span>Weekly Produce Box</span>
+                  <div className="relative h-20 w-20 overflow-hidden rounded-xl">
+                    <Image
+                      src={meal.image}
+                      alt={meal.name}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
 
-                  <div className="mt-3 flex items-center justify-between text-sm text-[#667164]">
-                    <span>One-off extras</span>
-                    <span>{showAddOns ? "3 items" : "0 items"}</span>
-                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#243328]">
+                      {meal.name}
+                    </p>
 
-                  <AnimatePresence>
-                    {showSummary && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        className="mt-4 rounded-xl bg-[#243328] px-4 py-3 text-sm text-white"
-                      >
-                        Only your box repeats. Pantry extras stay flexible.
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    <p className="mt-1 text-xs text-[#70756d]">
+                      Added to weekly plan
+                    </p>
+                  </div>
                 </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* STEP 2 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+            viewport={{ once: true }}
+            className="rounded-[28px] bg-white p-5 shadow-sm"
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <span className="text-sm font-medium text-[#7a7a6d]">Step 2</span>
+
+              <div className="rounded-full bg-[#edf2eb] px-3 py-1 text-xs font-medium text-[#243328]">
+                Pantry builds
               </div>
             </div>
-          </div>
-        </section>
+
+            <div className="grid grid-cols-2 gap-3">
+              {pantryItems.map((item, index) => (
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    delay: index * 0.12,
+                    duration: 0.4,
+                  }}
+                  viewport={{ once: true }}
+                  className="overflow-hidden rounded-2xl border border-[#ece7dd] bg-[#faf8f4]"
+                >
+                  <div className="relative aspect-square">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div className="p-3">
+                    <p className="text-xs font-medium text-[#243328]">
+                      {item.name}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* STEP 3 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            viewport={{ once: true }}
+            className="overflow-hidden rounded-[28px] bg-[#243328] text-white shadow-sm"
+          >
+            <div className="relative min-h-full">
+              <div className="absolute inset-0">
+                <Image
+                  src="/images/demo/local-delivery.jpg"
+                  alt="Local Pantry delivery"
+                  fill
+                  className="object-cover opacity-45"
+                />
+              </div>
+
+              <div className="relative z-10 flex h-full flex-col justify-between p-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-white/70">
+                    Step 3
+                  </span>
+
+                  <div className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                    Delivered locally
+                  </div>
+                </div>
+
+                <div className="mt-24">
+                  <motion.div
+                    initial={{ opacity: 0, y: 18 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className="rounded-3xl bg-white/10 p-5 backdrop-blur-md"
+                  >
+                    <p className="mb-2 text-2xl font-medium">
+                      Your week arrives ready to cook.
+                    </p>
+
+                    <p className="text-sm leading-relaxed text-white/80">
+                      Fresh produce on subscription. Pantry ingredients only
+                      when needed. Less waste. Less mental load.
+                    </p>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
