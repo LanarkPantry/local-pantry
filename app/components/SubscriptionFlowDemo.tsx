@@ -30,11 +30,12 @@ export default function SubscriptionFlowDemo() {
       <div className="mx-auto max-w-7xl">
         <section className="rounded-[32px] border border-[#ddd4c8] bg-white/80 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
           <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-            How it works
+            How orders work
           </p>
 
           <h2 className="mt-3 max-w-3xl font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.7rem]">
-            A regular fruit & veg box, with flexible extras when you need them.
+            Subscribe to regular fruit & veg. Add pantry extras only when you
+            want them.
           </h2>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">

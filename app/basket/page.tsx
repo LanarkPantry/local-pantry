@@ -27,7 +27,11 @@ export default function BasketPage() {
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-
+  const [pauseEmail, setPauseEmail] = useState("");
+  const [pauseWeeks, setPauseWeeks] = useState<1 | 2 | 4>(1);
+  const [isPausingSubscription, setIsPausingSubscription] = useState(false);
+  const [pauseMessage, setPauseMessage] = useState("");
+  const [pauseError, setPauseError] = useState("");
   const totalItems = cart.length;
 
   const subscriptionSubtotal = useMemo(() => {
@@ -151,6 +155,40 @@ Thanks!`,
       );
     } finally {
       setIsLoadingCheckout(false);
+    }
+  };
+  const pauseSubscription = async () => {
+    try {
+      setPauseMessage("");
+      setPauseError("");
+      setIsPausingSubscription(true);
+
+      const response = await fetch("/api/pause-subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: pauseEmail,
+          weeks: pauseWeeks,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not pause subscription.");
+      }
+
+      setPauseMessage(data.message || "Your subscription has been paused.");
+    } catch (error) {
+      setPauseError(
+        error instanceof Error
+          ? error.message
+          : "Could not pause subscription.",
+      );
+    } finally {
+      setIsPausingSubscription(false);
     }
   };
 
@@ -763,7 +801,128 @@ Thanks!`,
                     Check your postcode
                   </Link>
                 </div>
+                <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Manage your subscription
+                  </p>
 
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Pause, cancel or update your box subscription at any time.
+                  </p>
+
+                  <form
+                    className="mt-4 space-y-3"
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+
+                      const formData = new FormData(e.currentTarget);
+                      const email = formData.get("email");
+
+                      try {
+                        const response = await fetch("/api/customer-portal", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({ email }),
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                          throw new Error(
+                            data.error || "Something went wrong.",
+                          );
+                        }
+
+                        if (data.url) {
+                          window.location.href = data.url;
+                        }
+                      } catch (error) {
+                        alert(
+                          error instanceof Error
+                            ? error.message
+                            : "Could not open subscription portal.",
+                        );
+                      }
+                    }}
+                  >
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="Enter your subscription email"
+                      className="w-full rounded-xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
+                    />
+
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl border border-[#d6cec2] bg-[rgba(251,250,248,0.9)] px-4 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
+                    >
+                      Manage subscription
+                    </button>
+                  </form>
+                </div>
+                <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Pause your subscription
+                  </p>
+
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Pause your box for 1, 2 or 4 weeks. Paused weeks will not be
+                    charged.
+                  </p>
+
+                  <div className="mt-4 space-y-3">
+                    <input
+                      type="email"
+                      value={pauseEmail}
+                      onChange={(e) => setPauseEmail(e.target.value)}
+                      placeholder="Enter your subscription email"
+                      className="w-full rounded-xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
+                    />
+
+                    <div className="grid grid-cols-3 gap-2">
+                      {[1, 2, 4].map((weeks) => (
+                        <button
+                          key={weeks}
+                          type="button"
+                          onClick={() => setPauseWeeks(weeks as 1 | 2 | 4)}
+                          className={`rounded-xl border px-3 py-2 text-sm transition ${
+                            pauseWeeks === weeks
+                              ? "border-[#243328] bg-[#243328] text-white"
+                              : "border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] text-[#243328] hover:bg-white"
+                          }`}
+                        >
+                          {weeks} week{weeks === 1 ? "" : "s"}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={pauseSubscription}
+                      disabled={isPausingSubscription || !pauseEmail.trim()}
+                      className="w-full rounded-xl border border-[#d6cec2] bg-[rgba(251,250,248,0.9)] px-4 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isPausingSubscription
+                        ? "Pausing..."
+                        : "Pause subscription"}
+                    </button>
+
+                    {pauseMessage && (
+                      <p className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                        {pauseMessage}
+                      </p>
+                    )}
+
+                    {pauseError && (
+                      <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        {pauseError}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <div className="mt-5 space-y-3">
                   <button
                     type="button"
