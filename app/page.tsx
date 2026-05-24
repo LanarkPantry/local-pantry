@@ -4,7 +4,7 @@ import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import PostcodeChecker from "./components/PostcodeChecker";
 import SiteFooter from "./components/SiteFooter";
-
+import SubscriptionFlowDemo from "./components/SubscriptionFlowDemo";
 const sampleWeek = [
   {
     day: "Monday",
@@ -23,27 +23,6 @@ const sampleWeek = [
     meal: "Hot Honey Halloumi Couscous",
     image: "/images/recipes/hot-honey-halloumi-couscous.jpg",
     note: "Flexible Friday meal with herbs, grains and vegetables.",
-  },
-];
-
-const howItWorks = [
-  {
-    number: "1",
-    title: "Choose your meals",
-    text: "Choose meals for the week ahead.",
-    image: "/images/home/plan-your-week.jpg",
-  },
-  {
-    number: "2",
-    title: "Build your basket",
-    text: "Add ingredients, pantry staples and produce boxes to your basket.",
-    image: "/images/home/build-your-basket.jpg",
-  },
-  {
-    number: "3",
-    title: "Get ingredients delivered",
-    text: "Get flexible weekly or fortnightly local delivery.",
-    image: "/images/home/save-your-regulars.jpg",
   },
 ];
 
@@ -107,46 +86,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
-        <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] border border-[#ddd4c8] bg-white/78 p-5 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-              How it works
-            </p>
-
-            <h2 className="mt-3 font-serif text-[1.8rem] leading-tight text-[#243328] md:text-[2.5rem]">
-              Flexible weekly groceries built around real cooking.
-            </h2>
-
-            <div className="mt-7 grid gap-5 md:grid-cols-3">
-              {howItWorks.map((step) => (
-                <article
-                  key={step.number}
-                  className="rounded-[24px] border border-[#e5dccf] bg-[#f8f4ee]/85 p-4"
-                >
-                  <img
-                    src={step.image}
-                    alt={step.title}
-                    className="h-36 w-full rounded-[18px] object-cover sm:h-40 md:h-36 lg:h-40"
-                  />
-
-                  <div className="mt-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#243328] text-sm font-medium text-white">
-                    {step.number}
-                  </div>
-
-                  <h3 className="mt-4 font-serif text-[1.45rem] leading-tight text-[#243328]">
-                    {step.title}
-                  </h3>
-
-                  <p className="mt-3 text-sm leading-7 text-[#667164]">
-                    {step.text}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </section>
-        </div>
-      </section>
+      <SubscriptionFlowDemo />
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
         <div className="mx-auto max-w-7xl">
           <section
