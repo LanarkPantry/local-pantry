@@ -181,6 +181,9 @@ export default function PlannerPage() {
   const [savingRecipeSlug, setSavingRecipeSlug] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const [recentlyAddedItem, setRecentlyAddedItem] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     async function checkUser() {
@@ -417,6 +420,8 @@ export default function PlannerPage() {
       category: product.category,
       checkoutType: product.checkoutType,
     });
+
+    showAddedFeedback(product.name);
   }
 
   function addDisplayItem(item: ShopDisplayItem) {
@@ -427,6 +432,16 @@ export default function PlannerPage() {
       category: item.category,
       checkoutType: item.checkoutType,
     });
+
+    showAddedFeedback(item.name);
+  }
+
+  function showAddedFeedback(itemName: string) {
+    setRecentlyAddedItem(itemName);
+
+    window.setTimeout(() => {
+      setRecentlyAddedItem(null);
+    }, 1200);
   }
 
   function addAllAddOns() {
@@ -920,9 +935,15 @@ export default function PlannerPage() {
                               key={product}
                               type="button"
                               onClick={() => addProductByName(product)}
-                              className="rounded-full border border-[#d6cec2] bg-white/80 px-3 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+                              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                                recentlyAddedItem === product
+                                  ? "border-[#5f7f5f] bg-[#eef5ea] text-[#36553c]"
+                                  : "border-[#d6cec2] bg-white/80 text-[#243328] hover:bg-white"
+                              }`}
                             >
-                              Add {product}
+                              {recentlyAddedItem === product
+                                ? "Added ✓"
+                                : `Add ${product}`}
                             </button>
                           ))}
                         </div>
@@ -1069,18 +1090,14 @@ export default function PlannerPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  addToCart({
-                    name: item.name,
-                    price: item.price,
-                    image: item.image,
-                    category: item.category,
-                    checkoutType: item.checkoutType,
-                  })
-                }
-                className="mt-4 w-full rounded-full bg-[#243328] px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                onClick={() => addDisplayItem(item)}
+                className={`mt-4 w-full rounded-full px-4 py-3 text-sm font-medium transition ${
+                  recentlyAddedItem === item.name
+                    ? "bg-[#5f7f5f] text-white"
+                    : "bg-[#243328] text-white hover:opacity-90"
+                }`}
               >
-                Add to basket
+                {recentlyAddedItem === item.name ? "Added ✓" : "Add to basket"}
               </button>
             </article>
           ))}
