@@ -842,129 +842,124 @@ Thanks!`,
                     {basketSummaryText}
                   </p>
                 </div>
-                <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] p-4">
-                  <p className="text-sm font-medium text-[#243328]">
-                    Manage your subscription
-                  </p>
+                {subscriptionItemCount > 0 && (
+                  <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] p-4">
+                    <p className="text-sm font-medium text-[#243328]">
+                      Subscription help
+                    </p>
 
-                  <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Cancel your subscription or update your subscription details
-                    through Stripe.
-                  </p>
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      Already subscribed? Enter your subscription email once to
+                      pause, cancel or update your box.
+                    </p>
 
-                  <form
-                    className="mt-4 space-y-3"
-                    onSubmit={async (e) => {
-                      e.preventDefault();
+                    <div className="mt-4 space-y-3">
+                      <input
+                        type="email"
+                        value={pauseEmail}
+                        onChange={(e) => setPauseEmail(e.target.value)}
+                        placeholder="Enter your subscription email"
+                        className="w-full rounded-xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
+                      />
 
-                      const formData = new FormData(e.currentTarget);
-                      const email = formData.get("email");
+                      <div>
+                        <p className="mb-2 text-xs font-medium uppercase tracking-[0.14em] text-[#6b776c]">
+                          Pause your box
+                        </p>
 
-                      try {
-                        const response = await fetch("/api/customer-portal", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({ email }),
-                        });
+                        <div className="grid grid-cols-3 gap-2">
+                          {[1, 2, 4].map((weeks) => (
+                            <button
+                              key={weeks}
+                              type="button"
+                              onClick={() => setPauseWeeks(weeks as 1 | 2 | 4)}
+                              className={`rounded-xl border px-3 py-2 text-sm transition ${
+                                pauseWeeks === weeks
+                                  ? "border-[#243328] bg-[#243328] text-white"
+                                  : "border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] text-[#243328] hover:bg-white"
+                              }`}
+                            >
+                              {weeks} week{weeks === 1 ? "" : "s"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
-                        const data = await response.json();
+                      <button
+                        type="button"
+                        onClick={pauseSubscription}
+                        disabled={isPausingSubscription || !pauseEmail.trim()}
+                        className="w-full rounded-xl border border-[#d6cec2] bg-[rgba(251,250,248,0.9)] px-4 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isPausingSubscription
+                          ? "Pausing..."
+                          : "Pause subscription"}
+                      </button>
 
-                        if (!response.ok) {
-                          throw new Error(
-                            data.error || "Something went wrong.",
-                          );
-                        }
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
 
-                        if (data.url) {
-                          window.location.href = data.url;
-                        }
-                      } catch (error) {
-                        alert(
-                          error instanceof Error
-                            ? error.message
-                            : "Could not open subscription portal.",
-                        );
-                      }
-                    }}
-                  >
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      placeholder="Enter your subscription email"
-                      className="w-full rounded-xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
-                    />
+                          try {
+                            const response = await fetch(
+                              "/api/customer-portal",
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ email: pauseEmail }),
+                              },
+                            );
 
-                    <button
-                      type="submit"
-                      className="w-full rounded-xl border border-[#d6cec2] bg-[rgba(251,250,248,0.9)] px-4 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
-                    >
-                      Manage subscription
-                    </button>
-                  </form>
-                </div>
-                <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-[rgba(255,255,255,0.78)] p-4">
-                  <p className="text-sm font-medium text-[#243328]">
-                    Pause your subscription
-                  </p>
+                            const data = await response.json();
 
-                  <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Pause your box for 1, 2 or 4 weeks. Paused weeks will not be
-                    charged.
-                  </p>
+                            if (!response.ok) {
+                              throw new Error(
+                                data.error || "Something went wrong.",
+                              );
+                            }
 
-                  <div className="mt-4 space-y-3">
-                    <input
-                      type="email"
-                      value={pauseEmail}
-                      onChange={(e) => setPauseEmail(e.target.value)}
-                      placeholder="Enter your subscription email"
-                      className="w-full rounded-xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm text-[#243328] outline-none transition placeholder:text-[#8a9388] focus:border-[#314534]"
-                    />
-
-                    <div className="grid grid-cols-3 gap-2">
-                      {[1, 2, 4].map((weeks) => (
+                            if (data.url) {
+                              window.location.href = data.url;
+                            }
+                          } catch (error) {
+                            alert(
+                              error instanceof Error
+                                ? error.message
+                                : "Could not open subscription portal.",
+                            );
+                          }
+                        }}
+                      >
                         <button
-                          key={weeks}
-                          type="button"
-                          onClick={() => setPauseWeeks(weeks as 1 | 2 | 4)}
-                          className={`rounded-xl border px-3 py-2 text-sm transition ${
-                            pauseWeeks === weeks
-                              ? "border-[#243328] bg-[#243328] text-white"
-                              : "border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] text-[#243328] hover:bg-white"
-                          }`}
+                          type="submit"
+                          disabled={!pauseEmail.trim()}
+                          className="w-full rounded-xl border border-[#d6cec2] bg-[rgba(255,255,255,0.92)] px-4 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          {weeks} week{weeks === 1 ? "" : "s"}
+                          Manage or cancel subscription
                         </button>
-                      ))}
+                      </form>
+
+                      {pauseMessage && (
+                        <p className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                          {pauseMessage}
+                        </p>
+                      )}
+
+                      {pauseError && (
+                        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                          {pauseError}
+                        </p>
+                      )}
+
+                      <p className="text-xs leading-5 text-[#7a8478]">
+                        Paused weeks will not be charged. Use the manage button
+                        for Stripe billing details and cancellation.
+                      </p>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={pauseSubscription}
-                      disabled={isPausingSubscription || !pauseEmail.trim()}
-                      className="w-full rounded-xl border border-[#d6cec2] bg-[rgba(251,250,248,0.9)] px-4 py-3 text-sm font-medium text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isPausingSubscription
-                        ? "Pausing..."
-                        : "Pause subscription"}
-                    </button>
-
-                    {pauseMessage && (
-                      <p className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                        {pauseMessage}
-                      </p>
-                    )}
-
-                    {pauseError && (
-                      <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                        {pauseError}
-                      </p>
-                    )}
                   </div>
-                </div>
+                )}
               </div>
             </aside>
           </div>
