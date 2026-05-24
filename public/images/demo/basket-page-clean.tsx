@@ -848,8 +848,7 @@ Thanks!`,
                   </p>
 
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Cancel your subscription or update your subscription details
-                    through Stripe.
+                    Cancel your subscription or update your subscription details through Stripe.
                   </p>
 
                   <form
