@@ -1,209 +1,194 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
-const selectedMeals = [
+const steps = [
   {
-    name: "Rose Harissa Butter Beans",
-    image: "/images/demo/rose-harissa.png",
+    title: "Choose your box",
+    text: "Start with a fruit and veg box for the week ahead.",
   },
   {
-    name: "Sorrel Walnut Bucatini",
-    image: "/images/demo/sorrel-walnut-pesto.png",
-  },
-];
-
-const pantryItems = [
-  {
-    name: "Casarecce",
-    image: "/images/demo/casarecce.jpg",
+    title: "Add extras",
+    text: "Add jars, beans, pasta, grains or cupboard staples only when useful.",
   },
   {
-    name: "Giant Couscous",
-    image: "/images/demo/giant-couscous.jpg",
+    title: "Review your basket",
+    text: "Your basket clearly separates the repeatable box from one-off extras.",
   },
   {
-    name: "Rose Harissa",
-    image: "/images/demo/rose-harissa.png",
-  },
-  {
-    name: "Sorrel Walnut Pesto",
-    image: "/images/demo/sorrel-walnut-pesto.png",
+    title: "Delivered locally",
+    text: "Your weekly food arrives ready for normal home cooking.",
   },
 ];
 
 export default function SubscriptionFlowDemo() {
+  const [step, setStep] = useState(0);
+
   return (
-    <section className="overflow-hidden rounded-[32px] border border-[#d8d2c8] bg-[#f8f5ef] p-6 md:p-10">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-10 max-w-2xl">
-          <p className="mb-3 text-sm uppercase tracking-[0.2em] text-[#7b7b6f]">
+    <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
+      <div className="mx-auto max-w-7xl">
+        <section className="rounded-[32px] border border-[#ddd4c8] bg-white/80 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
             How it works
           </p>
 
-          <h2 className="mb-4 text-3xl font-medium tracking-tight text-[#243328] md:text-5xl">
-            Build meals. We build the pantry.
+          <h2 className="mt-3 max-w-3xl font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.7rem]">
+            A regular fruit & veg box, with flexible extras when you need them.
           </h2>
 
-          <p className="text-base leading-relaxed text-[#4e5a51] md:text-lg">
-            Choose recipes for the week and your basket updates automatically
-            with the pantry ingredients and fresh produce you need.
-          </p>
-        </div>
+          <div className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+            <div className="space-y-3">
+              {steps.map((item, index) => (
+                <button
+                  key={item.title}
+                  type="button"
+                  onClick={() => setStep(index)}
+                  className={`w-full rounded-2xl border p-4 text-left transition ${
+                    step === index
+                      ? "border-[#243328] bg-[#f8f4ee]"
+                      : "border-[#e5dccf] bg-white hover:bg-[#fbf8f4]"
+                  }`}
+                >
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                    Step {index + 1}
+                  </p>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* STEP 1 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="rounded-[28px] bg-white p-5 shadow-sm"
-          >
-            <div className="mb-5 flex items-center justify-between">
-              <span className="text-sm font-medium text-[#7a7a6d]">Step 1</span>
+                  <h3 className="mt-1 font-serif text-xl text-[#243328]">
+                    {item.title}
+                  </h3>
 
-              <div className="rounded-full bg-[#edf2eb] px-3 py-1 text-xs font-medium text-[#243328]">
-                Choose meals
-              </div>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    {item.text}
+                  </p>
+                </button>
+              ))}
             </div>
 
-            <div className="space-y-4">
-              {selectedMeals.map((meal, index) => (
-                <motion.div
-                  key={meal.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: index * 0.2,
-                    duration: 0.45,
-                  }}
-                  viewport={{ once: true }}
-                  className="flex items-center gap-4 rounded-2xl border border-[#ece7dd] bg-[#faf8f4] p-3"
-                >
-                  <div className="relative h-20 w-20 overflow-hidden rounded-xl">
+            <div className="rounded-[28px] border border-[#e5dccf] bg-[#f8f4ee] p-5">
+              {step === 0 && (
+                <div>
+                  <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white">
                     <Image
-                      src={meal.image}
-                      alt={meal.name}
-                      fill
-                      className="object-cover"
+                      src="/images/demo/local-delivery.jpg"
+                      alt="Fruit and veg box delivery"
+                      width={900}
+                      height={600}
+                      className="h-64 w-full object-cover"
                     />
                   </div>
 
-                  <div>
-                    <p className="text-sm font-medium text-[#243328]">
-                      {meal.name}
-                    </p>
+                  <div className="mt-5 rounded-2xl border border-[#ddd4c8] bg-white p-5">
+                    <span className="rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
+                      can repeat
+                    </span>
 
-                    <p className="mt-1 text-xs text-[#70756d]">
-                      Added to weekly plan
+                    <h3 className="mt-4 font-serif text-2xl text-[#243328]">
+                      Fruit & veg box
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      The box is the regular part of the order. Choose weekly or
+                      fortnightly.
                     </p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+                </div>
+              )}
 
-          {/* STEP 2 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-            viewport={{ once: true }}
-            className="rounded-[28px] bg-white p-5 shadow-sm"
-          >
-            <div className="mb-5 flex items-center justify-between">
-              <span className="text-sm font-medium text-[#7a7a6d]">Step 2</span>
+              {step === 1 && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {["Jars", "Beans", "Pasta", "Grains"].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-2xl border border-[#ddd4c8] bg-white p-5"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f4efe9] text-xl">
+                        {item === "Jars" && "🥫"}
+                        {item === "Beans" && "🫘"}
+                        {item === "Pasta" && "🍝"}
+                        {item === "Grains" && "🌾"}
+                      </div>
 
-              <div className="rounded-full bg-[#edf2eb] px-3 py-1 text-xs font-medium text-[#243328]">
-                Pantry builds
-              </div>
-            </div>
+                      <h3 className="mt-4 font-serif text-2xl text-[#243328]">
+                        {item}
+                      </h3>
 
-            <div className="grid grid-cols-2 gap-3">
-              {pantryItems.map((item, index) => (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    delay: index * 0.12,
-                    duration: 0.4,
-                  }}
-                  viewport={{ once: true }}
-                  className="overflow-hidden rounded-2xl border border-[#ece7dd] bg-[#faf8f4]"
-                >
-                  <div className="relative aspect-square">
+                      <p className="mt-2 text-sm leading-6 text-[#667164]">
+                        Optional one-off add-ons for the meals you want to cook.
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {step === 2 && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-[#ddd4c8] bg-white p-5">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                      Repeats
+                    </p>
+
+                    <h3 className="mt-3 font-serif text-2xl text-[#243328]">
+                      Fruit & veg box
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      This can repeat weekly or fortnightly.
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-[#ddd4c8] bg-white p-5">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                      One-off
+                    </p>
+
+                    <h3 className="mt-3 font-serif text-2xl text-[#243328]">
+                      Pantry extras
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-6 text-[#667164]">
+                      Extras only appear when you add them.
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl bg-[#243328] p-5 text-white md:col-span-2">
+                    <p className="font-serif text-2xl">
+                      Clear before checkout.
+                    </p>
+
+                    <p className="mt-2 text-sm leading-6 text-white/75">
+                      No guessing what repeats. No accidental subscription to
+                      cupboard items.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div>
+                  <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white">
                     <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
+                      src="/images/demo/local-delivery.jpg"
+                      alt="Local grocery delivery"
+                      width={900}
+                      height={600}
+                      className="h-72 w-full object-cover"
                     />
                   </div>
 
-                  <div className="p-3">
-                    <p className="text-xs font-medium text-[#243328]">
-                      {item.name}
+                  <div className="mt-5 rounded-2xl bg-[#243328] p-5 text-white">
+                    <h3 className="font-serif text-2xl">Delivered locally.</h3>
+
+                    <p className="mt-2 text-sm leading-6 text-white/75">
+                      Fresh produce as your regular base. Flexible extras when
+                      you want them.
                     </p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* STEP 3 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            viewport={{ once: true }}
-            className="overflow-hidden rounded-[28px] bg-[#243328] text-white shadow-sm"
-          >
-            <div className="relative min-h-full">
-              <div className="absolute inset-0">
-                <Image
-                  src="/images/demo/local-delivery.jpg"
-                  alt="Local Pantry delivery"
-                  fill
-                  className="object-cover opacity-45"
-                />
-              </div>
-
-              <div className="relative z-10 flex h-full flex-col justify-between p-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white/70">
-                    Step 3
-                  </span>
-
-                  <div className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur-sm">
-                    Delivered locally
-                  </div>
                 </div>
-
-                <div className="mt-24">
-                  <motion.div
-                    initial={{ opacity: 0, y: 18 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.5 }}
-                    viewport={{ once: true }}
-                    className="rounded-3xl bg-white/10 p-5 backdrop-blur-md"
-                  >
-                    <p className="mb-2 text-2xl font-medium">
-                      Your week arrives ready to cook.
-                    </p>
-
-                    <p className="text-sm leading-relaxed text-white/80">
-                      Fresh produce on subscription. Pantry ingredients only
-                      when needed. Less waste. Less mental load.
-                    </p>
-                  </motion.div>
-                </div>
-              </div>
+              )}
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </section>
       </div>
     </section>
   );
