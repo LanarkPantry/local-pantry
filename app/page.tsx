@@ -73,24 +73,6 @@ const kitchenWeekStrip = [
   },
 ];
 
-const orderSteps = [
-  {
-    number: "1",
-    title: "Choose a box",
-    text: "Weekly or fortnightly fruit and veg delivery.",
-  },
-  {
-    number: "2",
-    title: "Add extras",
-    text: "Pantry staples only when you actually need them.",
-  },
-  {
-    number: "3",
-    title: "Cook easier",
-    text: "Flexible meal inspiration for the week ahead.",
-  },
-];
-
 function formatPrice(value: number) {
   return `£${value.toFixed(2)}`;
 }
@@ -387,49 +369,84 @@ export default function HomePage() {
 
       <section className="px-4 pb-10 sm:px-6 md:px-10 md:pb-14">
         <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] bg-white/82 p-5 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-7">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-2xl">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                  How it works
+          <section className="rounded-[32px] bg-white/82 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
+            <div className="max-w-3xl">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                Built around normal home cooking
+              </p>
+
+              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+                The box is the base. Everything else stays flexible.
+              </h2>
+
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+                Start with a regular fruit and veg delivery, add useful pantry
+                extras only when you need them, and use the planner to make
+                weekday cooking feel simpler.
+              </p>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <article className="rounded-[26px] bg-[#f8f4ee]/85 p-6 transition hover:bg-white">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                  Your box
                 </p>
 
-                <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.6rem]">
-                  Your box is the regular part. Everything else is flexible.
-                </h2>
-              </div>
+                <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328]">
+                  Weekly fruit & veg
+                </h3>
 
+                <p className="mt-4 text-sm leading-7 text-[#667164]">
+                  Choose a weekly or fortnightly produce box built around
+                  useful, everyday ingredients.
+                </p>
+              </article>
+
+              <article className="rounded-[26px] bg-[#f8f4ee]/85 p-6 transition hover:bg-white">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                  Pantry extras
+                </p>
+
+                <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328]">
+                  Add regular staples
+                </h3>
+
+                <p className="mt-4 text-sm leading-7 text-[#667164]">
+                  Pasta, grains, beans, sauces and useful cupboard ingredients
+                  only when you actually need them.
+                </p>
+              </article>
+
+              <article className="rounded-[26px] bg-[#f8f4ee]/85 p-6 transition hover:bg-white">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                  Planner
+                </p>
+
+                <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328]">
+                  Keep meals simple
+                </h3>
+
+                <p className="mt-4 text-sm leading-7 text-[#667164]">
+                  Flexible meal inspiration designed around the food already in
+                  your kitchen.
+                </p>
+              </article>
+            </div>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/shop"
                 className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
               >
-                Start with a box
+                Choose your box
               </Link>
-            </div>
 
-            <div className="mt-7 grid gap-3 md:grid-cols-3">
-              {orderSteps.map((step) => (
-                <article
-                  key={step.number}
-                  className="rounded-[24px] bg-[#f8f4ee]/85 p-5"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#243328] text-sm font-medium text-white">
-                      {step.number}
-                    </div>
-
-                    <div>
-                      <h3 className="font-serif text-[1.35rem] leading-tight text-[#243328]">
-                        {step.title}
-                      </h3>
-
-                      <p className="mt-2 text-sm leading-6 text-[#667164]">
-                        {step.text}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
+              <Link
+                href="/planner"
+                className="rounded-full border border-[#d3cabd] bg-[#f7f2eb] px-6 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-white"
+              >
+                Explore the planner
+              </Link>
             </div>
           </section>
         </div>
