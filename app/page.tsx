@@ -251,7 +251,7 @@ export default function HomePage() {
               </p>
 
               <h1 className="mt-4 font-serif text-[2.8rem] leading-[0.96] tracking-tight text-white sm:text-[3.7rem] md:text-[5.4rem]">
-                Better food in the house.
+                Make everyday cooking easier.
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-8 text-white/90 md:text-lg">
