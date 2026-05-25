@@ -19,7 +19,7 @@ export default function SiteFooter({
           </p>
 
           <p className="mt-4 text-sm text-white/70">
-            Currently testing delivery in ML11 and nearby areas.
+            Delivering to Lanark, Carluke and surrounding areas.
           </p>
         </div>
 
