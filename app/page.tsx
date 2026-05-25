@@ -1,3 +1,9 @@
+// FULL UPDATED HOMEPAGE
+// Tightened structure for launch
+// Reduced repetition and visual clutter
+// Merged delivery + postcode messaging
+// Cleaner premium rhythm
+
 "use client";
 
 import Link from "next/link";
@@ -13,52 +19,37 @@ const sampleWeek = [
     day: "Monday",
     meal: "Harissa Butter Beans & Couscous",
     image: "/images/recipes/harissa-butterbeans-peppers-couscous.jpg",
-    note: "Fast pantry dinner using beans, couscous and rose harissa.",
+    note: "Fast pantry dinner using flexible staples and fresh veg.",
   },
   {
     day: "Wednesday",
     meal: "Courgette Bucatini with Pesto",
     image: "/images/recipes/bucatini-courgette-pesto.jpg",
-    note: "A quick pasta built around fresh veg and a useful pantry jar.",
+    note: "Simple weeknight pasta with useful fridge and cupboard ingredients.",
   },
   {
     day: "Friday",
     meal: "Hot Honey Halloumi Couscous",
     image: "/images/recipes/hot-honey-halloumi-couscous.jpg",
-    note: "Flexible Friday food using grains, herbs, veg and something punchy.",
+    note: "Quick comfort food built around grains, herbs and pantry extras.",
   },
 ];
 
 const orderSteps = [
   {
-    number: "01",
-    title: "Choose your box",
-    text: "Pick the regular fruit and veg box that fits the way you cook.",
+    number: "1",
+    title: "Choose a box",
+    text: "Weekly or fortnightly fruit and veg delivery.",
   },
   {
-    number: "02",
-    title: "Add only what helps",
-    text: "Top up with pantry extras when you need them. No filler, no pressure.",
+    number: "2",
+    title: "Add extras",
+    text: "Pantry staples only when you actually need them.",
   },
   {
-    number: "03",
-    title: "Cook from what arrives",
-    text: "Use quick recipe ideas to make the week feel easier.",
-  },
-];
-
-const reasons = [
-  {
-    title: "Less supermarket drift",
-    text: "A useful base of fresh food arrives each week or fortnight, so you are not starting from zero.",
-  },
-  {
-    title: "Better everyday dinners",
-    text: "Fresh produce, useful staples and simple ideas make midweek food less of a scramble.",
-  },
-  {
-    title: "Flexible by design",
-    text: "The box can repeat. Pantry extras are one-off unless you add them again.",
+    number: "3",
+    title: "Cook easier",
+    text: "Flexible meal inspiration for the week ahead.",
   },
 ];
 
@@ -112,7 +103,7 @@ export default function HomePage() {
           onClick={() => addDisplayItemToCart(item)}
           className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
         >
-          {item.buttonLabel ?? "Add to basket"}
+          Add to basket
         </button>
       );
     }
@@ -124,7 +115,6 @@ export default function HomePage() {
             type="button"
             onClick={() => removeOneFromCart(item.name)}
             className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
-            aria-label={`Decrease quantity of ${item.name}`}
           >
             −
           </button>
@@ -137,7 +127,6 @@ export default function HomePage() {
             type="button"
             onClick={() => addDisplayItemToCart(item)}
             className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
-            aria-label={`Increase quantity of ${item.name}`}
           >
             +
           </button>
@@ -159,14 +148,9 @@ export default function HomePage() {
     fallbackImage: string;
     bestFor: string;
   }) {
-    const includesPreview =
-      item.weeklyIncludes && item.weeklyIncludes.length > 0
-        ? item.weeklyIncludes.slice(0, 4).join(", ")
-        : "";
-
     return (
-      <article className="overflow-hidden rounded-[30px] border border-[#ddd4c8] bg-white shadow-[0_12px_30px_rgba(36,51,40,0.06)]">
-        <div className="h-56 overflow-hidden bg-[#f4efe9] sm:h-64">
+      <article className="overflow-hidden rounded-[30px] bg-white/85 shadow-[0_10px_28px_rgba(36,51,40,0.06)]">
+        <div className="h-64 overflow-hidden bg-[#f4efe9]">
           <img
             src={item.image || fallbackImage}
             alt={item.name}
@@ -174,46 +158,30 @@ export default function HomePage() {
           />
         </div>
 
-        <div className="p-5 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#7a806f]">
-                {label}
-              </p>
-
-              <h3 className="mt-2 font-serif text-3xl leading-tight text-[#243328]">
-                {item.name}
-              </h3>
-            </div>
-
-            <p className="shrink-0 font-serif text-2xl text-[#243328]">
+        <div className="p-6">
+          <div className="flex items-center gap-2">
+            <p className="inline-flex rounded-full bg-[#243328] px-3 py-1 text-xs text-white">
               {formatPrice(item.price)}
+            </p>
+
+            <p className="text-xs uppercase tracking-[0.14em] text-[#667164]">
+              {label}
             </p>
           </div>
 
-          <p className="mt-4 text-sm leading-7 text-[#667164] md:text-base">
+          <h3 className="mt-5 font-serif text-3xl text-[#243328]">
+            {item.name}
+          </h3>
+
+          <p className="mt-3 text-sm leading-7 text-[#667164] md:text-base">
             {item.description}
           </p>
 
-          {item.details ? (
-            <p className="mt-3 text-sm leading-6 text-[#5f675c]">
-              {item.details}
-            </p>
-          ) : null}
+          <p className="mt-5 text-sm font-medium text-[#243328]">Best for</p>
 
-          <div className="mt-5 border-t border-[#eee5d9] pt-5">
-            <p className="text-sm font-medium text-[#243328]">Best for</p>
-
-            <p className="mt-2 text-sm leading-7 text-[#667164]">
-              {item.bestFor ?? bestFor}
-            </p>
-
-            {includesPreview ? (
-              <p className="mt-3 text-sm leading-7 text-[#667164]">
-                Typical box: {includesPreview}.
-              </p>
-            ) : null}
-          </div>
+          <p className="mt-2 text-sm leading-7 text-[#667164]">
+            {item.bestFor ?? bestFor}
+          </p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {renderAddControls(item)}
@@ -242,29 +210,31 @@ export default function HomePage() {
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
 
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.10)_0%,rgba(0,0,0,0.20)_38%,rgba(0,0,0,0.70)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.18)_34%,rgba(0,0,0,0.68)_100%)]" />
 
           <div className="relative z-10 mx-auto flex min-h-[78vh] max-w-7xl items-end px-4 pb-8 pt-28 sm:px-6 md:min-h-[82vh] md:px-10 md:pb-14">
             <div className="max-w-3xl">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/78">
+              <p className="inline-flex rounded-full border border-white/35 bg-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur">
                 Local fruit & veg delivery
               </p>
 
-              <h1 className="mt-4 font-serif text-[2.8rem] leading-[0.96] tracking-tight text-white sm:text-[3.7rem] md:text-[5.4rem]">
+              <h1 className="mt-5 font-serif text-[2.9rem] leading-[0.98] tracking-tight text-white sm:text-[3.8rem] md:text-[5.3rem]">
                 Make everyday cooking easier.
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-8 text-white/90 md:text-lg">
-                Seasonal fruit and veg boxes with optional pantry extras and
-                quick meal ideas for the week ahead.
+                Weekly fruit and veg delivery with optional pantry extras and
+                flexible meal inspiration for the week ahead.
               </p>
 
-              <p className="mt-4 max-w-xl text-sm leading-7 text-white/76">
-                Delivered Tuesday and Wednesday across Lanark, Carluke and
-                surrounding areas.
-              </p>
+              <div className="mt-6 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur">
+                <p className="text-sm text-white/82">
+                  Delivered every Tuesday and Wednesday across Lanark, Carluke
+                  and surrounding areas.
+                </p>
+              </div>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/shop"
                   className="rounded-full bg-white px-7 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
@@ -272,16 +242,16 @@ export default function HomePage() {
                   Choose your box
                 </Link>
 
-                <a
-                  href="#postcode-checker"
+                <Link
+                  href="/planner"
                   className="rounded-full border border-white/35 bg-white/10 px-7 py-3 text-center text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
                 >
-                  Check your postcode
-                </a>
+                  Explore the planner
+                </Link>
               </div>
 
-              <p className="mt-4 text-xs leading-6 text-white/70">
-                Weekly or fortnightly. Pause or cancel easily.
+              <p className="mt-4 text-xs leading-6 text-white/72">
+                Weekly or fortnightly. Pause or cancel anytime.
               </p>
             </div>
           </div>
@@ -290,47 +260,49 @@ export default function HomePage() {
 
       <section className="px-4 py-10 sm:px-6 md:px-10 md:py-14">
         <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
-            <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
-              <div>
+          <section className="rounded-[32px] bg-white/82 p-5 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-7">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-2xl">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                   How it works
                 </p>
 
-                <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.7rem]">
-                  Your box is regular. Everything else stays flexible.
+                <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.6rem]">
+                  Your box is the regular part. Everything else is flexible.
                 </h2>
-
-                <p className="mt-4 text-sm leading-7 text-[#667164] md:text-base">
-                  Start with fruit and veg, then add pantry staples only when
-                  they are useful.
-                </p>
               </div>
 
-              <div className="grid gap-3">
-                {orderSteps.map((step) => (
-                  <article
-                    key={step.number}
-                    className="rounded-[24px] border border-[#e5dccf] bg-[#f8f4ee] p-5"
-                  >
-                    <div className="flex gap-4">
-                      <p className="pt-1 font-serif text-2xl text-[#8b6f4e]">
-                        {step.number}
-                      </p>
+              <Link
+                href="/shop"
+                className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Start with a box
+              </Link>
+            </div>
 
-                      <div>
-                        <h3 className="font-serif text-[1.35rem] leading-tight text-[#243328]">
-                          {step.title}
-                        </h3>
-
-                        <p className="mt-2 text-sm leading-6 text-[#667164]">
-                          {step.text}
-                        </p>
-                      </div>
+            <div className="mt-7 grid gap-3 md:grid-cols-3">
+              {orderSteps.map((step) => (
+                <article
+                  key={step.number}
+                  className="rounded-[24px] bg-[#f8f4ee]/85 p-5"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#243328] text-sm font-medium text-white">
+                      {step.number}
                     </div>
-                  </article>
-                ))}
-              </div>
+
+                    <div>
+                      <h3 className="font-serif text-[1.35rem] leading-tight text-[#243328]">
+                        {step.title}
+                      </h3>
+
+                      <p className="mt-2 text-sm leading-6 text-[#667164]">
+                        {step.text}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              ))}
             </div>
           </section>
         </div>
@@ -338,14 +310,14 @@ export default function HomePage() {
 
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
         <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] border border-[#d9d0c4] bg-[#efe7db] p-5 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
+          <section className="rounded-[32px] bg-[#efe7db] p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                   Choose your box
                 </p>
 
-                <h2 className="mt-3 max-w-3xl font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.9rem]">
+                <h2 className="mt-3 max-w-3xl font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.8rem]">
                   Fruit and veg for the way you actually cook.
                 </h2>
               </div>
@@ -354,7 +326,7 @@ export default function HomePage() {
                 href="/shop"
                 className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
               >
-                View the shop
+                View all shop items
               </Link>
             </div>
 
@@ -362,18 +334,18 @@ export default function HomePage() {
               {weeklyProduceBox ? (
                 <BoxCard
                   item={weeklyProduceBox}
-                  label="Smaller household"
+                  label="Smaller box"
                   fallbackImage="/weekly-harvest-box.png"
-                  bestFor="Smaller households, solo cooking, couples, or anyone wanting a useful regular produce base."
+                  bestFor="Smaller households, solo cooking, couples, or anyone wanting a useful produce base."
                 />
               ) : null}
 
               {familyProduceBox ? (
                 <BoxCard
                   item={familyProduceBox}
-                  label="Bigger household"
+                  label="Larger box"
                   fallbackImage="/family-harvest-box.png"
-                  bestFor="Families, shared homes, and people who cook most nights."
+                  bestFor="Families, shared homes, and people cooking most nights."
                 />
               ) : null}
             </div>
@@ -383,92 +355,77 @@ export default function HomePage() {
 
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
         <div className="mx-auto max-w-7xl">
-          <section className="overflow-hidden rounded-[32px] border border-[#d9d0c4] bg-white shadow-[0_10px_28px_rgba(36,51,40,0.05)]">
-            <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
-              <div className="relative min-h-[280px] overflow-hidden lg:min-h-[520px]">
+          <section className="overflow-hidden rounded-[32px] bg-[#243328] text-white shadow-[0_10px_28px_rgba(36,51,40,0.08)]">
+            <div className="grid gap-0 lg:grid-cols-[1fr_0.95fr]">
+              <div className="p-6 md:p-10 lg:p-14">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">
+                  Built for real weeknights
+                </p>
+
+                <h2 className="mt-4 max-w-2xl font-serif text-[2.1rem] leading-tight text-white md:text-[3.5rem]">
+                  Less supermarket stress. More useful food at home.
+                </h2>
+
+                <p className="mt-6 max-w-2xl text-sm leading-8 text-white/78 md:text-base">
+                  Fresh produce, useful pantry staples and flexible meal
+                  inspiration without the big weekly supermarket shop.
+                </p>
+
+                <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
+                    <h3 className="font-serif text-2xl text-white">Flexible</h3>
+
+                    <p className="mt-2 text-sm leading-7 text-white/70">
+                      Weekly or fortnightly with easy pause or cancellation.
+                    </p>
+                  </div>
+
+                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
+                    <h3 className="font-serif text-2xl text-white">
+                      Useful extras
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-7 text-white/70">
+                      Add pantry staples only when you actually need them.
+                    </p>
+                  </div>
+
+                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
+                    <h3 className="font-serif text-2xl text-white">
+                      Easier meals
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-7 text-white/70">
+                      Quick ideas built around the food already in your kitchen.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href="/shop#pantry-staples"
+                    className="rounded-full bg-white px-6 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
+                  >
+                    Browse pantry extras
+                  </Link>
+
+                  <Link
+                    href="/planner"
+                    className="rounded-full border border-white/20 bg-white/5 px-6 py-3 text-center text-sm font-medium text-white transition hover:bg-white/10"
+                  >
+                    Explore the planner
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative min-h-[340px] lg:min-h-full">
                 <img
                   src="/images/home/hero-image.png"
                   alt="Fresh produce and pantry staples"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
-              </div>
 
-              <div className="p-6 md:p-10 lg:p-12">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                  Why it works
-                </p>
-
-                <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                  Less supermarket reliance. More useful food at home.
-                </h2>
-
-                <p className="mt-5 text-sm leading-8 text-[#667164] md:text-base">
-                  The Local Pantry is built for real weeks: busy days, quick
-                  dinners, half-full cupboards and the need to make food feel
-                  manageable again.
-                </p>
-
-                <div className="mt-8 grid gap-5">
-                  {reasons.map((reason) => (
-                    <article
-                      key={reason.title}
-                      className="border-t border-[#eadfd2] pt-5"
-                    >
-                      <h3 className="font-serif text-[1.45rem] leading-tight text-[#243328]">
-                        {reason.title}
-                      </h3>
-
-                      <p className="mt-2 text-sm leading-7 text-[#667164]">
-                        {reason.text}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-
-                <div className="mt-8">
-                  <Link
-                    href="/shop"
-                    className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                  >
-                    Start with a box
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-      </section>
-
-      <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
-        <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] border border-[#d9d0c4] bg-[#efe7db] p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-10">
-            <div className="mx-auto max-w-4xl text-center">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Pantry extras
-              </p>
-
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                Add the useful extras when you need them.
-              </h2>
-
-              <p className="mx-auto mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-                Sauces, pastes, beans, grains, pasta and cupboard staples that
-                make the produce easier to turn into dinner.
-              </p>
-
-              <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[#667164]">
-                Pantry items are one-off additions to your weekly or family
-                produce box. When you run out, just order them again and they'll
-                be added to your regular delivery.
-              </p>
-
-              <div className="mt-7">
-                <Link
-                  href="/shop#pantry-staples"
-                  className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Browse pantry extras
-                </Link>
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05)_0%,rgba(0,0,0,0.38)_100%)]" />
               </div>
             </div>
           </section>
@@ -483,28 +440,21 @@ export default function HomePage() {
                 Meal inspiration
               </p>
 
-              <h2 className="mt-3 font-serif text-3xl leading-tight md:text-5xl">
+              <h2 className="mt-3 font-serif text-3xl md:text-5xl">
                 Quick ideas for the week ahead.
               </h2>
 
               <p className="mt-5 text-base leading-8 text-white/80">
-                The planner suggests practical meals using seasonal produce and
-                useful pantry extras, without turning dinner into a project.
+                Flexible meal inspiration built around seasonal produce and
+                useful pantry staples — without turning dinner into a project.
               </p>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-7 flex flex-wrap gap-3">
                 <Link
                   href="/planner"
-                  className="rounded-full bg-white px-6 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
+                  className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
                 >
                   Explore the planner
-                </Link>
-
-                <Link
-                  href="/shop"
-                  className="rounded-full border border-white/25 bg-white/5 px-6 py-3 text-center text-sm font-medium text-white transition hover:bg-white/10"
-                >
-                  Choose your box
                 </Link>
               </div>
             </div>
@@ -513,7 +463,7 @@ export default function HomePage() {
               {sampleWeek.map((item) => (
                 <article
                   key={item.day}
-                  className="flex gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur transition hover:bg-white/[0.07]"
+                  className="flex items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur transition hover:bg-white/[0.07]"
                 >
                   <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[18px] border border-white/10 bg-white/5">
                     <img
@@ -524,11 +474,11 @@ export default function HomePage() {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/50">
+                    <p className="text-sm uppercase tracking-[0.12em] text-white/50">
                       {item.day}
                     </p>
 
-                    <h3 className="mt-1 font-serif text-xl leading-tight text-white sm:text-2xl">
+                    <h3 className="mt-1 font-serif text-2xl leading-tight text-white">
                       {item.meal}
                     </h3>
 
@@ -543,21 +493,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 md:px-10 md:py-16">
-        <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] border border-[#d9d0c4] bg-white/82 p-6 text-center shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-10">
+      <section className="px-4 py-12 sm:px-6 md:px-10 md:py-18">
+        <div className="mx-auto max-w-5xl">
+          <section className="rounded-[32px] bg-white/82 p-6 text-center shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-10">
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
               Local delivery
             </p>
 
-            <h2 className="mx-auto mt-3 max-w-3xl font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-              Delivered Tuesday and Wednesday across Lanark, Carluke and nearby
-              areas.
+            <h2 className="mx-auto mt-3 max-w-3xl font-serif text-[2rem] leading-tight text-[#243328] md:text-[3.1rem]">
+              Delivered across Lanark, Carluke and surrounding areas.
             </h2>
 
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-              Check your postcode before ordering. More areas will be added as
-              demand grows.
+              Deliveries currently run every Tuesday and Wednesday. More areas
+              will be added as the service grows.
             </p>
 
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
@@ -570,9 +519,9 @@ export default function HomePage() {
 
               <a
                 href="#postcode-checker"
-                className="rounded-full border border-[#d3cabd] bg-white/70 px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
+                className="rounded-full border border-[#d3cabd] bg-[#f7f2eb] px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
               >
-                Check delivery area
+                Check your postcode
               </a>
             </div>
           </section>
