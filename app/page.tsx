@@ -39,56 +39,58 @@ export default function HomePage() {
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
 
-      <section className="bg-[#f4efe9] px-4 pb-10 pt-4 sm:px-6 md:px-10 lg:pb-16 lg:pt-10">
-        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
-          <div className="order-1 overflow-hidden rounded-[30px] border border-[#d8cfbf] bg-white shadow-[0_18px_42px_rgba(36,51,40,0.09)] lg:order-2">
-            <img
-              src="/images/home/hero-image.png"
-              alt="The Local Pantry fruit and veg box with pantry extras"
-              className="h-[300px] w-full object-cover sm:h-[420px] lg:h-[650px]"
-            />
-          </div>
+      <section className="relative overflow-hidden bg-[#243328] text-white">
+        <div className="relative min-h-[78vh] md:min-h-[82vh]">
+          <img
+            src="/images/home/hero-image.png"
+            alt="The Local Pantry fruit and veg box with pantry extras"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
 
-          <div className="order-2 max-w-xl lg:order-1">
-            <p className="inline-flex rounded-full border border-[#d8cfbf] bg-white/70 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-              Local fruit & veg delivery
-            </p>
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.18)_34%,rgba(0,0,0,0.68)_100%)]" />
 
-            <h1 className="mt-5 font-serif text-[2.65rem] leading-[0.98] tracking-tight text-[#243328] sm:text-[3.4rem] md:text-[4.7rem]">
-              Make everyday cooking easier.
-            </h1>
+          <div className="relative z-10 mx-auto flex min-h-[78vh] max-w-7xl items-end px-4 pb-8 pt-28 sm:px-6 md:min-h-[82vh] md:px-10 md:pb-14">
+            <div className="max-w-3xl">
+              <p className="inline-flex rounded-full border border-white/35 bg-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-white backdrop-blur">
+                Local fruit & veg delivery
+              </p>
 
-            <p className="mt-5 max-w-lg text-base leading-8 text-[#5f675c] md:text-lg">
-              Weekly fruit and veg delivery with optional pantry extras and
-              quick meal inspiration for the week ahead.
-            </p>
+              <h1 className="mt-5 font-serif text-[2.75rem] leading-[0.98] tracking-tight text-white sm:text-[3.6rem] md:text-[5.2rem]">
+                Make everyday cooking easier.
+              </h1>
 
-            <div className="mt-6 rounded-[24px] border border-[#ddd4c8] bg-white/72 p-4">
-              <p className="text-sm leading-7 text-[#5f675c]">
-                Delivered every Tuesday and Wednesday across Lanark, Carluke and
-                surrounding areas.
+              <p className="mt-5 max-w-2xl text-base leading-8 text-white/90 md:text-lg">
+                Weekly fruit and veg delivery with optional pantry extras and
+                quick meal inspiration for the week ahead.
+              </p>
+
+              <div className="mt-5 rounded-[24px] border border-white/20 bg-white/12 p-4 backdrop-blur">
+                <p className="text-sm leading-7 text-white/86">
+                  Delivered every Tuesday and Wednesday across Lanark, Carluke
+                  and surrounding areas.
+                </p>
+              </div>
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/shop"
+                  className="rounded-full bg-white px-7 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
+                >
+                  Choose your box
+                </Link>
+
+                <Link
+                  href="/shop#pantry"
+                  className="rounded-full border border-white/35 bg-white/10 px-7 py-3 text-center text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+                >
+                  Browse pantry extras
+                </Link>
+              </div>
+
+              <p className="mt-4 text-xs leading-6 text-white/72">
+                Choose weekly or fortnightly. Pause or cancel easily.
               </p>
             </div>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/shop"
-                className="rounded-full bg-[#243328] px-7 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
-              >
-                Choose your box
-              </Link>
-
-              <Link
-                href="/shop#pantry"
-                className="rounded-full border border-[#d3cabd] bg-white/75 px-7 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-white"
-              >
-                Browse pantry extras
-              </Link>
-            </div>
-
-            <p className="mt-4 text-xs leading-6 text-[#7a8478]">
-              Choose weekly or fortnightly. Pause or cancel easily.
-            </p>
           </div>
         </div>
       </section>
