@@ -457,7 +457,9 @@ export default function HomePage() {
               </p>
 
               <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[#667164]">
-                Pantry items are one-off additions unless you choose them again.
+                Pantry items are one-off additions to your weekly or family
+                produce box. When you run out, just order them again and they'll
+                be added to your regular delivery.
               </p>
 
               <div className="mt-7">
