@@ -419,11 +419,18 @@ export default function HomePage() {
               </div>
 
               <div className="relative min-h-[340px] lg:min-h-full">
-                <img
-                  src="/images/home/hero-image.png"
-                  alt="Fresh produce and pantry staples"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+                <picture>
+                  <source
+                    media="(max-width: 768px)"
+                    srcSet="/images/home/mobile-pantry-hero.png"
+                  />
+
+                  <img
+                    src="/images/home/pantry-kitchen-scene-wide.png"
+                    alt="The Local Pantry fruit, veg and pantry staples"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                  />
+                </picture>
 
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05)_0%,rgba(0,0,0,0.38)_100%)]" />
               </div>
