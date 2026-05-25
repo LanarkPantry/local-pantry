@@ -306,45 +306,54 @@ export default function HomePage() {
       <section className="px-4 py-10 sm:px-6 md:px-10 md:py-14">
         <div className="mx-auto max-w-7xl">
           <section className="overflow-hidden rounded-[34px] bg-[#efe7db] shadow-[0_12px_34px_rgba(36,51,40,0.06)]">
-            <div className="grid gap-0 lg:grid-cols-[0.42fr_0.58fr]">
-              <div className="flex flex-col justify-between p-6 md:p-9 lg:p-10">
+            <div className="p-6 md:p-9 lg:p-10">
+              <div className="grid gap-6 lg:grid-cols-[0.72fr_0.28fr] lg:items-end">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                     A week in the kitchen
                   </p>
 
-                  <h2 className="mt-3 max-w-xl font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+                  <h2 className="mt-3 max-w-4xl font-serif text-[2.35rem] leading-[0.98] tracking-tight text-[#243328] sm:text-[3rem] md:text-[3.6rem] lg:text-[4.1rem]">
                     The box is the base. The planner keeps it simple.
                   </h2>
 
-                  <p className="mt-5 max-w-lg text-sm leading-8 text-[#667164] md:text-base">
+                  <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
                     Fruit and veg delivery, optional pantry extras and realistic
                     meal ideas working together — so the week feels easier, not
                     more complicated.
                   </p>
                 </div>
 
-                <div className="mt-7 rounded-[24px] border border-[#d8d0c4] bg-white/55 p-5">
-                  <p className="font-serif text-2xl leading-tight text-[#243328]">
+                <div className="rounded-[24px] border border-[#d8d0c4] bg-white/55 p-5 lg:p-6">
+                  <p className="font-serif text-[1.65rem] leading-tight text-[#243328] md:text-3xl">
                     Start with fresh produce. Add what helps. Repeat what works.
                   </p>
 
                   <p className="mt-3 text-sm leading-7 text-[#667164]">
-                    This is not a recipe box. It is a calmer way to keep useful
-                    food in the house and make everyday cooking less of a mental
-                    load.
+                    Not a recipe box — a calmer way to keep useful food in the
+                    house.
                   </p>
                 </div>
               </div>
+            </div>
 
-              <div className="border-t border-[#ded4c6] bg-[#f6f1ea]/60 lg:border-l lg:border-t-0">
-                <div className="flex snap-x gap-3 overflow-x-auto p-4 sm:p-5 lg:grid lg:grid-cols-5 lg:overflow-visible lg:p-5">
+            <div className="border-t border-[#ded4c6] bg-[#f6f1ea]/60">
+              <div className="flex items-center justify-between px-5 pt-4 lg:hidden">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                  Swipe through the week
+                </p>
+
+                <span className="text-lg text-[#6b776c]">→</span>
+              </div>
+
+              <div className="relative">
+                <div className="flex snap-x gap-3 overflow-x-auto p-4 pr-12 sm:p-5 sm:pr-16 lg:grid lg:grid-cols-5 lg:overflow-visible lg:p-5">
                   {kitchenWeekStrip.map((item) => (
                     <article
                       key={item.title}
-                      className="min-w-[78%] snap-start overflow-hidden rounded-[26px] bg-white shadow-[0_8px_22px_rgba(36,51,40,0.06)] sm:min-w-[45%] lg:min-w-0"
+                      className="min-w-[82%] snap-start overflow-hidden rounded-[26px] bg-white shadow-[0_8px_22px_rgba(36,51,40,0.06)] sm:min-w-[46%] lg:min-w-0"
                     >
-                      <div className="h-52 overflow-hidden bg-[#e8dfd3] lg:h-64">
+                      <div className="h-48 overflow-hidden bg-[#e8dfd3] sm:h-52 lg:h-44 xl:h-48">
                         <img
                           src={item.image}
                           alt={item.alt}
@@ -352,22 +361,24 @@ export default function HomePage() {
                         />
                       </div>
 
-                      <div className="p-4">
+                      <div className="p-4 lg:min-h-[150px]">
                         <p className="text-[10px] uppercase tracking-[0.16em] text-[#7a8478]">
                           {item.label}
                         </p>
 
-                        <h3 className="mt-2 font-serif text-[1.45rem] leading-tight text-[#243328]">
+                        <h3 className="mt-2 font-serif text-[1.45rem] leading-tight text-[#243328] lg:text-[1.35rem] xl:text-[1.5rem]">
                           {item.title}
                         </h3>
 
-                        <p className="mt-2 text-sm leading-6 text-[#667164]">
+                        <p className="mt-2 text-sm leading-6 text-[#667164] lg:text-[13px] lg:leading-6 xl:text-sm">
                           {item.text}
                         </p>
                       </div>
                     </article>
                   ))}
                 </div>
+
+                <div className="pointer-events-none absolute right-0 top-0 h-full w-14 bg-gradient-to-l from-[#f6f1ea] to-transparent lg:hidden" />
               </div>
             </div>
           </section>
