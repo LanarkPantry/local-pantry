@@ -35,6 +35,44 @@ const sampleWeek = [
   },
 ];
 
+const kitchenWeekStrip = [
+  {
+    label: "Delivery day",
+    title: "Start with the box",
+    text: "Fresh fruit and veg gives the week a simple starting point.",
+    image: "/images/home/week-box-arrives.png",
+    alt: "A fresh fruit and veg box on a kitchen counter",
+  },
+  {
+    label: "Pantry extras",
+    title: "Add what helps",
+    text: "Useful staples like pasta, grains, jars and beans sit around the box.",
+    image: "/images/home/week-pantry-extras.png",
+    alt: "Pantry jars and dry goods beside fresh vegetables",
+  },
+  {
+    label: "Meal planning",
+    title: "Know what’s for dinner",
+    text: "The planner turns what you have into a few realistic meals.",
+    image: "/images/home/week-planner-counter.png",
+    alt: "A phone showing a meal planner beside vegetables and pantry staples",
+  },
+  {
+    label: "Midweek cooking",
+    title: "Use the same ingredients",
+    text: "Simple meals repeat ingredients instead of creating more decisions.",
+    image: "/images/home/week-midweek-cooking.png",
+    alt: "Simple midweek cooking with chopped vegetables and pantry staples",
+  },
+  {
+    label: "Repeat what works",
+    title: "Make next week easier",
+    text: "Keep your regulars close, pause what you don’t need, and build from there.",
+    image: "/images/home/week-repeat-regulars.png",
+    alt: "A calm kitchen counter with remaining produce, jars and a meal note",
+  },
+];
+
 const orderSteps = [
   {
     number: "1",
@@ -266,6 +304,77 @@ export default function HomePage() {
       </section>
 
       <section className="px-4 py-10 sm:px-6 md:px-10 md:py-14">
+        <div className="mx-auto max-w-7xl">
+          <section className="overflow-hidden rounded-[34px] bg-[#efe7db] shadow-[0_12px_34px_rgba(36,51,40,0.06)]">
+            <div className="grid gap-0 lg:grid-cols-[0.42fr_0.58fr]">
+              <div className="flex flex-col justify-between p-6 md:p-9 lg:p-10">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                    A week in the kitchen
+                  </p>
+
+                  <h2 className="mt-3 max-w-xl font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+                    The box is the base. The planner keeps it simple.
+                  </h2>
+
+                  <p className="mt-5 max-w-lg text-sm leading-8 text-[#667164] md:text-base">
+                    Fruit and veg delivery, optional pantry extras and realistic
+                    meal ideas working together — so the week feels easier, not
+                    more complicated.
+                  </p>
+                </div>
+
+                <div className="mt-7 rounded-[24px] border border-[#d8d0c4] bg-white/55 p-5">
+                  <p className="font-serif text-2xl leading-tight text-[#243328]">
+                    Start with fresh produce. Add what helps. Repeat what works.
+                  </p>
+
+                  <p className="mt-3 text-sm leading-7 text-[#667164]">
+                    This is not a recipe box. It is a calmer way to keep useful
+                    food in the house and make everyday cooking less of a mental
+                    load.
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-[#ded4c6] bg-[#f6f1ea]/60 lg:border-l lg:border-t-0">
+                <div className="flex snap-x gap-3 overflow-x-auto p-4 sm:p-5 lg:grid lg:grid-cols-5 lg:overflow-visible lg:p-5">
+                  {kitchenWeekStrip.map((item) => (
+                    <article
+                      key={item.title}
+                      className="min-w-[78%] snap-start overflow-hidden rounded-[26px] bg-white shadow-[0_8px_22px_rgba(36,51,40,0.06)] sm:min-w-[45%] lg:min-w-0"
+                    >
+                      <div className="h-52 overflow-hidden bg-[#e8dfd3] lg:h-64">
+                        <img
+                          src={item.image}
+                          alt={item.alt}
+                          className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+                        />
+                      </div>
+
+                      <div className="p-4">
+                        <p className="text-[10px] uppercase tracking-[0.16em] text-[#7a8478]">
+                          {item.label}
+                        </p>
+
+                        <h3 className="mt-2 font-serif text-[1.45rem] leading-tight text-[#243328]">
+                          {item.title}
+                        </h3>
+
+                        <p className="mt-2 text-sm leading-6 text-[#667164]">
+                          {item.text}
+                        </p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section className="px-4 pb-10 sm:px-6 md:px-10 md:pb-14">
         <div className="mx-auto max-w-7xl">
           <section className="rounded-[32px] bg-white/82 p-5 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-7">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
