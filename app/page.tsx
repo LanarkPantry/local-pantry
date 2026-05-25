@@ -205,7 +205,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-[#243328] text-white">
         <div className="relative min-h-[78vh] md:min-h-[82vh]">
           <img
-            src="/images/home/pantry-kitchen-scene.jpg"
+            src="/images/home/pantry-kitchen-scene-wide.png"
             alt="The Local Pantry fruit and veg box with pantry extras"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
