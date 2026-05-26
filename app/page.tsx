@@ -348,83 +348,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 pb-10 sm:px-6 md:px-10 md:pb-14">
-        <div className="mx-auto max-w-7xl">
-          <section className="rounded-[32px] bg-white/82 p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
-            <div className="max-w-3xl">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Built around normal home cooking
-              </p>
-
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                Built around normal home cooking.
-              </h2>
-
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-                Start with a regular fruit and veg delivery, add staples when
-                you need them, and keep weekday cooking simpler.
-              </p>
-            </div>
-
-            <div className="mt-8 grid gap-4 md:grid-cols-3">
-              <article className="rounded-[26px] bg-[#f8f4ee]/85 p-6 transition hover:bg-white">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                  Your box
-                </p>
-
-                <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328]">
-                  Weekly fruit & veg
-                </h3>
-
-                <p className="mt-4 text-sm leading-7 text-[#667164]">
-                  Choose a weekly or fortnightly box built around useful,
-                  everyday produce.
-                </p>
-              </article>
-
-              <article className="rounded-[26px] bg-[#f8f4ee]/85 p-6 transition hover:bg-white">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                  Pantry extras
-                </p>
-
-                <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328]">
-                  Add your regulars
-                </h3>
-
-                <p className="mt-4 text-sm leading-7 text-[#667164]">
-                  Add pasta, grains, beans, sauces and cupboard basics when you
-                  need them.
-                </p>
-              </article>
-
-              <article className="rounded-[26px] bg-[#f8f4ee]/85 p-6 transition hover:bg-white">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                  Planner
-                </p>
-
-                <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328]">
-                  Keep meals simple
-                </h3>
-
-                <p className="mt-4 text-sm leading-7 text-[#667164]">
-                  Simple meal ideas built around the food already in your
-                  kitchen.
-                </p>
-              </article>
-            </div>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                href="/shop"
-                className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
-              >
-                Choose your box
-              </Link>
-            </div>
-          </section>
-        </div>
-      </section>
-
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
         <div className="mx-auto max-w-7xl">
           <section className="rounded-[32px] bg-[#efe7db] p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-8">
@@ -545,7 +468,7 @@ export default function HomePage() {
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <p className="text-sm uppercase tracking-[0.18em] text-white/60">
-                Simple weekday cooking
+                Built around normal home cooking
               </p>
 
               <h2 className="mt-3 font-serif text-3xl md:text-5xl">
