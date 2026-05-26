@@ -195,8 +195,6 @@ export default function HomePage() {
             {item.description}
           </p>
 
-          <p className="mt-5 text-sm font-medium text-[#243328]">Best for</p>
-
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {renderAddControls(item)}
 
