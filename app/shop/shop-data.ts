@@ -21,13 +21,9 @@ export const produceBoxes: ShopDisplayItem[] = [
     category: "boxes",
     checkoutType: "subscription",
     buttonLabel: "Add weekly box",
-    description:
-      "A smaller produce box with a useful mix of everyday fruit and veg.",
+    description: "A flexible weekly produce base for everyday cooking.",
     details:
-      "Best suited to weekly delivery. Contents change week to week depending on availability, so the mix is not fixed.",
-    weeklyIncludes: ["Carrots", "Potatoes", "Leeks", "Apples", "Onions"],
-    bestFor: "Best for 1–2 people or lighter weekly cooking",
-    note: "Best as a weekly subscription",
+      "Contents shift slightly through the seasons depending on availability.",
   },
   {
     name: "Family Produce Box",
@@ -37,12 +33,9 @@ export const produceBoxes: ShopDisplayItem[] = [
     checkoutType: "subscription",
     buttonLabel: "Add family box",
     description:
-      "A larger produce box for households that cook regularly through the week.",
+      "A fuller weekly produce box for households that cook most nights.",
     details:
-      "Designed as a fuller weekly box, with contents changing depending on what is available.",
-    weeklyIncludes: ["Carrots", "Potatoes", "Tomatoes", "Apples", "Greens"],
-    bestFor: "Best for families or households cooking most nights",
-    note: "Best as a weekly subscription",
+      "Contents shift slightly through the seasons depending on availability.",
   },
 ];
 
@@ -53,9 +46,9 @@ export const pantryItems: ShopDisplayItem[] = [
     image: "/sorrel-walnut-pesto.png",
     category: "pantry",
     checkoutType: "one-off",
-    description: "A fresh, savoury jar for pasta or roasted vegetables.",
-    details:
-      "A useful one-off add-on to include with your weekly box or order.",
+    description:
+      "A fresh savoury jar for pasta, potatoes or roasted vegetables.",
+    details: "Add when you want something quick and green in the fridge.",
     note: "Usually added as a one-off",
   },
   {
@@ -64,8 +57,9 @@ export const pantryItems: ShopDisplayItem[] = [
     image: "/rose-harissa.png",
     category: "pantry",
     checkoutType: "one-off",
-    description: "A gently spiced pantry extra for roasting or dressing.",
-    details: "Easy to add when you want a little more flavour in the week.",
+    description: "A gently spiced jar for beans, grains and roast vegetables.",
+    details:
+      "A small spoonful brings warmth without making dinner complicated.",
     note: "Usually added as a one-off",
   },
   {
@@ -74,8 +68,8 @@ export const pantryItems: ShopDisplayItem[] = [
     image: "/salted-caramel.png",
     category: "pantry",
     checkoutType: "one-off",
-    description: "A rich sauce for desserts or simple extras.",
-    details: "A simple one-off extra rather than part of a weekly base order.",
+    description: "A rich sweet jar for desserts, yoghurt, toast or baking.",
+    details: "A simple cupboard treat to add when you want one.",
     note: "Usually added as a one-off",
   },
   {
@@ -84,8 +78,9 @@ export const pantryItems: ShopDisplayItem[] = [
     image: "/dark-chocolate.png",
     category: "pantry",
     checkoutType: "one-off",
-    description: "A simple chocolate spread for toast or baking.",
-    details: "A good add-on when you want something sweet in the cupboard.",
+    description:
+      "A darker chocolate spread for toast, baking or simple puddings.",
+    details: "An easy sweet extra to keep in the cupboard.",
     note: "Usually added as a one-off",
   },
 ];
@@ -99,11 +94,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "540g",
     description:
-      "Large soft butter beans in a rich stock. Ideal for fast dinners, traybakes and creamy bean dishes.",
-    details:
-      "A strong planner staple for tomato braises, harissa beans, roast vegetable bowls and quick pantry dinners.",
-    bestFor:
-      "Perfect for rose harissa beans, tomato braises and crispy roasted bean dinners.",
+      "Large soft butter beans for fast dinners, traybakes and simple weeknight cooking.",
+    details: "Works well with tomatoes, harissa, greens and roast vegetables.",
     note: "Usually added as a one-off",
   },
   {
@@ -114,11 +106,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "540g",
     description:
-      "Tender jarred chickpeas with a softer texture and richer flavour than standard canned versions.",
-    details:
-      "Useful for stews, crispy traybakes, hummus-style bowls and quick weeknight meals.",
-    bestFor:
-      "Excellent with harissa, tomatoes, herbs, couscous, roast vegetables and tahini.",
+      "Tender jarred chickpeas for quick bowls, traybakes and easy dinners.",
+    details: "Works well with harissa, tomatoes, herbs, couscous and tahini.",
     note: "Usually added as a one-off",
   },
   {
@@ -129,10 +118,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "540g",
     description:
-      "Creamy white beans for soups, tomato dishes and simple pantry meals.",
-    details:
-      "A flexible cupboard base for garlic greens, miso beans, lemony bowls and slow tomato sauces.",
-    bestFor: "Great with greens, garlic, lemon, miso and tomato-based dinners.",
+      "Creamy white beans for soups, greens, tomato dishes and simple bowls.",
+    details: "Works well with garlic, lemon, miso, herbs and soft vegetables.",
     note: "Usually added as a one-off",
   },
   {
@@ -143,11 +130,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "400g",
     description:
-      "Finely chopped Italian tomatoes with a bright sweet flavour and rich texture.",
-    details:
-      "One of the most useful cupboard bases for sauces, beans, pasta and quick one-pan meals.",
-    bestFor:
-      "Perfect for pasta sauces, beans, shakshuka and slow simmered dishes.",
+      "Finely chopped tomatoes for sauces, beans and quick one-pan meals.",
+    details: "One of the most useful bases to keep in the cupboard.",
     note: "Usually added as a one-off",
   },
   {
@@ -158,11 +142,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "Traditional hollow pasta with extra bite and excellent sauce coverage.",
-    details:
-      "A useful pasta shape when you want something more satisfying than spaghetti but still easy to cook.",
-    bestFor:
-      "Perfect for tomato sauces, chilli butter, pesto and creamy pasta dishes.",
+      "Hollow pasta with extra bite for tomato sauces, pesto and creamy dishes.",
+    details: "A satisfying pasta shape that still feels easy to cook.",
     note: "Usually added as a one-off",
   },
   {
@@ -173,9 +154,9 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A slightly more special pasta shape that still feels easy to cook with.",
+      "A useful pasta shape for pesto, roasted vegetables, greens and jarred sauces.",
     details:
-      "Good with pesto, harissa, greens, roasted vegetables, or whatever needs using up.",
+      "Good when you want something simple but a little more interesting.",
     note: "Usually added as a one-off",
   },
   {
@@ -186,9 +167,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A very flexible pasta for quick bowls, soups, traybakes, and easy midweek cooking.",
-    details:
-      "Especially useful when you want something fast, simple, and not too heavy.",
+      "A small pasta for quick bowls, soups, traybakes and easy midweek cooking.",
+    details: "Useful when you want something fast, flexible and not too heavy.",
     note: "Usually added as a one-off",
   },
   {
@@ -198,9 +178,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     category: "cupboard",
     checkoutType: "one-off",
     weight: "500g",
-    description: "A useful grain-like cupboard staple that works warm or cold.",
-    details:
-      "Good with roast vegetables, herbs, dressings, and spoonfuls of something punchy from the fridge.",
+    description: "A flexible cupboard staple that works warm or cold.",
+    details: "Good with roast vegetables, herbs, dressings and punchy jars.",
     note: "Usually added as a one-off",
   },
   {
@@ -211,9 +190,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A comforting base for soft bowls, roasted vegetables, and simple suppers.",
-    details:
-      "Naturally gluten-free and especially good with greens, beans, pesto, or harissa.",
+      "A soft comforting base for roasted vegetables, beans and simple suppers.",
+    details: "Naturally gluten-free and useful for quick savoury bowls.",
     note: "Usually added as a one-off",
   },
   {
@@ -224,9 +202,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A pantry staple with a little more structure, good for warm salads and batch cooking.",
-    details:
-      "Useful to cook ahead and keep in the fridge for easy lunches, bowls, and simple dinners.",
+      "Structured lentils for warm salads, batch cooking, bowls and sides.",
+    details: "Useful to cook ahead and keep in the fridge for quick meals.",
     note: "Usually added as a one-off",
   },
   {
@@ -237,9 +214,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A versatile rice for risotto-style cooking, gentle puddings, and simple sides.",
-    details:
-      "One of the most useful cupboard basics if you want something that works for sweet or savoury cooking.",
+      "A versatile rice for risotto-style cooking, simple sides and puddings.",
+    details: "A flexible cupboard basic that works sweet or savoury.",
     note: "Usually added as a one-off",
   },
   {
@@ -250,9 +226,9 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A nutty, chewy grain that makes simple bowls and salads feel a little more special.",
+      "A nutty chewy grain for bowls, salads and simple vegetable-led dinners.",
     details:
-      "Especially good with roast vegetables, herbs, soft cheeses, and bold jars like harissa or pesto.",
+      "Works well with roast vegetables, herbs, soft cheeses and harissa.",
     note: "Usually added as a one-off",
   },
 ];
@@ -266,7 +242,7 @@ export const extraItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "An everyday nut to keep on hand for baking, breakfast, salads, and simple cooking.",
+      "An everyday nut for baking, breakfast, salads and simple cooking.",
     note: "Usually added as a one-off",
   },
   {
@@ -277,7 +253,7 @@ export const extraItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A savoury-leaning extra that works beautifully with grains, leaves, roast veg, and cheese.",
+      "A savoury-leaning extra for grains, leaves, roast veg and cheese.",
     note: "Usually added as a one-off",
   },
   {
@@ -288,7 +264,7 @@ export const extraItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A slightly more special nut that works especially well with sweet things and darker flavours.",
+      "A slightly special nut for sweet things, baking and darker flavours.",
     note: "Usually added as a one-off",
   },
   {
@@ -298,8 +274,7 @@ export const extraItems: ShopDisplayItem[] = [
     category: "extras",
     checkoutType: "one-off",
     weight: "500g",
-    description:
-      "A soft, useful nut for snacking, cooking, and adding a little richness to simple meals.",
+    description: "A soft useful nut for snacking, cooking and adding richness.",
     note: "Usually added as a one-off",
   },
 ];
