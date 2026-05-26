@@ -248,8 +248,8 @@ export default function HomePage() {
 
               <div className="mt-6 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur">
                 <p className="text-sm text-white/82">
-                  Delivered every Tuesday and Wednesday across Lanark, Carluke
-                  and surrounding areas.
+                  Delivered every Monday and Tuesday across Lanark, Carluke and
+                  surrounding areas.
                 </p>
               </div>
 
@@ -265,7 +265,7 @@ export default function HomePage() {
                   href="/planner"
                   className="rounded-full border border-white/35 bg-white/10 px-7 py-3 text-center text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
                 >
-                  Explore the planner
+                  Start planning meals
                 </Link>
               </div>
 
@@ -295,17 +295,6 @@ export default function HomePage() {
                     Fruit and veg delivery, regular staples and simple meal
                     support working together — so the week feels easier, not
                     more complicated.
-                  </p>
-                </div>
-
-                <div className="rounded-[24px] border border-[#d8d0c4] bg-white/55 p-5 lg:p-6">
-                  <p className="font-serif text-[1.65rem] leading-tight text-[#243328] md:text-3xl">
-                    Start with fresh produce. Add what helps. Repeat what works.
-                  </p>
-
-                  <p className="mt-3 text-sm leading-7 text-[#667164]">
-                    Not a recipe box — a calmer way to keep useful food in the
-                    house.
                   </p>
                 </div>
               </div>
@@ -573,7 +562,7 @@ export default function HomePage() {
                   href="/planner"
                   className="rounded-full bg-white px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
                 >
-                  Explore the planner
+                  Start planning meals
                 </Link>
               </div>
             </div>
