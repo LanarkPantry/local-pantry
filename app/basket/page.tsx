@@ -77,13 +77,13 @@ export default function BasketPage() {
   const orderTypeLabel = isSubscription
     ? subscriptionFrequency === "weekly"
       ? "Weekly box delivery"
-      : "Every two weeks"
+      : "Fortnightly"
     : "One-off order";
 
   const whatsappOrderTypeText = isSubscription
     ? subscriptionFrequency === "weekly"
       ? "Weekly box delivery with one-off add-ons"
-      : "Box delivery every two weeks with one-off add-ons"
+      : "Box delivery fortnightly with one-off add-ons"
     : "One-off order";
 
   const whatsappLink = `https://wa.me/447576613770?text=${encodeURIComponent(
@@ -343,13 +343,6 @@ Thanks!`,
               </Link>
 
               <Link
-                href="/recipes"
-                className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
-              >
-                Recipes
-              </Link>
-
-              <Link
                 href="/planner"
                 className="text-sm text-[#4f5e52] transition hover:text-[#243328]"
               >
@@ -386,14 +379,14 @@ Thanks!`,
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Local delivery across ML11
+                Local delivery
               </p>
               <h1 className="mt-2 font-serif text-[2.2rem] leading-tight md:text-[3.3rem]">
                 Review your basket for the week ahead
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164] md:text-base">
-                Boxes can be one-off, weekly, or every two weeks. Everything
-                else stays easy to add whenever you like.
+                Choose a one-off order, or repeat your produce box weekly or
+                fortnightly. Pantry extras stay flexible.
               </p>
             </div>
 
@@ -424,8 +417,8 @@ Thanks!`,
               </h2>
 
               <p className="mx-auto mt-3 text-sm leading-6 text-[#667164] md:text-base">
-                Start with a produce box, then add pantry items or extras. You
-                can plan meals from anywhere, and order locally across ML11.
+                Start with a produce box, then add regular staples or extras
+                when you need them.
               </p>
 
               <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -452,12 +445,12 @@ Thanks!`,
                 <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
                   <div className="rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
                     <p className="text-sm font-medium text-[#243328]">
-                      Boxes are the only items that can repeat
+                      Only your box repeats
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      You can keep the whole order one-off, or choose to repeat
-                      just your box. Everything else stays one-off and easy to
-                      add any time.
+                      Keep the whole order one-off, or repeat just your produce
+                      box. Pantry extras stay one-off and can be added when
+                      needed.
                     </p>
                   </div>
 
@@ -561,11 +554,11 @@ Thanks!`,
                     Order type
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
-                    Choose how this order should work
+                    Choose your order rhythm
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-[#667164]">
-                    Keep this as a one-off order, or repeat just your box.
-                    Everything else stays flexible.
+                    Keep this as a one-off order, or repeat just your produce
+                    box. Pantry extras stay flexible.
                   </p>
 
                   <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -608,10 +601,11 @@ Thanks!`,
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="font-serif text-2xl text-[#243328]">
-                            Repeat my box
+                            Repeat my produce box
                           </div>
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
-                            Only your box repeats. One-off add-ons stay one-off.
+                            Only your produce box repeats. Pantry extras stay
+                            one-off.
                           </p>
                         </div>
 
@@ -627,7 +621,7 @@ Thanks!`,
                   {isSubscription && (
                     <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
                       <p className="text-sm font-medium text-[#243328]">
-                        How often should your box repeat?
+                        How often should your produce box repeat?
                       </p>
 
                       <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -643,10 +637,10 @@ Thanks!`,
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <div className="font-serif text-2xl text-[#243328]">
-                                Every week
+                                Weekly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                                Best if you want your regular weekly box.
+                                For a steady weekly produce rhythm.
                               </p>
                             </div>
 
@@ -672,7 +666,7 @@ Thanks!`,
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <div className="font-serif text-2xl text-[#243328]">
-                                Every two weeks
+                                Fortnightly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
                                 A lighter rhythm if weekly feels too much.
@@ -689,7 +683,7 @@ Thanks!`,
                       </div>
 
                       <p className="mt-4 text-sm leading-6 text-[#667164]">
-                        You can still add one-off extras whenever you like.
+                        You can still add pantry extras whenever you need them.
                       </p>
                     </div>
                   )}
@@ -697,8 +691,7 @@ Thanks!`,
                   {!isSubscription && (
                     <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
                       <p className="text-sm leading-6 text-[#667164]">
-                        Your whole basket will be treated as a one-off order
-                        this time.
+                        Nothing repeats. This basket is just for this delivery.
                       </p>
                     </div>
                   )}
@@ -709,8 +702,8 @@ Thanks!`,
                         No box in yet
                       </p>
                       <p className="mt-2 text-sm leading-6 text-[#667164]">
-                        Add a box if you want weekly or every two weeks to make
-                        sense.
+                        Add a box if you want a weekly or fortnightly order to
+                        make sense.
                       </p>
                     </div>
                   )}
@@ -791,12 +784,12 @@ Thanks!`,
                     Local delivery
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Delivery is currently available across ML11. If anything
-                    about your order needs checked, we’ll confirm it with you
-                    directly.
+                    Delivery currently runs across Lanark, Carluke and
+                    surrounding areas. If anything about your order needs
+                    checked, we’ll confirm it directly.
                   </p>
                   <Link
-                    href="/#postcode-checker"
+                    href="/delivery#postcode-checker"
                     className="mt-3 inline-flex text-sm text-[#243328] underline underline-offset-4 transition hover:text-[#4f5e52]"
                   >
                     Check your postcode

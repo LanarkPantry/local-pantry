@@ -495,7 +495,7 @@ export default function PlannerPage() {
         <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
           <img
             src="/images/home/plan-your-week.jpg"
-            alt="Plan your week"
+            alt="Build a calmer food week"
             className="h-44 w-full object-cover"
           />
         </div>
@@ -514,8 +514,8 @@ export default function PlannerPage() {
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
                 {isLoggedIn
-                  ? "You are signed in. Preview a week while subscription access is being connected."
-                  : "Preview a week built from real recipes and seasonal produce."}
+                  ? "Build a simple week around your produce box and regular staples."
+                  : "Simple meal ideas built around real home cooking."}
               </p>
 
               {plannerError ? (
@@ -551,7 +551,7 @@ export default function PlannerPage() {
 
                   <div>
                     <p className="mb-3 text-sm font-medium text-[#243328]">
-                      What kind of week?
+                      What suits this week?
                     </p>
 
                     <div className="flex flex-wrap gap-2">
@@ -587,7 +587,7 @@ export default function PlannerPage() {
 
                       <ChoiceChip
                         active={eatingStyle === "my-regulars"}
-                        label="My regulars"
+                        label="Saved favourites"
                         onClick={() => setEatingStyle("my-regulars")}
                       />
                     </div>
@@ -595,12 +595,12 @@ export default function PlannerPage() {
 
                   <div className="rounded-[22px] border border-[#ddd4c8] bg-white/65 p-4">
                     <p className="text-sm font-medium text-[#243328]">
-                      Flexible weekly planning
+                      Built for normal weeks
                     </p>
 
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Weekly delivery members unlock saved weeks, My Regulars
-                      and deeper planner features.
+                      Flexible meal ideas designed to work with your weekly
+                      produce box and pantry basics.
                     </p>
                   </div>
 
@@ -611,7 +611,7 @@ export default function PlannerPage() {
                       disabled={!authChecked}
                       className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {authChecked ? "Preview my week" : "Checking account..."}
+                      {authChecked ? "Build my week" : "Checking account..."}
                     </button>
 
                     <Link
@@ -662,12 +662,12 @@ export default function PlannerPage() {
                     </p>
 
                     <h2 className="mt-2 font-serif text-[1.9rem] leading-tight md:text-[2.35rem]">
-                      A full week that still feels good to cook
+                      Simple dinners for the week ahead
                     </h2>
 
                     <p className="mt-3 text-sm leading-6 text-white/86">
-                      A veg box that comes with a plan: meals, pantry ideas and
-                      a calmer way to organise the week.
+                      Fruit and veg delivery, pantry staples and realistic meal
+                      ideas working together more simply.
                     </p>
                   </div>
                 </div>
@@ -682,7 +682,7 @@ export default function PlannerPage() {
           <div className="mx-auto max-w-7xl">
             <div className="mb-6 rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)] md:p-6">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Planner preview
+                Your week
               </p>
 
               <h3 className="mt-2 font-serif text-2xl text-[#243328]">
@@ -692,7 +692,7 @@ export default function PlannerPage() {
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5f675c]">
                 {isLoggedIn
                   ? "This planner avoids meals you have marked as cooked recently."
-                  : "Build flexible weekly plans around produce boxes, pantry staples and repeat meals."}
+                  : "Simple meal ideas designed around flexible weekly cooking."}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-3">
@@ -701,8 +701,8 @@ export default function PlannerPage() {
                   className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
                 >
                   {isLoggedIn
-                    ? "Choose a weekly veg box"
-                    : "Start a weekly veg box"}
+                    ? "Choose a produce box"
+                    : "Start with a produce box"}
                 </Link>
 
                 <button
@@ -741,11 +741,12 @@ export default function PlannerPage() {
                     </p>
 
                     <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                      Add a weekly produce box as your base
+                      Start with your produce box
                     </h3>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      Choose a weekly produce box to build the week around.
+                      The planner works best when your fruit and veg box becomes
+                      the base of the week.
                     </p>
                   </div>
 
@@ -915,7 +916,7 @@ export default function PlannerPage() {
                               ? "Saving..."
                               : savedRecipeSlugs.includes(meal.recipeSlug)
                                 ? "Saved"
-                                : "Save to My Regulars"}
+                                : "Save recipe"}
                           </button>
 
                           <button
@@ -996,7 +997,7 @@ export default function PlannerPage() {
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
                     <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                      Planner intelligence
+                      Why this week works
                     </p>
 
                     <h3 className="mt-2 font-serif text-2xl text-[#243328]">
@@ -1004,14 +1005,14 @@ export default function PlannerPage() {
                     </h3>
 
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Balanced around ingredient reuse, variety and practical
-                      weeknight cooking.
+                      Designed to keep cooking realistic, reduce waste and make
+                      the week feel easier.
                     </p>
                   </div>
 
                   <div className="rounded-[24px] border border-[#ded3c6] bg-[#f7f2eb] p-5 text-center shadow-[0_8px_18px_rgba(36,51,40,0.04)]">
                     <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                      Waste efficiency
+                      Kitchen flow
                     </p>
 
                     <p className="mt-2 font-serif text-4xl text-[#243328]">
@@ -1049,15 +1050,15 @@ export default function PlannerPage() {
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-              Planner pantry
+              Useful additions
             </p>
 
             <h2 className="mt-2 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.3rem]">
-              Suggested pantry additions
+              Pantry extras that fit this week
             </h2>
 
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
-              Based on the meals in your planner this week.
+              Optional extras that work naturally with the meals in this plan.
             </p>
           </div>
         </div>
