@@ -315,38 +315,75 @@ export default function PlannerPage() {
 
   async function handleBuildWeek() {
     setPlannerError("");
+    setRegularsMessage("");
     setSwapMealId(null);
 
-    let generatedRecipes: Recipe[] = [];
+    const requestedNights = Math.min(Math.max(nights, 3), DAY_NAMES.length);
     const recentlyCookedSlugs = await getRecentlyCookedSlugs(14);
+
+    let baseRecipes: Recipe[] = [];
 
     if (eatingStyle === "my-regulars") {
       const regularRecipes = await getSavedRecipes();
 
-      generatedRecipes = generateRegularsWeek({
-        regularRecipes: regularRecipes.filter(
-          (recipe) => !recentlyCookedSlugs.includes(recipe.slug),
-        ),
-        mealCount: nights,
+      baseRecipes = generateRegularsWeek({
+        regularRecipes,
+        mealCount: requestedNights,
       });
     } else {
-      generatedRecipes = generateWeek(eatingStyle as PlannerStyle)
-        .filter((recipe) => !recentlyCookedSlugs.includes(recipe.slug))
-        .slice(0, nights);
+      baseRecipes = generateWeek(eatingStyle as PlannerStyle);
     }
 
-    if (generatedRecipes.length === 0) {
+    const selectedRecipes: Recipe[] = [];
+    const selectedSlugs = new Set<string>();
+
+    function addRecipe(recipe: Recipe) {
+      if (selectedRecipes.length >= requestedNights) return;
+      if (selectedSlugs.has(recipe.slug)) return;
+
+      selectedRecipes.push(recipe);
+      selectedSlugs.add(recipe.slug);
+    }
+
+    baseRecipes
+      .filter((recipe) => !recentlyCookedSlugs.includes(recipe.slug))
+      .forEach(addRecipe);
+
+    if (selectedRecipes.length < requestedNights) {
+      baseRecipes.forEach(addRecipe);
+    }
+
+    if (selectedRecipes.length < requestedNights) {
+      recipes
+        .filter((recipe) => !recentlyCookedSlugs.includes(recipe.slug))
+        .forEach(addRecipe);
+    }
+
+    if (selectedRecipes.length < requestedNights) {
+      recipes.forEach(addRecipe);
+    }
+
+    if (selectedRecipes.length === 0) {
       setPlannerError(
         "No meals matched that choice yet. Try Mixed, Mostly veggie, or Quick dinners while more recipes are being tagged.",
       );
       return;
     }
 
-    const plannedWeek: PlannedMeal[] = generatedRecipes.map((recipe, index) =>
+    if (selectedRecipes.length < requestedNights) {
+      setRegularsMessage(
+        `I found ${selectedRecipes.length} meal${
+          selectedRecipes.length === 1 ? "" : "s"
+        } for this choice. Add more recipes to create a fuller ${requestedNights}-night week.`,
+      );
+    }
+
+    const plannedWeek: PlannedMeal[] = selectedRecipes.map((recipe, index) =>
       recipeToPlannedMeal(recipe, index),
     );
 
     setWeek(plannedWeek);
+    setNights(plannedWeek.length);
     setOpenDay(null);
     setStep("results");
   }
