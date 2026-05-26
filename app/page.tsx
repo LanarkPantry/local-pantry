@@ -506,8 +506,8 @@ export default function HomePage() {
             </h2>
 
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-              Deliveries currently run every Tuesday and Wednesday. More areas
-              will be added as the service grows.
+              Deliveries currently run every Monday and Tuesday. More areas will
+              be added as the service grows.
             </p>
 
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">

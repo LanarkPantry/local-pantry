@@ -121,8 +121,8 @@ export default function PostcodeChecker() {
 
         <p className="mx-auto mt-4 max-w-2xl text-[#667164]">
           Planning works wherever you are. Grocery delivery is currently
-          available across ML8 and ML11. Enter your postcode to check
-          availability.
+          available in Lanark, Carluke and surrounding areas. Enter your
+          postcode to check availability.
         </p>
 
         <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
@@ -194,9 +194,9 @@ export default function PostcodeChecker() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#5f675c]">
-              Local Pantry is currently delivering in ML8 and ML11 only.
-              Register your interest and we&apos;ll let you know when delivery
-              opens in your area.
+              Local Pantry is currently delivering throughout Lanark and
+              Carluke. Register your interest and we&apos;ll let you know when
+              delivery opens in your area.
             </p>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
