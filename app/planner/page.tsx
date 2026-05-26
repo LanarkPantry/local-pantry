@@ -685,7 +685,7 @@ export default function PlannerPage() {
             <article className="overflow-hidden rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
               <div className="relative min-h-[280px]">
                 <img
-                  src="/hero.jpg"
+                  src="/images/home/week-midweek-cooking.png"
                   alt="The Local Pantry planner"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
