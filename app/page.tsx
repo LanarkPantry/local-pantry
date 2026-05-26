@@ -409,36 +409,6 @@ export default function HomePage() {
                   the big weekly supermarket shop.
                 </p>
 
-                <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
-                    <h3 className="font-serif text-2xl text-white">Flexible</h3>
-
-                    <p className="mt-2 text-sm leading-7 text-white/70">
-                      Weekly or fortnightly with easy pause or cancellation.
-                    </p>
-                  </div>
-
-                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
-                    <h3 className="font-serif text-2xl text-white">
-                      Regular staples
-                    </h3>
-
-                    <p className="mt-2 text-sm leading-7 text-white/70">
-                      Add cupboard basics only when you actually need them.
-                    </p>
-                  </div>
-
-                  <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
-                    <h3 className="font-serif text-2xl text-white">
-                      Simple meals
-                    </h3>
-
-                    <p className="mt-2 text-sm leading-7 text-white/70">
-                      Meal ideas built around what is already at home.
-                    </p>
-                  </div>
-                </div>
-
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
                     href="/shop#pantry-staples"
