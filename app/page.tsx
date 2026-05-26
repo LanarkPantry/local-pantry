@@ -376,7 +376,7 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                The box is the base. Everything else stays flexible.
+                Built around normal home cooking.
               </h2>
 
               <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
