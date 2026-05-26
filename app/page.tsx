@@ -361,13 +361,6 @@ export default function HomePage() {
                   Start with the fruit and veg box.
                 </h2>
               </div>
-
-              <Link
-                href="/shop"
-                className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
-              >
-                View all shop items
-              </Link>
             </div>
 
             <div className="mt-7 grid gap-5 md:grid-cols-2">
