@@ -161,12 +161,10 @@ export default function HomePage() {
     item,
     label,
     fallbackImage,
-    bestFor,
   }: {
     item: ShopDisplayItem;
     label: string;
     fallbackImage: string;
-    bestFor: string;
   }) {
     return (
       <article className="overflow-hidden rounded-[30px] bg-white/85 shadow-[0_10px_28px_rgba(36,51,40,0.06)]">
@@ -198,10 +196,6 @@ export default function HomePage() {
           </p>
 
           <p className="mt-5 text-sm font-medium text-[#243328]">Best for</p>
-
-          <p className="mt-2 text-sm leading-7 text-[#667164]">
-            {item.bestFor ?? bestFor}
-          </p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {renderAddControls(item)}
@@ -472,7 +466,6 @@ export default function HomePage() {
                   item={weeklyProduceBox}
                   label="Smaller box"
                   fallbackImage="/weekly-harvest-box.png"
-                  bestFor="Smaller households, solo cooking, couples, or anyone wanting a useful produce base."
                 />
               ) : null}
 
@@ -481,7 +474,6 @@ export default function HomePage() {
                   item={familyProduceBox}
                   label="Larger box"
                   fallbackImage="/family-harvest-box.png"
-                  bestFor="Families, shared homes, and people cooking most nights."
                 />
               ) : null}
             </div>
