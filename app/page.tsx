@@ -19,19 +19,19 @@ const sampleWeek = [
     day: "Monday",
     meal: "Harissa Butter Beans & Couscous",
     image: "/images/recipes/harissa-butterbeans-peppers-couscous.jpg",
-    note: "Fast pantry dinner using flexible staples and fresh veg.",
+    note: "A fast dinner using fresh veg and regular staples.",
   },
   {
     day: "Wednesday",
     meal: "Courgette Bucatini with Pesto",
     image: "/images/recipes/bucatini-courgette-pesto.jpg",
-    note: "Simple weeknight pasta with useful fridge and cupboard ingredients.",
+    note: "Weeknight pasta using what is already at home.",
   },
   {
     day: "Friday",
     meal: "Hot Honey Halloumi Couscous",
     image: "/images/recipes/hot-honey-halloumi-couscous.jpg",
-    note: "Quick comfort food built around grains, herbs and pantry extras.",
+    note: "Quick comfort food built around grains, herbs and veg.",
   },
 ];
 
@@ -46,28 +46,28 @@ const kitchenWeekStrip = [
   {
     label: "Pantry extras",
     title: "Add what helps",
-    text: "Useful staples like pasta, grains, jars and beans sit around the box.",
+    text: "Add the regular staples you use most.",
     image: "/images/home/week-pantry-extras.png",
     alt: "Pantry jars and dry goods beside fresh vegetables",
   },
   {
     label: "Meal planning",
     title: "Know what’s for dinner",
-    text: "The planner turns what you have into a few realistic meals.",
+    text: "Keep weekday meals realistic and simple.",
     image: "/images/home/week-planner-counter.png",
     alt: "A phone showing a meal planner beside vegetables and pantry staples",
   },
   {
     label: "Midweek cooking",
     title: "Use the same ingredients",
-    text: "Simple meals repeat ingredients instead of creating more decisions.",
+    text: "Use what you already have before adding more.",
     image: "/images/home/week-midweek-cooking.png",
     alt: "Simple midweek cooking with chopped vegetables and pantry staples",
   },
   {
     label: "Repeat what works",
     title: "Make next week easier",
-    text: "Keep your regulars close, pause what you don’t need, and build from there.",
+    text: "Keep your regulars close and repeat what works.",
     image: "/images/home/week-repeat-regulars.png",
     alt: "A calm kitchen counter with remaining produce, jars and a meal note",
   },
@@ -250,8 +250,8 @@ export default function HomePage() {
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-8 text-white/90 md:text-lg">
-                Weekly fruit and veg delivery with optional pantry extras and
-                flexible meal inspiration for the week ahead.
+                Weekly fruit and veg delivery with optional regular staples and
+                simple weekday meal support.
               </p>
 
               <div className="mt-6 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur">
@@ -300,8 +300,8 @@ export default function HomePage() {
                   </h2>
 
                   <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-                    Fruit and veg delivery, optional pantry extras and realistic
-                    meal ideas working together — so the week feels easier, not
+                    Fruit and veg delivery, regular staples and simple meal
+                    support working together — so the week feels easier, not
                     more complicated.
                   </p>
                 </div>
@@ -380,9 +380,8 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-                Start with a regular fruit and veg delivery, add useful pantry
-                extras only when you need them, and use the planner to make
-                weekday cooking feel simpler.
+                Start with a regular fruit and veg delivery, add staples when
+                you need them, and keep weekday cooking simpler.
               </p>
             </div>
 
@@ -397,8 +396,8 @@ export default function HomePage() {
                 </h3>
 
                 <p className="mt-4 text-sm leading-7 text-[#667164]">
-                  Choose a weekly or fortnightly produce box built around
-                  useful, everyday ingredients.
+                  Choose a weekly or fortnightly box built around useful,
+                  everyday produce.
                 </p>
               </article>
 
@@ -408,12 +407,12 @@ export default function HomePage() {
                 </p>
 
                 <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-[#243328]">
-                  Add regular staples
+                  Add your regulars
                 </h3>
 
                 <p className="mt-4 text-sm leading-7 text-[#667164]">
-                  Pasta, grains, beans, sauces and useful cupboard ingredients
-                  only when you actually need them.
+                  Add pasta, grains, beans, sauces and cupboard basics when you
+                  need them.
                 </p>
               </article>
 
@@ -427,8 +426,8 @@ export default function HomePage() {
                 </h3>
 
                 <p className="mt-4 text-sm leading-7 text-[#667164]">
-                  Flexible meal inspiration designed around the food already in
-                  your kitchen.
+                  Simple meal ideas built around the food already in your
+                  kitchen.
                 </p>
               </article>
             </div>
@@ -439,13 +438,6 @@ export default function HomePage() {
                 className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
               >
                 Choose your box
-              </Link>
-
-              <Link
-                href="/planner"
-                className="rounded-full border border-[#d3cabd] bg-[#f7f2eb] px-6 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-white"
-              >
-                Explore the planner
               </Link>
             </div>
           </section>
@@ -462,7 +454,7 @@ export default function HomePage() {
                 </p>
 
                 <h2 className="mt-3 max-w-3xl font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.8rem]">
-                  Fruit and veg for the way you actually cook.
+                  Start with the fruit and veg box.
                 </h2>
               </div>
 
@@ -503,16 +495,16 @@ export default function HomePage() {
             <div className="grid gap-0 lg:grid-cols-[1fr_0.95fr]">
               <div className="p-6 md:p-10 lg:p-14">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">
-                  Built for real weeknights
+                  Designed for repeat use
                 </p>
 
                 <h2 className="mt-4 max-w-2xl font-serif text-[2.1rem] leading-tight text-white md:text-[3.5rem]">
-                  Less supermarket stress. More useful food at home.
+                  Keep useful food in the house.
                 </h2>
 
                 <p className="mt-6 max-w-2xl text-sm leading-8 text-white/78 md:text-base">
-                  Fresh produce, useful pantry staples and flexible meal
-                  inspiration without the big weekly supermarket shop.
+                  Fresh produce, regular staples and simple meal support without
+                  the big weekly supermarket shop.
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -526,21 +518,21 @@ export default function HomePage() {
 
                   <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
                     <h3 className="font-serif text-2xl text-white">
-                      Useful extras
+                      Regular staples
                     </h3>
 
                     <p className="mt-2 text-sm leading-7 text-white/70">
-                      Add pantry staples only when you actually need them.
+                      Add cupboard basics only when you actually need them.
                     </p>
                   </div>
 
                   <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur">
                     <h3 className="font-serif text-2xl text-white">
-                      Easier meals
+                      Simple meals
                     </h3>
 
                     <p className="mt-2 text-sm leading-7 text-white/70">
-                      Quick ideas built around the food already in your kitchen.
+                      Meal ideas built around what is already at home.
                     </p>
                   </div>
                 </div>
@@ -550,14 +542,7 @@ export default function HomePage() {
                     href="/shop#pantry-staples"
                     className="rounded-full bg-white px-6 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
                   >
-                    Browse pantry extras
-                  </Link>
-
-                  <Link
-                    href="/planner"
-                    className="rounded-full border border-white/20 bg-white/5 px-6 py-3 text-center text-sm font-medium text-white transition hover:bg-white/10"
-                  >
-                    Explore the planner
+                    Browse regular staples
                   </Link>
                 </div>
               </div>
@@ -581,16 +566,16 @@ export default function HomePage() {
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <p className="text-sm uppercase tracking-[0.18em] text-white/60">
-                Meal inspiration
+                Simple weekday cooking
               </p>
 
               <h2 className="mt-3 font-serif text-3xl md:text-5xl">
-                Quick ideas for the week ahead.
+                Simple meals for the week ahead.
               </h2>
 
               <p className="mt-5 text-base leading-8 text-white/80">
-                Flexible meal inspiration built around seasonal produce and
-                useful pantry staples — without turning dinner into a project.
+                Simple meal ideas built around seasonal produce and regular
+                staples — without turning dinner into a project.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
