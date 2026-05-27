@@ -78,7 +78,7 @@ export default function RegularsPage() {
   }, []);
 
   async function handleRemove(id: string) {
-    const confirmRemove = window.confirm("Remove this meal from My Regulars?");
+    const confirmRemove = window.confirm("Remove this meal from My Kitchen?");
 
     if (!confirmRemove) return;
 
@@ -117,7 +117,7 @@ export default function RegularsPage() {
           <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
             <article className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                My Regulars
+                My Kitchen
               </p>
 
               <h1 className="mt-3 max-w-3xl font-serif text-[2rem] leading-[1.02] tracking-tight text-[#243328] md:text-[3.35rem]">
@@ -134,7 +134,7 @@ export default function RegularsPage() {
                   href="/planner"
                   className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  Build from My Regulars
+                  Build from My Kitchen
                 </Link>
 
                 <Link
@@ -156,7 +156,7 @@ export default function RegularsPage() {
               </h2>
 
               <p className="mt-4 text-sm leading-7 text-[#667164]">
-                Most households repeat meals. My Regulars turns that natural
+                Most households repeat meals. My Kitchen turns that natural
                 rhythm into a useful planning system.
               </p>
             </article>
@@ -168,14 +168,14 @@ export default function RegularsPage() {
         <div className="mx-auto max-w-7xl">
           {loading ? (
             <div className="rounded-[24px] border border-[#ddd4c8] bg-white/80 p-6 text-sm text-[#667164]">
-              Loading My Regulars...
+              Loading My Kitchen...
             </div>
           ) : null}
 
           {!loading && !isLoggedIn ? (
             <div className="rounded-[24px] border border-[#ddd4c8] bg-white/80 p-6">
               <h2 className="font-serif text-2xl text-[#243328]">
-                Sign in to view My Regulars
+                Sign in to view My Kitchen
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-[#667164]">
@@ -205,7 +205,7 @@ export default function RegularsPage() {
               </h2>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
-                Open the planner, generate a week, then use Save to My Regulars
+                Open the planner, generate a week, then use Save to My Kitchen
                 on meals you want to cook again.
               </p>
 

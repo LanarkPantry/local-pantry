@@ -56,7 +56,7 @@ function getPlannerStyleLabel(style: string | null) {
     case "quick":
       return "Quick dinners";
     case "my-regulars":
-      return "My Regulars";
+      return "My Kitchen";
     default:
       return "Saved week";
   }
@@ -213,7 +213,7 @@ export default function SavedWeeksPage() {
                   href="/regulars"
                   className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
                 >
-                  View My Regulars
+                  View My Kitchen
                 </Link>
               </div>
             </article>

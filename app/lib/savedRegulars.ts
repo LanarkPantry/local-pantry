@@ -33,7 +33,7 @@ export async function getSavedRegulars() {
   if (userError || !user) {
     return {
       savedRecipes: [] as SavedRecipeRow[],
-      error: "You need to be signed in to view My Regulars.",
+      error: "You need to be signed in to view My Kitchen.",
     };
   }
 
@@ -81,7 +81,7 @@ export async function saveRecipeToRegulars(recipe: Recipe) {
   if (userError || !user) {
     return {
       success: false,
-      error: "You need to be signed in to save meals to My Regulars.",
+      error: "You need to be signed in to save meals to My Kitchen.",
     };
   }
 
@@ -124,7 +124,7 @@ export async function removeRecipeFromRegulars(recipeSlug: string) {
   if (userError || !user) {
     return {
       success: false,
-      error: "You need to be signed in to remove meals from My Regulars.",
+      error: "You need to be signed in to remove meals from My Kitchen.",
     };
   }
 
