@@ -172,7 +172,7 @@ export default function HomePage() {
           <img
             src={item.image || fallbackImage}
             alt={item.name}
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-contain p-3"
           />
         </div>
 
