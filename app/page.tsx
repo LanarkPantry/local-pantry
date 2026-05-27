@@ -17,9 +17,9 @@ import { type ShopDisplayItem, produceBoxes } from "./shop/shop-data";
 const sampleWeek = [
   {
     day: "Monday",
-    meal: "Harissa Butter Beans & Couscous",
-    image: "/images/recipes/harissa-butterbeans-peppers-couscous.jpg",
-    note: "A fast dinner using fresh veg and regular staples.",
+    meal: "Salmon, Dill & Crushed Potato Traybake",
+    image: "/images/recipes/salmon-dill-crushed-potato-traybake.jpg",
+    note: "A simple traybake with salmon, greens and crisp-edged potatoes.",
   },
   {
     day: "Wednesday",
