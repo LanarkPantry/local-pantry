@@ -168,11 +168,11 @@ export default function HomePage() {
   }) {
     return (
       <article className="overflow-hidden rounded-[30px] bg-white/85 shadow-[0_10px_28px_rgba(36,51,40,0.06)]">
-        <div className="h-64 overflow-hidden bg-[#f4efe9]">
+        <div className="aspect-[4/3] overflow-hidden bg-[#f4efe9]">
           <img
             src={item.image || fallbackImage}
             alt={item.name}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-center"
           />
         </div>
 
