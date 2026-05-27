@@ -969,7 +969,10 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
             <div className="mt-2 flex items-start gap-3">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[#e9dfd2] bg-[rgba(255,255,255,0.9)] p-2">
                 <img
-                  src={starterBoxFromShop?.image ?? "/weekly-harvest-box.png"}
+                  src={
+                    starterBoxFromShop?.image ??
+                    "//weekly-harvest-box-v2.pngarvest-box.png"
+                  }
                   alt={starterBoxFromShop?.name ?? "Weekly Produce Box"}
                   className="h-full w-full object-contain"
                 />
