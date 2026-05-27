@@ -36,7 +36,7 @@ type EatingStyle =
   | "vegan"
   | "gluten-free"
   | "quick"
-  | "my-regulars";
+  | "my-kitchen";
 
 type PlannedMeal = {
   id: string;
@@ -158,8 +158,8 @@ function getStyleLabel(style: EatingStyle) {
       return "Gluten-free friendly week";
     case "quick":
       return "Quick dinners";
-    case "my-regulars":
-      return "My Regulars week";
+    case "my-kitchen":
+      return "My Kitchen week";
     default:
       return "Weekly plan";
   }
@@ -323,7 +323,7 @@ export default function PlannerPage() {
 
     let baseRecipes: Recipe[] = [];
 
-    if (eatingStyle === "my-regulars") {
+    if (eatingStyle === "my-kitchen") {
       const regularRecipes = await getSavedRecipes();
 
       baseRecipes = generateRegularsWeek({
@@ -404,7 +404,7 @@ export default function PlannerPage() {
 
     if (!isLoggedIn) {
       setRegularsMessage(
-        "Sign in or create an account to save meals to My Regulars.",
+        "Sign in or create an account to save meals to My Kitchen.",
       );
       return;
     }
@@ -423,7 +423,7 @@ export default function PlannerPage() {
     setSavedRecipeSlugs((current) =>
       current.includes(recipe.slug) ? current : [...current, recipe.slug],
     );
-    setRegularsMessage(`${recipe.title} saved to My Regulars.`);
+    setRegularsMessage(`${recipe.title} saved to My Kitchen.`);
   }
 
   function handleSwapMeal(replacementRecipe: Recipe) {
@@ -623,9 +623,9 @@ export default function PlannerPage() {
                       />
 
                       <ChoiceChip
-                        active={eatingStyle === "my-regulars"}
+                        active={eatingStyle === "my-kitchen"}
                         label="Saved favourites"
-                        onClick={() => setEatingStyle("my-regulars")}
+                        onClick={() => setEatingStyle("my-kitchen")}
                       />
                     </div>
                   </div>
@@ -755,7 +755,7 @@ export default function PlannerPage() {
                   href="/saved-weeks"
                   className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
                 >
-                  View saved weeks
+                  View My Kitchen
                 </Link>
 
                 {!isLoggedIn ? (
