@@ -368,7 +368,7 @@ export default function HomePage() {
                 <BoxCard
                   item={weeklyProduceBox}
                   label="Smaller box"
-                  fallbackImage="//weekly-harvest-box-v2.pngarvest-box-v2.png"
+                  fallbackImage="//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png"
                 />
               ) : null}
 
@@ -376,7 +376,7 @@ export default function HomePage() {
                 <BoxCard
                   item={familyProduceBox}
                   label="Larger box"
-                  fallbackImage="//family-harvest-box-v2.pngarvest-box-v2.png"
+                  fallbackImage="//family-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png"
                 />
               ) : null}
             </div>

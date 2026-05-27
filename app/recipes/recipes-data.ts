@@ -459,7 +459,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -497,7 +497,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -564,7 +564,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -600,7 +600,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -703,7 +703,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -733,7 +733,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -763,7 +763,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -793,7 +793,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -884,7 +884,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box-v2.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -914,7 +914,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box-v2.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -981,7 +981,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box-v2.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1060,7 +1060,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box-v2.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1285,7 +1285,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1498,7 +1498,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1529,7 +1529,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1740,7 +1740,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1814,7 +1814,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1888,7 +1888,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1919,7 +1919,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -1950,7 +1950,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2012,7 +2012,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2049,7 +2049,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2118,7 +2118,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2254,7 +2254,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2298,7 +2298,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2360,7 +2360,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2391,7 +2391,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2459,7 +2459,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2490,7 +2490,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2521,7 +2521,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2552,7 +2552,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2583,7 +2583,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2614,7 +2614,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2645,7 +2645,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2713,7 +2713,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2744,7 +2744,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2843,7 +2843,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2917,7 +2917,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -2997,7 +2997,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",
@@ -3101,7 +3101,7 @@ export const recipes: Recipe[] = [
     product: {
       name: "Weekly Produce Box",
       price: 20,
-      image: "//weekly-harvest-box-v2.pngarvest-box.png",
+      image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
     companionItems: [],
     shopAnchor: "/shop#pantry-additions",

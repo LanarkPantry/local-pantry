@@ -215,7 +215,7 @@ define(["./workbox-4754cb34"], function (e) {
           revision: "8d9163c6d7d9b95633055363900e07b2",
         },
         {
-          url: "//family-harvest-box-v2.pngarvest-box.png",
+          url: "//family-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
           revision: "566bed7250635c71f3289c602f1d01b5",
         },
         { url: "/file.svg", revision: "d09f95206c3fa0bb9bd9fefabfd0ea71" },
@@ -746,7 +746,7 @@ define(["./workbox-4754cb34"], function (e) {
         },
         { url: "/vercel.svg", revision: "c0af2f507b369b085b35ef4bbe3bcf1e" },
         {
-          url: "//weekly-harvest-box-v2.pngarvest-box.png",
+          url: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
           revision: "6440714d0ea1f466060328f60719d50c",
         },
         { url: "/window.svg", revision: "a2760511c65806022ad20adf74370ff3" },

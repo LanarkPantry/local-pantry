@@ -971,7 +971,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                 <img
                   src={
                     starterBoxFromShop?.image ??
-                    "//weekly-harvest-box-v2.pngarvest-box.png"
+                    "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png"
                   }
                   alt={starterBoxFromShop?.name ?? "Weekly Produce Box"}
                   className="h-full w-full object-contain"
