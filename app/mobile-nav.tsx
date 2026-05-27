@@ -17,13 +17,13 @@ const navItems = [
   },
   {
     href: "/planner",
-    label: "Planner",
+    label: "Plan",
     icon: "🗓️",
   },
   {
-    href: "/regulars",
-    label: "Regulars",
-    icon: "⭐",
+    href: "/my-kitchen",
+    label: "Kitchen",
+    icon: "🍽️",
   },
 ];
 
@@ -34,6 +34,17 @@ export default function MobileNav() {
   const totalItems = cart.length;
 
   function isActive(href: string) {
+    if (href === "/my-kitchen") {
+      return (
+        pathname === "/my-kitchen" ||
+        pathname.startsWith("/my-kitchen/") ||
+        pathname === "/regulars" ||
+        pathname.startsWith("/regulars/") ||
+        pathname === "/saved-weeks" ||
+        pathname.startsWith("/saved-weeks/")
+      );
+    }
+
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 

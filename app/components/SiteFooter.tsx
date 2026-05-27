@@ -32,7 +32,11 @@ export default function SiteFooter({
             </Link>
 
             <Link href="/planner" className="hover:text-white">
-              Planner
+              Plan Meals
+            </Link>
+
+            <Link href="/my-kitchen" className="hover:text-white">
+              My Kitchen
             </Link>
 
             <Link href="/delivery" className="hover:text-white">

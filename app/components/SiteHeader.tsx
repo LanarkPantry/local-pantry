@@ -46,7 +46,7 @@ export default function SiteHeader() {
           THE LOCAL PANTRY
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-5 md:flex">
           {navItems.map((item) => {
             const active = isActive(item.href);
 
@@ -56,7 +56,7 @@ export default function SiteHeader() {
                 href={item.href}
                 className={`text-sm transition ${
                   active
-                    ? "text-[#243328] underline underline-offset-4"
+                    ? "text-[#243328] underline decoration-[1px] underline-offset-4"
                     : "text-[#4f5e52] hover:text-[#243328]"
                 }`}
               >
