@@ -8,9 +8,8 @@ import { useMemo } from "react";
 
 const navItems = [
   { href: "/shop", label: "Shop" },
-  { href: "/planner", label: "Planner" },
-  { href: "/regulars", label: "My Regulars" },
-  { href: "/saved-weeks", label: "Saved Weeks" },
+  { href: "/planner", label: "Plan Meals" },
+  { href: "/my-kitchen", label: "My Kitchen" },
 ];
 
 export default function SiteHeader() {
@@ -23,6 +22,17 @@ export default function SiteHeader() {
   );
 
   function isActive(href: string) {
+    if (href === "/my-kitchen") {
+      return (
+        pathname === "/my-kitchen" ||
+        pathname.startsWith("/my-kitchen/") ||
+        pathname === "/regulars" ||
+        pathname.startsWith("/regulars/") ||
+        pathname === "/saved-weeks" ||
+        pathname.startsWith("/saved-weeks/")
+      );
+    }
+
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
