@@ -151,12 +151,14 @@ export default function MyKitchenPage() {
       return;
     }
 
-    const weeks = (weeksResult.data ?? []).map((week) => ({
-      ...week,
-      saved_week_meals: [...(week.saved_week_meals ?? [])].sort(
-        (a, b) => a.position - b.position,
-      ),
-    })) as SavedWeekRow[];
+    const weeks = ((weeksResult.data ?? []) as unknown as SavedWeekRow[]).map(
+      (week) => ({
+        ...week,
+        saved_week_meals: [...(week.saved_week_meals ?? [])].sort(
+          (a, b) => a.position - b.position,
+        ),
+      }),
+    );
 
     setSavedWeeks(weeks);
     setSavedRecipes((recipesResult.data ?? []) as SavedRecipeRow[]);
@@ -229,9 +231,7 @@ export default function MyKitchenPage() {
       return;
     }
 
-    setSavedRecipes((current) =>
-      current.filter((recipe) => recipe.id !== id),
-    );
+    setSavedRecipes((current) => current.filter((recipe) => recipe.id !== id));
   }
 
   const hasSavedWeeks = savedWeeks.length > 0;
