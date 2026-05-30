@@ -41,47 +41,59 @@ export const produceBoxes: ShopDisplayItem[] = [
 
 export const pantryItems: ShopDisplayItem[] = [
   {
+    name: "Vegetable Stock",
+    price: 4.5,
+    image: "/images/pantry/vegetable-stock.jpg",
+    category: "pantry",
+    checkoutType: "one-off",
+    description:
+      "A concentrated vegetable stock made for soups, grains, sauces and everyday cooking.",
+    details:
+      "Adds depth and savoury flavour without needing multiple ingredients.",
+    note: "Usually added as a one-off",
+    weight: "200ml",
+  },
+
+  {
     name: "Sorrel & Walnut Pesto",
     price: 4.5,
-    image: "/sorrel-walnut-pesto.png",
+    image: "/images/pantry/sorrel-walnut-pesto.jpg",
     category: "pantry",
     checkoutType: "one-off",
     description:
-      "A fresh savoury jar for pasta, potatoes or roasted vegetables.",
-    details: "Add when you want something quick and green in the fridge.",
-    note: "Usually added as a one-off",
-  },
-  {
-    name: "Rose Harissa",
-    price: 5.25,
-    image: "/rose-harissa.png",
-    category: "pantry",
-    checkoutType: "one-off",
-    description: "A gently spiced jar for beans, grains and roast vegetables.",
+      "A fresh savoury pesto made with sorrel, walnuts and parmesan.",
     details:
-      "A small spoonful brings warmth without making dinner complicated.",
+      "Use with pasta, potatoes, beans, roasted vegetables or stirred through grains.",
     note: "Usually added as a one-off",
+    weight: "200ml",
   },
+
   {
-    name: "Salted Caramel Sauce",
-    price: 5.0,
-    image: "/salted-caramel.png",
-    category: "pantry",
-    checkoutType: "one-off",
-    description: "A rich sweet jar for desserts, yoghurt, toast or baking.",
-    details: "A simple cupboard treat to add when you want one.",
-    note: "Usually added as a one-off",
-  },
-  {
-    name: "Dark Chocolate & Hazelnut Spread",
-    price: 5.0,
-    image: "/dark-chocolate.png",
+    name: "Gochujang Sauce",
+    price: 5.25,
+    image: "/images/pantry/gochujang-sauce.jpg",
     category: "pantry",
     checkoutType: "one-off",
     description:
-      "A darker chocolate spread for toast, baking or simple puddings.",
-    details: "An easy sweet extra to keep in the cupboard.",
+      "A sweet, savoury and gently spicy Korean-inspired cooking sauce.",
+    details:
+      "Ideal for traybakes, roasted vegetables, noodles, rice bowls and quick midweek dinners.",
     note: "Usually added as a one-off",
+    weight: "200ml",
+  },
+
+  {
+    name: "Rose Harissa Paste",
+    price: 5.25,
+    image: "/images/pantry/rose-harissa.jpg",
+    category: "pantry",
+    checkoutType: "one-off",
+    description:
+      "A fragrant North African-inspired chilli paste with warmth rather than intense heat.",
+    details:
+      "Excellent with beans, roasted vegetables, couscous, grains and dressings.",
+    note: "Usually added as a one-off",
+    weight: "200ml",
   },
 ];
 
