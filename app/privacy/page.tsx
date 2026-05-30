@@ -3,7 +3,7 @@ import Link from "next/link";
 export const metadata = {
   title: "Privacy Policy | The Local Pantry",
   description:
-    "Privacy Policy explaining how The Local Pantry collects, uses and protects personal information.",
+    "Privacy Policy for The Local Pantry explaining how personal information is collected, used and protected.",
 };
 
 export default function PrivacyPage() {
@@ -14,18 +14,16 @@ export default function PrivacyPage() {
           THE LOCAL PANTRY
         </Link>
 
-        <section className="mt-8 rounded-[30px] border border-[#ddd4c8] bg-white/75 p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-10">
+        <section className="mt-8 rounded-[30px] border border-[#ddd4c8] bg-white/80 p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-10">
           <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
             Customer information
           </p>
 
-          <h1 className="mt-3 font-serif text-4xl leading-tight md:text-5xl">
+          <h1 className="mt-3 font-serif text-4xl leading-tight text-[#243328] md:text-5xl">
             Privacy Policy
           </h1>
 
-          <p className="mt-4 text-sm leading-7 text-[#5f675c]">
-            Last updated: 30 May 2026
-          </p>
+          <p className="mt-4 text-sm text-[#5f675c]">Last updated: June 2026</p>
 
           <div className="mt-8 space-y-8 text-sm leading-7 text-[#4f5d50]">
             <section>
@@ -39,7 +37,13 @@ export default function PrivacyPage() {
               </p>
 
               <p className="mt-3">
-                Address: Cedar House, Oakwood Mews, Lanark, ML11 7RH
+                Cedar House
+                <br />
+                Oakwood Mews
+                <br />
+                Lanark
+                <br />
+                ML11 7RH
               </p>
 
               <p className="mt-3">
@@ -66,10 +70,12 @@ export default function PrivacyPage() {
                 <li>Name</li>
                 <li>Email address</li>
                 <li>Delivery address</li>
-                <li>Phone number</li>
+                <li>Telephone number</li>
                 <li>Order history</li>
                 <li>Account information</li>
-                <li>Planner preferences and saved recipes</li>
+                <li>Saved meal plans and planner data</li>
+                <li>Shopping lists and saved recipes</li>
+                <li>Communications you send to us</li>
                 <li>Website usage information</li>
               </ul>
             </section>
@@ -79,16 +85,18 @@ export default function PrivacyPage() {
                 3. How we use your information
               </h2>
 
-              <p className="mt-3">We use your information to:</p>
+              <p className="mt-3">We use personal information to:</p>
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>Process and deliver orders</li>
                 <li>Manage customer accounts</li>
                 <li>Provide customer support</li>
-                <li>Operate the meal planner and recipe features</li>
+                <li>Operate the planner and recipe features</li>
+                <li>Create shopping lists and meal plans</li>
+                <li>Respond to enquiries</li>
                 <li>Improve the website and services</li>
                 <li>Send service-related communications</li>
-                <li>Comply with legal obligations</li>
+                <li>Meet legal and regulatory obligations</li>
               </ul>
             </section>
 
@@ -97,9 +105,7 @@ export default function PrivacyPage() {
                 4. Legal basis for processing
               </h2>
 
-              <p className="mt-3">
-                We process personal information where necessary to:
-              </p>
+              <p className="mt-3">We process information where necessary to:</p>
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>Perform a contract with you</li>
@@ -115,9 +121,8 @@ export default function PrivacyPage() {
               </h2>
 
               <p className="mt-3">
-                Payments are processed through secure third-party payment
-                providers. We do not store full payment card information on our
-                systems.
+                Payments are processed securely through Stripe. We do not store
+                full payment card information on our systems.
               </p>
             </section>
 
@@ -127,21 +132,20 @@ export default function PrivacyPage() {
               </h2>
 
               <p className="mt-3">
-                Delivery addresses and contact details are used solely for
-                fulfilling orders and providing customer support related to
-                those orders.
+                Delivery addresses and contact details are used only for order
+                fulfilment, customer support and delivery-related communication.
               </p>
             </section>
 
             <section>
               <h2 className="font-serif text-2xl text-[#243328]">
-                7. Planner accounts and saved data
+                7. Accounts and planner data
               </h2>
 
               <p className="mt-3">
-                If you create an account, we may store planner information such
-                as saved recipes, meal plans and shopping lists so that these
-                features remain available when you return.
+                If you create an account, we may store planner information,
+                saved recipes, meal plans and shopping lists to provide ongoing
+                access to these features.
               </p>
             </section>
 
@@ -151,8 +155,9 @@ export default function PrivacyPage() {
               </h2>
 
               <p className="mt-3">
-                If you choose to receive updates, we may send occasional emails
-                about products, seasonal boxes, recipes and service updates.
+                If you choose to receive updates from us, we may occasionally
+                send emails about seasonal produce, new products, recipes,
+                service updates and special offers.
               </p>
 
               <p className="mt-3">
@@ -168,16 +173,41 @@ export default function PrivacyPage() {
               <p className="mt-3">We do not sell personal information.</p>
 
               <p className="mt-3">
-                We may share information with trusted service providers where
-                necessary to operate the business, including:
+                We use trusted third-party providers to operate our website and
+                services. These providers may process personal information on
+                our behalf where necessary to deliver their services.
               </p>
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>Payment processors</li>
-                <li>Website hosting providers</li>
-                <li>Email service providers</li>
-                <li>Delivery partners</li>
+                <li>
+                  Supabase for customer accounts, authentication, planner data
+                  and database storage.
+                </li>
+                <li>
+                  Stripe for secure payment processing and order transactions.
+                </li>
+                <li>
+                  Vercel for website hosting, infrastructure and performance
+                  monitoring.
+                </li>
+                <li>
+                  Resend for transactional emails, notifications and customer
+                  communications.
+                </li>
+                <li>
+                  Google Workspace and Gmail for business email communication
+                  and customer support.
+                </li>
+                <li>
+                  GitHub for website development, source code management and
+                  deployment workflows.
+                </li>
               </ul>
+
+              <p className="mt-3">
+                Information may also be disclosed where required by law or to
+                protect our legal rights.
+              </p>
             </section>
 
             <section>
@@ -187,7 +217,7 @@ export default function PrivacyPage() {
 
               <p className="mt-3">
                 We retain personal information only for as long as necessary to
-                provide services, maintain business records and comply with
+                provide our services, maintain business records and comply with
                 legal obligations.
               </p>
             </section>
@@ -199,8 +229,8 @@ export default function PrivacyPage() {
 
               <p className="mt-3">
                 We take reasonable technical and organisational measures to
-                protect personal information from loss, misuse or unauthorised
-                access.
+                protect personal information from unauthorised access, misuse,
+                loss or disclosure.
               </p>
             </section>
 
@@ -210,9 +240,24 @@ export default function PrivacyPage() {
               </h2>
 
               <p className="mt-3">
-                The website may use cookies and analytics tools to understand
-                how visitors use the site and to improve performance and user
-                experience.
+                We use cookies and similar technologies to ensure the website
+                functions correctly and to understand how visitors use the site.
+              </p>
+
+              <p className="mt-3">These technologies may be used to:</p>
+
+              <ul className="mt-3 list-disc space-y-2 pl-6">
+                <li>Maintain login sessions</li>
+                <li>Remember preferences and settings</li>
+                <li>Improve website performance</li>
+                <li>Monitor reliability and usage patterns</li>
+                <li>Improve customer experience</li>
+              </ul>
+
+              <p className="mt-3">
+                Some analytics and infrastructure services may be provided
+                through Vercel and other technical providers used to operate the
+                website.
               </p>
             </section>
 
@@ -234,7 +279,8 @@ export default function PrivacyPage() {
               </ul>
 
               <p className="mt-3">
-                To exercise these rights, contact us using the details below.
+                To exercise any of these rights, please contact us using the
+                details below.
               </p>
             </section>
 
@@ -244,14 +290,16 @@ export default function PrivacyPage() {
               </h2>
 
               <p className="mt-3">
-                If you have questions about this Privacy Policy or how your
-                information is handled, please contact:
+                If you have any questions about this Privacy Policy or how we
+                handle personal information, please contact:
               </p>
 
               <p className="mt-3">
                 The Local Pantry
                 <br />
-                Cedar House, Oakwood Mews
+                Cedar House
+                <br />
+                Oakwood Mews
                 <br />
                 Lanark
                 <br />
