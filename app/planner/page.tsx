@@ -308,6 +308,8 @@ export default function PlannerPage() {
       meal.matchedProducts.forEach((productName) => names.add(productName));
     });
 
+    names.add("Vegetable Stock");
+
     const allAddOns = [...pantryItems, ...cupboardItems];
 
     return allAddOns.filter((item) => names.has(item.name)).slice(0, 6);
