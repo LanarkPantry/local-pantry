@@ -73,6 +73,29 @@ const kitchenWeekStrip = [
   },
 ];
 
+const pantryStaples = [
+  {
+    name: "Rose Harissa",
+    image: "/images/pantry/rose-harissa.jpg",
+    text: "A useful jar for traybakes, couscous, beans and quick sauces.",
+  },
+  {
+    name: "Sorrel & Walnut Pesto",
+    image: "/images/pantry/sorrel-walnut-pesto.jpg",
+    text: "Bright, herby and easy with pasta, potatoes, grains and roasted veg.",
+  },
+  {
+    name: "Gochujang Sauce",
+    image: "/images/pantry/gochujang-sauce.jpg",
+    text: "Sweet, savoury heat for noodles, rice bowls and roasted vegetables.",
+  },
+  {
+    name: "Vegetable Stock Concentrate",
+    image: "/images/pantry/vegetable-stock.jpg",
+    text: "A proper fridge staple for soups, risotto, stews and quick sauces.",
+  },
+];
+
 function formatPrice(value: number) {
   return `£${value.toFixed(2)}`;
 }
@@ -368,7 +391,7 @@ export default function HomePage() {
                 <BoxCard
                   item={weeklyProduceBox}
                   label="Smaller box"
-                  fallbackImage="//weekly-harvest-box-v2.png"
+                  fallbackImage="/weekly-harvest-box-v2.png"
                 />
               ) : null}
 
@@ -376,7 +399,7 @@ export default function HomePage() {
                 <BoxCard
                   item={familyProduceBox}
                   label="Larger box"
-                  fallbackImage="//family-harvest-box-v2.png"
+                  fallbackImage="/family-harvest-box-v2.png"
                 />
               ) : null}
             </div>
@@ -421,6 +444,64 @@ export default function HomePage() {
 
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05)_0%,rgba(0,0,0,0.38)_100%)]" />
               </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
+        <div className="mx-auto max-w-7xl">
+          <section className="overflow-hidden rounded-[32px] bg-white shadow-[0_10px_28px_rgba(36,51,40,0.05)]">
+            <div className="flex flex-col gap-4 border-b border-[#e2d8ca] bg-[#f7f2eb] p-6 md:flex-row md:items-end md:justify-between md:p-8">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                  Pantry staples
+                </p>
+
+                <h2 className="mt-3 max-w-3xl font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.8rem]">
+                  Made in small batches in Lanarkshire.
+                </h2>
+
+                <p className="mt-4 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+                  Add useful staples to your box only when you need them. These
+                  are the jars designed to help turn simple produce into proper
+                  meals.
+                </p>
+              </div>
+
+              <Link
+                href="/shop#pantry-staples"
+                className="inline-flex rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Browse pantry staples
+              </Link>
+            </div>
+
+            <div className="flex snap-x gap-4 overflow-x-auto p-4 sm:p-5 md:grid md:grid-cols-4 md:overflow-visible">
+              {pantryStaples.map((item) => (
+                <article
+                  key={item.name}
+                  className="min-w-[76%] snap-start overflow-hidden rounded-[26px] border border-[#e2d8ca] bg-[#fbf8f3] sm:min-w-[44%] md:min-w-0"
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-[#efe7db]">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-full w-full object-contain p-5 transition duration-500 hover:scale-[1.03]"
+                    />
+                  </div>
+
+                  <div className="p-5">
+                    <h3 className="font-serif text-2xl leading-tight text-[#243328]">
+                      {item.name}
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-7 text-[#667164]">
+                      {item.text}
+                    </p>
+                  </div>
+                </article>
+              ))}
             </div>
           </section>
         </div>
@@ -482,6 +563,58 @@ export default function HomePage() {
                   </div>
                 </article>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
+        <div className="mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-white shadow-[0_10px_28px_rgba(36,51,40,0.05)]">
+          <div className="grid gap-0 lg:grid-cols-[0.82fr_1.18fr] lg:items-stretch">
+            <div className="relative min-h-[360px] bg-[#e8dfd3]">
+              <img
+                src="/images/founder/ainsley.jpg"
+                alt="Ainsley, founder of The Local Pantry"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="p-6 md:p-10 lg:p-12">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                Meet the founder
+              </p>
+
+              <h2 className="mt-3 max-w-3xl font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+                Making everyday cooking easier.
+              </h2>
+
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+                I created The Local Pantry to make everyday cooking easier for
+                local households. After running a local café, meal delivery
+                service and yoga studio, I wanted to build something simple,
+                useful and rooted in the area.
+              </p>
+
+              <p className="mt-4 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+                The aim is straightforward: fresh produce, useful pantry staples
+                and realistic meal support for normal weeks.
+              </p>
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/about"
+                  className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
+                >
+                  Read more about The Local Pantry
+                </Link>
+
+                <Link
+                  href="/shop"
+                  className="rounded-full border border-[#d3cabd] bg-[#f7f2eb] px-6 py-3 text-center text-sm font-medium text-[#243328] transition hover:bg-white"
+                >
+                  Choose your box
+                </Link>
+              </div>
             </div>
           </div>
         </div>
