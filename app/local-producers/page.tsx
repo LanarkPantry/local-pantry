@@ -15,9 +15,20 @@ export default function LocalProducersPage() {
       <SiteHeader />
 
       <main className="bg-[#f4efe9] text-[#243328]">
-        <section className="px-4 py-12 sm:px-6 md:px-10 md:py-18">
+        <section className="px-4 py-10 sm:px-6 md:px-10 md:py-18">
           <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <div>
+            <div className="order-1 overflow-hidden rounded-[32px] bg-[#e8dfd3] shadow-[0_12px_34px_rgba(36,51,40,0.08)] lg:order-2">
+              <Image
+                src="/images/local-producers/local-food-starts-local.png"
+                alt="Local produce, preserves, bread, herbs and food from local growers and makers"
+                width={1400}
+                height={900}
+                className="h-[260px] w-full object-cover md:h-[420px] lg:h-full"
+                priority
+              />
+            </div>
+
+            <div className="order-2 lg:order-1">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                 Local producers
               </p>
@@ -27,15 +38,14 @@ export default function LocalProducersPage() {
               </h1>
 
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#667164] md:text-lg">
-                We&apos;re building a network of local growers, makers and food
+                We're building a network of local growers, makers and food
                 producers across Lanark, Carluke and the surrounding area.
               </p>
 
               <p className="mt-4 max-w-2xl text-base leading-8 text-[#667164] md:text-lg">
                 If you grow vegetables, keep bees, make preserves, bake, produce
                 sauces, grow herbs, forage seasonal ingredients or create
-                something else, we&apos;d love to hear what you&apos;re working
-                on.
+                something else, we'd love to hear what you're working on.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -53,17 +63,6 @@ export default function LocalProducersPage() {
                   Visit the shop
                 </Link>
               </div>
-            </div>
-
-            <div className="overflow-hidden rounded-[32px] bg-[#e8dfd3] shadow-[0_12px_34px_rgba(36,51,40,0.08)]">
-              <Image
-                src="/images/local-producers/local-food-starts-local.png"
-                alt="Local produce, preserves, bread, herbs and food from local growers and makers"
-                width={1400}
-                height={900}
-                className="h-full w-full object-cover"
-                priority
-              />
             </div>
           </div>
         </section>
