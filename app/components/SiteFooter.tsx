@@ -19,13 +19,16 @@ export default function SiteFooter({
           </p>
 
           <p className="mt-4 text-sm text-white/70">
-            Delivering around Lanark, Carluke and surrounding areas.
+            Delivering around Lanark, Carluke, Forth, Carstairs and surrounding
+            areas.
           </p>
         </div>
 
         <div>
           <p className="text-sm font-medium text-white">Explore</p>
-
+          <Link href="/about" className="hover:text-white">
+            About
+          </Link>
           <div className="mt-4 flex flex-col gap-2 text-sm text-white/70">
             <Link href="/shop" className="hover:text-white">
               Shop
@@ -41,6 +44,10 @@ export default function SiteFooter({
 
             <Link href="/delivery" className="hover:text-white">
               Delivery
+            </Link>
+
+            <Link href="/local-producers" className="hover:text-white">
+              Local Producers
             </Link>
 
             <Link href="/basket" className="hover:text-white">

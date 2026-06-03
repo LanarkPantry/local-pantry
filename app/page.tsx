@@ -523,7 +523,37 @@ export default function HomePage() {
       </section>
 
       <PostcodeChecker />
+      <section className="bg-[#efe7db] px-4 py-12 sm:px-6 md:px-10">
+        <div className="mx-auto max-w-5xl overflow-hidden rounded-[32px] bg-white p-8 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                Local producers
+              </p>
 
+              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+                Do you grow or make food locally?
+              </h2>
+
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+                We're building a network of local growers, makers and producers
+                across Lanark and the surrounding area. Whether you grow
+                vegetables, make preserves, produce sauces or create something
+                unique, we'd love to hear what you're working on.
+              </p>
+            </div>
+
+            <div>
+              <Link
+                href="/local-producers"
+                className="inline-flex rounded-full bg-[#243328] px-8 py-4 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Tell us about your products
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
       <SiteFooter />
     </main>
   );
