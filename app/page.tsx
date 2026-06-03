@@ -271,8 +271,7 @@ export default function HomePage() {
 
               <div className="mt-6 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur">
                 <p className="text-sm text-white/82">
-                  Delivered every Monday and Tuesday across Lanark, Carluke and
-                  surrounding areas.
+                  Delivering across Lanark, Carluke and surrounding areas.
                 </p>
               </div>
 
