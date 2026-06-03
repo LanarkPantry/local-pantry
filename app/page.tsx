@@ -271,7 +271,8 @@ export default function HomePage() {
 
               <div className="mt-6 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur">
                 <p className="text-sm text-white/82">
-                  Delivering across Lanark, Carluke and surrounding areas.
+                  Delivered every Monday and Tuesday across Lanark, Carluke and
+                  surrounding areas.
                 </p>
               </div>
 
@@ -390,7 +391,7 @@ export default function HomePage() {
                 <BoxCard
                   item={weeklyProduceBox}
                   label="Smaller box"
-                  fallbackImage="/weekly-harvest-box-v2.png"
+                  fallbackImage="//weekly-harvest-box-v2.png"
                 />
               ) : null}
 
@@ -398,7 +399,7 @@ export default function HomePage() {
                 <BoxCard
                   item={familyProduceBox}
                   label="Larger box"
-                  fallbackImage="/family-harvest-box-v2.png"
+                  fallbackImage="//family-harvest-box-v2.png"
                 />
               ) : null}
             </div>
@@ -567,7 +568,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
+      <section className="px-4 py-10 sm:px-6 md:px-10 md:py-14">
         <div className="mx-auto max-w-6xl rounded-[32px] bg-white p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-10">
           <div className="grid gap-6 md:grid-cols-[220px_1fr] md:items-center">
             <div className="mx-auto h-36 w-36 overflow-hidden rounded-full bg-[#e8dfd3] md:h-full md:w-full md:rounded-[24px]">
@@ -590,15 +591,10 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-5 text-sm leading-8 text-[#667164] md:text-base">
-                I created The Local Pantry to make everyday cooking easier for
-                local households. After running a local café, meal delivery
-                service and yoga studio, I wanted to build something simple,
-                useful and rooted in the area.
-              </p>
-
-              <p className="mt-4 text-sm leading-8 text-[#667164] md:text-base">
-                The aim is straightforward: fresh produce, useful pantry staples
-                and realistic meal support for normal weeks.
+                I created The Local Pantry after running a local café, meal
+                delivery service and yoga studio. The aim is simple: fresh
+                produce, useful pantry staples and realistic meal support for
+                normal weeks.
               </p>
 
               <div className="mt-7 flex flex-col gap-3 sm:flex-row md:justify-start">
@@ -621,7 +617,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 md:px-10 md:py-18">
+      <section className="px-4 py-10 sm:px-6 md:px-10 md:py-14">
         <div className="mx-auto max-w-5xl">
           <section className="rounded-[32px] bg-white/82 p-6 text-center shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-10">
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
@@ -657,35 +653,24 @@ export default function HomePage() {
       </section>
 
       <PostcodeChecker />
-      <section className="bg-[#efe7db] px-4 py-12 sm:px-6 md:px-10">
-        <div className="mx-auto max-w-5xl overflow-hidden rounded-[32px] bg-white p-8 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-12">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Local producers
-              </p>
+      <section className="bg-[#efe7db] px-4 py-8 sm:px-6 md:px-10">
+        <div className="mx-auto max-w-5xl rounded-[28px] border border-[#ddd4c8] bg-white/80 p-6 text-center shadow-[0_8px_20px_rgba(36,51,40,0.04)] md:flex md:items-center md:justify-between md:text-left">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+              Local producers
+            </p>
 
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
-                Do you grow or make food locally?
-              </h2>
-
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
-                We're building a network of local growers, makers and producers
-                across Lanark and the surrounding area. Whether you grow
-                vegetables, make preserves, produce sauces or create something
-                unique, we'd love to hear what you're working on.
-              </p>
-            </div>
-
-            <div>
-              <Link
-                href="/local-producers"
-                className="inline-flex rounded-full bg-[#243328] px-8 py-4 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                Tell us about your products
-              </Link>
-            </div>
+            <h2 className="mt-2 font-serif text-2xl leading-tight text-[#243328] md:text-3xl">
+              Do you grow or make food locally?
+            </h2>
           </div>
+
+          <Link
+            href="/local-producers"
+            className="mt-5 inline-flex rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 md:mt-0"
+          >
+            Tell us what you produce
+          </Link>
         </div>
       </section>
       <SiteFooter />

@@ -136,12 +136,19 @@ export default function AboutPage() {
             need, and pause or cancel anytime.
           </p>
 
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/shop"
               className="inline-flex rounded-full bg-white px-8 py-4 text-sm font-medium text-[#243328] transition hover:bg-[#f4efe9]"
             >
               Shop The Local Pantry
+            </Link>
+
+            <Link
+              href="/local-producers"
+              className="inline-flex rounded-full border border-white/20 bg-white/10 px-8 py-4 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+            >
+              Are you a local producer?
             </Link>
           </div>
         </div>
