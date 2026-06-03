@@ -271,8 +271,7 @@ export default function HomePage() {
 
               <div className="mt-6 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 backdrop-blur">
                 <p className="text-sm text-white/82">
-                  Delivered every Monday and Tuesday across Lanark, Carluke and
-                  surrounding areas.
+                  Delivering across Lanark, Carluke and surrounding areas.
                 </p>
               </div>
 
@@ -569,38 +568,40 @@ export default function HomePage() {
       </section>
 
       <section className="px-4 pb-12 sm:px-6 md:px-10 md:pb-16">
-        <div className="mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-white shadow-[0_10px_28px_rgba(36,51,40,0.05)]">
-          <div className="grid gap-0 lg:grid-cols-[0.82fr_1.18fr] lg:items-stretch">
-            <div className="relative min-h-[360px] bg-[#e8dfd3]">
+        <div className="mx-auto max-w-6xl rounded-[32px] bg-white p-6 shadow-[0_10px_28px_rgba(36,51,40,0.05)] md:p-10">
+          <div className="grid gap-6 md:grid-cols-[220px_1fr] md:items-center">
+            <div className="mx-auto h-36 w-36 overflow-hidden rounded-full bg-[#e8dfd3] md:h-full md:w-full md:rounded-[24px]">
               <img
                 src="/images/founder/ainsley.jpg"
                 alt="Ainsley, founder of The Local Pantry"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="h-full w-full object-cover"
               />
             </div>
 
-            <div className="p-6 md:p-10 lg:p-12">
+            <div className="text-center md:text-left">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                 Meet the founder
               </p>
 
-              <h2 className="mt-3 max-w-3xl font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[3rem]">
+                Meet Ainsley.
+                <br />
                 Making everyday cooking easier.
               </h2>
 
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+              <p className="mt-5 text-sm leading-8 text-[#667164] md:text-base">
                 I created The Local Pantry to make everyday cooking easier for
                 local households. After running a local café, meal delivery
                 service and yoga studio, I wanted to build something simple,
                 useful and rooted in the area.
               </p>
 
-              <p className="mt-4 max-w-2xl text-sm leading-8 text-[#667164] md:text-base">
+              <p className="mt-4 text-sm leading-8 text-[#667164] md:text-base">
                 The aim is straightforward: fresh produce, useful pantry staples
                 and realistic meal support for normal weeks.
               </p>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row md:justify-start">
                 <Link
                   href="/about"
                   className="rounded-full bg-[#243328] px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
