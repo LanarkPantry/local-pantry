@@ -583,7 +583,7 @@ export default function HomePage() {
                 Meet the founder
               </p>
 
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-[#243328] md:text-[1.8rem]">
+              <h2 className="mt-3 font-serif text-[1.5rem] leading-tight text-[#243328] md:text-[1.3rem]">
                 Hi, I'm Ainsley.
                 <br />
                 Making everyday cooking easier.
