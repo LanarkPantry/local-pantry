@@ -802,8 +802,8 @@ export default function PlannerPage() {
                   </p>
 
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    You can rebuild, change choices or save this week from the
-                    top of the results.
+                    You can rebuild the full week, edit choices or save this
+                    week from the top of the results.
                   </p>
                 </div>
               )}
@@ -878,7 +878,7 @@ export default function PlannerPage() {
                   onClick={handleBuildWeek}
                   className="rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-4 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
                 >
-                  Rebuild
+                  Try another week
                 </button>
 
                 {isLoggedIn ? (
@@ -891,10 +891,10 @@ export default function PlannerPage() {
                   </button>
                 ) : (
                   <a
-                    href="/account"
+                    href="/login"
                     className="rounded-full bg-[#243328] px-4 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
                   >
-                    Sign in to save
+                    Create account or sign in
                   </a>
                 )}
 
