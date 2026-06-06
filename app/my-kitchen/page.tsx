@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import { supabase } from "../lib/supabaseClient";
@@ -34,6 +34,12 @@ type SavedWeekRow = {
   created_at: string;
   saved_week_meals: SavedWeekMealRow[];
 };
+
+const EMPTY_STATE_RECIPE_SLUGS = [
+  "harissa-butterbeans-peppers-couscous",
+  "bucatini-courgette-pesto",
+  "gochujang-broccoli-rice-bowls",
+] as const;
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
@@ -71,11 +77,58 @@ function getPlannerStyleLabel(style: string | null) {
       return "Gluten-free";
     case "quick":
       return "Quick dinners";
+    case "my-kitchen":
+      return "My Kitchen";
     case "my-regulars":
       return "Regular meals";
     default:
       return "Saved week";
   }
+}
+
+function EmptyRecipeInspiration() {
+  const featuredRecipes = EMPTY_STATE_RECIPE_SLUGS.flatMap((slug) => {
+    const recipe = getRecipeBySlug(slug);
+
+    return recipe ? [recipe] : [];
+  });
+
+  if (featuredRecipes.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6">
+      <p className="text-sm font-medium text-[#243328]">
+        Start by saving meals like these:
+      </p>
+
+      <div className="mt-4 flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+        {featuredRecipes.map((recipe) => (
+          <article
+            key={recipe.slug}
+            className="min-w-[240px] overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white shadow-[0_10px_24px_rgba(36,51,40,0.06)]"
+          >
+            <img
+              src={recipe.image}
+              alt={recipe.title}
+              className="h-40 w-full object-cover"
+            />
+
+            <div className="p-4">
+              <h3 className="font-serif text-xl leading-tight text-[#243328]">
+                {recipe.title}
+              </h3>
+
+              <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#667164]">
+                {recipe.intro}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function MyKitchenPage() {
@@ -235,38 +288,37 @@ export default function MyKitchenPage() {
   }
 
   const hasSavedWeeks = savedWeeks.length > 0;
-  const hasRegularMeals = savedRecipes.length > 0;
-  const hasKitchenItems = hasSavedWeeks || hasRegularMeals;
+  const hasFavouriteMeals = savedRecipes.length > 0;
+  const hasKitchenItems = hasSavedWeeks || hasFavouriteMeals;
+
+  const totalMealsInSavedWeeks = useMemo(
+    () =>
+      savedWeeks.reduce(
+        (total, week) => total + (week.saved_week_meals?.length ?? 0),
+        0,
+      ),
+    [savedWeeks],
+  );
 
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
 
-      <div className="px-4 pt-4 sm:px-6 md:hidden">
-        <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
-          <img
-            src="/images/home/build-your-basket.jpg"
-            alt="Fresh food and weekly planning"
-            className="h-44 w-full object-cover"
-          />
-        </div>
-      </div>
-
-      <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
+      <section className="px-4 pb-8 pt-4 sm:px-6 md:px-10 md:pb-10 md:pt-8">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
-            <article className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
+          <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+            <article className="rounded-[32px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.9)] p-5 shadow-[0_14px_34px_rgba(36,51,40,0.07)] md:p-8">
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
                 My Kitchen
               </p>
 
-              <h1 className="mt-3 max-w-3xl font-serif text-[2rem] leading-[1.02] tracking-tight text-[#243328] md:text-[3.35rem]">
-                Saved meals and food weeks that work
+              <h1 className="mt-3 max-w-3xl font-serif text-[2.45rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4rem]">
+                Your collection of favourite dinners.
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
-                Keep the meals you come back to, save full weekly plans, and
-                make future ordering easier.
+                Save meals you love, keep useful weekly plans, and make future
+                weeks easier to build.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
@@ -274,58 +326,82 @@ export default function MyKitchenPage() {
                   href="/planner"
                   className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  Build a new week
+                  Plan a new week
                 </Link>
 
                 <Link
                   href="/shop"
                   className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
                 >
-                  Shop food
+                  Shop pantry
                 </Link>
               </div>
             </article>
 
-            <article className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)] md:p-7">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Why it helps
-              </p>
+            <aside className="overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-white shadow-[0_14px_34px_rgba(36,51,40,0.07)]">
+              <img
+                src="/images/home/build-your-basket.jpg"
+                alt="Fresh food and weekly planning"
+                className="h-56 w-full object-cover md:h-72 lg:h-full"
+              />
 
-              <h2 className="mt-3 font-serif text-3xl leading-tight">
-                Less starting from scratch.
-              </h2>
-
-              <p className="mt-4 text-sm leading-7 text-[#667164]">
-                Most households repeat patterns. My Kitchen keeps those useful
-                meals and weeks in one place, so planning becomes quicker each
-                time.
-              </p>
-
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[22px] border border-[#ddd4c8] bg-white/70 p-4">
-                  <p className="font-serif text-xl text-[#243328]">
-                    Saved weeks
+              <div className="grid grid-cols-3 divide-x divide-[#eee5da] border-t border-[#eee5da] bg-[#f7f2eb] lg:hidden">
+                <div className="p-4 text-center">
+                  <p className="font-serif text-3xl text-[#243328]">
+                    {savedRecipes.length}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Repeat a full plan that already worked.
-                  </p>
+                  <p className="mt-1 text-xs text-[#667164]">Meals</p>
                 </div>
 
-                <div className="rounded-[22px] border border-[#ddd4c8] bg-white/70 p-4">
-                  <p className="font-serif text-xl text-[#243328]">
-                    Regular meals
+                <div className="p-4 text-center">
+                  <p className="font-serif text-3xl text-[#243328]">
+                    {savedWeeks.length}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Keep reliable dinners close by.
+                  <p className="mt-1 text-xs text-[#667164]">Weeks</p>
+                </div>
+
+                <div className="p-4 text-center">
+                  <p className="font-serif text-3xl text-[#243328]">
+                    {totalMealsInSavedWeeks}
                   </p>
+                  <p className="mt-1 text-xs text-[#667164]">Planned</p>
                 </div>
               </div>
-            </article>
+            </aside>
+          </div>
+
+          <div className="mt-5 hidden grid-cols-3 gap-4 lg:grid">
+            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)]">
+              <p className="font-serif text-4xl text-[#243328]">
+                {savedRecipes.length}
+              </p>
+              <p className="mt-1 text-sm text-[#667164]">
+                favourite dinner{savedRecipes.length === 1 ? "" : "s"}
+              </p>
+            </div>
+
+            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)]">
+              <p className="font-serif text-4xl text-[#243328]">
+                {savedWeeks.length}
+              </p>
+              <p className="mt-1 text-sm text-[#667164]">
+                saved week{savedWeeks.length === 1 ? "" : "s"}
+              </p>
+            </div>
+
+            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)]">
+              <p className="font-serif text-4xl text-[#243328]">
+                {totalMealsInSavedWeeks}
+              </p>
+              <p className="mt-1 text-sm text-[#667164]">
+                dinners in saved plans
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-8 sm:px-6 md:px-10 md:py-10">
+      <section className="px-4 pb-10 sm:px-6 md:px-10 md:pb-14">
         <div className="mx-auto max-w-7xl">
           {loading ? (
             <div className="rounded-[24px] border border-[#ddd4c8] bg-white/80 p-6 text-sm text-[#667164]">
@@ -334,22 +410,33 @@ export default function MyKitchenPage() {
           ) : null}
 
           {!loading && !isLoggedIn ? (
-            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/80 p-6">
-              <h2 className="font-serif text-2xl text-[#243328]">
-                Sign in to view My Kitchen
+            <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-6 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-8">
+              <h2 className="font-serif text-3xl text-[#243328]">
+                Sign in to save your kitchen.
               </h2>
 
-              <p className="mt-3 text-sm leading-6 text-[#667164]">
-                Saved meals and weeks are linked to your account so you can come
-                back to them later.
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
+                Save full weeks, favourite meals and regular dinners so you can
+                come back to them later.
               </p>
 
-              <Link
-                href="/login"
-                className="mt-5 inline-flex rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
-              >
-                Sign in
-              </Link>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link
+                  href="/login"
+                  className="inline-flex rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
+                >
+                  Create account or sign in
+                </Link>
+
+                <Link
+                  href="/planner"
+                  className="inline-flex rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
+                >
+                  Try the planner
+                </Link>
+              </div>
+
+              <EmptyRecipeInspiration />
             </div>
           ) : null}
 
@@ -360,14 +447,14 @@ export default function MyKitchenPage() {
           ) : null}
 
           {!loading && isLoggedIn && !hasKitchenItems ? (
-            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/80 p-6">
-              <h2 className="font-serif text-2xl text-[#243328]">
-                Nothing saved yet
+            <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-6 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-8">
+              <h2 className="font-serif text-3xl text-[#243328]">
+                Nothing saved yet.
               </h2>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
-                Build a week in the planner, save useful weeks, or save regular
-                meals you want to cook again.
+                Build a week in the planner, then save full weeks or favourite
+                dinners you want to cook again.
               </p>
 
               <Link
@@ -376,11 +463,152 @@ export default function MyKitchenPage() {
               >
                 Open planner
               </Link>
+
+              <EmptyRecipeInspiration />
             </div>
           ) : null}
 
           {!loading && isLoggedIn && hasKitchenItems ? (
-            <div className="space-y-10">
+            <div className="space-y-12">
+              <section>
+                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+                      Favourite meals
+                    </p>
+
+                    <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
+                      Dinners you come back to
+                    </h2>
+
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
+                      Your reliable meals. Use them as anchors for future weeks.
+                    </p>
+                  </div>
+
+                  <Link
+                    href="/planner"
+                    className="inline-flex w-fit rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
+                  >
+                    Find more meals
+                  </Link>
+                </div>
+
+                {hasFavouriteMeals ? (
+                  <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                    {savedRecipes.map((savedRecipe) => {
+                      const recipe = getRecipeBySlug(savedRecipe.recipe_slug);
+
+                      const title = recipe?.title ?? savedRecipe.recipe_title;
+                      const image = recipe?.image ?? savedRecipe.recipe_image;
+                      const intro =
+                        recipe?.intro ?? savedRecipe.recipe_intro ?? "";
+                      const time = recipe?.time ?? savedRecipe.recipe_time;
+                      const mealType =
+                        recipe?.mealType ?? savedRecipe.recipe_meal_type;
+                      const dietary =
+                        recipe?.dietary ?? savedRecipe.recipe_dietary ?? [];
+
+                      return (
+                        <article
+                          key={savedRecipe.id}
+                          className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/86 shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
+                        >
+                          <div className="h-52 overflow-hidden bg-[#f7f2eb]">
+                            {image ? (
+                              <img
+                                src={image}
+                                alt={title}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : null}
+                          </div>
+
+                          <div className="p-5 md:p-6">
+                            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                              Saved {formatDate(savedRecipe.created_at)}
+                            </p>
+
+                            <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
+                              {title}
+                            </h3>
+
+                            {intro ? (
+                              <p className="mt-3 text-sm leading-6 text-[#667164]">
+                                {intro}
+                              </p>
+                            ) : null}
+
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {time ? (
+                                <span className="rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1.5 text-xs text-[#4f5e52]">
+                                  {time}
+                                </span>
+                              ) : null}
+
+                              {mealType ? (
+                                <span className="rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1.5 text-xs text-[#4f5e52]">
+                                  {mealType.replace("-", " ")}
+                                </span>
+                              ) : null}
+
+                              {dietary.slice(0, 2).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1.5 text-xs text-[#4f5e52]"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+
+                            <div className="mt-5 flex flex-wrap gap-3">
+                              <Link
+                                href="/planner"
+                                className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
+                              >
+                                Use in planner
+                              </Link>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveRegular(savedRecipe.id)
+                                }
+                                disabled={removingRecipeId === savedRecipe.id}
+                                className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                {removingRecipeId === savedRecipe.id
+                                  ? "Removing..."
+                                  : "Remove"}
+                              </button>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-6 md:p-8">
+                    <h3 className="font-serif text-2xl text-[#243328]">
+                      No favourite meals saved yet.
+                    </h3>
+
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
+                      Open the planner, generate a week, then save the dinners
+                      you want to cook again.
+                    </p>
+
+                    <Link
+                      href="/planner"
+                      className="mt-5 inline-flex rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
+                    >
+                      Open planner
+                    </Link>
+                  </div>
+                )}
+              </section>
+
               <section>
                 <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
@@ -389,12 +617,12 @@ export default function MyKitchenPage() {
                     </p>
 
                     <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
-                      Full weeks to repeat
+                      Weekly plans worth repeating
                     </h2>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      These are your most useful weekly plans. Load one back
-                      into the planner when you want an easier week.
+                      Load a week back into the planner when you want an easier
+                      food week.
                     </p>
                   </div>
 
@@ -402,7 +630,7 @@ export default function MyKitchenPage() {
                     href="/planner"
                     className="inline-flex w-fit rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
                   >
-                    Build new week
+                    Plan another week
                   </Link>
                 </div>
 
@@ -503,148 +731,22 @@ export default function MyKitchenPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-[24px] border border-[#ddd4c8] bg-white/80 p-6">
+                  <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-6 md:p-8">
                     <h3 className="font-serif text-2xl text-[#243328]">
-                      No saved weeks yet
+                      No saved weeks yet.
                     </h3>
 
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
-                      Build a week in the planner, then use Save this week. Your
+                      Build a week in the planner, then save the full plan. Your
                       saved weeks will appear here.
                     </p>
-                  </div>
-                )}
-              </section>
 
-              <section>
-                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                      Regular meals
-                    </p>
-
-                    <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
-                      Meals you come back to
-                    </h2>
-
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      Reliable meals saved from the planner. Use them as anchors
-                      for future weeks.
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/planner"
-                    className="inline-flex w-fit rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
-                  >
-                    Open planner
-                  </Link>
-                </div>
-
-                {hasRegularMeals ? (
-                  <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                    {savedRecipes.map((savedRecipe) => {
-                      const recipe = getRecipeBySlug(savedRecipe.recipe_slug);
-
-                      const title = recipe?.title ?? savedRecipe.recipe_title;
-                      const image = recipe?.image ?? savedRecipe.recipe_image;
-                      const intro =
-                        recipe?.intro ?? savedRecipe.recipe_intro ?? "";
-                      const time = recipe?.time ?? savedRecipe.recipe_time;
-                      const mealType =
-                        recipe?.mealType ?? savedRecipe.recipe_meal_type;
-                      const dietary =
-                        recipe?.dietary ?? savedRecipe.recipe_dietary ?? [];
-
-                      return (
-                        <article
-                          key={savedRecipe.id}
-                          className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/86 shadow-[0_10px_24px_rgba(36,51,40,0.05)]"
-                        >
-                          <div className="h-52 overflow-hidden bg-[#f7f2eb]">
-                            {image ? (
-                              <img
-                                src={image}
-                                alt={title}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : null}
-                          </div>
-
-                          <div className="p-5 md:p-6">
-                            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                              Saved {formatDate(savedRecipe.created_at)}
-                            </p>
-
-                            <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
-                              {title}
-                            </h3>
-
-                            {intro ? (
-                              <p className="mt-3 text-sm leading-6 text-[#667164]">
-                                {intro}
-                              </p>
-                            ) : null}
-
-                            <div className="mt-4 flex flex-wrap gap-2">
-                              {time ? (
-                                <span className="rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1.5 text-xs text-[#4f5e52]">
-                                  {time}
-                                </span>
-                              ) : null}
-
-                              {mealType ? (
-                                <span className="rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1.5 text-xs text-[#4f5e52]">
-                                  {mealType.replace("-", " ")}
-                                </span>
-                              ) : null}
-
-                              {dietary.slice(0, 3).map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1.5 text-xs text-[#4f5e52]"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-
-                            <div className="mt-5 flex flex-wrap gap-3">
-                              <Link
-                                href="/planner"
-                                className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
-                              >
-                                Use in planner
-                              </Link>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveRegular(savedRecipe.id)
-                                }
-                                disabled={removingRecipeId === savedRecipe.id}
-                                className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-                              >
-                                {removingRecipeId === savedRecipe.id
-                                  ? "Removing..."
-                                  : "Remove"}
-                              </button>
-                            </div>
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="rounded-[24px] border border-[#ddd4c8] bg-white/80 p-6">
-                    <h3 className="font-serif text-2xl text-[#243328]">
-                      No regular meals saved yet
-                    </h3>
-
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
-                      Open the planner, generate a week, then save the meals you
-                      want to cook again.
-                    </p>
+                    <Link
+                      href="/planner"
+                      className="mt-5 inline-flex rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
+                    >
+                      Plan a week
+                    </Link>
                   </div>
                 )}
               </section>
