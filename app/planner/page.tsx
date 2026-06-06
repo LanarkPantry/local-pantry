@@ -71,11 +71,35 @@ function ChoiceChip({ active, label, onClick }: ChoiceChipProps) {
       onClick={onClick}
       className={`rounded-full border px-4 py-2 text-sm transition ${
         active
-          ? "border-[#243328] bg-[#243328] text-white"
-          : "border-[#d6cec2] bg-white/80 text-[#243328] hover:bg-white"
+          ? "border-[#243328] bg-[#243328] text-white shadow-[0_8px_18px_rgba(36,51,40,0.12)]"
+          : "border-[#d6cec2] bg-white/82 text-[#243328] hover:bg-white"
       }`}
     >
       {label}
+    </button>
+  );
+}
+
+function DayButton({
+  active,
+  value,
+  onClick,
+}: {
+  active: boolean;
+  value: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex h-12 w-12 items-center justify-center rounded-2xl border text-sm font-medium transition ${
+        active
+          ? "border-[#243328] bg-[#243328] text-white shadow-[0_8px_18px_rgba(36,51,40,0.12)]"
+          : "border-[#d6cec2] bg-white/82 text-[#243328] hover:bg-white"
+      }`}
+    >
+      {value}
     </button>
   );
 }
@@ -120,7 +144,7 @@ function getStyleLabel(style: EatingStyle) {
     case "quick":
       return "Quick dinners";
     case "my-kitchen":
-      return "My Kitchen week";
+      return "Saved favourites week";
     default:
       return "Weekly plan";
   }
@@ -365,7 +389,7 @@ export default function PlannerPage() {
 
     const allAddOns = [...pantryItems, ...cupboardItems];
 
-    return allAddOns.filter((item) => names.has(item.name)).slice(0, 6);
+    return allAddOns.filter((item) => names.has(item.name)).slice(0, 4);
   }, [week]);
 
   async function handleBuildWeek() {
@@ -580,70 +604,82 @@ export default function PlannerPage() {
         </div>
       ) : null}
 
-      <div className="px-4 pt-4 sm:px-6 md:hidden">
-        <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
-          <img
-            src="/images/home/plan-your-week.jpg"
-            alt="Fresh produce and pantry ingredients ready for the week"
-            className="h-44 w-full object-cover"
-          />
-        </div>
-      </div>
-
-      <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-7 pt-5 sm:px-6 md:px-10 md:pb-10 md:pt-8">
+      <section className="px-4 pb-8 pt-4 sm:px-6 md:px-10 md:pb-12 md:pt-8">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-5 lg:grid-cols-[1fr_0.95fr]">
-            <article className="rounded-[30px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.88)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                Free meal planner
-              </p>
+          <div className="overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-[#efe6da] shadow-[0_16px_40px_rgba(36,51,40,0.08)]">
+            <div className="relative">
+              <img
+                src="/images/planner/planner-hero.jpg"
+                alt="Meal planning with fresh produce, pantry jars and dry goods"
+                className="h-[310px] w-full object-cover sm:h-[390px] lg:h-[520px]"
+              />
 
-              <h1 className="mt-3 max-w-3xl font-serif text-[2.15rem] leading-[1.02] tracking-tight text-[#243328] md:text-[3.6rem]">
-                Make your produce box easier to use.
-              </h1>
+              <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/35 lg:bg-gradient-to-r lg:from-black/0 lg:via-black/0 lg:to-black/15" />
 
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
-                Choose how many nights you want to cook and get a simple week of
-                meal ideas built around fresh produce, useful pantry staples and
-                real home cooking.
-              </p>
+              <div className="absolute bottom-4 left-4 right-4 rounded-[26px] border border-white/45 bg-[#f7f2eb]/92 p-5 shadow-[0_16px_38px_rgba(36,51,40,0.14)] backdrop-blur md:bottom-6 md:left-6 md:max-w-xl md:p-6">
+                <p className="text-[10px] uppercase tracking-[0.24em] text-[#6b776c]">
+                  Free meal planner
+                </p>
 
-              <div className="mt-5 flex flex-wrap gap-2 text-xs text-[#4f5d50]">
-                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
-                  Free to use
-                </span>
-                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
-                  3–7 nights
-                </span>
-                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
-                  Save favourites
-                </span>
-                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
-                  Add useful extras
-                </span>
+                <h1 className="mt-2 font-serif text-3xl leading-[1.02] tracking-tight text-[#243328] md:text-5xl">
+                  Turn your box into dinners.
+                </h1>
+
+                <p className="mt-3 text-sm leading-6 text-[#5f675c] md:text-base md:leading-7">
+                  Choose your nights, pick your style and build a simple week of
+                  meals around produce, pantry staples and food you will
+                  actually cook.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-5 lg:grid-cols-[0.92fr_1.08fr]">
+            <article className="rounded-[30px] border border-[#ddd4c8] bg-white/84 p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+                    Build your week
+                  </p>
+
+                  <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328]">
+                    Start here
+                  </h2>
+                </div>
+
+                <a
+                  href="/shop"
+                  className="hidden rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white sm:inline-flex"
+                >
+                  Shop boxes
+                </a>
               </div>
 
+              <p className="mt-3 text-sm leading-6 text-[#667164]">
+                No complicated planning. Just enough structure to make the week
+                easier.
+              </p>
+
               {!hasProduceBox ? (
-                <div className="mt-6 rounded-[22px] border border-[#d8cbbd] bg-white/72 p-4">
+                <div className="mt-5 rounded-[22px] border border-[#d8cbbd] bg-[#f7f2eb] p-4">
                   <p className="text-sm font-medium text-[#243328]">
-                    Start with a produce box.
+                    Best with a produce box.
                   </p>
 
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    The planner works best when you have your weekly or family
-                    produce box in mind. Add a box, then use this page to make
-                    the week feel easier.
+                    Add a weekly or family box, then use the planner to turn it
+                    into dinners and useful pantry extras.
                   </p>
                 </div>
               ) : (
-                <div className="mt-6 rounded-[22px] border border-[#cbd8ca] bg-white/72 p-4">
+                <div className="mt-5 rounded-[22px] border border-[#cbd8ca] bg-[#f7f2eb] p-4">
                   <p className="text-sm font-medium text-[#243328]">
                     Produce box added.
                   </p>
 
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Now build a week around it and add any pantry extras you
-                    actually need.
+                    Now build a week around it and add only the pantry extras
+                    you need.
                   </p>
                 </div>
               )}
@@ -661,18 +697,22 @@ export default function PlannerPage() {
               ) : null}
 
               {step === "choices" ? (
-                <div className="mt-8 space-y-7">
+                <div className="mt-7 space-y-7">
                   <div>
-                    <p className="mb-3 text-sm font-medium text-[#243328]">
-                      How many nights?
-                    </p>
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium text-[#243328]">
+                        Nights to plan
+                      </p>
+
+                      <p className="text-xs text-[#7b846f]">Pick 3 to 7</p>
+                    </div>
 
                     <div className="flex flex-wrap gap-2">
                       {[3, 4, 5, 6, 7].map((value) => (
-                        <ChoiceChip
+                        <DayButton
                           key={value}
                           active={nights === value}
-                          label={`${value} nights`}
+                          value={value}
                           onClick={() => setNights(value)}
                         />
                       ))}
@@ -681,10 +721,10 @@ export default function PlannerPage() {
 
                   <div>
                     <p className="mb-3 text-sm font-medium text-[#243328]">
-                      What suits this week?
+                      Cooking style
                     </p>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                       <ChoiceChip
                         active={eatingStyle === "mixed"}
                         label="Mixed"
@@ -695,6 +735,12 @@ export default function PlannerPage() {
                         active={eatingStyle === "mostly-veggie"}
                         label="Mostly veggie"
                         onClick={() => setEatingStyle("mostly-veggie")}
+                      />
+
+                      <ChoiceChip
+                        active={eatingStyle === "quick"}
+                        label="Quick dinners"
+                        onClick={() => setEatingStyle("quick")}
                       />
 
                       <ChoiceChip
@@ -710,12 +756,6 @@ export default function PlannerPage() {
                       />
 
                       <ChoiceChip
-                        active={eatingStyle === "quick"}
-                        label="Quick dinners"
-                        onClick={() => setEatingStyle("quick")}
-                      />
-
-                      <ChoiceChip
                         active={eatingStyle === "my-kitchen"}
                         label="Saved favourites"
                         onClick={() => setEatingStyle("my-kitchen")}
@@ -723,26 +763,24 @@ export default function PlannerPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3 pt-1">
-                    <button
-                      type="button"
-                      onClick={handleBuildWeek}
-                      disabled={!authChecked}
-                      className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {authChecked ? "Build my week" : "Checking account..."}
-                    </button>
+                  <button
+                    type="button"
+                    onClick={handleBuildWeek}
+                    disabled={!authChecked}
+                    className="w-full rounded-full bg-[#243328] px-6 py-3.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {authChecked ? "Build my week" : "Checking account..."}
+                  </button>
 
-                    <a
-                      href="/shop"
-                      className="rounded-full border border-[#d6cec2] bg-white/78 px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
-                    >
-                      Shop produce boxes
-                    </a>
-                  </div>
+                  <a
+                    href="/shop"
+                    className="flex w-full justify-center rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-white sm:hidden"
+                  >
+                    Shop produce boxes
+                  </a>
                 </div>
               ) : (
-                <div className="mt-8 flex flex-wrap gap-3">
+                <div className="mt-7 grid gap-2 sm:grid-cols-3">
                   <button
                     type="button"
                     onClick={() => {
@@ -771,30 +809,77 @@ export default function PlannerPage() {
                     >
                       Save week
                     </button>
-                  ) : null}
+                  ) : (
+                    <a
+                      href="/account"
+                      className="rounded-full border border-[#d6cec2] bg-white/78 px-5 py-2.5 text-center text-sm font-medium text-[#243328] transition hover:bg-white"
+                    >
+                      Sign in to save
+                    </a>
+                  )}
                 </div>
               )}
             </article>
 
-            <aside className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-              <ProductPromptCard
-                item={weeklyProduceBox}
-                eyebrow="Best for lighter weeks"
-                onAdd={() => addDisplayItem(weeklyProduceBox)}
-              />
+            <aside className="grid gap-5">
+              <div className="rounded-[30px] border border-[#ddd4c8] bg-[#243328] p-5 text-white shadow-[0_12px_30px_rgba(36,51,40,0.08)] md:p-7">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-white/58">
+                  What this planner is for
+                </p>
 
-              <ProductPromptCard
-                item={familyProduceBox}
-                eyebrow="Best for fuller kitchens"
-                onAdd={() => addDisplayItem(familyProduceBox)}
-              />
+                <h2 className="mt-2 font-serif text-3xl leading-tight">
+                  Less staring into the fridge.
+                </h2>
+
+                <p className="mt-3 text-sm leading-7 text-white/72">
+                  It helps you use the box, repeat meals you like and add pantry
+                  extras only when they make the week easier.
+                </p>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                  <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
+                    <p className="font-serif text-xl">Use the box</p>
+                    <p className="mt-2 text-sm leading-6 text-white/65">
+                      Meal ideas built around fresh produce.
+                    </p>
+                  </div>
+
+                  <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
+                    <p className="font-serif text-xl">Waste less</p>
+                    <p className="mt-2 text-sm leading-6 text-white/65">
+                      Overlapping ingredients make shopping work harder.
+                    </p>
+                  </div>
+
+                  <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
+                    <p className="font-serif text-xl">Save favourites</p>
+                    <p className="mt-2 text-sm leading-6 text-white/65">
+                      Build future weeks around meals you cook again.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <ProductPromptCard
+                  item={weeklyProduceBox}
+                  eyebrow="Best for lighter weeks"
+                  onAdd={() => addDisplayItem(weeklyProduceBox)}
+                />
+
+                <ProductPromptCard
+                  item={familyProduceBox}
+                  eyebrow="Best for fuller kitchens"
+                  onAdd={() => addDisplayItem(familyProduceBox)}
+                />
+              </div>
             </aside>
           </div>
         </div>
       </section>
 
       {step === "results" ? (
-        <section className="px-4 py-8 sm:px-6 md:px-10 md:py-12">
+        <section className="px-4 pb-10 sm:px-6 md:px-10 md:pb-14">
           <div className="mx-auto max-w-7xl">
             <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
@@ -808,24 +893,30 @@ export default function PlannerPage() {
               </div>
 
               <p className="max-w-xl text-sm leading-6 text-[#667164]">
-                Open a meal to see ingredients, quick steps and pantry matches.
-                Swap anything that does not suit.
+                Open a meal for ingredients, quick steps and useful pantry
+                matches. Swap anything that does not suit.
               </p>
             </div>
 
             {plannerInsights.insights.length > 0 ? (
-              <div className="mb-6 grid gap-3 md:grid-cols-3">
-                {plannerInsights.insights.slice(0, 3).map((insight) => (
-                  <div
-                    key={insight.label}
-                    className="rounded-[20px] border border-[#ddd4c8] bg-white/72 p-4 text-sm leading-6 text-[#5f675c]"
-                  >
-                    <p className="font-medium text-[#243328]">
-                      {insight.label}
-                    </p>
-                    <p className="mt-1">{insight.text}</p>
-                  </div>
-                ))}
+              <div className="mb-6 rounded-[26px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 md:p-6">
+                <p className="font-serif text-2xl leading-tight text-[#243328]">
+                  This week is designed to make your box work harder.
+                </p>
+
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                  {plannerInsights.insights.slice(0, 3).map((insight) => (
+                    <div
+                      key={insight.label}
+                      className="rounded-[20px] border border-[#e4dbcf] bg-white/74 p-4 text-sm leading-6 text-[#5f675c]"
+                    >
+                      <p className="font-medium text-[#243328]">
+                        {insight.label}
+                      </p>
+                      <p className="mt-1">{insight.text}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : null}
 
@@ -838,7 +929,7 @@ export default function PlannerPage() {
                   return (
                     <article
                       key={meal.id}
-                      className="overflow-hidden rounded-[26px] border border-[#ddd4c8] bg-white/82 shadow-[0_12px_26px_rgba(36,51,40,0.05)]"
+                      className="overflow-hidden rounded-[26px] border border-[#ddd4c8] bg-white/86 shadow-[0_12px_26px_rgba(36,51,40,0.05)]"
                     >
                       <button
                         type="button"
@@ -853,10 +944,10 @@ export default function PlannerPage() {
                           <img
                             src={meal.imageUrl}
                             alt={meal.title}
-                            className="h-36 w-full rounded-[20px] object-cover md:h-28"
+                            className="h-40 w-full rounded-[20px] object-cover md:h-28"
                           />
                         ) : (
-                          <div className="h-36 rounded-[20px] bg-[#e8ded1] md:h-28" />
+                          <div className="h-40 rounded-[20px] bg-[#e8ded1] md:h-28" />
                         )}
 
                         <div>
@@ -871,10 +962,25 @@ export default function PlannerPage() {
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
                             {meal.description}
                           </p>
+
+                          {meal.ingredients.length > 0 ? (
+                            <div className="mt-3 flex flex-wrap gap-1.5">
+                              {meal.ingredients
+                                .slice(0, 3)
+                                .map((ingredient) => (
+                                  <span
+                                    key={ingredient}
+                                    className="rounded-full border border-[#e4dbcf] bg-[#f7f2eb] px-2.5 py-1 text-[11px] text-[#5f675c]"
+                                  >
+                                    {ingredient}
+                                  </span>
+                                ))}
+                            </div>
+                          ) : null}
                         </div>
 
                         <span className="rounded-full border border-[#d6cec2] px-4 py-2 text-sm font-medium text-[#243328]">
-                          {isOpen ? "Close" : "Open"}
+                          {isOpen ? "Close" : "View"}
                         </span>
                       </button>
 
@@ -909,7 +1015,7 @@ export default function PlannerPage() {
                           {meal.matchedProducts.length > 0 ? (
                             <div className="mt-6 rounded-[20px] border border-[#ddd4c8] bg-[#f7f2eb] p-4">
                               <p className="text-sm font-medium text-[#243328]">
-                                Useful pantry matches
+                                Useful with this meal
                               </p>
 
                               <div className="mt-3 flex flex-wrap gap-2">
@@ -929,13 +1035,13 @@ export default function PlannerPage() {
                             </div>
                           ) : null}
 
-                          <div className="mt-6 flex flex-wrap gap-3">
+                          <div className="mt-6 grid gap-2 sm:grid-cols-3">
                             <button
                               type="button"
                               onClick={() => handleOpenSwapOptions(meal.id)}
                               className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-[#f7f2eb]"
                             >
-                              Swap this meal
+                              Swap meal
                             </button>
 
                             <button
@@ -945,10 +1051,10 @@ export default function PlannerPage() {
                               className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-[#f7f2eb] disabled:opacity-60"
                             >
                               {isSaved
-                                ? "Saved to My Kitchen"
+                                ? "Saved"
                                 : savingRecipeSlug === meal.recipeSlug
                                   ? "Saving..."
-                                  : "Save to My Kitchen"}
+                                  : "Save"}
                             </button>
 
                             <button
@@ -967,18 +1073,18 @@ export default function PlannerPage() {
               </div>
 
               <aside className="space-y-4">
-                <div className="rounded-[26px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_12px_26px_rgba(36,51,40,0.05)]">
+                <div className="rounded-[26px] border border-[#ddd4c8] bg-white/86 p-5 shadow-[0_12px_26px_rgba(36,51,40,0.05)]">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
                     Pantry extras
                   </p>
 
                   <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
-                    Add only what helps.
+                    Useful with this week.
                   </h3>
 
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    These are the useful extras matched to this week. Skip
-                    anything you already have.
+                    Suggested extras based on the meals. Skip anything you
+                    already have.
                   </p>
 
                   {recommendedAddOns.length > 0 ? (
@@ -1031,7 +1137,7 @@ export default function PlannerPage() {
 
             {swapMealId ? (
               <section ref={swapSectionRef} className="mt-8">
-                <div className="rounded-[28px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_12px_26px_rgba(36,51,40,0.05)] md:p-6">
+                <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-5 shadow-[0_12px_26px_rgba(36,51,40,0.05)] md:p-6">
                   <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
@@ -1092,44 +1198,7 @@ export default function PlannerPage() {
             ) : null}
           </div>
         </section>
-      ) : (
-        <section className="px-4 py-8 sm:px-6 md:px-10 md:py-12">
-          <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
-            <div className="rounded-[26px] border border-[#ddd4c8] bg-white/76 p-5">
-              <p className="font-serif text-2xl text-[#243328]">
-                Start with the box.
-              </p>
-
-              <p className="mt-2 text-sm leading-6 text-[#667164]">
-                The produce box is the main thing. The planner simply helps you
-                turn it into dinners.
-              </p>
-            </div>
-
-            <div className="rounded-[26px] border border-[#ddd4c8] bg-white/76 p-5">
-              <p className="font-serif text-2xl text-[#243328]">
-                Add what is useful.
-              </p>
-
-              <p className="mt-2 text-sm leading-6 text-[#667164]">
-                Pantry extras are suggested only where they make sense for your
-                week.
-              </p>
-            </div>
-
-            <div className="rounded-[26px] border border-[#ddd4c8] bg-white/76 p-5">
-              <p className="font-serif text-2xl text-[#243328]">
-                Save your regulars.
-              </p>
-
-              <p className="mt-2 text-sm leading-6 text-[#667164]">
-                Keep meals you actually cook, then build future weeks around
-                your own favourites.
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
+      ) : null}
 
       <SiteFooter />
     </main>
