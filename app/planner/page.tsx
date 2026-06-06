@@ -164,7 +164,7 @@ function ProductPromptCard({
       <img
         src={item.image}
         alt={item.name}
-        className="h-44 w-full object-cover"
+        className="h-36 w-full object-cover sm:h-44"
       />
 
       <div className="p-5">
@@ -606,26 +606,53 @@ export default function PlannerPage() {
 
       <section className="px-4 pb-8 pt-4 sm:px-6 md:px-10 md:pb-12 md:pt-8">
         <div className="mx-auto max-w-7xl">
-          <div className="overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-[#efe6da] shadow-[0_16px_40px_rgba(36,51,40,0.08)]">
+          {/* Mobile hero: simple image first, text underneath, no overlay */}
+          <div className="md:hidden">
+            <div className="overflow-hidden rounded-[26px] border border-[#ddd4c8] bg-[#efe6da] shadow-[0_12px_28px_rgba(36,51,40,0.08)]">
+              <img
+                src="/images/planner/planner-hero.jpg"
+                alt="Meal planning with fresh produce, pantry jars and dry goods"
+                className="h-52 w-full object-cover object-[62%_50%]"
+              />
+            </div>
+
+            <div className="mt-5 px-1">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+                Free meal planner
+              </p>
+
+              <h1 className="mt-2 font-serif text-4xl leading-[1.02] tracking-tight text-[#243328]">
+                Turn your box into dinners.
+              </h1>
+
+              <p className="mt-3 text-sm leading-6 text-[#5f675c]">
+                Choose your nights, pick your style and build a simple week of
+                meals.
+              </p>
+            </div>
+          </div>
+
+          {/* Desktop hero: larger image with overlay card */}
+          <div className="hidden overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-[#efe6da] shadow-[0_16px_40px_rgba(36,51,40,0.08)] md:block">
             <div className="relative">
               <img
                 src="/images/planner/planner-hero.jpg"
                 alt="Meal planning with fresh produce, pantry jars and dry goods"
-                className="h-[310px] w-full object-cover sm:h-[390px] lg:h-[520px]"
+                className="h-[500px] w-full object-cover object-center lg:h-[540px]"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/35 lg:bg-gradient-to-r lg:from-black/0 lg:via-black/0 lg:to-black/15" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/10" />
 
-              <div className="absolute bottom-4 left-4 right-4 rounded-[26px] border border-white/45 bg-[#f7f2eb]/92 p-5 shadow-[0_16px_38px_rgba(36,51,40,0.14)] backdrop-blur md:bottom-6 md:left-6 md:max-w-xl md:p-6">
+              <div className="absolute bottom-6 left-6 max-w-xl rounded-[26px] border border-white/45 bg-[#f7f2eb]/92 p-6 shadow-[0_16px_38px_rgba(36,51,40,0.14)] backdrop-blur">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-[#6b776c]">
                   Free meal planner
                 </p>
 
-                <h1 className="mt-2 font-serif text-3xl leading-[1.02] tracking-tight text-[#243328] md:text-5xl">
+                <h1 className="mt-2 font-serif text-5xl leading-[1.02] tracking-tight text-[#243328]">
                   Turn your box into dinners.
                 </h1>
 
-                <p className="mt-3 text-sm leading-6 text-[#5f675c] md:text-base md:leading-7">
+                <p className="mt-3 text-base leading-7 text-[#5f675c]">
                   Choose your nights, pick your style and build a simple week of
                   meals around produce, pantry staples and food you will
                   actually cook.
