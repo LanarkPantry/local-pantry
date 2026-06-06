@@ -813,14 +813,17 @@ export default function PlannerPage() {
               </p>
             </div>
 
-            {plannerInsights.length > 0 ? (
+            {plannerInsights.insights.length > 0 ? (
               <div className="mb-6 grid gap-3 md:grid-cols-3">
-                {plannerInsights.slice(0, 3).map((insight) => (
+                {plannerInsights.insights.slice(0, 3).map((insight) => (
                   <div
-                    key={insight}
+                    key={insight.label}
                     className="rounded-[20px] border border-[#ddd4c8] bg-white/72 p-4 text-sm leading-6 text-[#5f675c]"
                   >
-                    {insight}
+                    <p className="font-medium text-[#243328]">
+                      {insight.label}
+                    </p>
+                    <p className="mt-1">{insight.text}</p>
                   </div>
                 ))}
               </div>
