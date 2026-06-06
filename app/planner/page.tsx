@@ -58,9 +58,9 @@ const DAY_NAMES = [
 ] as const;
 
 const FEATURED_RECIPE_SLUGS = [
-  "asparagus-lemon-orzo",
-  "butter-bean-rose-harissa-bake",
-  "gochujang-roasted-veg-tray-bake",
+  "harissa-butterbeans-peppers-couscous",
+  "bucatini-courgette-pesto",
+  "gochujang-broccoli-rice-bowls",
 ] as const;
 
 const NIGHT_OPTIONS = [
@@ -281,12 +281,8 @@ function FeaturedRecipeCards() {
     <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-5">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-            Meal inspiration
-          </p>
-
           <h2 className="mt-2 font-serif text-2xl leading-tight text-[#243328] md:text-3xl">
-            A few recent favourites
+            A few pantry favourites
           </h2>
         </div>
       </div>
