@@ -11,7 +11,6 @@ import {
 import { getUser } from "../lib/authClient";
 import { generateWeek, type PlannerStyle } from "../lib/planner";
 import { getSwapOptions } from "../lib/getSwapOptions";
-import { getPlannerInsights } from "../lib/getPlannerInsights";
 import {
   getSavedRecipeSlugs,
   saveRecipeToRegulars,
@@ -244,6 +243,7 @@ function CompactShopCard({
 
 export default function PlannerPage() {
   const { groupedCart, addToCart } = useCart();
+  const resultsSectionRef = useRef<HTMLElement | null>(null);
   const swapSectionRef = useRef<HTMLElement | null>(null);
 
   const [step, setStep] = useState<PlannerStep>("choices");
@@ -373,11 +373,6 @@ export default function PlannerPage() {
     });
   }, [currentWeekSlugs, selectedSwapMeal]);
 
-  const plannerInsights = useMemo(
-    () => getPlannerInsights(week.map((meal) => meal.recipe)),
-    [week],
-  );
-
   const recommendedAddOns = useMemo(() => {
     const names = new Set<string>();
 
@@ -465,6 +460,13 @@ export default function PlannerPage() {
     setNights(plannedWeek.length);
     setOpenDay(null);
     setStep("results");
+
+    window.setTimeout(() => {
+      resultsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 120);
   }
 
   function handleOpenSwapOptions(mealId: string) {
@@ -626,7 +628,7 @@ export default function PlannerPage() {
               </h1>
 
               <p className="mt-3 text-sm leading-6 text-[#5f675c]">
-                Choose your nights, pick your style and build a simple week of
+                Choose your nights, pick your style, then get straight to the
                 meals.
               </p>
             </div>
@@ -683,33 +685,20 @@ export default function PlannerPage() {
               </div>
 
               <p className="mt-3 text-sm leading-6 text-[#667164]">
-                No complicated planning. Just enough structure to make the week
-                easier.
+                Pick the number of dinners you want, choose the kind of week you
+                need, then get straight to the meals.
               </p>
 
-              {!hasProduceBox ? (
-                <div className="mt-5 rounded-[22px] border border-[#d8cbbd] bg-[#f7f2eb] p-4">
-                  <p className="text-sm font-medium text-[#243328]">
-                    Best with a produce box.
-                  </p>
+              <div className="mt-5 rounded-[22px] border border-[#d8cbbd] bg-[#f7f2eb] p-4">
+                <p className="text-sm font-medium text-[#243328]">
+                  Best with a produce box.
+                </p>
 
-                  <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Add a weekly or family box, then use the planner to turn it
-                    into dinners and useful pantry extras.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-5 rounded-[22px] border border-[#cbd8ca] bg-[#f7f2eb] p-4">
-                  <p className="text-sm font-medium text-[#243328]">
-                    Produce box added.
-                  </p>
-
-                  <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    Now build a week around it and add only the pantry extras
-                    you need.
-                  </p>
-                </div>
-              )}
+                <p className="mt-2 text-sm leading-6 text-[#667164]">
+                  Use the planner to turn your weekly box into dinners, then add
+                  only the pantry extras you actually need.
+                </p>
+              </div>
 
               {plannerError ? (
                 <div className="mt-5 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
@@ -807,82 +796,43 @@ export default function PlannerPage() {
                   </a>
                 </div>
               ) : (
-                <div className="mt-7 grid gap-2 sm:grid-cols-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setStep("choices");
-                      setSwapMealId(null);
-                      setOpenDay(null);
-                    }}
-                    className="rounded-full border border-[#d6cec2] bg-white/78 px-5 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
-                  >
-                    Change choices
-                  </button>
+                <div className="mt-7 rounded-[22px] border border-[#d8cbbd] bg-[#f7f2eb] p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Your meals are below.
+                  </p>
 
-                  <button
-                    type="button"
-                    onClick={handleBuildWeek}
-                    className="rounded-full bg-[#243328] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
-                  >
-                    Rebuild week
-                  </button>
-
-                  {isLoggedIn ? (
-                    <button
-                      type="button"
-                      onClick={handleSaveWeek}
-                      className="rounded-full border border-[#d6cec2] bg-white/78 px-5 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
-                    >
-                      Save week
-                    </button>
-                  ) : (
-                    <a
-                      href="/account"
-                      className="rounded-full border border-[#d6cec2] bg-white/78 px-5 py-2.5 text-center text-sm font-medium text-[#243328] transition hover:bg-white"
-                    >
-                      Sign in to save
-                    </a>
-                  )}
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    You can rebuild, change choices or save this week from the
+                    top of the results.
+                  </p>
                 </div>
               )}
             </article>
 
             <aside className="grid gap-5">
-              <div className="rounded-[30px] border border-[#ddd4c8] bg-[#243328] p-5 text-white shadow-[0_12px_30px_rgba(36,51,40,0.08)] md:p-7">
+              <div className="hidden rounded-[30px] border border-[#ddd4c8] bg-[#243328] p-5 text-white shadow-[0_12px_30px_rgba(36,51,40,0.08)] md:block md:p-7">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-white/58">
-                  What this planner is for
+                  How it helps
                 </p>
 
                 <h2 className="mt-2 font-serif text-3xl leading-tight">
-                  Less staring into the fridge.
+                  A better week of cooking.
                 </h2>
 
-                <p className="mt-3 text-sm leading-7 text-white/72">
-                  It helps you use the box, repeat meals you like and add pantry
-                  extras only when they make the week easier.
-                </p>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                <div className="mt-6 grid gap-3 xl:grid-cols-3">
                   <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
-                    <p className="font-serif text-xl">Use the box</p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">
-                      Meal ideas built around fresh produce.
-                    </p>
+                    <p className="text-2xl">🥬</p>
+                    <p className="mt-2 font-serif text-xl">Use the box</p>
                   </div>
 
                   <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
-                    <p className="font-serif text-xl">Waste less</p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">
-                      Overlapping ingredients make shopping work harder.
-                    </p>
+                    <p className="text-2xl">🍽️</p>
+                    <p className="mt-2 font-serif text-xl">Plan dinners</p>
                   </div>
 
                   <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
-                    <p className="font-serif text-xl">Save favourites</p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">
-                      Build future weeks around meals you cook again.
-                    </p>
+                    <p className="text-2xl">🫙</p>
+                    <p className="mt-2 font-serif text-xl">Add extras</p>
                   </div>
                 </div>
               </div>
@@ -906,46 +856,62 @@ export default function PlannerPage() {
       </section>
 
       {step === "results" ? (
-        <section className="px-4 pb-10 sm:px-6 md:px-10 md:pb-14">
+        <section
+          ref={resultsSectionRef}
+          className="scroll-mt-4 px-4 pb-10 sm:px-6 md:px-10 md:pb-14"
+        >
           <div className="mx-auto max-w-7xl">
-            <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="mb-4 rounded-[26px] border border-[#ddd4c8] bg-white/82 p-4 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:flex md:items-center md:justify-between md:gap-4 md:p-5">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
                   Your week
                 </p>
 
-                <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
+                <h2 className="mt-1 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
                   {getStyleLabel(eatingStyle)}
                 </h2>
               </div>
 
-              <p className="max-w-xl text-sm leading-6 text-[#667164]">
-                Open a meal for ingredients, quick steps and useful pantry
-                matches. Swap anything that does not suit.
-              </p>
-            </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-3 md:mt-0 md:min-w-[420px]">
+                <button
+                  type="button"
+                  onClick={handleBuildWeek}
+                  className="rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-4 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
+                >
+                  Rebuild
+                </button>
 
-            {plannerInsights.insights.length > 0 ? (
-              <div className="mb-6 rounded-[26px] border border-[#ddd4c8] bg-[#f7f2eb] p-5 md:p-6">
-                <p className="font-serif text-2xl leading-tight text-[#243328]">
-                  This week is designed to make your box work harder.
-                </p>
+                {isLoggedIn ? (
+                  <button
+                    type="button"
+                    onClick={handleSaveWeek}
+                    className="rounded-full bg-[#243328] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Save to My Kitchen
+                  </button>
+                ) : (
+                  <a
+                    href="/account"
+                    className="rounded-full bg-[#243328] px-4 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Sign in to save
+                  </a>
+                )}
 
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  {plannerInsights.insights.slice(0, 3).map((insight) => (
-                    <div
-                      key={insight.label}
-                      className="rounded-[20px] border border-[#e4dbcf] bg-white/74 p-4 text-sm leading-6 text-[#5f675c]"
-                    >
-                      <p className="font-medium text-[#243328]">
-                        {insight.label}
-                      </p>
-                      <p className="mt-1">{insight.text}</p>
-                    </div>
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep("choices");
+                    setSwapMealId(null);
+                    setOpenDay(null);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-4 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
+                >
+                  Change
+                </button>
               </div>
-            ) : null}
+            </div>
 
             <div className="grid gap-4 lg:grid-cols-[1fr_0.36fr]">
               <div className="space-y-4">
