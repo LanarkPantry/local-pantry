@@ -401,7 +401,6 @@ function StyleChoiceCard({
 export default function PlannerPage() {
   const { groupedCart, addToCart } = useCart();
   const resultsSectionRef = useRef<HTMLElement | null>(null);
-  const swapSectionRef = useRef<HTMLElement | null>(null);
 
   const [step, setStep] = useState<PlannerStep>("choices");
   const [nights, setNights] = useState(5);
@@ -628,13 +627,6 @@ export default function PlannerPage() {
 
   function handleOpenSwapOptions(mealId: string) {
     setSwapMealId((current) => (current === mealId ? null : mealId));
-
-    window.setTimeout(() => {
-      swapSectionRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 80);
   }
 
   async function handleSaveToRegulars(recipe: Recipe) {
@@ -677,13 +669,6 @@ export default function PlannerPage() {
 
     setOpenDay(null);
     setSwapMealId(null);
-
-    window.setTimeout(() => {
-      resultsSectionRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 150);
   }
 
   function addProductByName(productName: string) {
@@ -1133,6 +1118,60 @@ export default function PlannerPage() {
                               Cooked this
                             </button>
                           </div>
+
+                          {swapMealId === meal.id ? (
+                            <div className="mt-6 rounded-[22px] border border-[#ddd4c8] bg-[#f7f2eb] p-4">
+                              <div className="flex items-center justify-between gap-3">
+                                <p className="text-sm font-medium text-[#243328]">
+                                  Choose a replacement
+                                </p>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setSwapMealId(null)}
+                                  className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-[#fbf7f1]"
+                                >
+                                  Close
+                                </button>
+                              </div>
+
+                              {swapOptions.length > 0 ? (
+                                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                  {swapOptions.slice(0, 6).map((recipe) => (
+                                    <button
+                                      key={recipe.slug}
+                                      type="button"
+                                      onClick={() => handleSwapMeal(recipe)}
+                                      className="overflow-hidden rounded-[18px] border border-[#e4dbcf] bg-white text-left transition hover:bg-[#fbf7f1]"
+                                    >
+                                      {recipe.image ? (
+                                        <img
+                                          src={recipe.image}
+                                          alt={recipe.title}
+                                          className="h-28 w-full object-cover"
+                                        />
+                                      ) : null}
+
+                                      <div className="p-3">
+                                        <p className="font-serif text-lg leading-tight text-[#243328]">
+                                          {recipe.title}
+                                        </p>
+
+                                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#667164]">
+                                          {recipe.intro}
+                                        </p>
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="mt-4 text-sm leading-6 text-[#667164]">
+                                  No close swaps found yet. Try another week or
+                                  choose a different style.
+                                </p>
+                              )}
+                            </div>
+                          ) : null}
                         </div>
                       ) : null}
                     </article>
@@ -1216,68 +1255,6 @@ export default function PlannerPage() {
                 </div>
               </aside>
             </div>
-
-            {swapMealId ? (
-              <section ref={swapSectionRef} className="mt-8">
-                <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-5 shadow-[0_12px_26px_rgba(36,51,40,0.05)] md:p-6">
-                  <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                        Swap meal
-                      </p>
-
-                      <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
-                        Choose a replacement
-                      </h3>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setSwapMealId(null)}
-                      className="self-start rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-[#f7f2eb]"
-                    >
-                      Close swaps
-                    </button>
-                  </div>
-
-                  {swapOptions.length > 0 ? (
-                    <div className="mt-5 grid gap-4 md:grid-cols-3">
-                      {swapOptions.slice(0, 6).map((recipe) => (
-                        <button
-                          key={recipe.slug}
-                          type="button"
-                          onClick={() => handleSwapMeal(recipe)}
-                          className="overflow-hidden rounded-[22px] border border-[#e4dbcf] bg-[#f7f2eb] text-left transition hover:bg-white"
-                        >
-                          {recipe.image ? (
-                            <img
-                              src={recipe.image}
-                              alt={recipe.title}
-                              className="h-32 w-full object-cover"
-                            />
-                          ) : null}
-
-                          <div className="p-4">
-                            <p className="font-serif text-xl leading-tight text-[#243328]">
-                              {recipe.title}
-                            </p>
-
-                            <p className="mt-2 text-sm leading-6 text-[#667164]">
-                              {recipe.intro}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="mt-5 text-sm leading-6 text-[#667164]">
-                      No close swaps found yet. Try another week or choose a
-                      different style.
-                    </p>
-                  )}
-                </div>
-              </section>
-            ) : null}
           </div>
         </section>
       ) : null}
