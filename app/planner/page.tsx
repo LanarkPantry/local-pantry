@@ -63,6 +63,79 @@ const DAY_NAMES = [
   "Sunday",
 ] as const;
 
+const ROTATING_EXAMPLES = [
+  { icon: "🥘", title: "Butter Bean & Rose Harissa Bake" },
+  { icon: "🍋", title: "Asparagus Lemon Orzo" },
+  { icon: "🍅", title: "Tomato & Walnut Bucatini" },
+  { icon: "🥬", title: "Green Vegetable Risotto" },
+  { icon: "🌶️", title: "Gochujang Roasted Veg Tray Bake" },
+] as const;
+
+const NIGHT_OPTIONS = [
+  {
+    value: 3,
+    icon: "🌿",
+    label: "3 nights",
+    description: "A lighter week",
+  },
+  {
+    value: 5,
+    icon: "🍅",
+    label: "5 nights",
+    description: "Most popular",
+  },
+  {
+    value: 7,
+    icon: "🧺",
+    label: "7 nights",
+    description: "Full week",
+  },
+] as const;
+
+const STYLE_OPTIONS: {
+  value: EatingStyle;
+  icon: string;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: "mixed",
+    icon: "🍝",
+    label: "Mixed",
+    description: "A bit of everything",
+  },
+  {
+    value: "mostly-veggie",
+    icon: "🥕",
+    label: "Mostly veggie",
+    description: "Produce-led cooking",
+  },
+  {
+    value: "quick",
+    icon: "⚡",
+    label: "Quick",
+    description: "Fast weekday dinners",
+  },
+  {
+    value: "vegan",
+    icon: "🌱",
+    label: "Vegan",
+    description: "Plant-based meals",
+  },
+  {
+    value: "gluten-free",
+    icon: "🌾",
+    label: "Gluten-free",
+    description: "Wheat-free ideas",
+  },
+  {
+    value: "my-kitchen",
+    icon: "📚",
+    label: "My Kitchen",
+    description: "Saved favourites",
+  },
+] as const;
+
 function ChoiceChip({ active, label, onClick }: ChoiceChipProps) {
   return (
     <button
@@ -238,6 +311,131 @@ function CompactShopCard({
         </div>
       </div>
     </div>
+  );
+}
+
+function RotatingMealExamples() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % ROTATING_EXAMPLES.length);
+    }, 2600);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const currentExample = ROTATING_EXAMPLES[activeIndex];
+
+  return (
+    <div className="rounded-[26px] border border-[#ddd4c8] bg-[#f7f2eb] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-5">
+      <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+        This week could include
+      </p>
+
+      <div className="mt-3 flex min-h-[56px] items-center gap-3">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-2xl shadow-[0_8px_18px_rgba(36,51,40,0.05)]">
+          {currentExample.icon}
+        </span>
+
+        <p
+          key={currentExample.title}
+          className="font-serif text-2xl leading-tight text-[#243328] animate-in fade-in duration-500 md:text-3xl"
+        >
+          {currentExample.title}
+        </p>
+      </div>
+
+      <div className="mt-4 flex gap-1.5">
+        {ROTATING_EXAMPLES.map((example, index) => (
+          <span
+            key={example.title}
+            className={`h-1.5 rounded-full transition-all ${
+              index === activeIndex ? "w-8 bg-[#243328]" : "w-2 bg-[#d6cec2]"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NightChoiceCard({
+  active,
+  icon,
+  label,
+  description,
+  onClick,
+}: {
+  active: boolean;
+  icon: string;
+  label: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-[24px] border p-4 text-left transition ${
+        active
+          ? "border-[#243328] bg-[#243328] text-white shadow-[0_12px_26px_rgba(36,51,40,0.14)]"
+          : "border-[#ddd4c8] bg-white/86 text-[#243328] hover:bg-white"
+      }`}
+    >
+      <span className="text-2xl">{icon}</span>
+      <span className="mt-3 block font-serif text-2xl leading-tight">
+        {label}
+      </span>
+      <span
+        className={`mt-1 block text-sm leading-5 ${
+          active ? "text-white/72" : "text-[#667164]"
+        }`}
+      >
+        {description}
+      </span>
+    </button>
+  );
+}
+
+function StyleChoiceCard({
+  active,
+  icon,
+  label,
+  description,
+  onClick,
+}: {
+  active: boolean;
+  icon: string;
+  label: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-[22px] border p-4 text-left transition ${
+        active
+          ? "border-[#243328] bg-[#243328] text-white shadow-[0_12px_26px_rgba(36,51,40,0.14)]"
+          : "border-[#ddd4c8] bg-white/86 text-[#243328] hover:bg-white"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <span className="text-2xl leading-none">{icon}</span>
+
+        <span>
+          <span className="block text-sm font-semibold">{label}</span>
+          <span
+            className={`mt-1 block text-xs leading-5 ${
+              active ? "text-white/72" : "text-[#667164]"
+            }`}
+          >
+            {description}
+          </span>
+        </span>
+      </div>
+    </button>
   );
 }
 
@@ -484,7 +682,9 @@ export default function PlannerPage() {
     setRegularsMessage("");
 
     if (!isLoggedIn) {
-      window.location.href = "/login";
+      setRegularsMessage(
+        "Sign in or create an account to save meals to My Kitchen.",
+      );
       return;
     }
 
@@ -591,7 +791,7 @@ export default function PlannerPage() {
       return;
     }
 
-    alert("Week saved.");
+    alert("Saved to My Kitchen.");
   }
 
   return (
@@ -606,7 +806,6 @@ export default function PlannerPage() {
 
       <section className="px-4 pb-8 pt-4 sm:px-6 md:px-10 md:pb-12 md:pt-8">
         <div className="mx-auto max-w-7xl">
-          {/* Mobile hero: simple image first, text underneath, no overlay */}
           <div className="md:hidden">
             <div className="overflow-hidden rounded-[26px] border border-[#ddd4c8] bg-[#efe6da] shadow-[0_12px_28px_rgba(36,51,40,0.08)]">
               <img
@@ -626,13 +825,16 @@ export default function PlannerPage() {
               </h1>
 
               <p className="mt-3 text-sm leading-6 text-[#5f675c]">
-                Choose your nights, pick your style, then get straight to the
+                Choose your week, pick your style, then get straight to the
                 meals.
               </p>
             </div>
+
+            <div className="mt-5">
+              <RotatingMealExamples />
+            </div>
           </div>
 
-          {/* Desktop hero: larger image with overlay card */}
           <div className="hidden overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-[#efe6da] shadow-[0_16px_40px_rgba(36,51,40,0.08)] md:block">
             <div className="relative">
               <img
@@ -653,48 +855,28 @@ export default function PlannerPage() {
                 </h1>
 
                 <p className="mt-3 text-base leading-7 text-[#5f675c]">
-                  Choose your nights, pick your style and build a simple week of
-                  meals around produce, pantry staples and food you will
-                  actually cook.
+                  Choose your week, pick your style and get meal ideas built
+                  around produce, pantry staples and food you will actually
+                  cook.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="mt-5 grid gap-5 lg:grid-cols-[0.92fr_1.08fr]">
-            <article className="rounded-[30px] border border-[#ddd4c8] bg-white/84 p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                    Build your week
-                  </p>
-
-                  <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328]">
-                    Start here
-                  </h2>
-                </div>
-
-                <a
-                  href="/shop"
-                  className="hidden rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-white sm:inline-flex"
-                >
-                  Shop boxes
-                </a>
-              </div>
-
-              <p className="mt-3 text-sm leading-6 text-[#667164]">
-                Pick the number of dinners you want, choose the kind of week you
-                need, then get straight to the meals.
-              </p>
-
-              <div className="mt-5 rounded-[22px] border border-[#d8cbbd] bg-[#f7f2eb] p-4">
-                <p className="text-sm font-medium text-[#243328]">
-                  Best with a produce box.
+          <div className="mt-5 grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+            <article className="rounded-[32px] border border-[#ddd4c8] bg-white/88 p-5 shadow-[0_14px_34px_rgba(36,51,40,0.07)] md:p-7">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+                  Choose your week
                 </p>
 
-                <p className="mt-2 text-sm leading-6 text-[#667164]">
-                  Use the planner to turn your weekly box into dinners, then add
-                  only the pantry extras you actually need.
+                <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
+                  What does this week look like?
+                </h2>
+
+                <p className="mt-3 text-sm leading-6 text-[#667164]">
+                  Choose how many nights you want to cook and we&apos;ll suggest
+                  dinners built around fresh produce and useful pantry staples.
                 </p>
               </div>
 
@@ -713,21 +895,19 @@ export default function PlannerPage() {
               {step === "choices" ? (
                 <div className="mt-7 space-y-7">
                   <div>
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <p className="text-sm font-medium text-[#243328]">
-                        Nights to plan
-                      </p>
+                    <p className="mb-3 text-sm font-medium text-[#243328]">
+                      How much cooking?
+                    </p>
 
-                      <p className="text-xs text-[#7b846f]">Pick 3 to 7</p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {[3, 4, 5, 6, 7].map((value) => (
-                        <DayButton
-                          key={value}
-                          active={nights === value}
-                          value={value}
-                          onClick={() => setNights(value)}
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      {NIGHT_OPTIONS.map((option) => (
+                        <NightChoiceCard
+                          key={option.value}
+                          active={nights === option.value}
+                          icon={option.icon}
+                          label={option.label}
+                          description={option.description}
+                          onClick={() => setNights(option.value)}
                         />
                       ))}
                     </div>
@@ -735,45 +915,20 @@ export default function PlannerPage() {
 
                   <div>
                     <p className="mb-3 text-sm font-medium text-[#243328]">
-                      Cooking style
+                      What kind of week?
                     </p>
 
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                      <ChoiceChip
-                        active={eatingStyle === "mixed"}
-                        label="Mixed"
-                        onClick={() => setEatingStyle("mixed")}
-                      />
-
-                      <ChoiceChip
-                        active={eatingStyle === "mostly-veggie"}
-                        label="Mostly veggie"
-                        onClick={() => setEatingStyle("mostly-veggie")}
-                      />
-
-                      <ChoiceChip
-                        active={eatingStyle === "quick"}
-                        label="Quick dinners"
-                        onClick={() => setEatingStyle("quick")}
-                      />
-
-                      <ChoiceChip
-                        active={eatingStyle === "vegan"}
-                        label="Vegan"
-                        onClick={() => setEatingStyle("vegan")}
-                      />
-
-                      <ChoiceChip
-                        active={eatingStyle === "gluten-free"}
-                        label="Gluten-free"
-                        onClick={() => setEatingStyle("gluten-free")}
-                      />
-
-                      <ChoiceChip
-                        active={eatingStyle === "my-kitchen"}
-                        label="Saved favourites"
-                        onClick={() => setEatingStyle("my-kitchen")}
-                      />
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {STYLE_OPTIONS.map((option) => (
+                        <StyleChoiceCard
+                          key={option.value}
+                          active={eatingStyle === option.value}
+                          icon={option.icon}
+                          label={option.label}
+                          description={option.description}
+                          onClick={() => setEatingStyle(option.value)}
+                        />
+                      ))}
                     </div>
                   </div>
 
@@ -781,9 +936,9 @@ export default function PlannerPage() {
                     type="button"
                     onClick={handleBuildWeek}
                     disabled={!authChecked}
-                    className="w-full rounded-full bg-[#243328] px-6 py-3.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-full rounded-full bg-[#243328] px-6 py-3.5 text-sm font-medium text-white shadow-[0_12px_26px_rgba(36,51,40,0.14)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {authChecked ? "Build my week" : "Checking account..."}
+                    {authChecked ? "Show me my dinners" : "Checking account..."}
                   </button>
 
                   <a
@@ -794,45 +949,22 @@ export default function PlannerPage() {
                   </a>
                 </div>
               ) : (
-                <div className="mt-7 rounded-[22px] border border-[#d8cbbd] bg-[#f7f2eb] p-4">
-                  <p className="text-sm font-medium text-[#243328]">
-                    Your meals are below.
+                <div className="mt-7 rounded-[24px] border border-[#d8cbbd] bg-[#f7f2eb] p-5">
+                  <p className="font-serif text-2xl leading-tight text-[#243328]">
+                    Your dinners are ready.
                   </p>
 
                   <p className="mt-2 text-sm leading-6 text-[#667164]">
-                    You can rebuild the full week, edit choices or save this
-                    week from the top of the results.
+                    Scroll to your meals, save the week, or try another set of
+                    suggestions from the results bar below.
                   </p>
                 </div>
               )}
             </article>
 
             <aside className="grid gap-5">
-              <div className="hidden rounded-[30px] border border-[#ddd4c8] bg-[#243328] p-5 text-white shadow-[0_12px_30px_rgba(36,51,40,0.08)] md:block md:p-7">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-white/58">
-                  How it helps
-                </p>
-
-                <h2 className="mt-2 font-serif text-3xl leading-tight">
-                  A better week of cooking.
-                </h2>
-
-                <div className="mt-6 grid gap-3 xl:grid-cols-3">
-                  <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
-                    <p className="text-2xl">🥬</p>
-                    <p className="mt-2 font-serif text-xl">Use the box</p>
-                  </div>
-
-                  <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
-                    <p className="text-2xl">🍽️</p>
-                    <p className="mt-2 font-serif text-xl">Plan dinners</p>
-                  </div>
-
-                  <div className="rounded-[20px] border border-white/10 bg-white/8 p-4">
-                    <p className="text-2xl">🫙</p>
-                    <p className="mt-2 font-serif text-xl">Add extras</p>
-                  </div>
-                </div>
+              <div className="hidden md:block">
+                <RotatingMealExamples />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
@@ -862,11 +994,11 @@ export default function PlannerPage() {
             <div className="mb-4 rounded-[26px] border border-[#ddd4c8] bg-white/82 p-4 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:flex md:items-center md:justify-between md:gap-4 md:p-5">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                  Your week
+                  This week's dinners
                 </p>
 
                 <h2 className="mt-1 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
-                  {getStyleLabel(eatingStyle)}
+                  {week.length} dinners planned
                 </h2>
               </div>
 
@@ -885,7 +1017,7 @@ export default function PlannerPage() {
                     onClick={handleSaveWeek}
                     className="rounded-full bg-[#243328] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
                   >
-                    Save to My Kitchen
+                    Save This Week to My Kitchen
                   </button>
                 ) : (
                   <a
@@ -906,7 +1038,7 @@ export default function PlannerPage() {
                   }}
                   className="rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-4 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
                 >
-                  Change
+                  Edit choices
                 </button>
               </div>
             </div>
