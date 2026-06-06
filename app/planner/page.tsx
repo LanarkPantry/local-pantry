@@ -677,6 +677,13 @@ export default function PlannerPage() {
 
     setOpenDay(null);
     setSwapMealId(null);
+
+    window.setTimeout(() => {
+      resultsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 150);
   }
 
   function addProductByName(productName: string) {
