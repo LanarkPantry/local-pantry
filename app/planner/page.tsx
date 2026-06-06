@@ -484,9 +484,7 @@ export default function PlannerPage() {
     setRegularsMessage("");
 
     if (!isLoggedIn) {
-      setRegularsMessage(
-        "Sign in or create an account to save meals to My Kitchen.",
-      );
+      window.location.href = "/login";
       return;
     }
 
