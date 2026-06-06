@@ -47,12 +47,6 @@ type PlannedMeal = {
   steps: string[];
 };
 
-type ChoiceChipProps = {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-};
-
 const DAY_NAMES = [
   "Monday",
   "Tuesday",
@@ -63,12 +57,10 @@ const DAY_NAMES = [
   "Sunday",
 ] as const;
 
-const ROTATING_EXAMPLES = [
-  { icon: "🥘", title: "Butter Bean & Rose Harissa Bake" },
-  { icon: "🍋", title: "Asparagus Lemon Orzo" },
-  { icon: "🍅", title: "Tomato & Walnut Bucatini" },
-  { icon: "🥬", title: "Green Vegetable Risotto" },
-  { icon: "🌶️", title: "Gochujang Roasted Veg Tray Bake" },
+const FEATURED_RECIPE_SLUGS = [
+  "asparagus-lemon-orzo",
+  "butter-bean-rose-harissa-bake",
+  "gochujang-roasted-veg-tray-bake",
 ] as const;
 
 const NIGHT_OPTIONS = [
@@ -135,46 +127,6 @@ const STYLE_OPTIONS: {
     description: "Saved favourites",
   },
 ] as const;
-
-function ChoiceChip({ active, label, onClick }: ChoiceChipProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-4 py-2 text-sm transition ${
-        active
-          ? "border-[#243328] bg-[#243328] text-white shadow-[0_8px_18px_rgba(36,51,40,0.12)]"
-          : "border-[#d6cec2] bg-white/82 text-[#243328] hover:bg-white"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-function DayButton({
-  active,
-  value,
-  onClick,
-}: {
-  active: boolean;
-  value: number;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex h-12 w-12 items-center justify-center rounded-2xl border text-sm font-medium transition ${
-        active
-          ? "border-[#243328] bg-[#243328] text-white shadow-[0_8px_18px_rgba(36,51,40,0.12)]"
-          : "border-[#d6cec2] bg-white/82 text-[#243328] hover:bg-white"
-      }`}
-    >
-      {value}
-    </button>
-  );
-}
 
 function buildCookingSteps(body: string) {
   return body
@@ -314,49 +266,60 @@ function CompactShopCard({
   );
 }
 
-function RotatingMealExamples() {
-  const [activeIndex, setActiveIndex] = useState(0);
+function FeaturedRecipeCards() {
+  const featuredMeals = FEATURED_RECIPE_SLUGS.flatMap((slug) => {
+    const recipe = recipes.find((item) => item.slug === slug);
 
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % ROTATING_EXAMPLES.length);
-    }, 2600);
+    return recipe ? [recipe] : [];
+  });
 
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const currentExample = ROTATING_EXAMPLES[activeIndex];
+  if (featuredMeals.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="rounded-[26px] border border-[#ddd4c8] bg-[#f7f2eb] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-5">
-      <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-        This week could include
-      </p>
+    <section className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb] p-4 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-5">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+            Meal inspiration
+          </p>
 
-      <div className="mt-3 flex min-h-[56px] items-center gap-3">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-2xl shadow-[0_8px_18px_rgba(36,51,40,0.05)]">
-          {currentExample.icon}
-        </span>
-
-        <p
-          key={currentExample.title}
-          className="font-serif text-2xl leading-tight text-[#243328] animate-in fade-in duration-500 md:text-3xl"
-        >
-          {currentExample.title}
-        </p>
+          <h2 className="mt-2 font-serif text-2xl leading-tight text-[#243328] md:text-3xl">
+            A few recent favourites
+          </h2>
+        </div>
       </div>
 
-      <div className="mt-4 flex gap-1.5">
-        {ROTATING_EXAMPLES.map((example, index) => (
-          <span
-            key={example.title}
-            className={`h-1.5 rounded-full transition-all ${
-              index === activeIndex ? "w-8 bg-[#243328]" : "w-2 bg-[#d6cec2]"
-            }`}
-          />
+      <div className="mt-4 flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+        {featuredMeals.map((recipe) => (
+          <article
+            key={recipe.slug}
+            className="min-w-[240px] overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white shadow-[0_10px_24px_rgba(36,51,40,0.06)]"
+          >
+            {recipe.image ? (
+              <img
+                src={recipe.image}
+                alt={recipe.title}
+                className="h-40 w-full object-cover"
+              />
+            ) : (
+              <div className="h-40 bg-[#e8ded1]" />
+            )}
+
+            <div className="p-4">
+              <h3 className="font-serif text-xl leading-tight text-[#243328]">
+                {recipe.title}
+              </h3>
+
+              <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#667164]">
+                {recipe.intro}
+              </p>
+            </div>
+          </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -682,9 +645,7 @@ export default function PlannerPage() {
     setRegularsMessage("");
 
     if (!isLoggedIn) {
-      setRegularsMessage(
-        "Sign in or create an account to save meals to My Kitchen.",
-      );
+      window.location.href = "/login";
       return;
     }
 
@@ -776,6 +737,11 @@ export default function PlannerPage() {
   }
 
   async function handleSaveWeek() {
+    if (!isLoggedIn) {
+      window.location.href = "/login";
+      return;
+    }
+
     const result = await saveWeek({
       name: `${getStyleLabel(eatingStyle)} ${new Date().toLocaleDateString()}`,
       plannerStyle: eatingStyle,
@@ -816,11 +782,7 @@ export default function PlannerPage() {
             </div>
 
             <div className="mt-5 px-1">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                Free meal planner
-              </p>
-
-              <h1 className="mt-2 font-serif text-4xl leading-[1.02] tracking-tight text-[#243328]">
+              <h1 className="font-serif text-4xl leading-[1.02] tracking-tight text-[#243328]">
                 Turn your box into dinners.
               </h1>
 
@@ -831,7 +793,7 @@ export default function PlannerPage() {
             </div>
 
             <div className="mt-5">
-              <RotatingMealExamples />
+              <FeaturedRecipeCards />
             </div>
           </div>
 
@@ -846,11 +808,7 @@ export default function PlannerPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/10" />
 
               <div className="absolute bottom-6 left-6 max-w-xl rounded-[26px] border border-white/45 bg-[#f7f2eb]/92 p-6 shadow-[0_16px_38px_rgba(36,51,40,0.14)] backdrop-blur">
-                <p className="text-[10px] uppercase tracking-[0.24em] text-[#6b776c]">
-                  Free meal planner
-                </p>
-
-                <h1 className="mt-2 font-serif text-5xl leading-[1.02] tracking-tight text-[#243328]">
+                <h1 className="font-serif text-5xl leading-[1.02] tracking-tight text-[#243328]">
                   Turn your box into dinners.
                 </h1>
 
@@ -962,24 +920,8 @@ export default function PlannerPage() {
               )}
             </article>
 
-            <aside className="grid gap-5">
-              <div className="hidden md:block">
-                <RotatingMealExamples />
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <ProductPromptCard
-                  item={weeklyProduceBox}
-                  eyebrow="Best for lighter weeks"
-                  onAdd={() => addDisplayItem(weeklyProduceBox)}
-                />
-
-                <ProductPromptCard
-                  item={familyProduceBox}
-                  eyebrow="Best for fuller kitchens"
-                  onAdd={() => addDisplayItem(familyProduceBox)}
-                />
-              </div>
+            <aside className="hidden md:block">
+              <FeaturedRecipeCards />
             </aside>
           </div>
         </div>
@@ -1255,6 +1197,20 @@ export default function PlannerPage() {
                     Continue shopping
                   </a>
                 </div>
+
+                <div className="grid gap-4">
+                  <ProductPromptCard
+                    item={weeklyProduceBox}
+                    eyebrow="Best for lighter weeks"
+                    onAdd={() => addDisplayItem(weeklyProduceBox)}
+                  />
+
+                  <ProductPromptCard
+                    item={familyProduceBox}
+                    eyebrow="Best for fuller kitchens"
+                    onAdd={() => addDisplayItem(familyProduceBox)}
+                  />
+                </div>
               </aside>
             </div>
 
@@ -1312,7 +1268,7 @@ export default function PlannerPage() {
                     </div>
                   ) : (
                     <p className="mt-5 text-sm leading-6 text-[#667164]">
-                      No close swaps found yet. Rebuild the week or choose a
+                      No close swaps found yet. Try another week or choose a
                       different style.
                     </p>
                   )}
