@@ -1,7 +1,5 @@
 "use client";
 
-import AccountNav from "../account-nav";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "../cart-context";
 import {
@@ -25,9 +23,8 @@ import { saveCookedRecipe } from "../lib/saveCookedRecipe";
 import { getRecentlyCookedSlugs } from "../lib/getRecentlyCookedSlugs";
 import { saveWeek } from "../lib/saveWeek";
 import SiteHeader from "../components/SiteHeader";
-import { getPlannerBasketSuggestions } from "../lib/getPlannerBasketSuggestions";
-import { allShopItems } from "../shop/shop-data";
 import SiteFooter from "../components/SiteFooter";
+
 type PlannerStep = "choices" | "results";
 
 type EatingStyle =
@@ -83,42 +80,6 @@ function ChoiceChip({ active, label, onClick }: ChoiceChipProps) {
   );
 }
 
-function compactCardItem(item: ShopDisplayItem, onAdd: () => void) {
-  return (
-    <div className="rounded-[20px] border border-[#e4dbcf] bg-white/88 p-4 shadow-[0_8px_18px_rgba(36,51,40,0.04)]">
-      <div className="flex items-start gap-3">
-        <img
-          src={item.image}
-          alt={item.name}
-          className="h-16 w-16 rounded-[14px] object-cover"
-        />
-
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-[#243328]">{item.name}</p>
-
-          <p className="mt-1 text-sm leading-6 text-[#667164]">
-            {item.description}
-          </p>
-
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <span className="text-sm font-medium text-[#243328]">
-              £{item.price.toFixed(2)}
-            </span>
-
-            <button
-              type="button"
-              onClick={onAdd}
-              className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.88)] px-3 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function buildCookingSteps(body: string) {
   return body
     .split(". ")
@@ -163,6 +124,98 @@ function getStyleLabel(style: EatingStyle) {
     default:
       return "Weekly plan";
   }
+}
+
+function ProductPromptCard({
+  item,
+  eyebrow,
+  onAdd,
+}: {
+  item: ShopDisplayItem;
+  eyebrow: string;
+  onAdd: () => void;
+}) {
+  return (
+    <article className="overflow-hidden rounded-[26px] border border-[#ddd4c8] bg-white shadow-[0_14px_30px_rgba(36,51,40,0.06)]">
+      <img
+        src={item.image}
+        alt={item.name}
+        className="h-44 w-full object-cover"
+      />
+
+      <div className="p-5">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-[#7b846f]">
+          {eyebrow}
+        </p>
+
+        <div className="mt-2 flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-serif text-2xl leading-tight text-[#243328]">
+              {item.name}
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-[#667164]">
+              {item.description}
+            </p>
+          </div>
+
+          <p className="shrink-0 text-sm font-semibold text-[#243328]">
+            £{item.price.toFixed(2)}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onAdd}
+          className="mt-5 w-full rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          Add to basket
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function CompactShopCard({
+  item,
+  onAdd,
+}: {
+  item: ShopDisplayItem;
+  onAdd: () => void;
+}) {
+  return (
+    <div className="rounded-[20px] border border-[#e4dbcf] bg-white/88 p-4 shadow-[0_8px_18px_rgba(36,51,40,0.04)]">
+      <div className="flex items-start gap-3">
+        <img
+          src={item.image}
+          alt={item.name}
+          className="h-16 w-16 rounded-[14px] object-cover"
+        />
+
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-[#243328]">{item.name}</p>
+
+          <p className="mt-1 text-sm leading-6 text-[#667164]">
+            {item.description}
+          </p>
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <span className="text-sm font-medium text-[#243328]">
+              £{item.price.toFixed(2)}
+            </span>
+
+            <button
+              type="button"
+              onClick={onAdd}
+              className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.88)] px-3 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function PlannerPage() {
@@ -486,6 +539,7 @@ export default function PlannerPage() {
   function addAllAddOns() {
     recommendedAddOns.forEach((item) => addDisplayItem(item));
   }
+
   async function handleCookedThis(recipeSlug: string) {
     const result = await saveCookedRecipe(recipeSlug);
 
@@ -516,46 +570,83 @@ export default function PlannerPage() {
     alert("Week saved.");
   }
 
-  const suggestedProducts = useMemo(() => {
-    const plannerText = week.flatMap((meal) => [
-      meal.title,
-      meal.description,
-      ...(meal.ingredients ?? []),
-    ]);
-
-    return getPlannerBasketSuggestions(plannerText);
-  }, [week]);
-
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
+
+      {recentlyAddedItem ? (
+        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white shadow-[0_12px_30px_rgba(36,51,40,0.22)]">
+          Added {recentlyAddedItem}
+        </div>
+      ) : null}
 
       <div className="px-4 pt-4 sm:px-6 md:hidden">
         <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
           <img
             src="/images/home/plan-your-week.jpg"
-            alt="Build a calmer food week"
+            alt="Fresh produce and pantry ingredients ready for the week"
             className="h-44 w-full object-cover"
           />
         </div>
       </div>
-      <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-6 pt-5 sm:px-6 md:px-10 md:pb-8 md:pt-6">
+
+      <section className="border-b border-[rgba(230,221,210,0.86)] px-4 pb-7 pt-5 sm:px-6 md:px-10 md:pb-10 md:pt-8">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
-            <article className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.84)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-7">
+          <div className="grid gap-5 lg:grid-cols-[1fr_0.95fr]">
+            <article className="rounded-[30px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.88)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
-                Weekly planner
+                Free meal planner
               </p>
 
-              <h1 className="mt-3 max-w-3xl font-serif text-[2rem] leading-[1.02] tracking-tight text-[#243328] md:text-[3.35rem]">
-                Plan your week
+              <h1 className="mt-3 max-w-3xl font-serif text-[2.15rem] leading-[1.02] tracking-tight text-[#243328] md:text-[3.6rem]">
+                Make your produce box easier to use.
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
-                {isLoggedIn
-                  ? "Build a simple week around your produce box and regular staples."
-                  : "Simple meal ideas built around real home cooking."}
+                Choose how many nights you want to cook and get a simple week of
+                meal ideas built around fresh produce, useful pantry staples and
+                real home cooking.
               </p>
+
+              <div className="mt-5 flex flex-wrap gap-2 text-xs text-[#4f5d50]">
+                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
+                  Free to use
+                </span>
+                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
+                  3–7 nights
+                </span>
+                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
+                  Save favourites
+                </span>
+                <span className="rounded-full border border-[#ddd4c8] bg-white/76 px-3 py-1.5">
+                  Add useful extras
+                </span>
+              </div>
+
+              {!hasProduceBox ? (
+                <div className="mt-6 rounded-[22px] border border-[#d8cbbd] bg-white/72 p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Start with a produce box.
+                  </p>
+
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    The planner works best when you have your weekly or family
+                    produce box in mind. Add a box, then use this page to make
+                    the week feel easier.
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-6 rounded-[22px] border border-[#cbd8ca] bg-white/72 p-4">
+                  <p className="text-sm font-medium text-[#243328]">
+                    Produce box added.
+                  </p>
+
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    Now build a week around it and add any pantry extras you
+                    actually need.
+                  </p>
+                </div>
+              )}
 
               {plannerError ? (
                 <div className="mt-5 rounded-[18px] border border-[#e4d8cb] bg-[#fbf6f0] px-4 py-3 text-sm text-[#6a5c4f]">
@@ -632,17 +723,6 @@ export default function PlannerPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-[22px] border border-[#ddd4c8] bg-white/65 p-4">
-                    <p className="text-sm font-medium text-[#243328]">
-                      Built for normal weeks
-                    </p>
-
-                    <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Flexible meal ideas designed to work with your weekly
-                      produce box and pantry basics.
-                    </p>
-                  </div>
-
                   <div className="flex flex-wrap gap-3 pt-1">
                     <button
                       type="button"
@@ -653,12 +733,12 @@ export default function PlannerPage() {
                       {authChecked ? "Build my week" : "Checking account..."}
                     </button>
 
-                    <Link
+                    <a
                       href="/shop"
-                      className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+                      className="rounded-full border border-[#d6cec2] bg-white/78 px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-white"
                     >
-                      Browse the shop
-                    </Link>
+                      Shop produce boxes
+                    </a>
                   </div>
                 </div>
               ) : (
@@ -668,481 +748,386 @@ export default function PlannerPage() {
                     onClick={() => {
                       setStep("choices");
                       setSwapMealId(null);
+                      setOpenDay(null);
                     }}
-                    className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                    className="rounded-full border border-[#d6cec2] bg-white/78 px-5 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
                   >
-                    Preview another week
+                    Change choices
                   </button>
 
-                  <Link
-                    href="/shop"
-                    className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+                  <button
+                    type="button"
+                    onClick={handleBuildWeek}
+                    className="rounded-full bg-[#243328] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
                   >
-                    Browse the shop
-                  </Link>
+                    Rebuild week
+                  </button>
+
+                  {isLoggedIn ? (
+                    <button
+                      type="button"
+                      onClick={handleSaveWeek}
+                      className="rounded-full border border-[#d6cec2] bg-white/78 px-5 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
+                    >
+                      Save week
+                    </button>
+                  ) : null}
                 </div>
               )}
             </article>
 
-            <article className="overflow-hidden rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.86)] shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
-              <div className="relative min-h-[280px]">
-                <img
-                  src="/images/home/week-midweek-cooking.png"
-                  alt="The Local Pantry planner"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+            <aside className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+              <ProductPromptCard
+                item={weeklyProduceBox}
+                eyebrow="Best for lighter weeks"
+                onAdd={() => addDisplayItem(weeklyProduceBox)}
+              />
 
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.28)_52%,rgba(0,0,0,0.42)_100%)]" />
-
-                <div className="relative z-10 flex min-h-[280px] items-end p-6 text-white md:p-7">
-                  <div className="max-w-md">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-white/80">
-                      Food first
-                    </p>
-
-                    <h2 className="mt-2 font-serif text-[1.9rem] leading-tight md:text-[2.35rem]">
-                      Simple dinners for the week ahead
-                    </h2>
-
-                    <p className="mt-3 text-sm leading-6 text-white/86">
-                      Fruit and veg delivery, pantry staples and realistic meal
-                      ideas working together more simply.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </article>
+              <ProductPromptCard
+                item={familyProduceBox}
+                eyebrow="Best for fuller kitchens"
+                onAdd={() => addDisplayItem(familyProduceBox)}
+              />
+            </aside>
           </div>
         </div>
       </section>
 
       {step === "results" ? (
-        <section className="px-4 py-8 sm:px-6 md:px-10 md:py-10">
+        <section className="px-4 py-8 sm:px-6 md:px-10 md:py-12">
           <div className="mx-auto max-w-7xl">
-            <div className="mb-6 rounded-[24px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.05)] md:p-6">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Your week
-              </p>
+            <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+                  Your week
+                </p>
 
-              <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                {getStyleLabel(eatingStyle)}
-              </h3>
-
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5f675c]">
-                {isLoggedIn
-                  ? "This planner avoids meals you have marked as cooked recently."
-                  : "Simple meal ideas designed around flexible weekly cooking."}
-              </p>
-
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Link
-                  href="/shop"
-                  className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
-                >
-                  {isLoggedIn
-                    ? "Choose a produce box"
-                    : "Start with a produce box"}
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleSaveWeek}
-                  disabled={!isLoggedIn || week.length === 0}
-                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Save this week
-                </button>
-
-                <Link
-                  href="/saved-weeks"
-                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
-                >
-                  View My Kitchen
-                </Link>
-
-                {!isLoggedIn ? (
-                  <Link
-                    href="/login"
-                    className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
-                  >
-                    Create account
-                  </Link>
-                ) : null}
+                <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
+                  {getStyleLabel(eatingStyle)}
+                </h2>
               </div>
+
+              <p className="max-w-xl text-sm leading-6 text-[#667164]">
+                Open a meal to see ingredients, quick steps and pantry matches.
+                Swap anything that does not suit.
+              </p>
             </div>
 
-            {!hasProduceBox ? (
-              <div className="mb-6 rounded-[24px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.86)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-6">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                      Start with the box
-                    </p>
-
-                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                      Start with your produce box
-                    </h3>
-
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      The planner works best when your fruit and veg box becomes
-                      the base of the week.
-                    </p>
+            {plannerInsights.length > 0 ? (
+              <div className="mb-6 grid gap-3 md:grid-cols-3">
+                {plannerInsights.slice(0, 3).map((insight) => (
+                  <div
+                    key={insight}
+                    className="rounded-[20px] border border-[#ddd4c8] bg-white/72 p-4 text-sm leading-6 text-[#5f675c]"
+                  >
+                    {insight}
                   </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    {weeklyProduceBox ? (
-                      <button
-                        type="button"
-                        onClick={() => addDisplayItem(weeklyProduceBox)}
-                        className="rounded-full bg-[#243328] px-5 py-2.5 text-sm text-white transition hover:opacity-90"
-                      >
-                        Add weekly box
-                      </button>
-                    ) : null}
-
-                    {familyProduceBox ? (
-                      <button
-                        type="button"
-                        onClick={() => addDisplayItem(familyProduceBox)}
-                        className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
-                      >
-                        Add family box
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
+                ))}
               </div>
             ) : null}
 
-            {selectedSwapMeal ? (
-              <section
-                ref={swapSectionRef}
-                className="scroll-mt-6 mb-6 rounded-[26px] border border-[#d8cbbd] bg-[#fbf6f0] p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)] md:p-6"
-              >
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                      Swap meal
-                    </p>
+            <div className="grid gap-4 lg:grid-cols-[1fr_0.36fr]">
+              <div className="space-y-4">
+                {week.map((meal) => {
+                  const isOpen = openDay === meal.id;
+                  const isSaved = savedRecipeSlugs.includes(meal.recipeSlug);
 
-                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                      Swap {selectedSwapMeal.day}: {selectedSwapMeal.title}
-                    </h3>
-
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      These options keep the same meal style, avoid duplicates,
-                      stay close on effort, and move the flavour in a different
-                      direction.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setSwapMealId(null)}
-                    className="rounded-full border border-[#d6cec2] bg-white/80 px-4 py-2 text-sm text-[#243328] transition hover:bg-white"
-                  >
-                    Close
-                  </button>
-                </div>
-
-                {swapOptions.length > 0 ? (
-                  <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    {swapOptions.map((recipe) => (
-                      <article
-                        key={recipe.slug}
-                        className="overflow-hidden rounded-[22px] border border-[#e2d8cc] bg-white/88 shadow-[0_8px_20px_rgba(36,51,40,0.04)]"
+                  return (
+                    <article
+                      key={meal.id}
+                      className="overflow-hidden rounded-[26px] border border-[#ddd4c8] bg-white/82 shadow-[0_12px_26px_rgba(36,51,40,0.05)]"
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenDay((current) =>
+                            current === meal.id ? null : meal.id,
+                          )
+                        }
+                        className="grid w-full gap-4 p-4 text-left md:grid-cols-[150px_1fr_auto] md:items-center"
                       >
-                        <img
-                          src={recipe.image}
-                          alt={recipe.alt}
-                          className="h-36 w-full object-cover"
-                        />
+                        {meal.imageUrl ? (
+                          <img
+                            src={meal.imageUrl}
+                            alt={meal.title}
+                            className="h-36 w-full rounded-[20px] object-cover md:h-28"
+                          />
+                        ) : (
+                          <div className="h-36 rounded-[20px] bg-[#e8ded1] md:h-28" />
+                        )}
 
-                        <div className="p-4">
-                          <div className="flex flex-wrap gap-1.5">
-                            <span className="rounded-full bg-[#f4efe9] px-2.5 py-1 text-[11px] text-[#5f675c]">
-                              {recipe.time}
-                            </span>
-
-                            <span className="rounded-full bg-[#f4efe9] px-2.5 py-1 text-[11px] text-[#5f675c]">
-                              {recipe.mealType.replace("-", " ")}
-                            </span>
-                          </div>
-
-                          <h4 className="mt-3 font-serif text-xl leading-tight text-[#243328]">
-                            {recipe.title}
-                          </h4>
-
-                          <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#667164]">
-                            {recipe.intro}
-                          </p>
-
-                          <button
-                            type="button"
-                            onClick={() => handleSwapMeal(recipe)}
-                            className="mt-4 w-full rounded-full bg-[#243328] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
-                          >
-                            Choose this meal
-                          </button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-5 rounded-[20px] border border-[#e4d8cb] bg-white/72 p-4 text-sm leading-6 text-[#667164]">
-                    No suitable swaps found yet for this meal. Add more recipes
-                    with the same meal type and dietary style to improve this.
-                  </div>
-                )}
-              </section>
-            ) : null}
-
-            <div className="grid gap-5 lg:grid-cols-2">
-              {week.map((meal) => {
-                const isOpen = openDay === meal.id;
-                const isSwapActive = swapMealId === meal.id;
-
-                return (
-                  <article
-                    key={meal.id}
-                    className={`overflow-hidden rounded-[26px] border bg-[rgba(255,255,255,0.86)] shadow-[0_10px_24px_rgba(36,51,40,0.05)] ${
-                      isSwapActive
-                        ? "border-[#b8a58f] ring-2 ring-[#d8cbbd]"
-                        : "border-[rgba(221,212,200,0.95)]"
-                    }`}
-                  >
-                    <img
-                      src={meal.imageUrl ?? ""}
-                      alt={meal.title}
-                      className="h-56 w-full object-cover"
-                    />
-
-                    <div className="p-5 md:p-6">
-                      <div className="space-y-4">
-                        <div className="min-w-0">
-                          <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.18em] text-[#7b846f]">
                             {meal.day}
                           </p>
 
-                          <h3 className="mt-1 font-serif text-[1.55rem] leading-tight text-[#243328]">
+                          <h3 className="mt-1 font-serif text-2xl leading-tight text-[#243328]">
                             {meal.title}
                           </h3>
 
-                          <p className="mt-3 text-sm leading-6 text-[#667164]">
+                          <p className="mt-2 text-sm leading-6 text-[#667164]">
                             {meal.description}
                           </p>
                         </div>
 
-                        <div className="grid gap-2 sm:flex sm:flex-wrap">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenSwapOptions(meal.id)}
-                            className="rounded-full border border-[#d6cec2] bg-[#243328] px-3.5 py-2 text-xs font-medium text-white transition hover:opacity-90"
-                          >
-                            Swap meal
-                          </button>
+                        <span className="rounded-full border border-[#d6cec2] px-4 py-2 text-sm font-medium text-[#243328]">
+                          {isOpen ? "Close" : "Open"}
+                        </span>
+                      </button>
 
-                          <button
-                            type="button"
-                            onClick={() => handleSaveToRegulars(meal.recipe)}
-                            disabled={
-                              savingRecipeSlug === meal.recipeSlug ||
-                              savedRecipeSlugs.includes(meal.recipeSlug)
-                            }
-                            className="rounded-full border border-[#d6cec2] bg-[rgba(247,242,235,0.84)] px-3.5 py-2 text-xs font-medium text-[#243328] transition hover:bg-white disabled:cursor-default disabled:opacity-70"
-                          >
-                            {savingRecipeSlug === meal.recipeSlug
-                              ? "Saving..."
-                              : savedRecipeSlugs.includes(meal.recipeSlug)
-                                ? "Saved"
-                                : "Save recipe"}
-                          </button>
+                      {isOpen ? (
+                        <div className="border-t border-[#e4dbcf] p-5 md:p-6">
+                          <div className="grid gap-6 md:grid-cols-2">
+                            <div>
+                              <h4 className="text-sm font-semibold text-[#243328]">
+                                Ingredients
+                              </h4>
 
-                          <button
-                            type="button"
-                            onClick={() => handleCookedThis(meal.recipeSlug)}
-                            className="rounded-full border border-[#d6cec2] bg-white/80 px-3.5 py-2 text-xs font-medium text-[#243328] transition hover:bg-white"
-                          >
-                            Cooked this
-                          </button>
-                        </div>
-                      </div>
+                              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-[#667164]">
+                                {meal.ingredients.map((ingredient) => (
+                                  <li key={ingredient}>{ingredient}</li>
+                                ))}
+                              </ul>
+                            </div>
 
-                      {meal.matchedProducts.length > 0 ? (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {meal.matchedProducts.map((product) => (
+                            <div>
+                              <h4 className="text-sm font-semibold text-[#243328]">
+                                Quick method
+                              </h4>
+
+                              <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-[#667164]">
+                                {meal.steps.slice(0, 5).map((stepText) => (
+                                  <li key={stepText}>{stepText}</li>
+                                ))}
+                              </ol>
+                            </div>
+                          </div>
+
+                          {meal.matchedProducts.length > 0 ? (
+                            <div className="mt-6 rounded-[20px] border border-[#ddd4c8] bg-[#f7f2eb] p-4">
+                              <p className="text-sm font-medium text-[#243328]">
+                                Useful pantry matches
+                              </p>
+
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {meal.matchedProducts.map((productName) => (
+                                  <button
+                                    key={productName}
+                                    type="button"
+                                    onClick={() =>
+                                      addProductByName(productName)
+                                    }
+                                    className="rounded-full border border-[#d6cec2] bg-white/82 px-3 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+                                  >
+                                    Add {productName}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null}
+
+                          <div className="mt-6 flex flex-wrap gap-3">
                             <button
-                              key={product}
                               type="button"
-                              onClick={() => addProductByName(product)}
-                              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                                recentlyAddedItem === product
-                                  ? "border-[#5f7f5f] bg-[#eef5ea] text-[#36553c]"
-                                  : "border-[#d6cec2] bg-white/80 text-[#243328] hover:bg-white"
-                              }`}
+                              onClick={() => handleOpenSwapOptions(meal.id)}
+                              className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-[#f7f2eb]"
                             >
-                              {recentlyAddedItem === product
-                                ? "Added ✓"
-                                : `Add ${product}`}
+                              Swap this meal
                             </button>
-                          ))}
+
+                            <button
+                              type="button"
+                              onClick={() => handleSaveToRegulars(meal.recipe)}
+                              disabled={savingRecipeSlug === meal.recipeSlug}
+                              className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-[#f7f2eb] disabled:opacity-60"
+                            >
+                              {isSaved
+                                ? "Saved to My Kitchen"
+                                : savingRecipeSlug === meal.recipeSlug
+                                  ? "Saving..."
+                                  : "Save to My Kitchen"}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleCookedThis(meal.recipeSlug)}
+                              className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-[#f7f2eb]"
+                            >
+                              Cooked this
+                            </button>
+                          </div>
                         </div>
                       ) : null}
+                    </article>
+                  );
+                })}
+              </div>
 
-                      <div className="mt-5 rounded-[20px] border border-[#e6ddd2] bg-[rgba(249,246,241,0.78)] p-4">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setOpenDay((current) =>
-                              current === meal.id ? null : meal.id,
-                            )
-                          }
-                          className="flex w-full items-center justify-between gap-4 text-left"
-                        >
-                          <span className="text-sm font-medium text-[#243328]">
-                            Cooking steps
-                          </span>
+              <aside className="space-y-4">
+                <div className="rounded-[26px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_12px_26px_rgba(36,51,40,0.05)]">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+                    Pantry extras
+                  </p>
 
-                          <span className="text-xs text-[#5f675c]">
-                            {isOpen ? "Hide" : "Show"}
-                          </span>
-                        </button>
+                  <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
+                    Add only what helps.
+                  </h3>
 
-                        {isOpen ? (
-                          <ol className="mt-4 space-y-2.5 text-sm leading-6 text-[#5f675c]">
-                            {meal.steps.map((stepText, index) => (
-                              <li
-                                key={index}
-                                className="flex items-start gap-3"
-                              >
-                                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#d6cec2] text-[10px] text-[#243328]">
-                                  {index + 1}
-                                </span>
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    These are the useful extras matched to this week. Skip
+                    anything you already have.
+                  </p>
 
-                                <span>{stepText}</span>
-                              </li>
-                            ))}
-                          </ol>
-                        ) : null}
+                  {recommendedAddOns.length > 0 ? (
+                    <>
+                      <div className="mt-5 space-y-3">
+                        {recommendedAddOns.map((item) => (
+                          <CompactShopCard
+                            key={item.name}
+                            item={item}
+                            onAdd={() => addDisplayItem(item)}
+                          />
+                        ))}
                       </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
 
-            {week.length > 0 ? (
-              <section className="mt-8 rounded-[26px] border border-[#ddd4c8] bg-[rgba(255,255,255,0.88)] p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-6">
-                <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="max-w-3xl">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                      Why this week works
+                      <button
+                        type="button"
+                        onClick={addAllAddOns}
+                        className="mt-5 w-full rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                      >
+                        Add suggested extras
+                      </button>
+                    </>
+                  ) : (
+                    <p className="mt-4 text-sm leading-6 text-[#667164]">
+                      Build a week to see matched pantry extras.
                     </p>
-
-                    <h3 className="mt-2 font-serif text-2xl text-[#243328]">
-                      Why this week works
-                    </h3>
-
-                    <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Designed to keep cooking realistic, reduce waste and make
-                      the week feel easier.
-                    </p>
-                  </div>
-
-                  <div className="rounded-[24px] border border-[#ded3c6] bg-[#f7f2eb] p-5 text-center shadow-[0_8px_18px_rgba(36,51,40,0.04)]">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
-                      Kitchen flow
-                    </p>
-
-                    <p className="mt-2 font-serif text-4xl text-[#243328]">
-                      {plannerInsights.score}%
-                    </p>
-
-                    <p className="mt-1 text-xs text-[#667164]">
-                      {plannerInsights.summary}
-                    </p>
-                  </div>
+                  )}
                 </div>
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {plannerInsights.insights.map((insight) => (
-                    <article
-                      key={insight.label}
-                      className="rounded-[22px] border border-[#e4dbcf] bg-[#fbf8f3] p-4"
-                    >
-                      <p className="text-sm font-medium text-[#243328]">
-                        {insight.label}
+                <div className="rounded-[26px] border border-[#ddd4c8] bg-[#f7f2eb] p-5">
+                  <p className="text-sm font-medium text-[#243328]">Basket</p>
+
+                  <p className="mt-2 text-sm leading-6 text-[#667164]">
+                    {totalBasketItems === 0
+                      ? "Your basket is empty."
+                      : `${totalBasketItems} item${
+                          totalBasketItems === 1 ? "" : "s"
+                        } in your basket.`}
+                  </p>
+
+                  <a
+                    href="/shop"
+                    className="mt-4 inline-flex rounded-full border border-[#d6cec2] bg-white/78 px-5 py-2.5 text-sm font-medium text-[#243328] transition hover:bg-white"
+                  >
+                    Continue shopping
+                  </a>
+                </div>
+              </aside>
+            </div>
+
+            {swapMealId ? (
+              <section ref={swapSectionRef} className="mt-8">
+                <div className="rounded-[28px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_12px_26px_rgba(36,51,40,0.05)] md:p-6">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
+                        Swap meal
                       </p>
 
-                      <p className="mt-2 text-sm leading-6 text-[#667164]">
-                        {insight.text}
-                      </p>
-                    </article>
-                  ))}
+                      <h3 className="mt-2 font-serif text-2xl leading-tight text-[#243328]">
+                        Choose a replacement
+                      </h3>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSwapMealId(null)}
+                      className="self-start rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] transition hover:bg-[#f7f2eb]"
+                    >
+                      Close swaps
+                    </button>
+                  </div>
+
+                  {swapOptions.length > 0 ? (
+                    <div className="mt-5 grid gap-4 md:grid-cols-3">
+                      {swapOptions.slice(0, 6).map((recipe) => (
+                        <button
+                          key={recipe.slug}
+                          type="button"
+                          onClick={() => handleSwapMeal(recipe)}
+                          className="overflow-hidden rounded-[22px] border border-[#e4dbcf] bg-[#f7f2eb] text-left transition hover:bg-white"
+                        >
+                          {recipe.image ? (
+                            <img
+                              src={recipe.image}
+                              alt={recipe.title}
+                              className="h-32 w-full object-cover"
+                            />
+                          ) : null}
+
+                          <div className="p-4">
+                            <p className="font-serif text-xl leading-tight text-[#243328]">
+                              {recipe.title}
+                            </p>
+
+                            <p className="mt-2 text-sm leading-6 text-[#667164]">
+                              {recipe.intro}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-5 text-sm leading-6 text-[#667164]">
+                      No close swaps found yet. Rebuild the week or choose a
+                      different style.
+                    </p>
+                  )}
                 </div>
               </section>
             ) : null}
           </div>
         </section>
-      ) : null}
-      <section className="mt-12 rounded-[28px] border border-[#ddd4c8] bg-white/78 p-5 shadow-[0_10px_26px_rgba(36,51,40,0.05)] md:p-7">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-              Useful additions
-            </p>
+      ) : (
+        <section className="px-4 py-8 sm:px-6 md:px-10 md:py-12">
+          <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
+            <div className="rounded-[26px] border border-[#ddd4c8] bg-white/76 p-5">
+              <p className="font-serif text-2xl text-[#243328]">
+                Start with the box.
+              </p>
 
-            <h2 className="mt-2 font-serif text-[1.9rem] leading-tight text-[#243328] md:text-[2.3rem]">
-              Pantry extras that fit this week
-            </h2>
+              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                The produce box is the main thing. The planner simply helps you
+                turn it into dinners.
+              </p>
+            </div>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
-              Optional extras that work naturally with the meals in this plan.
-            </p>
+            <div className="rounded-[26px] border border-[#ddd4c8] bg-white/76 p-5">
+              <p className="font-serif text-2xl text-[#243328]">
+                Add what is useful.
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                Pantry extras are suggested only where they make sense for your
+                week.
+              </p>
+            </div>
+
+            <div className="rounded-[26px] border border-[#ddd4c8] bg-white/76 p-5">
+              <p className="font-serif text-2xl text-[#243328]">
+                Save your regulars.
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                Keep meals you actually cook, then build future weeks around
+                your own favourites.
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
+      )}
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {suggestedProducts.map((item) => (
-            <article
-              key={item.name}
-              className="rounded-[22px] border border-[#e2d8cb] bg-[#f8f4ee]/82 p-4"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-20 w-20 items-center justify-center rounded-[18px] bg-white/90 p-3">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="max-h-full object-contain"
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <h3 className="text-sm font-medium text-[#243328]">
-                    {item.name}
-                  </h3>
-
-                  <p className="mt-1 text-sm text-[#5f675c]">
-                    £{item.price.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => addDisplayItem(item)}
-                className={`mt-4 w-full rounded-full px-4 py-3 text-sm font-medium transition ${
-                  recentlyAddedItem === item.name
-                    ? "bg-[#5f7f5f] text-white"
-                    : "bg-[#243328] text-white hover:opacity-90"
-                }`}
-              >
-                {recentlyAddedItem === item.name ? "Added ✓" : "Add to basket"}
-              </button>
-            </article>
-          ))}
-        </div>
-      </section>
       <SiteFooter />
     </main>
   );

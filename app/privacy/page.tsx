@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Privacy Policy | The Local Pantry",
+  title: "Your Privacy | The Local Pantry",
   description:
-    "Privacy Policy for The Local Pantry explaining how personal information is collected, used and protected.",
+    "How The Local Pantry collects, uses and protects customer information.",
 };
 
 export default function PrivacyPage() {
@@ -16,20 +16,34 @@ export default function PrivacyPage() {
 
         <section className="mt-8 rounded-[30px] border border-[#ddd4c8] bg-white/80 p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-10">
           <p className="text-xs uppercase tracking-[0.18em] text-[#6b776c]">
-            Customer information
+            Your information
           </p>
 
           <h1 className="mt-3 font-serif text-4xl leading-tight text-[#243328] md:text-5xl">
-            Privacy Policy
+            Your Privacy
           </h1>
 
           <p className="mt-4 text-sm text-[#5f675c]">Last updated: June 2026</p>
 
           <div className="mt-8 space-y-8 text-sm leading-7 text-[#4f5d50]">
+            <section className="rounded-[24px] bg-[#f7f2eb] p-5 md:p-6">
+              <p className="font-serif text-2xl leading-snug text-[#243328]">
+                We believe your information belongs to you.
+              </p>
+
+              <p className="mt-4">
+                We only collect the information we need to manage your account,
+                process orders, deliver your shopping and provide features such
+                as meal planning and saved recipes.
+              </p>
+
+              <p className="mt-3 font-medium text-[#243328]">
+                We never sell your personal information.
+              </p>
+            </section>
+
             <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                1. Who we are
-              </h2>
+              <h2 className="font-serif text-2xl text-[#243328]">Who we are</h2>
 
               <p className="mt-3">
                 The Local Pantry is responsible for the personal information
@@ -37,6 +51,8 @@ export default function PrivacyPage() {
               </p>
 
               <p className="mt-3">
+                The Local Pantry
+                <br />
                 Cedar House
                 <br />
                 Oakwood Mews
@@ -59,7 +75,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="font-serif text-2xl text-[#243328]">
-                2. Information we collect
+                What information we collect
               </h2>
 
               <p className="mt-3">
@@ -67,203 +83,125 @@ export default function PrivacyPage() {
               </p>
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>Name</li>
-                <li>Email address</li>
-                <li>Delivery address</li>
-                <li>Telephone number</li>
-                <li>Order history</li>
-                <li>Account information</li>
-                <li>Saved meal plans and planner data</li>
-                <li>Shopping lists and saved recipes</li>
-                <li>Communications you send to us</li>
-                <li>Website usage information</li>
+                <li>Your name</li>
+                <li>Your email address</li>
+                <li>Your delivery address</li>
+                <li>Your telephone number, if you provide one</li>
+                <li>Your order history</li>
+                <li>Your account details</li>
+                <li>Saved meal plans, recipes and shopping lists</li>
+                <li>Messages you send to us</li>
+                <li>Basic website usage information</li>
               </ul>
             </section>
 
             <section>
               <h2 className="font-serif text-2xl text-[#243328]">
-                3. How we use your information
+                Why we collect it
               </h2>
 
-              <p className="mt-3">We use personal information to:</p>
+              <p className="mt-3">We use your information to:</p>
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>Process and deliver orders</li>
-                <li>Manage customer accounts</li>
+                <li>Deliver your orders</li>
+                <li>Manage your account</li>
+                <li>Process payments securely</li>
                 <li>Provide customer support</li>
-                <li>Operate the planner and recipe features</li>
-                <li>Create shopping lists and meal plans</li>
-                <li>Respond to enquiries</li>
-                <li>Improve the website and services</li>
-                <li>Send service-related communications</li>
-                <li>Meet legal and regulatory obligations</li>
+                <li>Save your planner and recipe information</li>
+                <li>Send important service updates about your orders</li>
+                <li>Improve the website and customer experience</li>
+                <li>Meet legal, tax and accounting requirements</li>
               </ul>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                4. Legal basis for processing
-              </h2>
-
-              <p className="mt-3">We process information where necessary to:</p>
-
-              <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>Perform a contract with you</li>
-                <li>Comply with legal obligations</li>
-                <li>Pursue legitimate business interests</li>
-                <li>Act on your consent where required</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                5. Payments
-              </h2>
 
               <p className="mt-3">
-                Payments are processed securely through Stripe. We do not store
-                full payment card information on our systems.
+                In legal terms, we use your information where it is needed to
+                provide the service you have asked for, where we have a legal
+                obligation, where we have a legitimate business reason, or where
+                you have given consent.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-serif text-2xl text-[#243328]">Payments</h2>
+
+              <p className="mt-3">
+                Payments are processed securely by Stripe. We do not store your
+                full payment card details on our website.
               </p>
             </section>
 
             <section>
               <h2 className="font-serif text-2xl text-[#243328]">
-                6. Delivery information
+                Who helps us run the service
               </h2>
 
               <p className="mt-3">
-                Delivery addresses and contact details are used only for order
-                fulfilment, customer support and delivery-related communication.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                7. Accounts and planner data
-              </h2>
-
-              <p className="mt-3">
-                If you create an account, we may store planner information,
-                saved recipes, meal plans and shopping lists to provide ongoing
-                access to these features.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                8. Marketing communications
-              </h2>
-
-              <p className="mt-3">
-                If you choose to receive updates from us, we may occasionally
-                send emails about seasonal produce, new products, recipes,
-                service updates and special offers.
-              </p>
-
-              <p className="mt-3">
-                You can unsubscribe from marketing communications at any time.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                9. Sharing information
-              </h2>
-
-              <p className="mt-3">We do not sell personal information.</p>
-
-              <p className="mt-3">
-                We use trusted third-party providers to operate our website and
-                services. These providers may process personal information on
-                our behalf where necessary to deliver their services.
+                We work with trusted providers that help us operate The Local
+                Pantry. These providers only process information where necessary
+                to provide their services.
               </p>
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>
-                  Supabase for customer accounts, authentication, planner data
-                  and database storage.
-                </li>
-                <li>
-                  Stripe for secure payment processing and order transactions.
-                </li>
-                <li>
-                  Vercel for website hosting, infrastructure and performance
-                  monitoring.
-                </li>
-                <li>
-                  Resend for transactional emails, notifications and customer
-                  communications.
-                </li>
-                <li>
-                  Google Workspace and Gmail for business email communication
-                  and customer support.
-                </li>
-                <li>
-                  GitHub for website development, source code management and
-                  deployment workflows.
-                </li>
+                <li>Stripe for secure payment processing</li>
+                <li>Supabase for customer accounts and data storage</li>
+                <li>Vercel for website hosting and performance</li>
+                <li>Resend for service emails and notifications</li>
+                <li>Google Workspace and Gmail for business email</li>
+                <li>GitHub for website development and maintenance</li>
               </ul>
 
               <p className="mt-3">
-                Information may also be disclosed where required by law or to
+                We may also share information if required by law or if needed to
                 protect our legal rights.
               </p>
             </section>
 
             <section>
               <h2 className="font-serif text-2xl text-[#243328]">
-                10. Data retention
+                Marketing emails
               </h2>
 
               <p className="mt-3">
-                We retain personal information only for as long as necessary to
-                provide our services, maintain business records and comply with
-                legal obligations.
+                If you choose to receive updates from us, we may occasionally
+                send emails about seasonal produce, new products, recipes,
+                service updates or special offers.
+              </p>
+
+              <p className="mt-3">
+                You can unsubscribe from marketing emails at any time.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-serif text-2xl text-[#243328]">Cookies</h2>
+
+              <p className="mt-3">
+                We use cookies and similar technologies to keep the website
+                working properly, maintain login sessions, remember preferences,
+                understand how the website is used and improve performance.
+              </p>
+
+              <p className="mt-3">
+                Some of this may be provided through the technical services we
+                use to run the website.
               </p>
             </section>
 
             <section>
               <h2 className="font-serif text-2xl text-[#243328]">
-                11. Security
+                How long we keep information
               </h2>
 
               <p className="mt-3">
-                We take reasonable technical and organisational measures to
-                protect personal information from unauthorised access, misuse,
-                loss or disclosure.
+                We keep personal information only for as long as necessary to
+                provide our services, maintain business records and meet legal,
+                tax and accounting requirements.
               </p>
             </section>
 
             <section>
               <h2 className="font-serif text-2xl text-[#243328]">
-                12. Cookies and analytics
-              </h2>
-
-              <p className="mt-3">
-                We use cookies and similar technologies to ensure the website
-                functions correctly and to understand how visitors use the site.
-              </p>
-
-              <p className="mt-3">These technologies may be used to:</p>
-
-              <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>Maintain login sessions</li>
-                <li>Remember preferences and settings</li>
-                <li>Improve website performance</li>
-                <li>Monitor reliability and usage patterns</li>
-                <li>Improve customer experience</li>
-              </ul>
-
-              <p className="mt-3">
-                Some analytics and infrastructure services may be provided
-                through Vercel and other technical providers used to operate the
-                website.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                13. Your rights
+                Your rights
               </h2>
 
               <p className="mt-3">
@@ -271,39 +209,31 @@ export default function PrivacyPage() {
               </p>
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>Access your personal information</li>
+                <li>Access the personal information we hold about you</li>
                 <li>Correct inaccurate information</li>
-                <li>Request deletion of information</li>
-                <li>Object to certain processing activities</li>
+                <li>Request deletion of your information</li>
+                <li>Object to certain uses of your information</li>
                 <li>Request a copy of your information</li>
               </ul>
 
               <p className="mt-3">
-                To exercise any of these rights, please contact us using the
-                details below.
+                To ask about any of these rights, email{" "}
+                <a
+                  href="mailto:hello@thelocalpantry.shop"
+                  className="underline underline-offset-4"
+                >
+                  hello@thelocalpantry.shop
+                </a>
+                .
               </p>
             </section>
 
             <section>
-              <h2 className="font-serif text-2xl text-[#243328]">
-                14. Contact us
-              </h2>
+              <h2 className="font-serif text-2xl text-[#243328]">Contact us</h2>
 
               <p className="mt-3">
-                If you have any questions about this Privacy Policy or how we
-                handle personal information, please contact:
-              </p>
-
-              <p className="mt-3">
-                The Local Pantry
-                <br />
-                Cedar House
-                <br />
-                Oakwood Mews
-                <br />
-                Lanark
-                <br />
-                ML11 7RH
+                If you have any questions about privacy or how we handle your
+                information, please contact:
               </p>
 
               <p className="mt-3">
@@ -313,6 +243,12 @@ export default function PrivacyPage() {
                 >
                   hello@thelocalpantry.shop
                 </a>
+              </p>
+
+              <p className="mt-3">
+                If you are unhappy with how your information is handled, you
+                also have the right to complain to the UK Information
+                Commissioner's Office.
               </p>
             </section>
           </div>
