@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import { supabase } from "../lib/supabaseClient";
@@ -291,15 +291,6 @@ export default function MyKitchenPage() {
   const hasFavouriteMeals = savedRecipes.length > 0;
   const hasKitchenItems = hasSavedWeeks || hasFavouriteMeals;
 
-  const totalMealsInSavedWeeks = useMemo(
-    () =>
-      savedWeeks.reduce(
-        (total, week) => total + (week.saved_week_meals?.length ?? 0),
-        0,
-      ),
-    [savedWeeks],
-  );
-
   return (
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
@@ -313,12 +304,12 @@ export default function MyKitchenPage() {
               </p>
 
               <h1 className="mt-3 max-w-3xl font-serif text-[2.45rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4rem]">
-                Your collection of favourite dinners.
+                Your favourite dinners, saved.
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
-                Save meals you love, keep useful weekly plans, and make future
-                weeks easier to build.
+                Keep the meals you love, save useful weekly plans, and make
+                future food weeks easier to build.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
@@ -326,14 +317,14 @@ export default function MyKitchenPage() {
                   href="/planner"
                   className="rounded-full bg-[#243328] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
                 >
-                  Plan a new week
+                  Plan a week
                 </Link>
 
                 <Link
                   href="/shop"
                   className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
                 >
-                  Shop pantry
+                  Shop food
                 </Link>
               </div>
             </article>
@@ -344,59 +335,7 @@ export default function MyKitchenPage() {
                 alt="Fresh food and weekly planning"
                 className="h-56 w-full object-cover md:h-72 lg:h-full"
               />
-
-              <div className="grid grid-cols-3 divide-x divide-[#eee5da] border-t border-[#eee5da] bg-[#f7f2eb] lg:hidden">
-                <div className="p-4 text-center">
-                  <p className="font-serif text-3xl text-[#243328]">
-                    {savedRecipes.length}
-                  </p>
-                  <p className="mt-1 text-xs text-[#667164]">Meals</p>
-                </div>
-
-                <div className="p-4 text-center">
-                  <p className="font-serif text-3xl text-[#243328]">
-                    {savedWeeks.length}
-                  </p>
-                  <p className="mt-1 text-xs text-[#667164]">Weeks</p>
-                </div>
-
-                <div className="p-4 text-center">
-                  <p className="font-serif text-3xl text-[#243328]">
-                    {totalMealsInSavedWeeks}
-                  </p>
-                  <p className="mt-1 text-xs text-[#667164]">Planned</p>
-                </div>
-              </div>
             </aside>
-          </div>
-
-          <div className="mt-5 hidden grid-cols-3 gap-4 lg:grid">
-            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)]">
-              <p className="font-serif text-4xl text-[#243328]">
-                {savedRecipes.length}
-              </p>
-              <p className="mt-1 text-sm text-[#667164]">
-                favourite dinner{savedRecipes.length === 1 ? "" : "s"}
-              </p>
-            </div>
-
-            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)]">
-              <p className="font-serif text-4xl text-[#243328]">
-                {savedWeeks.length}
-              </p>
-              <p className="mt-1 text-sm text-[#667164]">
-                saved week{savedWeeks.length === 1 ? "" : "s"}
-              </p>
-            </div>
-
-            <div className="rounded-[24px] border border-[#ddd4c8] bg-white/82 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.04)]">
-              <p className="font-serif text-4xl text-[#243328]">
-                {totalMealsInSavedWeeks}
-              </p>
-              <p className="mt-1 text-sm text-[#667164]">
-                dinners in saved plans
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -412,12 +351,12 @@ export default function MyKitchenPage() {
           {!loading && !isLoggedIn ? (
             <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-6 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-8">
               <h2 className="font-serif text-3xl text-[#243328]">
-                Sign in to save your kitchen.
+                Save your favourite dinners.
               </h2>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
-                Save full weeks, favourite meals and regular dinners so you can
-                come back to them later.
+                Create a free account or sign in to save favourite meals, full
+                weeks and regular dinners.
               </p>
 
               <div className="mt-5 flex flex-wrap gap-3">
@@ -449,12 +388,12 @@ export default function MyKitchenPage() {
           {!loading && isLoggedIn && !hasKitchenItems ? (
             <div className="rounded-[28px] border border-[#ddd4c8] bg-white/86 p-6 shadow-[0_10px_24px_rgba(36,51,40,0.04)] md:p-8">
               <h2 className="font-serif text-3xl text-[#243328]">
-                Nothing saved yet.
+                Your kitchen is empty for now.
               </h2>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164]">
-                Build a week in the planner, then save full weeks or favourite
-                dinners you want to cook again.
+                Build a week in the planner, then save the dinners and weekly
+                plans you want to come back to.
               </p>
 
               <Link
@@ -478,11 +417,12 @@ export default function MyKitchenPage() {
                     </p>
 
                     <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
-                      Dinners you come back to
+                      Meals you want again
                     </h2>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      Your reliable meals. Use them as anchors for future weeks.
+                      Reliable dinners saved from the planner, ready to use in
+                      future weeks.
                     </p>
                   </div>
 
@@ -605,6 +545,8 @@ export default function MyKitchenPage() {
                     >
                       Open planner
                     </Link>
+
+                    <EmptyRecipeInspiration />
                   </div>
                 )}
               </section>
@@ -617,12 +559,12 @@ export default function MyKitchenPage() {
                     </p>
 
                     <h2 className="mt-2 font-serif text-3xl leading-tight text-[#243328] md:text-4xl">
-                      Weekly plans worth repeating
+                      Weeks worth repeating
                     </h2>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667164]">
-                      Load a week back into the planner when you want an easier
-                      food week.
+                      Load a saved plan back into the planner when you want an
+                      easier food week.
                     </p>
                   </div>
 
