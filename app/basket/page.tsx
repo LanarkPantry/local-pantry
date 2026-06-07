@@ -266,7 +266,7 @@ Thanks!`,
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain p-1"
                 />
               </div>
 
