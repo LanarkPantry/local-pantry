@@ -9,10 +9,38 @@ const DELIVERY_FEE = 2.5;
 const FREE_DELIVERY_THRESHOLD = 30;
 
 const LAUNCH_GIFT_OPTIONS = [
-  "Rose Harissa",
-  "Sorrel & Walnut Pesto",
-  "Signature Gochujang",
-  "Vegetable Stock Concentrate",
+  {
+    name: "Rose Harissa Paste",
+    shortName: "Rose Harissa",
+    image: "/images/pantry/rose-harissa.jpg",
+    price: 5.25,
+    description:
+      "Fragrant, gently warm and brilliant with beans, grains and roast vegetables.",
+  },
+  {
+    name: "Sorrel & Walnut Pesto",
+    shortName: "Sorrel & Walnut Pesto",
+    image: "/images/pantry/sorrel-walnut-pesto.jpg",
+    price: 4.5,
+    description:
+      "Fresh, savoury and useful with pasta, potatoes, beans and roasted vegetables.",
+  },
+  {
+    name: "Gochujang Sauce",
+    shortName: "Signature Gochujang",
+    image: "/images/pantry/gochujang-sauce.jpg",
+    price: 5.25,
+    description:
+      "Sweet, savoury and gently spicy for traybakes, bowls, noodles and veg.",
+  },
+  {
+    name: "Vegetable Stock",
+    shortName: "Vegetable Stock",
+    image: "/images/pantry/vegetable-stock.jpg",
+    price: 4.5,
+    description:
+      "A concentrated stock for soups, grains, sauces and everyday cooking.",
+  },
 ] as const;
 
 export default function BasketPage() {
@@ -574,7 +602,7 @@ Thanks!`,
                     Order type
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
-                    Choose your order rhythm
+                    Choose your order frequency
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-[#667164]">
                     Keep this as a one-off order, or repeat just your produce
@@ -660,7 +688,7 @@ Thanks!`,
                                 Weekly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                                For a steady weekly produce rhythm.
+                                For a steady weekly produce delivery.
                               </p>
                             </div>
 
@@ -689,7 +717,7 @@ Thanks!`,
                                 Fortnightly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                                A lighter rhythm if weekly feels too much.
+                                A lighter pattern if weekly feels too much.
                               </p>
                             </div>
 
@@ -747,40 +775,74 @@ Thanks!`,
                       box.
                     </p>
 
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                      {LAUNCH_GIFT_OPTIONS.map((gift) => (
-                        <button
-                          key={gift}
-                          type="button"
-                          onClick={() => setLaunchGift(gift)}
-                          className={`rounded-2xl border p-4 text-left transition ${
-                            launchGift === gift
-                              ? "border-[#314534] bg-[#243328] text-white shadow-[0_10px_25px_rgba(36,51,40,0.08)]"
-                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.82)] text-[#243328] hover:bg-white"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="font-serif text-2xl">{gift}</p>
-                              <p
-                                className={`mt-2 text-sm leading-6 ${
-                                  launchGift === gift
-                                    ? "text-white/75"
-                                    : "text-[#667164]"
-                                }`}
-                              >
-                                Complimentary with your first produce box.
-                              </p>
-                            </div>
+                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                      {LAUNCH_GIFT_OPTIONS.map((gift) => {
+                        const isSelected = launchGift === gift.name;
 
-                            {launchGift === gift && (
-                              <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs text-[#243328]">
-                                Selected
-                              </span>
-                            )}
-                          </div>
-                        </button>
-                      ))}
+                        return (
+                          <button
+                            key={gift.name}
+                            type="button"
+                            onClick={() => setLaunchGift(gift.name)}
+                            className={`overflow-hidden rounded-[24px] border text-left transition ${
+                              isSelected
+                                ? "border-[#314534] bg-[#243328] text-white shadow-[0_14px_30px_rgba(36,51,40,0.14)]"
+                                : "border-[#d6cec2] bg-[rgba(255,255,255,0.86)] text-[#243328] hover:bg-white"
+                            }`}
+                          >
+                            <div className="grid grid-cols-[104px_1fr] gap-0 sm:grid-cols-1">
+                              <div className="h-full min-h-[132px] overflow-hidden bg-[#e8dfd3] sm:h-40">
+                                <img
+                                  src={gift.image}
+                                  alt={gift.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+
+                              <div className="flex min-w-0 flex-col justify-between p-4">
+                                <div>
+                                  <div className="flex items-start justify-between gap-3">
+                                    <p className="font-serif text-xl leading-tight sm:text-2xl">
+                                      {gift.shortName}
+                                    </p>
+
+                                    {isSelected ? (
+                                      <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs text-[#243328]">
+                                        Selected
+                                      </span>
+                                    ) : (
+                                      <span className="shrink-0 rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1 text-xs text-[#5f675c]">
+                                        Free
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <p
+                                    className={`mt-2 text-sm leading-6 ${
+                                      isSelected
+                                        ? "text-white/75"
+                                        : "text-[#667164]"
+                                    }`}
+                                  >
+                                    {gift.description}
+                                  </p>
+                                </div>
+
+                                <p
+                                  className={`mt-3 text-xs ${
+                                    isSelected
+                                      ? "text-white/65"
+                                      : "text-[#7a8478]"
+                                  }`}
+                                >
+                                  Usually £{gift.price.toFixed(2)} ·
+                                  complimentary with your first produce box.
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
 
                     <p className="mt-4 text-xs leading-5 text-[#7a8478]">
