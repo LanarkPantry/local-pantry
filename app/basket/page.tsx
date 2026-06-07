@@ -648,7 +648,8 @@ Thanks!`,
                             Repeat my produce box
                           </div>
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
-                            Your produce box repeats. Add-ons stay flexible.
+                            Your produce box repeats. Add-ons are for this
+                            delivery only.
                           </p>
                         </div>
 
