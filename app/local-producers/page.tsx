@@ -23,7 +23,7 @@ export default function LocalProducersPage() {
                 alt="Local produce, preserves, bread, herbs and food from local growers and makers"
                 width={1400}
                 height={900}
-                className="h-[280px] w-full object-cover object-[35%_50%] md:h-[420px] md:object-center lg:h-full"
+                className="h-[280px] w-full object-cover object-[20%_50%] md:h-[420px] md:object-center lg:h-full"
                 priority
               />
             </div>
