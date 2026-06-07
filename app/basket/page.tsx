@@ -13,7 +13,7 @@ const LAUNCH_GIFT_OPTIONS = [
     name: "Rose Harissa Paste",
     label: "Rose Harissa",
     image: "/images/pantry/rose-harissa.jpg",
-    price: 5.25,
+    price: 3.95,
     description:
       "Fragrant, gently warm and brilliant with beans, grains and roast vegetables.",
   },
@@ -21,7 +21,7 @@ const LAUNCH_GIFT_OPTIONS = [
     name: "Sorrel & Walnut Pesto",
     label: "Sorrel & Walnut Pesto",
     image: "/images/pantry/sorrel-walnut-pesto.jpg",
-    price: 4.5,
+    price: 3.95,
     description:
       "Fresh, savoury and useful with pasta, potatoes, beans and roasted vegetables.",
   },
@@ -29,7 +29,7 @@ const LAUNCH_GIFT_OPTIONS = [
     name: "Gochujang Sauce",
     label: "Signature Gochujang",
     image: "/images/pantry/gochujang-sauce.jpg",
-    price: 5.25,
+    price: 3.95,
     description:
       "Sweet, savoury and gently spicy for traybakes, bowls, noodles and veg.",
   },
@@ -37,7 +37,7 @@ const LAUNCH_GIFT_OPTIONS = [
     name: "Vegetable Stock",
     label: "Vegetable Stock",
     image: "/images/pantry/vegetable-stock.jpg",
-    price: 4.5,
+    price: 3.5,
     description:
       "A concentrated stock for soups, grains, sauces and everyday cooking.",
   },
@@ -433,8 +433,7 @@ Thanks!`,
                 Review your basket for the week ahead
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#667164] md:text-base">
-                Choose a one-off order, or repeat your produce box weekly or
-                fortnightly. Pantry extras stay flexible.
+                Choose a one-off order or regular produce box delivery.
               </p>
             </div>
 
@@ -491,17 +490,6 @@ Thanks!`,
             <section className="min-w-0 space-y-6">
               <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
                 <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
-                  <div className="rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.82)] p-4">
-                    <p className="text-sm font-medium text-[#243328]">
-                      Only your box repeats
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Keep the whole order one-off, or repeat just your produce
-                      box. Pantry extras stay one-off and can be added when
-                      needed.
-                    </p>
-                  </div>
-
                   <div className="mt-5 flex flex-col gap-2 border-b border-[#ece4d8] pb-4 sm:flex-row sm:items-end sm:justify-between">
                     <div className="min-w-0">
                       <h2 className="font-serif text-3xl">Your basket</h2>
@@ -602,12 +590,8 @@ Thanks!`,
                     Order type
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
-                    Choose your order rhythm
+                    How would you like to order?
                   </h2>
-                  <p className="mt-3 text-sm leading-6 text-[#667164]">
-                    Keep this as a one-off order, or repeat just your produce
-                    box. Pantry extras stay flexible.
-                  </p>
 
                   <div className="mt-5 grid gap-3 md:grid-cols-2">
                     <button
@@ -652,8 +636,7 @@ Thanks!`,
                             Repeat my produce box
                           </div>
                           <p className="mt-2 text-sm leading-6 text-[#667164]">
-                            Only your produce box repeats. Pantry extras stay
-                            one-off.
+                            Your produce box repeats. Add-ons stay flexible.
                           </p>
                         </div>
 
@@ -688,7 +671,7 @@ Thanks!`,
                                 Weekly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                                For a steady weekly produce rhythm.
+                                For a steady weekly produce delivery.
                               </p>
                             </div>
 
@@ -717,7 +700,7 @@ Thanks!`,
                                 Fortnightly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                                A lighter rhythm if weekly feels too much.
+                                A lighter frequency if weekly feels too much.
                               </p>
                             </div>
 
@@ -729,10 +712,6 @@ Thanks!`,
                           </div>
                         </button>
                       </div>
-
-                      <p className="mt-4 text-sm leading-6 text-[#667164]">
-                        You can still add pantry extras whenever you need them.
-                      </p>
                     </div>
                   )}
 
@@ -770,8 +749,7 @@ Thanks!`,
                     </h2>
 
                     <p className="mt-3 text-sm leading-6 text-[#667164]">
-                      As a thank you for being one of our first customers,
-                      choose a complimentary pantry item with your first produce
+                      Choose a complimentary pantry item with your first produce
                       box.
                     </p>
 
@@ -833,7 +811,7 @@ Thanks!`,
                                       : "text-[#7a8478]"
                                   }`}
                                 >
-                                  Usually £{gift.price.toFixed(2)}
+                                  Included free
                                 </p>
                               </div>
                             </div>
@@ -898,11 +876,8 @@ Thanks!`,
 
                 <div className="mt-4 rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-5">
                   {summaryRow("Items", `${totalItems}`)}
-                  {summaryRow(
-                    "Boxes that can repeat",
-                    `${subscriptionItemCount}`,
-                  )}
-                  {summaryRow("One-off add-ons", `${oneOffItemCount}`)}
+                  {summaryRow("Produce boxes", `${subscriptionItemCount}`)}
+                  {summaryRow("Pantry extras", `${oneOffItemCount}`)}
                   {summaryRow("Order type", orderTypeLabel)}
                   {hasProduceBox
                     ? summaryRow(
