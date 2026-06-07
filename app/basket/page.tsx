@@ -134,7 +134,7 @@ ${basketSummaryText}
 Order type: ${whatsappOrderTypeText}
 ${hasProduceBox && launchGift ? `Launch gift: ${launchGift}` : ""}
 
-Boxes that can repeat: ${subscriptionItemCount}
+Produce boxes: ${subscriptionItemCount}
 One-off items: ${oneOffItemCount}
 
 Subtotal: £${subtotal.toFixed(2)}
@@ -259,63 +259,75 @@ Thanks!`,
         {items.map(({ item, quantity }) => (
           <div
             key={item.name}
-            className="rounded-2xl border border-[#e7dfd3] bg-[rgba(255,255,255,0.82)] p-4"
+            className="rounded-2xl border border-[#e7dfd3] bg-[rgba(255,255,255,0.82)] p-3"
           >
-            <div className="flex min-w-0 flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="min-w-0">
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <h3 className="min-w-0 break-words text-base font-medium text-[#243328] md:text-lg">
-                    {item.name}
-                  </h3>
-
-                  <span className="max-w-full rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-[11px] leading-5 text-[#5f675c]">
-                    {sectionType === "subscription"
-                      ? "Can repeat"
-                      : "One-off add-on"}
-                  </span>
-                </div>
-
-                <p className="mt-1 text-sm text-[#6d756a]">
-                  £{item.price.toFixed(2)} each
-                </p>
+            <div className="flex min-w-0 gap-3">
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#e5ddcf] bg-[#e8dfd3] md:h-24 md:w-24">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="h-full w-full object-cover"
+                />
               </div>
 
-              <div className="flex min-w-0 flex-wrap items-center gap-3">
-                <div className="inline-flex shrink-0 items-center rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)]">
-                  <button
-                    type="button"
-                    onClick={() => removeOneFromCart(item.name)}
-                    className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
-                    aria-label={`Decrease quantity of ${item.name}`}
-                  >
-                    −
-                  </button>
+              <div className="min-w-0 flex-1">
+                <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <h3 className="min-w-0 break-words text-base font-medium text-[#243328] md:text-lg">
+                        {item.name}
+                      </h3>
 
-                  <span className="min-w-[2rem] text-center text-sm">
-                    {quantity}
-                  </span>
+                      <span className="max-w-full rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-3 py-1 text-[11px] leading-5 text-[#5f675c]">
+                        {sectionType === "subscription"
+                          ? "Can repeat"
+                          : "One-off add-on"}
+                      </span>
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={() => addToCart(item)}
-                    className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
-                    aria-label={`Increase quantity of ${item.name}`}
-                  >
-                    +
-                  </button>
+                    <p className="mt-1 text-sm text-[#6d756a]">
+                      £{item.price.toFixed(2)} each
+                    </p>
+                  </div>
+
+                  <div className="flex min-w-0 flex-wrap items-center gap-3">
+                    <div className="inline-flex shrink-0 items-center rounded-full border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)]">
+                      <button
+                        type="button"
+                        onClick={() => removeOneFromCart(item.name)}
+                        className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
+                        aria-label={`Decrease quantity of ${item.name}`}
+                      >
+                        −
+                      </button>
+
+                      <span className="min-w-[2rem] text-center text-sm">
+                        {quantity}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => addToCart(item)}
+                        className="px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f3eee7]"
+                        aria-label={`Increase quantity of ${item.name}`}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <div className="min-w-[64px] shrink-0 text-sm font-medium text-[#243328]">
+                      £{(item.price * quantity).toFixed(2)}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => clearItemFromCart(item.name)}
+                      className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-
-                <div className="min-w-[64px] shrink-0 text-sm font-medium text-[#243328]">
-                  £{(item.price * quantity).toFixed(2)}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => clearItemFromCart(item.name)}
-                  className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
-                >
-                  Remove
-                </button>
               </div>
             </div>
           </div>
@@ -509,7 +521,7 @@ Thanks!`,
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <div>
                           <h3 className="text-sm font-medium text-[#243328]">
-                            Boxes that can repeat
+                            Produce boxes
                           </h3>
                           <p className="mt-1 text-sm text-[#667164]">
                             These only repeat if you choose weekly or every two
@@ -532,7 +544,7 @@ Thanks!`,
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <div>
                           <h3 className="text-sm font-medium text-[#243328]">
-                            One-off add-ons
+                            Pantry extras
                           </h3>
                           <p className="mt-1 text-sm text-[#667164]">
                             These stay one-off, whatever you choose for your
