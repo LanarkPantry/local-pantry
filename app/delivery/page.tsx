@@ -23,8 +23,8 @@ export default function DeliveryPage() {
 
                 <p className="mt-6 max-w-2xl text-base leading-8 text-white/78 md:text-lg">
                   Weekly fruit and veg boxes, optional regular staples and
-                  simple meal support delivered locally every Tuesday and
-                  Wednesday.
+                  simple meal support delivered locally every week or fortnight.
+                  Choose your preference at the checkout.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
