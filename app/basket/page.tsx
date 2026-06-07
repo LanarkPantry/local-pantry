@@ -8,6 +8,13 @@ import SiteFooter from "../components/SiteFooter";
 const DELIVERY_FEE = 2.5;
 const FREE_DELIVERY_THRESHOLD = 30;
 
+const LAUNCH_GIFT_OPTIONS = [
+  "Rose Harissa",
+  "Sorrel & Walnut Pesto",
+  "Signature Gochujang",
+  "Vegetable Stock Concentrate",
+] as const;
+
 export default function BasketPage() {
   const {
     cart,
@@ -25,6 +32,7 @@ export default function BasketPage() {
     "weekly" | "fortnightly"
   >("weekly");
   const [deliveryNotes, setDeliveryNotes] = useState("");
+  const [launchGift, setLaunchGift] = useState("");
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [pauseEmail, setPauseEmail] = useState("");
@@ -66,6 +74,8 @@ export default function BasketPage() {
     );
   }, [groupedCart]);
 
+  const hasProduceBox = subscriptionItemCount > 0;
+
   const basketSummaryText = useMemo(() => {
     if (groupedCart.length === 0) return "No items yet";
 
@@ -94,6 +104,7 @@ I'd like to place an order:
 ${basketSummaryText}
 
 Order type: ${whatsappOrderTypeText}
+${hasProduceBox && launchGift ? `Launch gift: ${launchGift}` : ""}
 
 Boxes that can repeat: ${subscriptionItemCount}
 One-off items: ${oneOffItemCount}
@@ -109,6 +120,14 @@ Thanks!`,
   const startCheckout = async () => {
     try {
       setCheckoutError("");
+
+      if (hasProduceBox && !launchGift) {
+        setCheckoutError(
+          "Please choose your free launch pantry item before checkout.",
+        );
+        return;
+      }
+
       setIsLoadingCheckout(true);
 
       const response = await fetch("/api/checkout", {
@@ -121,6 +140,7 @@ Thanks!`,
           isSubscription,
           subscriptionFrequency,
           deliveryNotes,
+          launchGift: hasProduceBox ? launchGift : "",
           subtotal,
           delivery,
           total: orderTotal,
@@ -710,6 +730,67 @@ Thanks!`,
                 </div>
               </div>
 
+              {hasProduceBox && (
+                <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
+                  <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                      Launch thank you
+                    </p>
+
+                    <h2 className="mt-2 font-serif text-3xl">
+                      Choose your free pantry item
+                    </h2>
+
+                    <p className="mt-3 text-sm leading-6 text-[#667164]">
+                      As a thank you for being one of our first customers,
+                      choose a complimentary pantry item with your first produce
+                      box.
+                    </p>
+
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      {LAUNCH_GIFT_OPTIONS.map((gift) => (
+                        <button
+                          key={gift}
+                          type="button"
+                          onClick={() => setLaunchGift(gift)}
+                          className={`rounded-2xl border p-4 text-left transition ${
+                            launchGift === gift
+                              ? "border-[#314534] bg-[#243328] text-white shadow-[0_10px_25px_rgba(36,51,40,0.08)]"
+                              : "border-[#d6cec2] bg-[rgba(255,255,255,0.82)] text-[#243328] hover:bg-white"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-serif text-2xl">{gift}</p>
+                              <p
+                                className={`mt-2 text-sm leading-6 ${
+                                  launchGift === gift
+                                    ? "text-white/75"
+                                    : "text-[#667164]"
+                                }`}
+                              >
+                                Complimentary with your first produce box.
+                              </p>
+                            </div>
+
+                            {launchGift === gift && (
+                              <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs text-[#243328]">
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    <p className="mt-4 text-xs leading-5 text-[#7a8478]">
+                      One launch gift per first produce box order. We'll add it
+                      manually when packing your delivery.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
                 <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
@@ -764,6 +845,12 @@ Thanks!`,
                   )}
                   {summaryRow("One-off add-ons", `${oneOffItemCount}`)}
                   {summaryRow("Order type", orderTypeLabel)}
+                  {hasProduceBox
+                    ? summaryRow(
+                        "Launch gift",
+                        launchGift || "Choose before checkout",
+                      )
+                    : null}
                   {summaryRow(
                     "Boxes total",
                     `£${subscriptionSubtotal.toFixed(2)}`,
@@ -799,12 +886,18 @@ Thanks!`,
                   <button
                     type="button"
                     onClick={startCheckout}
-                    disabled={cart.length === 0 || isLoadingCheckout}
+                    disabled={
+                      cart.length === 0 ||
+                      isLoadingCheckout ||
+                      (hasProduceBox && !launchGift)
+                    }
                     className="w-full rounded-2xl bg-gradient-to-r from-[#334e39] to-[#5a5326] px-6 py-4 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isLoadingCheckout
                       ? "Opening checkout..."
-                      : "Continue to checkout"}
+                      : hasProduceBox && !launchGift
+                        ? "Choose your free gift"
+                        : "Continue to checkout"}
                   </button>
 
                   <a

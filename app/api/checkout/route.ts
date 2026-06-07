@@ -9,6 +9,8 @@ if (!stripeSecretKey) {
 
 const stripe = new Stripe(stripeSecretKey);
 
+type SubscriptionFrequency = "weekly" | "fortnightly";
+
 type CartItem = {
   name: string;
   price: number;
@@ -18,7 +20,9 @@ type CartItem = {
 type CheckoutBody = {
   cart?: CartItem[];
   isSubscription?: boolean;
+  subscriptionFrequency?: SubscriptionFrequency;
   deliveryNotes?: string;
+  launchGift?: string;
   subtotal?: number;
   delivery?: number;
   total?: number;
@@ -41,8 +45,9 @@ function buildOneOffLineItem(
   };
 }
 
-function buildWeeklySubscriptionLineItem(
+function buildSubscriptionLineItem(
   item: CartItem,
+  subscriptionFrequency: SubscriptionFrequency,
 ): Stripe.Checkout.SessionCreateParams.LineItem {
   return {
     quantity: 1,
@@ -53,6 +58,7 @@ function buildWeeklySubscriptionLineItem(
       },
       recurring: {
         interval: "week",
+        interval_count: subscriptionFrequency === "fortnightly" ? 2 : 1,
       },
       unit_amount: Math.round(item.price * 100),
     },
@@ -68,9 +74,17 @@ export async function POST(req: Request) {
       ? body.subscriptionItems
       : [];
     const oneOffItems = Array.isArray(body.oneOffItems) ? body.oneOffItems : [];
+
     const delivery = typeof body.delivery === "number" ? body.delivery : 0;
     const deliveryNotes =
       typeof body.deliveryNotes === "string" ? body.deliveryNotes : "";
+
+    const launchGift =
+      typeof body.launchGift === "string" ? body.launchGift : "";
+
+    const subscriptionFrequency: SubscriptionFrequency =
+      body.subscriptionFrequency === "fortnightly" ? "fortnightly" : "weekly";
+
     const isSubscription = Boolean(body.isSubscription);
 
     if (cart.length === 0) {
@@ -85,11 +99,16 @@ export async function POST(req: Request) {
     let mode: Stripe.Checkout.SessionCreateParams.Mode = "payment";
     let line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
-    if (isSubscription && subscriptionItems.length > 0) {
+    const orderType =
+      isSubscription && subscriptionItems.length > 0
+        ? "subscription"
+        : "oneoff";
+
+    if (orderType === "subscription") {
       mode = "subscription";
 
-      const recurringLineItems = subscriptionItems.map(
-        buildWeeklySubscriptionLineItem,
+      const recurringLineItems = subscriptionItems.map((item) =>
+        buildSubscriptionLineItem(item, subscriptionFrequency),
       );
 
       const oneOffLineItems = oneOffItems.map(buildOneOffLineItem);
@@ -127,21 +146,29 @@ export async function POST(req: Request) {
       }
     }
 
+    const metadata = {
+      deliveryNotes: deliveryNotes.slice(0, 500),
+      launchGift: launchGift.slice(0, 100),
+      orderType,
+      subscriptionFrequency,
+      subscriptionItemCount: String(subscriptionItems.length),
+      oneOffItemCount: String(oneOffItems.length),
+    };
+
     const session = await stripe.checkout.sessions.create({
       mode,
       payment_method_types: ["card"],
       line_items,
       success_url: `${origin}/basket?success=true`,
       cancel_url: `${origin}/basket?cancelled=true`,
-      metadata: {
-        deliveryNotes: deliveryNotes.slice(0, 500),
-        orderType:
-          isSubscription && subscriptionItems.length > 0
-            ? "subscription"
-            : "oneoff",
-        subscriptionItemCount: String(subscriptionItems.length),
-        oneOffItemCount: String(oneOffItems.length),
-      },
+      metadata,
+      ...(mode === "subscription"
+        ? {
+            subscription_data: {
+              metadata,
+            },
+          }
+        : {}),
     });
 
     if (!session.url) {
