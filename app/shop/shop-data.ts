@@ -42,7 +42,7 @@ export const produceBoxes: ShopDisplayItem[] = [
 export const pantryItems: ShopDisplayItem[] = [
   {
     name: "Vegetable Stock",
-    price: 4.5,
+    price: 3.5,
     image: "/images/pantry/vegetable-stock.jpg",
     category: "pantry",
     checkoutType: "one-off",
@@ -56,7 +56,7 @@ export const pantryItems: ShopDisplayItem[] = [
 
   {
     name: "Sorrel & Walnut Pesto",
-    price: 4.5,
+    price: 3.95,
     image: "/images/pantry/sorrel-walnut-pesto.jpg",
     category: "pantry",
     checkoutType: "one-off",
@@ -70,7 +70,7 @@ export const pantryItems: ShopDisplayItem[] = [
 
   {
     name: "Gochujang Sauce",
-    price: 5.25,
+    price: 3.95,
     image: "/images/pantry/gochujang-sauce.jpg",
     category: "pantry",
     checkoutType: "one-off",
@@ -84,7 +84,7 @@ export const pantryItems: ShopDisplayItem[] = [
 
   {
     name: "Rose Harissa Paste",
-    price: 5.25,
+    price: 3.95,
     image: "/images/pantry/rose-harissa.jpg",
     category: "pantry",
     checkoutType: "one-off",
@@ -196,7 +196,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Polenta",
-    price: 4.0,
+    price: 2.75,
     image: "/images/cupboard/polenta.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -208,7 +208,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Puy Lentils",
-    price: 4.5,
+    price: 3.95,
     image: "/images/cupboard/puy-lentils.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -220,7 +220,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Short Grain Rice",
-    price: 4.75,
+    price: 3.75,
     image: "/images/cupboard/short-grain-rice.jpg",
     category: "cupboard",
     checkoutType: "one-off",
@@ -232,7 +232,7 @@ export const cupboardItems: ShopDisplayItem[] = [
   },
   {
     name: "Farro",
-    price: 5.5,
+    price: 3.95,
     image: "/images/cupboard/farro.jpg",
     category: "cupboard",
     checkoutType: "one-off",

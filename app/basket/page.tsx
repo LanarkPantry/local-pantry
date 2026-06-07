@@ -11,7 +11,7 @@ const FREE_DELIVERY_THRESHOLD = 30;
 const LAUNCH_GIFT_OPTIONS = [
   {
     name: "Rose Harissa Paste",
-    shortName: "Rose Harissa",
+    label: "Rose Harissa",
     image: "/images/pantry/rose-harissa.jpg",
     price: 5.25,
     description:
@@ -19,7 +19,7 @@ const LAUNCH_GIFT_OPTIONS = [
   },
   {
     name: "Sorrel & Walnut Pesto",
-    shortName: "Sorrel & Walnut Pesto",
+    label: "Sorrel & Walnut Pesto",
     image: "/images/pantry/sorrel-walnut-pesto.jpg",
     price: 4.5,
     description:
@@ -27,7 +27,7 @@ const LAUNCH_GIFT_OPTIONS = [
   },
   {
     name: "Gochujang Sauce",
-    shortName: "Signature Gochujang",
+    label: "Signature Gochujang",
     image: "/images/pantry/gochujang-sauce.jpg",
     price: 5.25,
     description:
@@ -35,7 +35,7 @@ const LAUNCH_GIFT_OPTIONS = [
   },
   {
     name: "Vegetable Stock",
-    shortName: "Vegetable Stock",
+    label: "Vegetable Stock",
     image: "/images/pantry/vegetable-stock.jpg",
     price: 4.5,
     description:
@@ -602,7 +602,7 @@ Thanks!`,
                     Order type
                   </p>
                   <h2 className="mt-2 font-serif text-3xl">
-                    Choose your order frequency
+                    Choose your order rhythm
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-[#667164]">
                     Keep this as a one-off order, or repeat just your produce
@@ -688,7 +688,7 @@ Thanks!`,
                                 Weekly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                                For a steady weekly produce delivery.
+                                For a steady weekly produce rhythm.
                               </p>
                             </div>
 
@@ -717,7 +717,7 @@ Thanks!`,
                                 Fortnightly
                               </div>
                               <p className="mt-2 text-sm leading-6 text-[#667164]">
-                                A lighter pattern if weekly feels too much.
+                                A lighter rhythm if weekly feels too much.
                               </p>
                             </div>
 
@@ -775,7 +775,7 @@ Thanks!`,
                       box.
                     </p>
 
-                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
                       {LAUNCH_GIFT_OPTIONS.map((gift) => {
                         const isSelected = launchGift === gift.name;
 
@@ -784,14 +784,14 @@ Thanks!`,
                             key={gift.name}
                             type="button"
                             onClick={() => setLaunchGift(gift.name)}
-                            className={`overflow-hidden rounded-[24px] border text-left transition ${
+                            className={`rounded-2xl border p-3 text-left transition ${
                               isSelected
-                                ? "border-[#314534] bg-[#243328] text-white shadow-[0_14px_30px_rgba(36,51,40,0.14)]"
-                                : "border-[#d6cec2] bg-[rgba(255,255,255,0.86)] text-[#243328] hover:bg-white"
+                                ? "border-2 border-[#314534] bg-[#243328] text-white shadow-[0_10px_25px_rgba(36,51,40,0.1)]"
+                                : "border border-[#d6cec2] bg-[rgba(255,255,255,0.82)] text-[#243328] hover:bg-white"
                             }`}
                           >
-                            <div className="grid grid-cols-[104px_1fr] gap-0 sm:grid-cols-1">
-                              <div className="h-full min-h-[132px] overflow-hidden bg-[#e8dfd3] sm:h-40">
+                            <div className="flex items-start gap-3">
+                              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#e5ddcf] bg-[#e8dfd3]">
                                 <img
                                   src={gift.image}
                                   alt={gift.name}
@@ -799,44 +799,41 @@ Thanks!`,
                                 />
                               </div>
 
-                              <div className="flex min-w-0 flex-col justify-between p-4">
-                                <div>
-                                  <div className="flex items-start justify-between gap-3">
-                                    <p className="font-serif text-xl leading-tight sm:text-2xl">
-                                      {gift.shortName}
-                                    </p>
-
-                                    {isSelected ? (
-                                      <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs text-[#243328]">
-                                        Selected
-                                      </span>
-                                    ) : (
-                                      <span className="shrink-0 rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-3 py-1 text-xs text-[#5f675c]">
-                                        Free
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  <p
-                                    className={`mt-2 text-sm leading-6 ${
-                                      isSelected
-                                        ? "text-white/75"
-                                        : "text-[#667164]"
-                                    }`}
-                                  >
-                                    {gift.description}
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-start justify-between gap-2">
+                                  <p className="font-serif text-xl leading-tight">
+                                    {gift.label}
                                   </p>
+
+                                  {isSelected ? (
+                                    <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] text-[#243328]">
+                                      Selected
+                                    </span>
+                                  ) : (
+                                    <span className="shrink-0 rounded-full border border-[#ddd4c8] bg-[#f7f2eb] px-2.5 py-1 text-[11px] text-[#5f675c]">
+                                      Free
+                                    </span>
+                                  )}
                                 </div>
 
                                 <p
-                                  className={`mt-3 text-xs ${
+                                  className={`mt-1.5 text-xs leading-5 ${
                                     isSelected
-                                      ? "text-white/65"
+                                      ? "text-white/75"
+                                      : "text-[#667164]"
+                                  }`}
+                                >
+                                  {gift.description}
+                                </p>
+
+                                <p
+                                  className={`mt-2 text-[11px] ${
+                                    isSelected
+                                      ? "text-white/60"
                                       : "text-[#7a8478]"
                                   }`}
                                 >
-                                  Usually £{gift.price.toFixed(2)} ·
-                                  complimentary with your first produce box.
+                                  Usually £{gift.price.toFixed(2)}
                                 </p>
                               </div>
                             </div>
