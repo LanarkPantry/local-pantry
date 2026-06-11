@@ -44,6 +44,37 @@ export default function ShopPage() {
     return quantityByName[itemName] ?? 0;
   }
 
+  function getShortLine(item: ShopDisplayItem) {
+    if (item.name === "Sorrel & Walnut Pesto") return "Fresh & herbaceous";
+    if (item.name === "Rose Harissa Paste") return "Warm & fragrant";
+    if (item.name === "Vegetable Stock") return "Deep savoury base";
+    if (item.name === "Gochujang Sauce") return "Sweet, savoury & spicy";
+
+    if (item.name === "Farro") return "Nutty ancient grain";
+    if (item.name === "Polenta") return "Italian cornmeal";
+    if (item.name === "Bucatini") return "Hollow pasta";
+    if (item.name === "Casarecce Pasta") return "Twisted pasta";
+    if (item.name === "Orzo Pasta") return "Rice-shaped pasta";
+    if (item.name === "Giant Couscous") return "Pearl pasta";
+    if (item.name === "Puy Lentils") return "Rich & peppery";
+    if (item.name === "Risotto Rice") return "For creamy risotto";
+
+    if (item.name === "Blanched Almonds") return "For baking & breakfasts";
+    if (item.name === "Walnuts") return "Great with salads";
+    if (item.name === "Hazelnuts") return "Perfect for baking";
+    if (item.name === "Cashews") return "Soft, rich & useful";
+
+    if (item.name.includes("Butter Beans")) return "Large & creamy";
+    if (item.name.includes("Chickpeas")) return "Pantry essential";
+    if (item.name.includes("White Beans")) return "Creamy white beans";
+    if (item.name === "Mutti Polpa Tomatoes") return "Sauce base";
+
+    if (item.name === "Weekly Produce Box") return "Fruit & veg for the week";
+    if (item.name === "Family Produce Box") return "For fuller weekly cooking";
+
+    return item.description;
+  }
+
   function addDisplayItemToCart(item: ShopDisplayItem) {
     addToCart({
       name: item.name,
@@ -154,6 +185,10 @@ export default function ShopPage() {
                 {item.name}
               </h3>
 
+              <p className="mt-1 text-xs leading-5 text-[#6b776c] sm:text-sm">
+                {getShortLine(item)}
+              </p>
+
               <div className="mt-3">
                 <span className="inline-flex rounded-full border border-[#ddd4c8] bg-white/90 px-3 py-1.5 text-sm font-medium text-[#243328]">
                   {formatPrice(item.price)}
@@ -261,11 +296,11 @@ export default function ShopPage() {
               </div>
             </article>
 
-            <article className="hidden overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/80 shadow-[0_10px_24px_rgba(36,51,40,0.05)] md:block">
+            <article className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/80 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
               <img
                 src="/images/home/local-delivery.jpg"
                 alt="A Local Pantry delivery with fresh produce and pantry staples"
-                className="h-full min-h-[270px] w-full object-cover"
+                className="h-[185px] w-full object-cover md:h-full md:min-h-[270px]"
               />
             </article>
           </div>
