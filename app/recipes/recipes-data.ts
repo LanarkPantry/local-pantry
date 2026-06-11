@@ -3262,69 +3262,6 @@ export const recipes: Recipe[] = [
     flavourProfile: ["bright", "coconut"],
     isQuick: false,
   },
-];
-
-export const useItUpIdeas = [
-  {
-    title: "Herby Grain Bowl",
-    text: "Use cooked grains, roast vegetables, leaves, lemon, and any soft herbs. Finish with pesto, tahini, yoghurt, or olive oil.",
-  },
-  {
-    title: "Soup from Almost Anything",
-    text: "Soften veg, add stock or water, then blend if you want it smooth. Miso, harissa, tomatoes, or pesto can shift the flavour quickly.",
-  },
-  {
-    title: "End-of-Week Roast Tin",
-    text: "Roast what needs using with oil and salt, then finish with herbs, lemon, yoghurt, tahini, or something punchy from a jar.",
-  },
-  {
-    title: "Beans on Something Better Than Toast",
-    text: "Warm beans with tomatoes, greens, miso, harissa, or stock, then spoon over toast, potatoes, rice, or couscous.",
-  },
-  {
-    title: "Pasta with the Last Good Things",
-    text: "Use pasta as a base for greens, soft tomatoes, roast veg, herbs, nuts, or a spoon of pesto loosened with pasta water.",
-  },
-  {
-    title: "Soft Fruit Bowl",
-    text: "If berries, pears, apples, or bananas are softening, spoon them over yoghurt with caramel, chocolate spread, nuts, or toasted oats.",
-  },
-];
-
-export const prompts = [
-  {
-    ingredient: "Broccoli",
-    idea: "Roast until the edges char, then add gochujang, lemon, yoghurt, or crispy chickpeas.",
-  },
-  {
-    ingredient: "Courgettes",
-    idea: "Char in a hot pan and fold through bucatini, pesto, lemon, or basil oil.",
-  },
-  {
-    ingredient: "Tomatoes",
-    idea: "Cook down until jammy for pasta, beans, or toast. Finish with basil or black pepper.",
-  },
-  {
-    ingredient: "Mushrooms",
-    idea: "Brown properly, then add miso, orzo, rice, greens, or a little stock for depth.",
-  },
-  {
-    ingredient: "Greens",
-    idea: "Wilt into beans, orzo, soups, eggs, rice, or pasta right at the end.",
-  },
-  {
-    ingredient: "Beetroot",
-    idea: "Roast and pair with farro, walnuts, dill, lemon, yoghurt, or tahini.",
-  },
-  {
-    ingredient: "Peppers",
-    idea: "Roast until sweet, then pair with harissa, butter beans, couscous, or tomatoes.",
-  },
-  {
-    ingredient: "Soft fruit",
-    idea: "Spoon over yoghurt, cook into compote, or use with caramel, chocolate spread, or toasted nuts.",
-  },
-
   ,
   {
     slug: "chicken-pesto-potatoes-green-beans",
@@ -3578,5 +3515,67 @@ export const prompts = [
     ],
     flavourProfile: ["herby", "tomatoey", "bright"],
     isQuick: true,
+  },
+];
+
+export const useItUpIdeas = [
+  {
+    title: "Herby Grain Bowl",
+    text: "Use cooked grains, roast vegetables, leaves, lemon, and any soft herbs. Finish with pesto, tahini, yoghurt, or olive oil.",
+  },
+  {
+    title: "Soup from Almost Anything",
+    text: "Soften veg, add stock or water, then blend if you want it smooth. Miso, harissa, tomatoes, or pesto can shift the flavour quickly.",
+  },
+  {
+    title: "End-of-Week Roast Tin",
+    text: "Roast what needs using with oil and salt, then finish with herbs, lemon, yoghurt, tahini, or something punchy from a jar.",
+  },
+  {
+    title: "Beans on Something Better Than Toast",
+    text: "Warm beans with tomatoes, greens, miso, harissa, or stock, then spoon over toast, potatoes, rice, or couscous.",
+  },
+  {
+    title: "Pasta with the Last Good Things",
+    text: "Use pasta as a base for greens, soft tomatoes, roast veg, herbs, nuts, or a spoon of pesto loosened with pasta water.",
+  },
+  {
+    title: "Soft Fruit Bowl",
+    text: "If berries, pears, apples, or bananas are softening, spoon them over yoghurt with caramel, chocolate spread, nuts, or toasted oats.",
+  },
+];
+
+export const prompts = [
+  {
+    ingredient: "Broccoli",
+    idea: "Roast until the edges char, then add gochujang, lemon, yoghurt, or crispy chickpeas.",
+  },
+  {
+    ingredient: "Courgettes",
+    idea: "Char in a hot pan and fold through bucatini, pesto, lemon, or basil oil.",
+  },
+  {
+    ingredient: "Tomatoes",
+    idea: "Cook down until jammy for pasta, beans, or toast. Finish with basil or black pepper.",
+  },
+  {
+    ingredient: "Mushrooms",
+    idea: "Brown properly, then add miso, orzo, rice, greens, or a little stock for depth.",
+  },
+  {
+    ingredient: "Greens",
+    idea: "Wilt into beans, orzo, soups, eggs, rice, or pasta right at the end.",
+  },
+  {
+    ingredient: "Beetroot",
+    idea: "Roast and pair with farro, walnuts, dill, lemon, yoghurt, or tahini.",
+  },
+  {
+    ingredient: "Peppers",
+    idea: "Roast until sweet, then pair with harissa, butter beans, couscous, or tomatoes.",
+  },
+  {
+    ingredient: "Soft fruit",
+    idea: "Spoon over yoghurt, cook into compote, or use with caramel, chocolate spread, or toasted nuts.",
   },
 ];
