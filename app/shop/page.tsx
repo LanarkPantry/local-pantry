@@ -54,22 +54,6 @@ export default function ShopPage() {
     });
   }
 
-  function renderOrderBadge(item: ShopDisplayItem) {
-    if (item.checkoutType === "subscription") {
-      return (
-        <span className="rounded-full border border-[#d9d1c5] bg-white/85 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-[#5f675c]">
-          Weekly or fortnightly
-        </span>
-      );
-    }
-
-    return (
-      <span className="rounded-full border border-[#d9d1c5] bg-white/85 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-[#5f675c]">
-        One-off add-on
-      </span>
-    );
-  }
-
   function renderAddControls(item: ShopDisplayItem) {
     const quantity = getQuantity(item.name);
 
@@ -78,38 +62,38 @@ export default function ShopPage() {
         <button
           type="button"
           onClick={() => addDisplayItemToCart(item)}
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
+          className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#243328] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
         >
-          {item.buttonLabel ?? "Add to basket"}
+          {item.buttonLabel ?? "Add"}
         </button>
       );
     }
 
     return (
-      <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="inline-flex items-center self-start overflow-hidden rounded-full border border-[#d8d0c4] bg-white/90">
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="inline-flex items-center overflow-hidden rounded-full border border-[#d8d0c4] bg-white/90">
           <button
             type="button"
             onClick={() => removeOneFromCart(item.name)}
-            className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
+            className="cursor-pointer px-3 py-1.5 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
           >
             −
           </button>
 
-          <span className="min-w-[2.2rem] text-center text-sm font-medium text-[#243328]">
+          <span className="min-w-[2rem] text-center text-sm font-medium text-[#243328]">
             {quantity}
           </span>
 
           <button
             type="button"
             onClick={() => addDisplayItemToCart(item)}
-            className="cursor-pointer px-4 py-2 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
+            className="cursor-pointer px-3 py-1.5 text-lg text-[#243328] transition hover:bg-[#f4efe9]"
           >
             +
           </button>
         </div>
 
-        <span className="text-sm text-[#5f675c]">{quantity} in basket</span>
+        <span className="text-xs text-[#6b776c]">{quantity} in basket</span>
       </div>
     );
   }
@@ -117,77 +101,73 @@ export default function ShopPage() {
   function ProductCard({
     item,
     label,
-    compact = false,
+    large = false,
   }: {
     item: ShopDisplayItem;
     label: string;
-    compact?: boolean;
+    large?: boolean;
   }) {
     return (
-      <article className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/80 shadow-[0_10px_24px_rgba(36,51,40,0.05)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_32px_rgba(36,51,40,0.07)]">
-        <div className="grid gap-0 sm:grid-cols-[200px_1fr]">
-          <div className="border-b border-[#e9dfd2] bg-[#eee7dc]/70 p-5 sm:border-b-0 sm:border-r">
+      <article className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white/82 shadow-[0_8px_20px_rgba(36,51,40,0.045)] transition hover:-translate-y-0.5 hover:bg-white">
+        <div
+          className={
+            large
+              ? "grid gap-0 sm:grid-cols-[190px_1fr]"
+              : "grid grid-cols-[116px_1fr] gap-0 sm:grid-cols-[170px_1fr]"
+          }
+        >
+          <div className="border-r border-[#e9dfd2] bg-[#eee7dc]/70 p-3 sm:p-4">
             <div
-              className={`flex h-full items-center justify-center rounded-[22px] bg-[#f8f4ee]/95 p-5 ${
-                compact ? "min-h-[170px]" : "min-h-[200px]"
-              }`}
+              className={
+                large
+                  ? "flex min-h-[150px] items-center justify-center rounded-[18px] bg-[#f8f4ee]/95 p-3 sm:min-h-[185px]"
+                  : "flex min-h-[118px] items-center justify-center rounded-[18px] bg-[#f8f4ee]/95 p-2 sm:min-h-[145px]"
+              }
             >
               <img
                 src={item.image}
                 alt={item.name}
-                className={`w-full object-contain ${
-                  compact ? "max-h-[145px]" : "max-h-[175px]"
-                }`}
+                className={
+                  large
+                    ? "max-h-[145px] w-full object-contain sm:max-h-[165px]"
+                    : "max-h-[105px] w-full object-contain sm:max-h-[130px]"
+                }
               />
             </div>
           </div>
 
-          <div className="flex flex-col justify-between p-5 md:p-6">
+          <div className="flex flex-col justify-between p-4 sm:p-5">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b776c]">
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[#6b776c]">
                   {label}
                 </p>
 
                 {item.weight ? (
-                  <span className="rounded-full border border-[#e0d6ca] bg-[#f7f2eb] px-2.5 py-1 text-xs text-[#5f675c]">
+                  <span className="rounded-full border border-[#e0d6ca] bg-[#f7f2eb] px-2.5 py-0.5 text-xs text-[#5f675c]">
                     {item.weight}
                   </span>
                 ) : null}
               </div>
 
-              <h3 className="mt-3 font-serif text-[1.65rem] leading-tight text-[#243328] md:text-[1.95rem]">
+              <h3 className="mt-2 font-serif text-[1.25rem] leading-tight text-[#243328] sm:text-[1.65rem]">
                 {item.name}
               </h3>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-[#ddd4c8] bg-white/90 px-4 py-2 text-sm font-medium text-[#243328]">
+              <div className="mt-3">
+                <span className="inline-flex rounded-full border border-[#ddd4c8] bg-white/90 px-3 py-1.5 text-sm font-medium text-[#243328]">
                   {formatPrice(item.price)}
                 </span>
-
-                {renderOrderBadge(item)}
               </div>
 
-              <p className="mt-4 text-sm leading-7 text-[#667164]">
-                {item.description}
-              </p>
-
-              {item.details ? (
-                <p className="mt-2 text-sm leading-7 text-[#5f675c]">
-                  {item.details}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="mt-5">
-              {renderAddControls(item)}
-
-              {item.checkoutType === "subscription" ? (
+              {large && item.checkoutType === "subscription" ? (
                 <p className="mt-3 text-xs leading-5 text-[#6b776c]">
-                  Pause, skip or cancel anytime.
+                  Weekly or fortnightly. Pause, skip or cancel anytime.
                 </p>
               ) : null}
             </div>
+
+            {renderAddControls(item)}
           </div>
         </div>
       </article>
@@ -210,18 +190,18 @@ export default function ShopPage() {
     if (items.length === 0) return null;
 
     return (
-      <section className="mt-12">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <section className="mt-10">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
               {eyebrow}
             </p>
 
-            <h2 className="mt-2 font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.55rem]">
+            <h2 className="mt-1 font-serif text-[1.8rem] leading-tight text-[#243328] md:text-[2.35rem]">
               {title}
             </h2>
 
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-[#667164] md:text-base">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
               {description}
             </p>
           </div>
@@ -230,13 +210,13 @@ export default function ShopPage() {
             href="/basket"
             className="text-sm text-[#5f675c] underline underline-offset-4 transition hover:text-[#243328]"
           >
-            Review basket{totalItems > 0 ? ` (${totalItems})` : ""}
+            Basket{totalItems > 0 ? ` (${totalItems})` : ""}
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
           {items.map((item) => (
-            <ProductCard key={item.name} item={item} label={label} compact />
+            <ProductCard key={item.name} item={item} label={label} />
           ))}
         </div>
       </section>
@@ -247,109 +227,76 @@ export default function ShopPage() {
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
 
-      <div className="px-4 pt-4 sm:px-6 md:hidden">
-        <div className="overflow-hidden rounded-[24px] border border-[#ddd4c8] shadow-[0_10px_24px_rgba(36,51,40,0.06)]">
-          <img
-            src="/images/home/local-delivery.jpg"
-            alt="A Local Pantry delivery with fresh produce and pantry staples"
-            className="h-44 w-full object-cover"
-          />
-        </div>
-      </div>
-
-      <section className="px-4 py-8 sm:px-6 md:px-10 md:py-10">
+      <section className="px-4 py-7 sm:px-6 md:px-10 md:py-10">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
-            <article className="rounded-[32px] border border-[#ddd4c8] bg-[#f7f2eb]/86 p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-8">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-[#6b776c]">
+          <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+            <article className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb]/86 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.055)] md:p-8">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#6b776c]">
                 Shop
               </p>
 
-              <h1 className="mt-3 max-w-3xl font-serif text-[2.45rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4.3rem]">
+              <h1 className="mt-3 max-w-3xl font-serif text-[2.15rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4rem]">
                 Start with the box. Add what helps.
               </h1>
 
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-[#667164] md:text-base">
-                Choose a weekly fruit and veg box, then add regular staples when
-                you need them.
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-[#667164] md:text-base md:leading-7">
+                Choose a weekly fruit and veg box, then add jars, dry goods and
+                cupboard staples when you need them.
               </p>
 
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <a
                   href="#weekly-boxes"
-                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  className="rounded-full bg-[#243328] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
                 >
                   Choose your box
                 </a>
 
                 <Link
-                  href="/planner"
-                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
+                  href="/basket"
+                  className="rounded-full border border-[#d6cec2] bg-white/80 px-5 py-2.5 text-sm text-[#243328] transition hover:bg-white"
                 >
-                  Open planner
+                  Basket{totalItems > 0 ? ` (${totalItems})` : ""}
                 </Link>
               </div>
             </article>
 
-            <article className="rounded-[32px] border border-[#ddd4c8] bg-white/80 p-6 shadow-[0_12px_30px_rgba(36,51,40,0.05)] md:p-8">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                Your basket
-              </p>
-
-              <h2 className="mt-3 font-serif text-3xl leading-tight text-[#243328]">
-                {totalItems > 0
-                  ? `${totalItems} item${totalItems === 1 ? "" : "s"} selected`
-                  : "Your basket is empty"}
-              </h2>
-
-              <p className="mt-3 text-sm leading-7 text-[#667164]">
-                Build a smaller, more useful weekly shop around the meals you
-                actually cook.
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  href="/basket"
-                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-                >
-                  Review basket
-                </Link>
-
-                <Link
-                  href="/saved-weeks"
-                  className="rounded-full border border-[#d6cec2] bg-[#f7f2eb] px-5 py-3 text-sm text-[#243328] transition hover:bg-white"
-                >
-                  Saved weeks
-                </Link>
-              </div>
+            <article className="hidden overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/80 shadow-[0_10px_24px_rgba(36,51,40,0.05)] md:block">
+              <img
+                src="/images/home/local-delivery.jpg"
+                alt="A Local Pantry delivery with fresh produce and pantry staples"
+                className="h-full min-h-[270px] w-full object-cover"
+              />
             </article>
           </div>
 
-          <section id="weekly-boxes" className="mt-12">
-            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
-                  Weekly base
-                </p>
+          <section id="weekly-boxes" className="mt-10">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[#6b776c]">
+                Weekly base
+              </p>
 
-                <h2 className="mt-2 font-serif text-[2rem] leading-tight text-[#243328] md:text-[2.65rem]">
-                  Weekly fruit and veg boxes
-                </h2>
+              <h2 className="mt-1 font-serif text-[1.8rem] leading-tight text-[#243328] md:text-[2.35rem]">
+                Weekly fruit and veg boxes
+              </h2>
 
-                <p className="mt-3 max-w-3xl text-sm leading-7 text-[#667164] md:text-base">
-                  A practical starting point for the week. Contents shift
-                  slightly through the seasons depending on availability.
-                </p>
-              </div>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-[#667164]">
+                A practical starting point for the week. Contents shift slightly
+                with the seasons.
+              </p>
             </div>
 
-            <div className="mt-6 grid gap-5 lg:grid-cols-2">
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
               {weeklyProduceBox ? (
-                <ProductCard item={weeklyProduceBox} label="Smaller box" />
+                <ProductCard
+                  item={weeklyProduceBox}
+                  label="Smaller box"
+                  large
+                />
               ) : null}
 
               {familyProduceBox ? (
-                <ProductCard item={familyProduceBox} label="Larger box" />
+                <ProductCard item={familyProduceBox} label="Larger box" large />
               ) : null}
             </div>
           </section>
@@ -357,7 +304,7 @@ export default function ShopPage() {
           <ProductSection
             title="Small-batch pantry jars"
             eyebrow="Made in-house"
-            description="The jars made in the Local Pantry kitchen. Add them to quick dinners, roast vegetables, beans, pasta and grains."
+            description="Pesto, harissa, stock and gochujang for fast flavour."
             items={pantryItems}
             label="Pantry jar"
           />
@@ -375,7 +322,7 @@ export default function ShopPage() {
           <ProductSection
             title="Nuts and extras"
             eyebrow="Useful add-ons"
-            description="Small extras for texture, richness, baking and easy upgrades through the week."
+            description="Texture, richness and easy upgrades through the week."
             items={extraItems}
             label="Extra"
           />
@@ -383,7 +330,7 @@ export default function ShopPage() {
           <ProductSection
             title="Beans and tomatoes"
             eyebrow="Cupboard essentials"
-            description="Ready-to-use jars and tins for fast dinners, traybakes, soups and bowls."
+            description="Ready-to-use jars and tins for quick dinners."
             items={cupboardItems}
             label="Cupboard staple"
           />
