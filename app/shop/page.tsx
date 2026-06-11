@@ -8,6 +8,7 @@ import SiteFooter from "../components/SiteFooter";
 import {
   type ShopDisplayItem,
   cupboardItems,
+  dryGoodsItems,
   extraItems,
   pantryItems,
   produceBoxes,
@@ -353,30 +354,38 @@ export default function ShopPage() {
             </div>
           </section>
 
+          <ProductSection
+            title="Small-batch pantry jars"
+            eyebrow="Made in-house"
+            description="The jars made in the Local Pantry kitchen. Add them to quick dinners, roast vegetables, beans, pasta and grains."
+            items={pantryItems}
+            label="Pantry jar"
+          />
+
           <div id="pantry-staples">
             <ProductSection
-              title="Useful regulars"
+              title="Dry goods"
               eyebrow="Cupboard staples"
-              description="The everyday ingredients that help turn fresh produce into simple meals."
-              items={cupboardItems}
-              label="Regular staple"
+              description="Pasta, grains, rice and lentils for everyday cooking."
+              items={dryGoodsItems}
+              label="Dry good"
             />
           </div>
 
           <ProductSection
-            title="Small flavour boosts"
-            eyebrow="Sauces and jars"
-            description="A few stronger flavours for quick dinners, roast vegetables, beans and grains."
-            items={pantryItems}
-            label="Flavour jar"
+            title="Nuts and extras"
+            eyebrow="Useful add-ons"
+            description="Small extras for texture, richness, baking and easy upgrades through the week."
+            items={extraItems}
+            label="Extra"
           />
 
           <ProductSection
-            title="Kitchen extras"
-            eyebrow="Useful add-ons"
-            description="Small extras for texture, richness and easy upgrades through the week."
-            items={extraItems}
-            label="Extra"
+            title="Beans and tomatoes"
+            eyebrow="Cupboard essentials"
+            description="Ready-to-use jars and tins for fast dinners, traybakes, soups and bowls."
+            items={cupboardItems}
+            label="Cupboard staple"
           />
         </div>
       </section>
