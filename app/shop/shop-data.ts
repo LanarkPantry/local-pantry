@@ -98,7 +98,7 @@ export const dryGoodsItems: ShopDisplayItem[] = [
   {
     name: "Farro",
     price: 3.95,
-    image: "/images/cupboard/farro.jpg",
+    image: "/images/cupboard/farro.jpg?v=2",
     category: "cupboard",
     checkoutType: "one-off",
     weight: "500g",
@@ -148,7 +148,7 @@ export const dryGoodsItems: ShopDisplayItem[] = [
   {
     name: "Orzo Pasta",
     price: 2.75,
-    image: "/images/cupboard/orzo.jpg",
+    image: "/images/cupboard/orzo.jpg?v=2",
     category: "cupboard",
     checkoutType: "one-off",
     weight: "500g",
@@ -171,7 +171,7 @@ export const dryGoodsItems: ShopDisplayItem[] = [
   {
     name: "Puy Lentils",
     price: 3.95,
-    image: "/images/cupboard/puy-lentils.jpg",
+    image: "/images/cupboard/puy-lentils.jpg?v=2",
     category: "cupboard",
     checkoutType: "one-off",
     weight: "500g",
@@ -183,7 +183,7 @@ export const dryGoodsItems: ShopDisplayItem[] = [
   {
     name: "Risotto Rice",
     price: 3.75,
-    image: "/images/cupboard/risotto-rice.jpg",
+    image: "/images/cupboard/risotto-rice.jpg?v=2",
     category: "cupboard",
     checkoutType: "one-off",
     weight: "500g",
@@ -209,7 +209,7 @@ export const extraItems: ShopDisplayItem[] = [
   {
     name: "Walnuts",
     price: 5.5,
-    image: "/images/extras/walnuts.jpg",
+    image: "/images/extras/walnuts.jpg?v=2",
     category: "extras",
     checkoutType: "one-off",
     weight: "500g",
@@ -231,7 +231,7 @@ export const extraItems: ShopDisplayItem[] = [
   {
     name: "Cashews",
     price: 4.25,
-    image: "/images/extras/cashews.jpg",
+    image: "/images/extras/cashews.jpg?v=2",
     category: "extras",
     checkoutType: "one-off",
     weight: "500g",
