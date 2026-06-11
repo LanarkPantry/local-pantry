@@ -262,15 +262,23 @@ export default function ShopPage() {
     <main className="min-h-screen bg-[#f4efe9] text-[#243328]">
       <SiteHeader />
 
-      <section className="px-4 py-7 sm:px-6 md:px-10 md:py-10">
+      <section className="px-4 py-4 sm:px-6 md:px-10 md:py-10">
         <div className="mx-auto max-w-7xl">
-          <div className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb]/86 shadow-[0_10px_24px_rgba(36,51,40,0.055)] lg:grid lg:grid-cols-[1.1fr_0.9fr]">
-            <article className="p-5 md:p-8">
+          <div className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch">
+            <article className="order-1 overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/80 shadow-[0_10px_24px_rgba(36,51,40,0.05)] lg:order-2">
+              <img
+                src="/images/home/local-delivery.jpg"
+                alt="A Local Pantry delivery with fresh produce and pantry staples"
+                className="h-auto w-full object-contain lg:h-full lg:min-h-[310px] lg:object-cover"
+              />
+            </article>
+
+            <article className="order-2 rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb]/86 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.055)] md:p-8 lg:order-1">
               <p className="text-[10px] uppercase tracking-[0.2em] text-[#6b776c]">
                 Shop
               </p>
 
-              <h1 className="mt-3 max-w-3xl font-serif text-[2.15rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4rem]">
+              <h1 className="mt-3 max-w-3xl font-serif text-[2.1rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4rem]">
                 Start with the box. Add what helps.
               </h1>
 
@@ -295,14 +303,6 @@ export default function ShopPage() {
                 </Link>
               </div>
             </article>
-
-            <div className="order-first h-[170px] lg:order-none lg:h-full">
-              <img
-                src="/images/home/local-delivery.jpg"
-                alt="A Local Pantry delivery with fresh produce and pantry staples"
-                className="h-full w-full object-cover"
-              />
-            </div>
           </div>
 
           <section id="weekly-boxes" className="mt-10">
@@ -338,7 +338,7 @@ export default function ShopPage() {
 
           <ProductSection
             title="Small-batch pantry jars"
-            eyebrow="Made in-house"
+            eyebrow="Made fresh to order in-house"
             description="Pesto, harissa, stock and gochujang for fast flavour."
             items={pantryItems}
             label="Pantry jar"

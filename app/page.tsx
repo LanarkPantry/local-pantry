@@ -584,9 +584,9 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-3 font-serif text-[1.5rem] leading-tight text-[#243328] md:text-[1.3rem]">
-                Hi, I'm Ainsley.
+                Hi, I'm Ainsley,
                 <br />
-                Making everyday cooking easier.
+                and I'm passionate about making everyday cooking easier.
               </h2>
 
               <p className="mt-5 text-sm leading-8 text-[#667164] md:text-base">
