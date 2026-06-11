@@ -3262,7 +3262,7 @@ export const recipes: Recipe[] = [
     flavourProfile: ["bright", "coconut"],
     isQuick: false,
   },
-  ,
+
   {
     slug: "chicken-pesto-potatoes-green-beans",
     title: "Chicken, Pesto Potatoes & Green Beans",
