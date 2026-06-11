@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useCart } from "../cart-context";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
+import { recipes } from "../recipes/recipes-data";
 import {
   type ShopDisplayItem,
   cupboardItems,
@@ -16,6 +17,42 @@ import {
 
 function formatPrice(value: number) {
   return `£${value.toFixed(2)}`;
+}
+
+function getPlannerAliases(itemName: string) {
+  if (itemName === "Rose Harissa Paste") return ["Rose Harissa"];
+  if (itemName === "Gochujang Sauce") return ["Signature Gochujang"];
+  if (itemName === "Mutti Polpa Tomatoes") return ["Premium Whole Tomatoes"];
+  if (itemName.includes("Butter Beans")) return ["Butter Beans"];
+  if (itemName.includes("Chickpeas")) return ["Chickpeas"];
+  if (itemName.includes("White Beans")) return ["Cannellini Beans"];
+  if (itemName === "Orzo Pasta") return ["Orzo"];
+  if (itemName === "Blanched Almonds") return ["Almonds"];
+
+  return [itemName];
+}
+
+function getPlannerRecipeCount(itemName: string) {
+  const aliases = getPlannerAliases(itemName);
+
+  return recipes.filter((recipe) =>
+    recipe.pantryMatches.some((pantryMatch) => aliases.includes(pantryMatch)),
+  ).length;
+}
+
+function PlannerRecipeBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+
+  return (
+    <div className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d9d1c5] bg-[#f7f2eb] px-2.5 py-1 text-[11px] font-medium text-[#4f5e52]">
+      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#243328] text-[10px] leading-none text-white">
+        ✓
+      </span>
+      <span>
+        Used in {count} planner recipe{count === 1 ? "" : "s"}
+      </span>
+    </div>
+  );
 }
 
 export default function ShopPage() {
@@ -138,6 +175,8 @@ export default function ShopPage() {
     label: string;
     large?: boolean;
   }) {
+    const plannerRecipeCount = large ? 0 : getPlannerRecipeCount(item.name);
+
     return (
       <article className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white/82 shadow-[0_8px_20px_rgba(36,51,40,0.045)] transition hover:-translate-y-0.5 hover:bg-white">
         <div
@@ -188,6 +227,8 @@ export default function ShopPage() {
               <p className="mt-1 text-xs leading-5 text-[#6b776c] sm:text-sm">
                 {getShortLine(item)}
               </p>
+
+              <PlannerRecipeBadge count={plannerRecipeCount} />
 
               <div className="mt-3">
                 <span className="inline-flex rounded-full border border-[#ddd4c8] bg-white/90 px-3 py-1.5 text-sm font-medium text-[#243328]">
@@ -338,7 +379,7 @@ export default function ShopPage() {
 
           <ProductSection
             title="Small-batch pantry jars"
-            eyebrow="Made fresh to order in-house"
+            eyebrow="Made in-house"
             description="Pesto, harissa, stock and gochujang for fast flavour."
             items={pantryItems}
             label="Pantry jar"
