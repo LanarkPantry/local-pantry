@@ -65,7 +65,7 @@ export const recipes: Recipe[] = [
     alt: "Bucatini with Charred Courgette & Green Pesto",
     intro:
       "A quick green pasta with smoky courgette, glossy pesto and a fresh lemon finish.",
-    body: "Cook the bucatini until properly al dente, saving a mug of pasta water before draining. Char the courgette hard in a hot pan so the edges catch and the middle softens. Loosen the pesto with a splash of pasta water, then toss through the bucatini and courgette until glossy. Finish with lemon zest, black pepper and parmesan.",
+    body: "Cook the bucatini until properly al dente, saving a mug of pasta water before draining. Char the courgette hard in a hot pan so the edges catch and the middle softens. Loosen the pesto with a splash of pasta water, then toss through the bucatini and courgette until glossy. Finish with lemon zest, black pepper and parmesan. Keep a little cooking water back so you can loosen the sauce rather than adding more oil. Taste before serving and adjust with lemon, black pepper or parmesan so the pasta feels glossy rather than heavy.",
     pantryLabel: "Made with Bucatini",
     product: {
       name: "Bucatini",
@@ -97,7 +97,7 @@ export const recipes: Recipe[] = [
       "Lemon",
       "Parmesan",
     ],
-    pantryMatches: ["Bucatini", "Sorrel & Walnut Pesto"],
+    pantryMatches: ["Bucatini", "Sorrel & Walnut Pesto", "Walnuts"],
     flavourProfile: ["bright", "fresh", "smoky"],
     isQuick: true,
   },
@@ -108,7 +108,7 @@ export const recipes: Recipe[] = [
     alt: "Rose Harissa Butter Beans with Roast Peppers & Giant Couscous",
     intro:
       "Soft butter beans, sweet roasted peppers and giant couscous in a warm harissa dressing.",
-    body: "Cook the giant couscous until tender, then dress it with olive oil and lemon while warm. Warm the butter beans with rose harissa, a splash of water and the roasted peppers until the sauce turns glossy. Fold the couscous through the beans so it catches the harissa dressing. Finish with parsley, yoghurt and a little extra lemon.",
+    body: "Cook the giant couscous in vegetable stock until tender, then dress it with olive oil and lemon while warm. Warm the butter beans with rose harissa, a splash of vegetable stock and the roasted peppers until the sauce turns glossy. Fold the couscous through the beans so it catches the harissa dressing. Finish with parsley, yoghurt and a little extra lemon. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Butter Beans",
     product: {
       name: "Bold Bean Co Queen Butter Beans",
@@ -144,11 +144,13 @@ export const recipes: Recipe[] = [
       "Giant couscous",
       "Rose harissa",
       "Parsley",
+      "Vegetable Stock",
     ],
     pantryMatches: [
       "Bold Bean Co Queen Butter Beans",
       "Giant Couscous",
       "Rose Harissa Paste",
+      "Vegetable Stock",
     ],
     flavourProfile: ["spiced", "roasted", "warming"],
     isQuick: false,
@@ -160,7 +162,7 @@ export const recipes: Recipe[] = [
     alt: "Miso Mushrooms with Farro & Greens",
     intro:
       "Deeply savoury mushrooms with chewy farro, leafy greens and a miso glaze.",
-    body: "Cook the farro until chewy but tender, then drain well. Fry the mushrooms in a hot pan until deeply browned and concentrated. Stir in garlic, white miso and a splash of water to make a savoury glaze. Fold through the greens until just wilted, then spoon over the farro.",
+    body: "Cook the farro in vegetable stock until chewy but tender, then drain well. Fry the mushrooms in a hot pan until deeply browned and concentrated. Stir in garlic, white miso and a splash of vegetable stock to make a savoury glaze. Fold through the greens until just wilted, then spoon over the farro. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Farro",
     product: {
       name: "Farro",
@@ -192,8 +194,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 35,
     protein: ["mushrooms"],
-    mainIngredients: ["Mushrooms", "Farro", "Greens", "White miso", "Garlic"],
-    pantryMatches: ["Farro", "White Miso"],
+    mainIngredients: [
+      "Mushrooms",
+      "Farro",
+      "Greens",
+      "White miso",
+      "Garlic",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Farro", "White Miso", "Vegetable Stock"],
     flavourProfile: ["umami"],
     isQuick: false,
   },
@@ -204,7 +213,7 @@ export const recipes: Recipe[] = [
     alt: "Tomato Chickpea Orzo with Herbs",
     intro:
       "A one-pan orzo with chickpeas, tomatoes and soft herbs for an easy midweek supper.",
-    body: "Soften garlic in olive oil until fragrant but not browned. Add tomatoes, chickpeas and orzo with enough water or stock to cook gently. Simmer until the orzo is tender and the sauce looks glossy rather than wet. Finish with basil, black pepper and a final drizzle of olive oil.",
+    body: "Soften garlic in olive oil until fragrant but not browned. Add tomatoes, chickpeas and orzo with enough vegetable stock to cook gently. Simmer until the orzo is tender and the sauce looks glossy rather than wet. Finish with basil, black pepper and a final drizzle of olive oil. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Orzo",
     product: {
       name: "Orzo Pasta",
@@ -241,7 +250,14 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 25,
     protein: ["chickpeas"],
-    mainIngredients: ["Orzo", "Chickpeas", "Tomatoes", "Garlic", "Basil"],
+    mainIngredients: [
+      "Orzo",
+      "Chickpeas",
+      "Tomatoes",
+      "Garlic",
+      "Basil",
+      "Vegetable Stock",
+    ],
     pantryMatches: [
       "Orzo Pasta",
       "Bold Bean Co Queen Chickpeas",
@@ -258,7 +274,7 @@ export const recipes: Recipe[] = [
     alt: "Gochujang Broccoli Rice Bowls",
     intro:
       "Charred broccoli with sticky gochujang dressing, rice and a cooling crunchy finish.",
-    body: "Cook the rice until fluffy and season lightly while warm. Char the broccoli in a hot pan or roasting tray until the tips catch. Toss the broccoli with gochujang, lime and a little sweetness until sticky. Serve over rice with cucumber, spring onions and sesame if using.",
+    body: "Cook the rice until fluffy and season lightly while warm. Char the broccoli in a hot pan or roasting tray until the tips catch. Toss the broccoli with gochujang, lime and a little sweetness until sticky. Serve over rice with cucumber, spring onions and sesame if using. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Made with Gochujang Sauce",
     product: {
       name: "Gochujang Sauce",
@@ -295,7 +311,7 @@ export const recipes: Recipe[] = [
     alt: "Roast Cauliflower Lentils with Soft Polenta",
     intro:
       "A comforting bowl of roasted cauliflower, puy lentils and creamy polenta.",
-    body: "Roast the cauliflower with oil, salt and thyme until golden at the edges. Warm the puy lentils with garlic, olive oil and a splash of stock or water. Cook the polenta slowly until soft, creamy and spoonable. Spoon the lentils and cauliflower over the polenta and finish with pepper.",
+    body: "Roast the cauliflower with oil, salt and thyme until golden at the edges. Warm the puy lentils with garlic, olive oil and a splash of vegetable stock. Cook the polenta slowly with vegetable stock until soft, creamy and spoonable. Spoon the lentils and cauliflower over the polenta and finish with pepper. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Puy Lentils",
     product: {
       name: "Puy Lentils",
@@ -333,6 +349,7 @@ export const recipes: Recipe[] = [
       "Polenta",
       "Thyme",
       "Garlic",
+      "Vegetable Stock",
     ],
     pantryMatches: ["Puy Lentils", "Polenta", "Vegetable Stock"],
     flavourProfile: ["creamy", "roasted", "comforting"],
@@ -345,7 +362,7 @@ export const recipes: Recipe[] = [
     alt: "Aubergine, Cannellini Beans & Tomatoes",
     intro:
       "A soft, tomato-rich pan of aubergine and beans, good with bread, rice or couscous.",
-    body: "Cook the aubergine in olive oil until soft, golden and collapsing. Add garlic and tomatoes, then simmer until the sauce thickens. Fold through the cannellini beans and warm gently so they stay whole. Finish with parsley and serve with bread, rice or couscous.",
+    body: "Cook the aubergine in olive oil until soft, golden and collapsing. Add garlic and tomatoes, then simmer until the sauce thickens. Fold through the cannellini beans and warm gently so they stay whole. Finish with parsley and serve with bread, rice or couscous. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Cannellini Beans",
     product: {
       name: "Bold Bean Co Queen White Beans",
@@ -376,8 +393,13 @@ export const recipes: Recipe[] = [
       "Tomatoes",
       "Garlic",
       "Parsley",
+      "Vegetable Stock",
     ],
-    pantryMatches: ["Bold Bean Co Queen White Beans", "Mutti Polpa Tomatoes"],
+    pantryMatches: [
+      "Bold Bean Co Queen White Beans",
+      "Mutti Polpa Tomatoes",
+      "Vegetable Stock",
+    ],
     flavourProfile: ["tomatoey"],
     isQuick: false,
   },
@@ -388,7 +410,7 @@ export const recipes: Recipe[] = [
     alt: "Beetroot Grain Salad with Herbs",
     intro:
       "Earthy beetroot, grains, herbs and a sharp dressing for a useful lunch or light supper.",
-    body: "Cook the farro until chewy, then dress it while warm with lemon, oil and salt. Slice the beetroot and toss it through the grains so the colour bleeds slightly. Fold through parsley and walnuts for freshness and crunch. Finish with extra lemon and goat’s cheese if liked.",
+    body: "Cook the farro until chewy, then dress it while warm with lemon, oil and salt. Slice the beetroot and toss it through the grains so the colour bleeds slightly. Fold through parsley and walnuts for freshness and crunch, adding them near the end so they stay distinct. Finish with extra lemon and goat’s cheese if liked. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Farro",
     product: {
       name: "Farro",
@@ -415,7 +437,7 @@ export const recipes: Recipe[] = [
     cookingMinutes: 25,
     protein: ["walnuts"],
     mainIngredients: ["Beetroot", "Farro", "Parsley", "Lemon", "Walnuts"],
-    pantryMatches: ["Farro"],
+    pantryMatches: ["Farro", "Walnuts"],
     flavourProfile: ["bright", "herby", "nutty"],
     isQuick: true,
   },
@@ -426,7 +448,7 @@ export const recipes: Recipe[] = [
     alt: "Green Bean & Lemon Risotto",
     intro:
       "A gentle risotto with green beans, lemon and herbs for a calm midweek dinner.",
-    body: "Soften the base of the risotto gently before stirring in the rice. Add hot stock gradually, stirring until the rice turns creamy. Add the green beans near the end so they stay bright. Finish off the heat with lemon zest, parmesan, mint and black pepper.",
+    body: "Soften the base of the risotto gently before stirring in the rice. Add hot vegetable stock gradually, stirring until the rice turns creamy. Add the green beans near the end so they stay bright. Finish off the heat with lemon zest, parmesan, mint and black pepper. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Made with Short Grain Rice",
     product: {
       name: "Short Grain Rice",
@@ -451,6 +473,7 @@ export const recipes: Recipe[] = [
       "Lemon",
       "Parmesan",
       "Mint",
+      "Vegetable Stock",
     ],
     pantryMatches: ["Short Grain Rice", "Vegetable Stock"],
     flavourProfile: ["bright", "herby"],
@@ -463,7 +486,7 @@ export const recipes: Recipe[] = [
     alt: "Pepper, Potato & Herb Frittata",
     intro:
       "A flexible egg-based supper for using up peppers, potatoes and soft herbs.",
-    body: "Cook the sliced potatoes until tender and lightly golden. Soften the peppers and onion in the same pan until sweet. Pour in seasoned eggs and cook gently until the edges begin to set. Finish under the grill, then scatter with parsley before serving.",
+    body: "Cook the sliced potatoes until tender and lightly golden. Soften the peppers and onion in the same pan until sweet. Pour in seasoned eggs and cook gently until the edges begin to set. Finish under the grill, then scatter with parsley before serving. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -501,7 +524,7 @@ export const recipes: Recipe[] = [
     alt: "Salmon, Dill & Crushed Potato Traybake",
     intro:
       "A simple traybake with flaky salmon, crushed potatoes, greens and a bright dill finish.",
-    body: "Boil the potatoes until tender, then lightly crush them on a tray. Roast the crushed potatoes until crisp at the edges. Add salmon and green beans for the final stretch so the fish stays soft. Finish with lemon, dill and a spoon of yoghurt if liked.",
+    body: "Boil the potatoes until tender, then lightly crush them on a tray. Roast the crushed potatoes until crisp at the edges. Add salmon and green beans for the final stretch so the fish stays soft. Finish with lemon, dill and a spoon of yoghurt if liked. Give everything enough space on the tray so it roasts rather than steams. Taste before serving and add lemon, herbs or yoghurt at the end to freshen the richer roasted edges.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -532,7 +555,7 @@ export const recipes: Recipe[] = [
     alt: "Gochujang Chicken Rice Bowls with Cucumber",
     intro:
       "Sticky gochujang chicken with rice, cucumber, herbs and a fresh crunchy finish.",
-    body: "Cook the rice until fluffy and keep warm. Pan-fry the chicken until golden and cooked through. Toss the chicken with gochujang, lime and a little sweetness until sticky. Serve with cucumber, spring onions and sesame over the rice.",
+    body: "Cook the rice until fluffy and keep warm. Pan-fry the chicken until golden and cooked through. Toss the chicken with gochujang, lime and a little sweetness until sticky. Serve with cucumber, spring onions and sesame over the rice. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Made with Gochujang Sauce",
     product: {
       name: "Gochujang Sauce",
@@ -568,7 +591,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/cashew-broccoli-noodles-lime.jpg",
     alt: "Cashew Broccoli Noodles with Lime",
     intro: "Noodles with charred broccoli, cashew sauce, lime and herbs.",
-    body: "Cook the noodles until just tender, then rinse or toss lightly so they do not clump. Char the broccoli until smoky at the edges but still green. Stir cashew butter or blended cashews with lime, soy and warm water into a loose sauce. Toss everything together and finish with coriander and extra lime.",
+    body: "Cook the noodles until just tender, then rinse or toss lightly so they do not clump. Char the broccoli until smoky at the edges but still green. Stir cashew butter or blended cashews with lime, soy and warm water into a loose sauce. Toss everything together and finish with coriander and extra lime. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -594,7 +617,7 @@ export const recipes: Recipe[] = [
       "Lime",
       "Coriander",
     ],
-    pantryMatches: [],
+    pantryMatches: ["Cashews"],
     flavourProfile: ["bright", "herby", "nutty"],
     isQuick: true,
   },
@@ -604,7 +627,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/crispy-tofu-peanut-rice-bowls.jpg",
     alt: "Crispy Tofu Peanut Rice Bowls",
     intro: "Crispy tofu, vegetables and rice with a creamy peanut-lime sauce.",
-    body: "Press and cube the tofu, then fry until crisp and golden. Cook the rice until fluffy and season lightly. Mix peanut sauce with lime, soy and warm water until spoonable. Serve tofu over rice with cucumber, carrots and plenty of sauce.",
+    body: "Press and cube the tofu, then fry until crisp and golden. Cook the rice until fluffy and season lightly. Mix peanut sauce with lime, soy and warm water until spoonable. Serve tofu over rice with cucumber, carrots and plenty of sauce. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -635,7 +658,7 @@ export const recipes: Recipe[] = [
     alt: "Roast Pepper Cashew Cream Casarecce",
     intro:
       "Casarecce folded through a silky roast pepper and cashew cream sauce.",
-    body: "Cook the casarecce until al dente, saving some pasta water. Blend roasted peppers with soaked cashews, garlic and seasoning until silky. Warm the sauce gently and loosen it with pasta water. Toss through the pasta and finish with basil and black pepper.",
+    body: "Cook the casarecce until al dente, saving some pasta water. Blend roasted peppers with soaked cashews, garlic and seasoning until silky. Warm the sauce gently and loosen it with pasta water. Toss through the pasta and finish with basil and black pepper. Keep a little cooking water back so you can loosen the sauce rather than adding more oil. Taste before serving and adjust with lemon, black pepper or parmesan so the pasta feels glossy rather than heavy.",
     pantryLabel: "Made with Casarecce Pasta",
     product: {
       name: "Casarecce Pasta",
@@ -661,7 +684,7 @@ export const recipes: Recipe[] = [
       "Garlic",
       "Basil",
     ],
-    pantryMatches: ["Casarecce Pasta"],
+    pantryMatches: ["Casarecce Pasta", "Cashews"],
     flavourProfile: ["creamy", "roasted", "nutty"],
     isQuick: false,
   },
@@ -671,7 +694,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/lemon-herb-chicken-giant-couscous.jpg",
     alt: "Lemon Herb Chicken with Giant Couscous",
     intro: "Golden chicken with herby giant couscous, vegetables and lemon.",
-    body: "Cook the giant couscous until tender, then dress with lemon and olive oil. Season the chicken and pan-fry until golden and cooked through. Char the courgette or seasonal vegetables in the same pan. Slice the chicken over the couscous and finish with parsley and lemon.",
+    body: "Cook the giant couscous until tender, then dress with lemon and olive oil. Season the chicken and pan-fry until golden and cooked through. Char the courgette or seasonal vegetables in the same pan. Slice the chicken over the couscous and finish with parsley and lemon. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Giant Couscous",
     product: {
       name: "Giant Couscous",
@@ -707,7 +730,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/salmon-crushed-peas-herby-potatoes.jpg",
     alt: "Salmon with Crushed Peas & Herby Potatoes",
     intro: "A fresh salmon supper with crushed peas, soft herbs and potatoes.",
-    body: "Boil the potatoes until tender, then toss with olive oil and herbs. Cook the salmon gently until just flaky. Crush the peas with mint, lemon, salt and a little olive oil. Serve the salmon with herby potatoes and the bright crushed peas.",
+    body: "Boil the potatoes until tender, then toss with olive oil and herbs. Cook the salmon gently until just flaky. Crush the peas with mint, lemon, salt and a little olive oil. Serve the salmon with herby potatoes and the bright crushed peas. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -737,7 +760,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/roast-fennel-tomato-burrata-toasts.jpg",
     alt: "Roast Fennel & Tomato Burrata Toasts",
     intro: "Sweet roast fennel and tomatoes over toast with creamy burrata.",
-    body: "Roast fennel and tomatoes until soft, sweet and slightly jammy. Toast the sourdough until crisp enough to hold the topping. Pile the roasted vegetables over the toast while still warm. Tear over burrata and finish with basil, olive oil and black pepper.",
+    body: "Roast fennel and tomatoes until soft, sweet and slightly jammy. Toast the sourdough until crisp enough to hold the topping. Pile the roasted vegetables over the toast while still warm. Tear over burrata and finish with basil, olive oil and black pepper. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -767,7 +790,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/spinach-ricotta-herb-stuffed-peppers.jpg",
     alt: "Spinach, Ricotta & Herb Stuffed Peppers",
     intro: "Sweet peppers filled with spinach, ricotta, herbs and grains.",
-    body: "Halve the peppers and roast until beginning to soften. Mix cooked rice with spinach, ricotta, herbs and seasoning. Fill the peppers generously and bake until the tops turn golden. Serve with extra herbs and a simple green salad.",
+    body: "Halve the peppers and roast until beginning to soften. Mix cooked rice with spinach, ricotta, herbs and seasoning. Fill the peppers generously and bake until the tops turn golden. Serve with extra herbs and a simple green salad. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -797,7 +820,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/sticky-soy-chicken-greens-rice.jpg",
     alt: "Sticky Soy Chicken with Greens & Rice",
     intro: "Glossy soy chicken with greens, rice and a sharp fresh finish.",
-    body: "Cook the rice until fluffy and keep warm. Pan-fry the chicken until golden on the outside. Add soy, ginger and a little sweetness to make a glossy glaze. Serve with quickly wilted greens and a sharp squeeze of lime.",
+    body: "Cook the rice until fluffy and keep warm. Pan-fry the chicken until golden on the outside. Add soy, ginger and a little sweetness to make a glossy glaze. Serve with quickly wilted greens and a sharp squeeze of lime. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -828,7 +851,7 @@ export const recipes: Recipe[] = [
     alt: "Creamy Tuscan Butter Beans with Greens",
     intro:
       "Butter beans in a creamy garlic sauce with greens, herbs and parmesan.",
-    body: "Warm garlic gently in olive oil until fragrant. Add butter beans, cream and a splash of water, then simmer until glossy. Fold through the greens until just wilted. Finish with parmesan, herbs and black pepper.",
+    body: "Warm garlic gently in olive oil until fragrant. Add butter beans, cream and a splash of water, then simmer until glossy. Fold through the greens until just wilted. Finish with parmesan, herbs and black pepper. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Butter Beans",
     product: {
       name: "Bold Bean Co Queen Butter Beans",
@@ -847,8 +870,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["butter beans", "beans"],
-    mainIngredients: ["Butter beans", "Greens", "Cream", "Garlic", "Parmesan"],
-    pantryMatches: ["Bold Bean Co Queen Butter Beans"],
+    mainIngredients: [
+      "Butter beans",
+      "Greens",
+      "Cream",
+      "Garlic",
+      "Parmesan",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Bold Bean Co Queen Butter Beans", "Vegetable Stock"],
     flavourProfile: ["herby", "creamy"],
     isQuick: false,
   },
@@ -858,7 +888,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/charred-courgette-whipped-feta-orzo.jpg",
     alt: "Charred Courgette & Whipped Feta Orzo",
     intro: "Lemony orzo with charred courgette, herbs and whipped feta.",
-    body: "Cook the orzo until tender, then drain and dress with lemon. Char the courgette hard so the edges brown and soften. Whip or mash feta with lemon and olive oil until creamy. Serve the orzo with courgette, mint and spoonfuls of whipped feta.",
+    body: "Cook the orzo until tender, then drain and dress with lemon. Char the courgette hard so the edges brown and soften. Whip or mash feta with lemon and olive oil until creamy. Serve the orzo with courgette, mint and spoonfuls of whipped feta. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Orzo",
     product: {
       name: "Orzo Pasta",
@@ -877,8 +907,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 35,
     protein: ["feta"],
-    mainIngredients: ["Orzo", "Courgette", "Feta", "Lemon", "Mint"],
-    pantryMatches: ["Orzo Pasta"],
+    mainIngredients: [
+      "Orzo",
+      "Courgette",
+      "Feta",
+      "Lemon",
+      "Mint",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Orzo Pasta", "Vegetable Stock"],
     flavourProfile: ["bright", "herby"],
     isQuick: false,
   },
@@ -888,7 +925,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/coconut-lime-greens-crispy-tofu.jpg",
     alt: "Coconut Lime Greens with Crispy Tofu",
     intro: "A coconut-lime greens bowl with crispy tofu and rice.",
-    body: "Cook the rice until fluffy. Fry the tofu until crisp and golden on the edges. Simmer the greens briefly with coconut milk, lime and seasoning. Serve the tofu over rice with coconut greens and extra lime.",
+    body: "Cook the rice until fluffy. Fry the tofu until crisp and golden on the edges. Simmer the greens briefly with coconut milk, lime and seasoning. Serve the tofu over rice with coconut greens and extra lime. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -907,8 +944,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["tofu"],
-    mainIngredients: ["Tofu", "Greens", "Coconut milk", "Lime", "Rice"],
-    pantryMatches: [],
+    mainIngredients: [
+      "Tofu",
+      "Greens",
+      "Coconut milk",
+      "Lime",
+      "Rice",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["bright", "coconut"],
     isQuick: false,
   },
@@ -918,7 +962,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/roasted-tomato-burrata-gnocchi.jpg",
     alt: "Roasted Tomato Burrata Gnocchi",
     intro: "Crispy gnocchi with roasted tomatoes, basil oil and burrata.",
-    body: "Roast tomatoes with garlic, olive oil and salt until they collapse. Pan-fry or bake the gnocchi until golden and crisp-edged. Toss the gnocchi through the roasted tomato juices. Finish with torn burrata, basil and black pepper.",
+    body: "Roast tomatoes with garlic, olive oil and salt until they collapse. Pan-fry or bake the gnocchi until golden and crisp-edged. Toss the gnocchi through the roasted tomato juices. Finish with torn burrata, basil and black pepper. Keep a little cooking water back so you can loosen the sauce rather than adding more oil. Taste before serving and adjust with lemon, black pepper or parmesan so the pasta feels glossy rather than heavy.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -949,7 +993,7 @@ export const recipes: Recipe[] = [
     alt: "Hot Honey Halloumi with Herby Couscous",
     intro:
       "Golden halloumi with lemony couscous, herbs and a chilli honey finish.",
-    body: "Cook the giant couscous until tender, then dress with lemon and olive oil. Pan-fry the halloumi until deeply golden on both sides. Toss cucumber and mint through the couscous for freshness. Drizzle the halloumi with hot honey and serve over the herby couscous.",
+    body: "Cook the giant couscous until tender, then dress with lemon and olive oil. Pan-fry the halloumi until deeply golden on both sides. Toss cucumber and mint through the couscous for freshness. Drizzle the halloumi with hot honey and serve over the herby couscous. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Giant Couscous",
     product: {
       name: "Giant Couscous",
@@ -985,7 +1029,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/smoky-sweet-potato-black-bean-bowls.jpg",
     alt: "Smoky Sweet Potato Black Bean Bowls",
     intro: "Roasted sweet potato, black beans, rice and avocado yoghurt.",
-    body: "Roast sweet potato with smoky spices until soft and caramelised. Warm the black beans with lime, garlic and seasoning. Cook the rice until fluffy. Serve with avocado yoghurt, coriander and extra lime.",
+    body: "Roast sweet potato with smoky spices until soft and caramelised. Warm the black beans with lime, garlic and seasoning. Cook the rice until fluffy. Serve with avocado yoghurt, coriander and extra lime. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1028,7 +1072,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/chicken-leek-mustard-cream-casarecce.jpg",
     alt: "Chicken, Leek & Mustard Cream Casarecce",
     intro: "A comforting casarecce with chicken, soft leeks and mustard cream.",
-    body: "Cook the casarecce until al dente, saving a splash of pasta water. Soften the leeks slowly until sweet and silky. Add cooked chicken, mustard and cream, then loosen with pasta water. Toss through the pasta and finish with black pepper.",
+    body: "Cook the casarecce until al dente, saving a splash of pasta water. Soften the leeks slowly until sweet and silky. Add cooked chicken, mustard and cream, then loosen with pasta water. Toss through the pasta and finish with black pepper. Keep a little cooking water back so you can loosen the sauce rather than adding more oil. Taste before serving and adjust with lemon, black pepper or parmesan so the pasta feels glossy rather than heavy.",
     pantryLabel: "Made with Casarecce Pasta",
     product: {
       name: "Casarecce Pasta",
@@ -1064,7 +1108,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/roasted-carrot-labneh-toasts.jpg",
     alt: "Roasted Carrot Labneh Toasts with Dukkah",
     intro: "Roasted carrots over thick labneh on toast with herbs and dukkah.",
-    body: "Roast the carrots until tender, browned and sweet at the edges. Toast the sourdough until crisp. Spread thick labneh over the toast. Top with carrots, parsley, dukkah and a drizzle of olive oil.",
+    body: "Roast the carrots until tender, browned and sweet at the edges. Toast the sourdough until crisp. Spread thick labneh over the toast. Top with carrots, parsley, dukkah and a drizzle of olive oil. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1094,7 +1138,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/thai-peanut-greens-rice-noodles.jpg",
     alt: "Thai Peanut Greens Rice Noodles",
     intro: "Rice noodles with greens, herbs and a peanut-lime dressing.",
-    body: "Cook the rice noodles until tender, then rinse lightly so they stay separate. Wilt the greens quickly in a hot pan. Mix peanut sauce with lime and warm water until loose and glossy. Toss noodles and greens with the sauce, then finish with coriander.",
+    body: "Cook the rice noodles until tender, then rinse lightly so they stay separate. Wilt the greens quickly in a hot pan. Mix peanut sauce with lime and warm water until loose and glossy. Toss noodles and greens with the sauce, then finish with coriander. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1131,7 +1175,7 @@ export const recipes: Recipe[] = [
     alt: "Baked Feta Butter Beans with Greens",
     intro:
       "Baked feta, butter beans, blistered tomatoes and greens served with toast.",
-    body: "Bake feta with tomatoes, olive oil and black pepper until soft and blistered. Add butter beans and return to the oven until bubbling. Fold through greens while everything is still hot. Serve with toast for scooping up the sauce.",
+    body: "Bake feta with tomatoes, olive oil and black pepper until soft and blistered. Add butter beans and return to the oven until bubbling. Fold through greens while everything is still hot. Serve with toast for scooping up the sauce. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Butter Beans",
     product: {
       name: "Bold Bean Co Queen Butter Beans",
@@ -1161,7 +1205,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/coconut-tomato-chickpea-curry-rice.jpg",
     alt: "Coconut Tomato Chickpea Curry with Rice",
     intro: "A gentle curry with chickpeas, tomatoes, coconut and greens.",
-    body: "Cook the rice until fluffy. Simmer tomatoes, chickpeas and coconut milk until the sauce thickens. Fold through greens near the end so they stay bright. Finish with coriander and lime before serving over rice.",
+    body: "Cook the rice until fluffy. Simmer tomatoes, chickpeas and coconut milk until the sauce thickens. Fold through greens near the end so they stay bright. Finish with coriander and lime before serving over rice. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Made with Chickpeas",
     product: {
       name: "Bold Bean Co Queen Chickpeas",
@@ -1199,8 +1243,13 @@ export const recipes: Recipe[] = [
       "Coconut milk",
       "Greens",
       "Rice",
+      "Vegetable Stock",
     ],
-    pantryMatches: ["Bold Bean Co Queen Chickpeas", "Mutti Polpa Tomatoes"],
+    pantryMatches: [
+      "Bold Bean Co Queen Chickpeas",
+      "Mutti Polpa Tomatoes",
+      "Vegetable Stock",
+    ],
     flavourProfile: ["coconut", "tomatoey"],
     isQuick: false,
   },
@@ -1210,7 +1259,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/white-bean-parmesan-broth-greens.jpg",
     alt: "White Bean Parmesan Broth with Greens",
     intro: "A brothy white bean bowl with greens, parmesan and crisp toasts.",
-    body: "Warm garlic in olive oil until fragrant. Add cannellini beans and stock or water, then simmer until the broth tastes rounded. Fold through greens at the end so they keep their colour. Finish with parmesan, black pepper and crisp toasts.",
+    body: "Warm garlic in olive oil until fragrant. Add cannellini beans and vegetable stock, then simmer until the broth tastes rounded. Fold through greens at the end so they keep their colour. Finish with parmesan, black pepper and crisp toasts. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Cannellini Beans",
     product: {
       name: "Bold Bean Co Queen White Beans",
@@ -1235,6 +1284,7 @@ export const recipes: Recipe[] = [
       "Parmesan",
       "Garlic",
       "Toast",
+      "Vegetable Stock",
     ],
     pantryMatches: ["Bold Bean Co Queen White Beans", "Vegetable Stock"],
     flavourProfile: ["balanced", "seasonal", "weeknight"],
@@ -1247,7 +1297,7 @@ export const recipes: Recipe[] = [
     alt: "Harissa Chickpea Flatbreads with Herbs",
     intro:
       "Warm flatbreads with harissa chickpeas, yoghurt, herbs and cucumber.",
-    body: "Warm chickpeas with rose harissa and olive oil until glossy. Toast or warm the flatbreads until soft with crisp edges. Spoon over yoghurt, cucumber and the warm chickpeas. Finish with herbs, lemon and a little extra harissa.",
+    body: "Warm chickpeas with rose harissa and olive oil until glossy. Toast or warm the flatbreads until soft with crisp edges. Spoon over yoghurt, cucumber and the warm chickpeas. Finish with herbs, lemon and a little extra harissa. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Chickpeas",
     product: {
       name: "Bold Bean Co Queen Chickpeas",
@@ -1289,7 +1339,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/green-lentil-coconut-curry-bowls.jpg",
     alt: "Green Lentil Coconut Curry Bowls",
     intro: "Green lentils simmered with coconut, spices and seasonal greens.",
-    body: "Simmer the green lentils until tender. Add coconut milk and gentle spices, then cook until creamy. Fold through the greens near the end. Serve with rice, coriander and lime.",
+    body: "Simmer the green lentils until tender. Add coconut milk and gentle spices, then cook until creamy. Fold through the greens near the end. Serve with rice, coriander and lime. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1321,8 +1371,9 @@ export const recipes: Recipe[] = [
       "Greens",
       "Rice",
       "Coriander",
+      "Vegetable Stock",
     ],
-    pantryMatches: [],
+    pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["coconut"],
     isQuick: false,
   },
@@ -1333,7 +1384,7 @@ export const recipes: Recipe[] = [
     alt: "Lemon Kale Bucatini with Parmesan",
     intro:
       "A simple bright bucatini with kale, lemon, parmesan and black pepper.",
-    body: "Cook the bucatini until al dente, saving pasta water. Soften garlic and kale in olive oil until the kale darkens and relaxes. Toss pasta with kale, lemon and enough pasta water to coat. Finish with parmesan, black pepper and extra lemon zest.",
+    body: "Cook the bucatini until al dente, saving pasta water. Soften garlic and kale in olive oil until the kale darkens and relaxes. Toss pasta with kale, lemon and enough pasta water to coat. Finish with parmesan, black pepper and extra lemon zest. Keep a little cooking water back so you can loosen the sauce rather than adding more oil. Taste before serving and adjust with lemon, black pepper or parmesan so the pasta feels glossy rather than heavy.",
     pantryLabel: "Made with Bucatini",
     product: {
       name: "Bucatini",
@@ -1363,7 +1414,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/walnut-herb-farro-roast-vegetables.jpg",
     alt: "Walnut Herb Farro with Roast Vegetables",
     intro: "A robust grain bowl with roasted vegetables, walnuts and herbs.",
-    body: "Roast the vegetables until golden and caramelised at the edges. Cook the farro until chewy but tender. Toss the warm farro with herbs, lemon and olive oil. Fold through the roast vegetables and finish with walnuts.",
+    body: "Roast the vegetables until golden and caramelised at the edges. Cook the farro until chewy but tender. Toss the warm farro with herbs, lemon and olive oil. Fold through the roast vegetables, then finish with walnuts for crunch and a little bitterness against the sweet vegetables. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Farro",
     product: {
       name: "Farro",
@@ -1396,7 +1447,7 @@ export const recipes: Recipe[] = [
       "Parsley",
       "Lemon",
     ],
-    pantryMatches: ["Farro"],
+    pantryMatches: ["Farro", "Walnuts"],
     flavourProfile: ["bright", "herby", "roasted", "nutty"],
     isQuick: false,
   },
@@ -1406,7 +1457,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/charred-greens-tahini-yoghurt-chickpeas.jpg",
     alt: "Charred Greens with Tahini Yoghurt & Crispy Chickpeas",
     intro: "Smoky greens with creamy tahini yoghurt and crunchy chickpeas.",
-    body: "Roast or fry the chickpeas until crisp and deeply golden. Char the greens in a hot pan until smoky at the edges. Mix tahini, yoghurt, lemon and salt into a creamy sauce. Spoon the sauce under the greens and scatter chickpeas over the top.",
+    body: "Roast or fry the chickpeas until crisp and deeply golden. Char the greens in a hot pan until smoky at the edges. Mix tahini, yoghurt, lemon and salt into a creamy sauce. Spoon the sauce under the greens and scatter chickpeas over the top. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Chickpeas",
     product: {
       name: "Bold Bean Co Queen Chickpeas",
@@ -1436,7 +1487,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/roasted-squash-puy-lentils-herbs.jpg",
     alt: "Roasted Squash & Puy Lentils with Herbs",
     intro: "Sweet squash with earthy lentils, herbs and a sharp dressing.",
-    body: "Roast the squash until soft, sweet and caramelised. Warm the puy lentils with olive oil, lemon and seasoning. Toss lentils with parsley while still warm. Serve with squash and yoghurt if liked.",
+    body: "Roast the squash until soft, sweet and caramelised. Warm the puy lentils with olive oil, lemon and seasoning. Toss lentils with parsley while still warm. Serve with squash and yoghurt if liked. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Puy Lentils",
     product: {
       name: "Puy Lentils",
@@ -1466,7 +1517,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/citrus-herb-halloumi-couscous-salad.jpg",
     alt: "Citrus Herb Halloumi Salad with Couscous",
     intro: "Golden halloumi with couscous, citrus, herbs and crisp vegetables.",
-    body: "Cook the giant couscous until tender, then dress with citrus juice. Pan-fry the halloumi until golden and crisp-edged. Fold cucumber, mint and orange through the couscous. Top with halloumi and extra citrus dressing.",
+    body: "Cook the giant couscous until tender, then dress with citrus juice. Pan-fry the halloumi until golden and crisp-edged. Fold cucumber, mint and orange through the couscous. Top with halloumi and extra citrus dressing. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Giant Couscous",
     product: {
       name: "Giant Couscous",
@@ -1502,7 +1553,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/creamy-tofu-korma-greens-rice.jpg",
     alt: "Creamy Tofu Korma with Greens & Rice",
     intro: "A mild creamy tofu korma with greens and fluffy rice.",
-    body: "Cook the rice until fluffy. Fry tofu until lightly golden on the edges. Warm the korma sauce with greens until the leaves soften. Serve tofu and sauce over rice with coriander.",
+    body: "Cook the rice until fluffy. Fry tofu until lightly golden on the edges. Warm the korma sauce with greens until the leaves soften. Serve tofu and sauce over rice with coriander. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1533,7 +1584,7 @@ export const recipes: Recipe[] = [
     alt: "Salmon Traybake with Greens & Mustard Yoghurt",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Roast the potatoes first until golden and crisp at the edges. Add salmon and greens for the final stretch so the fish stays flaky. Mix yoghurt, mustard, lemon and dill into a sharp spooning sauce. Serve everything from the tray with the sauce on the side.",
+    body: "Roast the potatoes first until golden and crisp at the edges. Add salmon and greens for the final stretch so the fish stays flaky. Mix yoghurt, mustard, lemon and dill into a sharp spooning sauce. Serve everything from the tray with the sauce on the side. Give everything enough space on the tray so it roasts rather than steams. Taste before serving and add lemon, herbs or yoghurt at the end to freshen the richer roasted edges.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1570,7 +1621,7 @@ export const recipes: Recipe[] = [
     alt: "Herby Butter Bean Skillet with Roast Tomatoes",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Roast or blister the tomatoes until they turn soft and jammy. Warm butter beans in a skillet with garlic, olive oil and herbs. Fold the tomatoes through the beans so their juices become the sauce. Serve with toast and extra parsley.",
+    body: "Roast or blister the tomatoes until they turn soft and jammy. Warm butter beans in a skillet with garlic, olive oil and herbs. Fold the tomatoes through the beans so their juices become the sauce. Serve with toast and extra parsley. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Butter Beans",
     product: {
       name: "Bold Bean Co Queen Butter Beans",
@@ -1607,7 +1658,7 @@ export const recipes: Recipe[] = [
     alt: "Smoky Tomato Lentil Stew with Herbs",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Soften garlic and onion slowly until sweet. Add smoked paprika and tomatoes, then let the sauce darken slightly. Simmer lentils until tender and the stew thickens naturally. Finish with parsley, olive oil and a squeeze of lemon.",
+    body: "Soften garlic and onion slowly until sweet. Add smoked paprika and tomatoes, then let the sauce darken slightly. Simmer lentils until tender and the stew thickens naturally. Finish with parsley, olive oil and a squeeze of lemon. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Made with Mutti Polpa Tomatoes",
     product: {
       name: "Mutti Polpa Tomatoes",
@@ -1633,8 +1684,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["lentils"],
-    mainIngredients: ["Lentils", "Tomatoes", "Paprika", "Parsley", "Garlic"],
-    pantryMatches: ["Mutti Polpa Tomatoes"],
+    mainIngredients: [
+      "Lentils",
+      "Tomatoes",
+      "Paprika",
+      "Parsley",
+      "Garlic",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Mutti Polpa Tomatoes", "Vegetable Stock"],
     flavourProfile: ["herby", "tomatoey", "smoky"],
     isQuick: false,
   },
@@ -1645,7 +1703,7 @@ export const recipes: Recipe[] = [
     alt: "Roast Tomato Bread Soup with Basil",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Roast the tomatoes and garlic until collapsed and sweet. Blend or crush with stock and torn bread until thick and rustic. Simmer gently until the bread softens into the soup. Finish with basil, parmesan if liked and olive oil.",
+    body: "Roast the tomatoes and garlic until collapsed and sweet. Blend or crush with vegetable stock and torn bread until thick and rustic. Simmer gently until the bread softens into the soup. Finish with basil, parmesan if liked and olive oil. Simmer gently rather than boiling hard so the flavours round out properly. Taste before serving and adjust the thickness with a splash more vegetable stock if needed.",
     pantryLabel: "Made with Mutti Polpa Tomatoes",
     product: {
       name: "Mutti Polpa Tomatoes",
@@ -1664,7 +1722,14 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["tomatoes"],
-    mainIngredients: ["Tomatoes", "Bread", "Basil", "Garlic", "Olive oil"],
+    mainIngredients: [
+      "Tomatoes",
+      "Bread",
+      "Basil",
+      "Garlic",
+      "Olive oil",
+      "Vegetable Stock",
+    ],
     pantryMatches: ["Mutti Polpa Tomatoes", "Vegetable Stock"],
     flavourProfile: ["herby", "tomatoey", "roasted"],
     isQuick: false,
@@ -1676,7 +1741,7 @@ export const recipes: Recipe[] = [
     alt: "Courgette Pea Lemon Risotto",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Soften the risotto base gently before stirring in the rice. Add hot stock gradually until the rice turns creamy. Stir in courgette and peas near the end so they stay green. Finish with lemon zest, mint and parmesan if using.",
+    body: "Soften the risotto base gently before stirring in the rice. Add hot stock gradually until the rice turns creamy. Stir in courgette and peas near the end so they stay green. Finish with lemon zest, mint and parmesan if using. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Made with Short Grain Rice",
     product: {
       name: "Short Grain Rice",
@@ -1695,7 +1760,14 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["risotto rice"],
-    mainIngredients: ["Risotto rice", "Courgette", "Peas", "Lemon", "Mint"],
+    mainIngredients: [
+      "Risotto rice",
+      "Courgette",
+      "Peas",
+      "Lemon",
+      "Mint",
+      "Vegetable Stock",
+    ],
     pantryMatches: ["Short Grain Rice", "Vegetable Stock"],
     flavourProfile: ["bright", "herby"],
     isQuick: false,
@@ -1707,7 +1779,7 @@ export const recipes: Recipe[] = [
     alt: "Butter Bean & Rosemary Stew",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook garlic and rosemary gently in olive oil until fragrant. Add tomatoes and butter beans, then simmer until thick and soft. Fold through greens near the end so they wilt into the stew. Serve with toast and a final drizzle of olive oil.",
+    body: "Cook garlic and rosemary gently in olive oil until fragrant. Add tomatoes and butter beans, then simmer until thick and soft. Fold through greens near the end so they wilt into the stew. Serve with toast and a final drizzle of olive oil. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Butter Beans",
     product: {
       name: "Bold Bean Co Queen Butter Beans",
@@ -1732,8 +1804,9 @@ export const recipes: Recipe[] = [
       "Garlic",
       "Tomatoes",
       "Greens",
+      "Vegetable Stock",
     ],
-    pantryMatches: ["Bold Bean Co Queen Butter Beans"],
+    pantryMatches: ["Bold Bean Co Queen Butter Beans", "Vegetable Stock"],
     flavourProfile: ["herby", "tomatoey"],
     isQuick: false,
   },
@@ -1744,7 +1817,7 @@ export const recipes: Recipe[] = [
     alt: "Green Goddess Potato Salad with Eggs",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Boil the potatoes until tender, then dress while still warm. Soft-boil the eggs, cool slightly and halve. Blend yoghurt, herbs, lemon and spring onions into a green dressing. Toss potatoes through the dressing and top with eggs.",
+    body: "Boil the potatoes until tender, then dress while still warm. Soft-boil the eggs, cool slightly and halve. Blend yoghurt, herbs, lemon and spring onions into a green dressing. Toss potatoes through the dressing and top with eggs. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1781,7 +1854,7 @@ export const recipes: Recipe[] = [
     alt: "Roasted Pepper Chickpea Stew",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Roast the peppers until soft and slightly charred. Simmer tomatoes and garlic until the sauce thickens. Add chickpeas and roasted peppers, then warm through gently. Finish with parsley, lemon and olive oil.",
+    body: "Roast the peppers until soft and slightly charred. Simmer tomatoes and garlic until the sauce thickens. Add chickpeas and roasted peppers, then warm through gently. Finish with parsley, lemon and olive oil. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Made with Chickpeas",
     product: {
       name: "Bold Bean Co Queen Chickpeas",
@@ -1806,8 +1879,19 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["chickpeas"],
-    mainIngredients: ["Peppers", "Chickpeas", "Tomatoes", "Garlic", "Parsley"],
-    pantryMatches: ["Bold Bean Co Queen Chickpeas", "Mutti Polpa Tomatoes"],
+    mainIngredients: [
+      "Peppers",
+      "Chickpeas",
+      "Tomatoes",
+      "Garlic",
+      "Parsley",
+      "Vegetable Stock",
+    ],
+    pantryMatches: [
+      "Bold Bean Co Queen Chickpeas",
+      "Mutti Polpa Tomatoes",
+      "Vegetable Stock",
+    ],
     flavourProfile: ["herby", "tomatoey", "roasted"],
     isQuick: false,
   },
@@ -1818,7 +1902,7 @@ export const recipes: Recipe[] = [
     alt: "Carrot Coconut Ginger Soup with Rice",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook carrots and ginger until the carrots are fully soft. Blend with coconut milk until silky and bright. Cook rice separately until fluffy. Serve the soup with rice, lime and coriander.",
+    body: "Cook carrots and ginger until the carrots are fully soft. Blend with coconut milk until silky and bright. Cook rice separately until fluffy. Serve the soup with rice, lime and coriander. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1837,8 +1921,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["carrots"],
-    mainIngredients: ["Carrots", "Coconut milk", "Ginger", "Rice", "Lime"],
-    pantryMatches: [],
+    mainIngredients: [
+      "Carrots",
+      "Coconut milk",
+      "Ginger",
+      "Rice",
+      "Lime",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["bright", "herby", "coconut"],
     isQuick: false,
   },
@@ -1849,7 +1940,7 @@ export const recipes: Recipe[] = [
     alt: "Tomato White Bean Bake with Herbs",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Combine white beans, tomatoes, garlic and olive oil in a baking dish. Bake until bubbling at the edges and slightly thickened. Let it sit briefly so the sauce settles around the beans. Finish with parsley and serve with toast.",
+    body: "Combine white beans, tomatoes, garlic and olive oil in a baking dish. Bake until bubbling at the edges and slightly thickened. Let it sit briefly so the sauce settles around the beans. Finish with parsley and serve with toast. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Cannellini Beans",
     product: {
       name: "Bold Bean Co Queen White Beans",
@@ -1880,8 +1971,13 @@ export const recipes: Recipe[] = [
       "Parsley",
       "Garlic",
       "Olive oil",
+      "Vegetable Stock",
     ],
-    pantryMatches: ["Bold Bean Co Queen White Beans", "Mutti Polpa Tomatoes"],
+    pantryMatches: [
+      "Bold Bean Co Queen White Beans",
+      "Mutti Polpa Tomatoes",
+      "Vegetable Stock",
+    ],
     flavourProfile: ["herby", "tomatoey"],
     isQuick: false,
   },
@@ -1892,7 +1988,7 @@ export const recipes: Recipe[] = [
     alt: "Charred Corn Black Bean Rice Bowls",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Char the corn in a hot pan until smoky and sweet. Warm black beans with lime, garlic and seasoning. Cook the rice until fluffy. Build the bowls with coriander, yoghurt and extra lime.",
+    body: "Char the corn in a hot pan until smoky and sweet. Warm black beans with lime, garlic and seasoning. Cook the rice until fluffy. Build the bowls with coriander, yoghurt and extra lime. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1923,7 +2019,7 @@ export const recipes: Recipe[] = [
     alt: "Baked Aubergine Yoghurt Plates",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Bake the aubergine until soft, smoky and collapsing. Mix yoghurt with lemon, garlic and salt. Spread the yoghurt over plates and top with warm aubergine. Finish with parsley, olive oil and any crunchy seeds or nuts.",
+    body: "Bake the aubergine until soft, smoky and collapsing. Mix yoghurt with lemon, garlic and salt. Spread the yoghurt over plates and top with warm aubergine. Finish with parsley, olive oil and any crunchy seeds or nuts. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1954,7 +2050,7 @@ export const recipes: Recipe[] = [
     alt: "Creamy Mushroom Barley Pot",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook mushrooms in a hot pan until deeply browned. Simmer barley in stock until chewy and tender. Stir in cream, thyme and garlic until the pot turns glossy. Finish with black pepper and herbs.",
+    body: "Cook mushrooms in a hot pan until deeply browned. Simmer barley in stock until chewy and tender. Stir in cream, thyme and garlic until the pot turns glossy. Finish with black pepper and herbs. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -1973,7 +2069,14 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["mushrooms"],
-    mainIngredients: ["Mushrooms", "Barley", "Cream", "Thyme", "Garlic"],
+    mainIngredients: [
+      "Mushrooms",
+      "Barley",
+      "Cream",
+      "Thyme",
+      "Garlic",
+      "Vegetable Stock",
+    ],
     pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["herby", "creamy"],
     isQuick: false,
@@ -1985,7 +2088,7 @@ export const recipes: Recipe[] = [
     alt: "Brothy Greens Beans & Parmesan",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Warm garlic and herbs in olive oil to start the broth. Add beans and stock, then simmer until the flavour rounds out. Fold through greens right at the end. Finish with parmesan, black pepper and toast.",
+    body: "Warm garlic and herbs in olive oil to start the broth. Add beans and stock, then simmer until the flavour rounds out. Fold through greens right at the end. Finish with parmesan, black pepper and toast. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Cannellini Beans",
     product: {
       name: "Bold Bean Co Queen White Beans",
@@ -2004,7 +2107,14 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["white beans", "beans"],
-    mainIngredients: ["Greens", "White beans", "Parmesan", "Garlic", "Herbs"],
+    mainIngredients: [
+      "Greens",
+      "White beans",
+      "Parmesan",
+      "Garlic",
+      "Herbs",
+      "Vegetable Stock",
+    ],
     pantryMatches: ["Bold Bean Co Queen White Beans", "Vegetable Stock"],
     flavourProfile: ["herby"],
     isQuick: false,
@@ -2016,7 +2126,7 @@ export const recipes: Recipe[] = [
     alt: "Roast Squash Coconut Dal",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Roast squash until golden and sweet at the edges. Simmer red lentils until soft and creamy. Stir in coconut milk and fold through the roasted squash. Finish with coriander, lime and chilli oil if liked.",
+    body: "Roast squash until golden and sweet at the edges. Simmer red lentils until soft and creamy. Stir in coconut milk and fold through the roasted squash. Finish with coriander, lime and chilli oil if liked. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2041,8 +2151,9 @@ export const recipes: Recipe[] = [
       "Coconut milk",
       "Coriander",
       "Rice",
+      "Vegetable Stock",
     ],
-    pantryMatches: [],
+    pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["herby", "coconut", "roasted"],
     isQuick: false,
   },
@@ -2053,7 +2164,7 @@ export const recipes: Recipe[] = [
     alt: "Herby Potato Green Bean Salad",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Boil potatoes until tender, then halve while warm. Cook green beans briefly so they keep some snap. Whisk mustard, lemon, olive oil and herbs into a sharp dressing. Toss everything together while warm so the potatoes absorb the flavour.",
+    body: "Boil potatoes until tender, then halve while warm. Cook green beans briefly so they keep some snap. Whisk mustard, lemon, olive oil and herbs into a sharp dressing. Toss everything together while warm so the potatoes absorb the flavour. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2091,7 +2202,7 @@ export const recipes: Recipe[] = [
     alt: "Soft Polenta with Roast Tomatoes & Greens",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Roast tomatoes until jammy and slightly collapsed. Cook polenta slowly until creamy and spoonable. Wilt the greens with garlic and olive oil. Spoon tomatoes and greens over the polenta and finish with parmesan.",
+    body: "Roast tomatoes until jammy and slightly collapsed. Cook polenta slowly until creamy and spoonable. Wilt the greens with garlic and olive oil. Spoon tomatoes and greens over the polenta and finish with parmesan. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Polenta",
     product: {
       name: "Polenta",
@@ -2110,8 +2221,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 40,
     protein: ["polenta"],
-    mainIngredients: ["Polenta", "Tomatoes", "Greens", "Garlic", "Parmesan"],
-    pantryMatches: ["Polenta"],
+    mainIngredients: [
+      "Polenta",
+      "Tomatoes",
+      "Greens",
+      "Garlic",
+      "Parmesan",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Polenta", "Vegetable Stock"],
     flavourProfile: ["herby", "tomatoey", "roasted"],
     isQuick: false,
   },
@@ -2122,7 +2240,7 @@ export const recipes: Recipe[] = [
     alt: "Broad Bean Herb Ricotta Toasts",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Blanch the broad beans briefly, then season with lemon and herbs. Toast the sourdough until crisp and golden. Spread ricotta generously over the toast. Pile on broad beans and finish with mint, olive oil and black pepper.",
+    body: "Blanch the broad beans briefly, then season with lemon and herbs. Toast the sourdough until crisp and golden. Spread ricotta generously over the toast. Pile on broad beans and finish with mint, olive oil and black pepper. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2153,7 +2271,7 @@ export const recipes: Recipe[] = [
     alt: "Runner Bean Tahini Salad with Crispy Chickpeas",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Roast chickpeas until crisp and golden. Cook runner beans until tender but still bright. Mix tahini, yoghurt, lemon and water into a creamy dressing. Toss the beans with dressing and finish with chickpeas.",
+    body: "Roast chickpeas until crisp and golden. Cook runner beans until tender but still bright. Mix tahini, yoghurt, lemon and water into a creamy dressing. Toss the beans with dressing and finish with chickpeas. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Made with Chickpeas",
     product: {
       name: "Bold Bean Co Queen Chickpeas",
@@ -2190,7 +2308,7 @@ export const recipes: Recipe[] = [
     alt: "Asparagus Lemon Parmesan Orzo",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook the orzo until tender, saving a little cooking water. Sauté asparagus quickly so it stays green and snappy. Toss orzo with lemon, parmesan and enough water to make it glossy. Fold through asparagus and finish with parsley.",
+    body: "Cook the orzo until tender, saving a little cooking water. Sauté asparagus quickly so it stays green and snappy. Toss orzo with lemon, parmesan and enough water to make it glossy. Fold through asparagus and finish with parsley. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Orzo",
     product: {
       name: "Orzo Pasta",
@@ -2221,7 +2339,7 @@ export const recipes: Recipe[] = [
     alt: "Tenderstem Gochujang Rice Bowls",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook the rice until fluffy. Char tenderstem broccoli until the stems soften and tips catch. Toss with gochujang, lime and a little sweetness until sticky. Serve with cucumber, spring onions and sesame.",
+    body: "Cook the rice until fluffy. Char tenderstem broccoli until the stems soften and tips catch. Toss with gochujang, lime and a little sweetness until sticky. Serve with cucumber, spring onions and sesame. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Made with Gochujang Sauce",
     product: {
       name: "Gochujang Sauce",
@@ -2258,7 +2376,7 @@ export const recipes: Recipe[] = [
     alt: "Spinach Coconut Dal with Lime",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Simmer red lentils until soft and creamy. Stir in coconut milk and cook until silky. Fold through spinach at the end so it stays bright. Finish with lime, coriander and chilli if liked.",
+    body: "Simmer red lentils until soft and creamy. Stir in coconut milk and cook until silky. Fold through spinach at the end so it stays bright. Finish with lime, coriander and chilli if liked. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2290,8 +2408,9 @@ export const recipes: Recipe[] = [
       "Coconut milk",
       "Lime",
       "Coriander",
+      "Vegetable Stock",
     ],
-    pantryMatches: [],
+    pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["bright", "herby", "coconut"],
     isQuick: false,
   },
@@ -2302,7 +2421,7 @@ export const recipes: Recipe[] = [
     alt: "Watercress Herb Potato Salad",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Boil potatoes until tender, then dress while warm. Roughly chop watercress and herbs. Whisk mustard, lemon and olive oil into a bright dressing. Fold everything together gently and serve with extra herbs.",
+    body: "Boil potatoes until tender, then dress while warm. Roughly chop watercress and herbs. Whisk mustard, lemon and olive oil into a bright dressing. Fold everything together gently and serve with extra herbs. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2333,7 +2452,7 @@ export const recipes: Recipe[] = [
     alt: "Rocket Pear Walnut Farro",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook the farro until chewy, then cool slightly. Dress the farro with lemon, olive oil and salt while still warm. Fold through rocket, pear slices and walnuts just before serving. Finish with black pepper and cheese if liked.",
+    body: "Cook the farro until chewy, then cool slightly. Dress the farro with lemon, olive oil and salt while still warm. Fold through rocket, pear slices and walnuts just before serving so the leaves stay lively and the nuts keep their texture. Finish with black pepper and cheese if liked. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Farro",
     product: {
       name: "Farro",
@@ -2353,7 +2472,7 @@ export const recipes: Recipe[] = [
     cookingMinutes: 35,
     protein: ["walnuts"],
     mainIngredients: ["Rocket", "Pear", "Farro", "Walnuts", "Lemon"],
-    pantryMatches: ["Farro"],
+    pantryMatches: ["Farro", "Walnuts"],
     flavourProfile: ["bright", "herby", "nutty"],
     isQuick: false,
   },
@@ -2364,7 +2483,7 @@ export const recipes: Recipe[] = [
     alt: "Apple Cabbage Mustard Grain Bowls",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook the grains until tender and dress while warm. Shred cabbage finely and toss with mustard, lemon and salt. Fold in apple slices and herbs for crunch. Serve as bowls with extra dressing spooned over.",
+    body: "Cook the grains until tender and dress while warm. Shred cabbage finely and toss with mustard, lemon and salt. Fold in apple slices and herbs for crunch. Serve as bowls with extra dressing spooned over. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2395,7 +2514,7 @@ export const recipes: Recipe[] = [
     alt: "Tenderstem Sesame Noodles with Cashews",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook noodles until tender, then toss lightly so they do not clump. Char or steam tenderstem until bright and just tender. Mix sesame, lime and soy into a loose dressing. Toss together and finish with cashews and spring onions.",
+    body: "Cook noodles until tender, then toss lightly so they do not clump. Char or steam tenderstem until bright and just tender. Mix sesame, lime and soy into a loose dressing. Toss together and finish with cashews and spring onions. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2421,7 +2540,7 @@ export const recipes: Recipe[] = [
       "Cashews",
       "Lime",
     ],
-    pantryMatches: [],
+    pantryMatches: ["Cashews"],
     flavourProfile: ["bright", "herby", "sesame", "nutty"],
     isQuick: true,
   },
@@ -2432,7 +2551,7 @@ export const recipes: Recipe[] = [
     alt: "Broad Bean Mint Lemon Couscous",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook giant couscous until tender, then dress with lemon and olive oil. Blanch broad beans briefly and season with salt. Fold beans, mint and feta through the couscous. Finish with extra lemon zest and black pepper.",
+    body: "Cook giant couscous until tender, then dress with lemon and olive oil. Blanch broad beans briefly and season with salt. Fold beans, mint and feta through the couscous. Finish with extra lemon zest and black pepper. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Made with Giant Couscous",
     product: {
       name: "Giant Couscous",
@@ -2463,7 +2582,7 @@ export const recipes: Recipe[] = [
     alt: "Spinach Yoghurt Flatbreads with Herbs",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Warm the flatbreads until soft with lightly crisped edges. Wilt spinach quickly, then mix with yoghurt, lemon and herbs. Spoon the spinach yoghurt over the flatbreads. Finish with olive oil, black pepper and extra herbs.",
+    body: "Warm the flatbreads until soft with lightly crisped edges. Wilt spinach quickly, then mix with yoghurt, lemon and herbs. Spoon the spinach yoghurt over the flatbreads. Finish with olive oil, black pepper and extra herbs. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2494,7 +2613,7 @@ export const recipes: Recipe[] = [
     alt: "Pear Gorgonzola Walnut Salad",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Slice the pear just before serving so it stays fresh. Toss leaves with a sharp honey-mustard dressing. Layer pear, gorgonzola and walnuts through the salad. Finish with black pepper and a final drizzle of dressing.",
+    body: "Slice the pear just before serving so it stays fresh. Toss leaves with a sharp honey-mustard dressing. Layer pear, gorgonzola and walnuts through the salad so every forkful has something crisp, creamy and sharp. Finish with black pepper and a final drizzle of dressing. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2514,7 +2633,7 @@ export const recipes: Recipe[] = [
     cookingMinutes: 25,
     protein: ["walnuts"],
     mainIngredients: ["Pear", "Gorgonzola", "Walnuts", "Leaves", "Honey"],
-    pantryMatches: [],
+    pantryMatches: ["Walnuts"],
     flavourProfile: ["herby", "nutty"],
     isQuick: true,
   },
@@ -2525,7 +2644,7 @@ export const recipes: Recipe[] = [
     alt: "Apple Rosemary Lentils with Greens",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Warm lentils with rosemary, olive oil and a little mustard. Wilt greens briefly so they stay vibrant. Fold in crisp apple slices for sweetness and crunch. Finish with lemon and extra rosemary.",
+    body: "Warm lentils with rosemary, olive oil and a little mustard. Wilt greens briefly so they stay vibrant. Fold in crisp apple slices for sweetness and crunch. Finish with lemon and extra rosemary. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2544,8 +2663,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 35,
     protein: ["lentils"],
-    mainIngredients: ["Apple", "Lentils", "Rosemary", "Greens", "Mustard"],
-    pantryMatches: [],
+    mainIngredients: [
+      "Apple",
+      "Lentils",
+      "Rosemary",
+      "Greens",
+      "Mustard",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["herby"],
     isQuick: false,
   },
@@ -2556,7 +2682,7 @@ export const recipes: Recipe[] = [
     alt: "Watercress Pea Herb Soup",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook potatoes and peas until tender. Add watercress and herbs at the end so the soup stays green. Blend until smooth and season with lemon. Finish with yoghurt, peas and olive oil.",
+    body: "Cook potatoes and peas until tender. Add watercress and herbs at the end so the soup stays green. Blend until smooth and season with lemon. Finish with yoghurt, peas and olive oil. Simmer gently rather than boiling hard so the flavours round out properly. Taste before serving and adjust the thickness with a splash more vegetable stock if needed.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2575,8 +2701,15 @@ export const recipes: Recipe[] = [
     difficulty: "easy",
     cookingMinutes: 25,
     protein: ["yoghurt"],
-    mainIngredients: ["Watercress", "Peas", "Mint", "Potatoes", "Yoghurt"],
-    pantryMatches: [],
+    mainIngredients: [
+      "Watercress",
+      "Peas",
+      "Mint",
+      "Potatoes",
+      "Yoghurt",
+      "Vegetable Stock",
+    ],
+    pantryMatches: ["Vegetable Stock"],
     flavourProfile: ["herby"],
     isQuick: true,
   },
@@ -2587,7 +2720,7 @@ export const recipes: Recipe[] = [
     alt: "Asparagus Dill Potato Salad",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Boil potatoes until tender, then halve while warm. Cook asparagus briefly so it stays bright with a little bite. Mix yoghurt, dill, lemon and salt into a creamy dressing. Toss gently and finish with extra dill.",
+    body: "Boil potatoes until tender, then halve while warm. Cook asparagus briefly so it stays bright with a little bite. Mix yoghurt, dill, lemon and salt into a creamy dressing. Toss gently and finish with extra dill. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2618,7 +2751,7 @@ export const recipes: Recipe[] = [
     alt: "Broad Bean Mint Labneh Toasts",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Blanch broad beans briefly and toss with mint, lemon and olive oil. Toast the bread until crisp and sturdy. Spread thick labneh over the toast. Pile on broad beans and finish with black pepper.",
+    body: "Blanch broad beans briefly and toss with mint, lemon and olive oil. Toast the bread until crisp and sturdy. Spread thick labneh over the toast. Pile on broad beans and finish with black pepper. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2649,7 +2782,7 @@ export const recipes: Recipe[] = [
     alt: "Tenderstem Sesame Ginger Greens",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Char tenderstem and greens quickly in a hot pan. Warm ginger, sesame and soy into a glossy dressing. Toss the greens through the dressing while still hot. Serve with rice, spring onions and sesame seeds.",
+    body: "Char tenderstem and greens quickly in a hot pan. Warm ginger, sesame and soy into a glossy dressing. Toss the greens through the dressing while still hot. Serve with rice, spring onions and sesame seeds. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2686,7 +2819,7 @@ export const recipes: Recipe[] = [
     alt: "Asparagus White Bean Lemon Skillet",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Sauté asparagus quickly so it stays green and snappy. Warm white beans with garlic, lemon and olive oil. Fold the asparagus through the beans until glossy. Finish with parsley, black pepper and extra lemon.",
+    body: "Sauté asparagus quickly so it stays green and snappy. Warm white beans with garlic, lemon and olive oil. Fold the asparagus through the beans until glossy. Finish with parsley, black pepper and extra lemon. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Cannellini Beans",
     product: {
       name: "Bold Bean Co Queen White Beans",
@@ -2717,7 +2850,7 @@ export const recipes: Recipe[] = [
     alt: "Runner Beans with Walnut Herb Crumbs",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Cook runner beans until tender but still bright. Toast walnuts with crumbs, garlic and herbs until fragrant. Toss the beans with lemon and yoghurt or olive oil. Scatter the walnut herb crumbs over the top just before serving.",
+    body: "Cook runner beans until tender but still bright. Toast walnuts with crumbs, garlic and herbs until fragrant. Toss the beans with lemon and yoghurt or olive oil. Scatter the walnut herb crumbs over the top just before serving. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2737,7 +2870,7 @@ export const recipes: Recipe[] = [
     cookingMinutes: 35,
     protein: ["walnuts", "beans", "yoghurt"],
     mainIngredients: ["Runner beans", "Walnuts", "Parsley", "Lemon", "Yoghurt"],
-    pantryMatches: [],
+    pantryMatches: ["Walnuts"],
     flavourProfile: ["bright", "herby", "nutty"],
     isQuick: false,
   },
@@ -2748,7 +2881,7 @@ export const recipes: Recipe[] = [
     alt: "Rocket Pear Blue Cheese Flatbreads",
     intro:
       "A produce-led planner meal with herbs, sauce and enough substance for a proper weeknight dinner.",
-    body: "Warm flatbreads until soft with crisp edges. Layer on pear slices and blue cheese, then heat briefly until the cheese softens. Top with rocket after baking so it stays peppery and fresh. Finish with walnuts, honey and black pepper.",
+    body: "Warm flatbreads until soft with crisp edges. Layer on pear slices and blue cheese, then heat briefly until the cheese softens. Top with rocket after baking so it stays peppery and fresh. Finish with walnuts, honey and black pepper. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2768,7 +2901,7 @@ export const recipes: Recipe[] = [
     cookingMinutes: 25,
     protein: ["walnuts"],
     mainIngredients: ["Rocket", "Pear", "Blue cheese", "Flatbreads", "Walnuts"],
-    pantryMatches: [],
+    pantryMatches: ["Walnuts"],
     flavourProfile: ["herby", "nutty"],
     isQuick: true,
   },
@@ -2779,7 +2912,7 @@ export const recipes: Recipe[] = [
     alt: "Miso Salmon with Greens & Sesame Rice",
     intro:
       "Miso-glazed salmon with greens, sesame rice and a fresh lime finish.",
-    body: "Cook the rice until fluffy, then fold through sesame seeds and a little salt. Brush the salmon with white miso, lime and a small splash of oil until glossy. Roast or pan-cook the salmon until just flaky, keeping the centre soft. Wilt the greens quickly and serve everything with lime and spring onions.",
+    body: "Cook the rice until fluffy, then fold through sesame seeds and a little salt. Brush the salmon with white miso, lime and a small splash of oil until glossy. Roast or pan-cook the salmon until just flaky, keeping the centre soft. Wilt the greens quickly and serve everything with lime and spring onions. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Made with White Miso",
     product: {
       name: "White Miso",
@@ -2810,7 +2943,7 @@ export const recipes: Recipe[] = [
     alt: "Chicken Meatballs with Herby Tomato Orzo",
     intro:
       "Soft chicken meatballs with tomato orzo, herbs and a parmesan finish.",
-    body: "Season chicken mince and shape into small meatballs. Brown the meatballs in olive oil until golden on the outside. Add tomatoes, orzo and enough water or stock to simmer gently. Finish with basil, parmesan and black pepper once the orzo is tender.",
+    body: "Season chicken mince and shape into small meatballs. Brown the meatballs in olive oil until golden on the outside. Add tomatoes, orzo and enough water or stock to simmer gently. Finish with basil, parmesan and black pepper once the orzo is tender. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Orzo",
     product: {
       name: "Orzo Pasta",
@@ -2847,7 +2980,7 @@ export const recipes: Recipe[] = [
     alt: "Crispy Tofu Satay Noodle Bowls",
     intro:
       "Crispy tofu, noodles, crunchy vegetables and a creamy satay-style sauce.",
-    body: "Press and cube the tofu, then fry until crisp and deeply golden. Cook the noodles until tender and toss lightly to prevent sticking. Mix peanut sauce with lime, soy and warm water until creamy. Serve with crunchy vegetables, coriander and plenty of satay sauce.",
+    body: "Press and cube the tofu, then fry until crisp and deeply golden. Cook the noodles until tender and toss lightly to prevent sticking. Mix peanut sauce with lime, soy and warm water until creamy. Serve with crunchy vegetables, coriander and plenty of satay sauce. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2884,7 +3017,7 @@ export const recipes: Recipe[] = [
     alt: "Lemon Chicken White Bean Skillet",
     intro:
       "A rustic one-pan chicken skillet with white beans, lemon, greens and herbs.",
-    body: "Brown chicken pieces in a wide pan until golden. Add cannellini beans, garlic, lemon and a splash of stock or water. Simmer until the chicken is cooked through and the beans are glossy. Fold through greens and finish with parsley.",
+    body: "Brown chicken pieces in a wide pan until golden. Add cannellini beans, garlic, lemon and a splash of stock or water. Simmer until the chicken is cooked through and the beans are glossy. Fold through greens and finish with parsley. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Cannellini Beans",
     product: {
       name: "Bold Bean Co Queen White Beans",
@@ -2921,7 +3054,7 @@ export const recipes: Recipe[] = [
     alt: "Soy Ginger Turkey Rice Bowls with Greens",
     intro:
       "Savoury turkey rice bowls with ginger, greens, cucumber and spring onions.",
-    body: "Cook the rice until fluffy and keep warm. Fry turkey mince with ginger, garlic and soy until savoury and browned. Add greens and cook just until wilted. Serve with rice, cucumber, spring onions and sesame.",
+    body: "Cook the rice until fluffy and keep warm. Fry turkey mince with ginger, garlic and soy until savoury and browned. Add greens and cook just until wilted. Serve with rice, cucumber, spring onions and sesame. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -2958,7 +3091,7 @@ export const recipes: Recipe[] = [
     alt: "Harissa Cod with Chickpeas & Roast Peppers",
     intro:
       "Flaky cod with chickpeas, roast peppers, herbs and a warm harissa sauce.",
-    body: "Warm chickpeas and roast peppers with rose harissa and olive oil. Nestle the cod into the pan and spoon some sauce over the top. Cook gently until the fish flakes easily. Finish with parsley, lemon and a drizzle of olive oil.",
+    body: "Warm chickpeas and roast peppers with rose harissa and olive oil. Nestle the cod into the pan and spoon some sauce over the top. Cook gently until the fish flakes easily. Finish with parsley, lemon and a drizzle of olive oil. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Made with Chickpeas",
     product: {
       name: "Bold Bean Co Queen Chickpeas",
@@ -3001,7 +3134,7 @@ export const recipes: Recipe[] = [
     alt: "Soft-Boiled Eggs with Green Tahini Lentils",
     intro:
       "Jammy eggs over herby lentils with greens and a creamy tahini dressing.",
-    body: "Boil the eggs until jammy, then cool, peel and halve. Warm lentils with olive oil, lemon and seasoning. Fold through greens and herbs until just wilted. Serve with green tahini dressing and the halved eggs.",
+    body: "Boil the eggs until jammy, then cool, peel and halve. Warm lentils with olive oil, lemon and seasoning. Fold through greens and herbs until just wilted. Serve with green tahini dressing and the halved eggs. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
@@ -3031,7 +3164,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/sticky-miso-chicken-tenderstem-rice.jpg",
     alt: "Sticky Miso Chicken with Tenderstem & Rice",
     intro: "Sticky miso chicken with tenderstem broccoli, rice and sesame.",
-    body: "Cook the rice until fluffy. Pan-fry the chicken until golden and almost cooked through. Add white miso, soy and a little sweetness to make a sticky glaze. Serve with tenderstem broccoli, sesame and rice.",
+    body: "Cook the rice until fluffy. Pan-fry the chicken until golden and almost cooked through. Add white miso, soy and a little sweetness to make a sticky glaze. Serve with tenderstem broccoli, sesame and rice. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Made with White Miso",
     product: {
       name: "White Miso",
@@ -3075,7 +3208,7 @@ export const recipes: Recipe[] = [
     alt: "Creamy Butter Bean Chicken Bake with Herbs",
     intro:
       "A comforting chicken and butter bean bake with cream, herbs and greens.",
-    body: "Brown chicken pieces in a pan or baking dish. Add butter beans, cream, garlic and herbs around the chicken. Bake until bubbling and the chicken is cooked through. Fold through greens and finish with black pepper.",
+    body: "Brown chicken pieces in a pan or baking dish. Add butter beans, cream, garlic and herbs around the chicken. Bake until bubbling and the chicken is cooked through. Fold through greens and finish with black pepper. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Made with Butter Beans",
     product: {
       name: "Bold Bean Co Queen Butter Beans",
@@ -3105,7 +3238,7 @@ export const recipes: Recipe[] = [
     image: "/images/recipes/salmon-coconut-lime-rice-bowls.jpg",
     alt: "Salmon Coconut Lime Rice Bowls",
     intro: "Bright salmon rice bowls with coconut greens, lime and coriander.",
-    body: "Cook the rice until fluffy. Cook the salmon until just flaky and still soft in the centre. Simmer greens briefly with coconut milk and lime. Serve the salmon over rice with coconut greens and coriander.",
+    body: "Cook the rice until fluffy. Cook the salmon until just flaky and still soft in the centre. Simmer greens briefly with coconut milk and lime. Serve the salmon over rice with coconut greens and coriander. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
       name: "Weekly Produce Box",
