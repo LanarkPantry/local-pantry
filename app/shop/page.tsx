@@ -264,8 +264,8 @@ export default function ShopPage() {
 
       <section className="px-4 py-7 sm:px-6 md:px-10 md:py-10">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-            <article className="rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb]/86 p-5 shadow-[0_10px_24px_rgba(36,51,40,0.055)] md:p-8">
+          <div className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-[#f7f2eb]/86 shadow-[0_10px_24px_rgba(36,51,40,0.055)] lg:grid lg:grid-cols-[1.1fr_0.9fr]">
+            <article className="p-5 md:p-8">
               <p className="text-[10px] uppercase tracking-[0.2em] text-[#6b776c]">
                 Shop
               </p>
@@ -296,13 +296,13 @@ export default function ShopPage() {
               </div>
             </article>
 
-            <article className="overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/80 shadow-[0_10px_24px_rgba(36,51,40,0.05)]">
+            <div className="order-first h-[170px] lg:order-none lg:h-full">
               <img
                 src="/images/home/local-delivery.jpg"
                 alt="A Local Pantry delivery with fresh produce and pantry staples"
-                className="h-[185px] w-full object-cover md:h-full md:min-h-[270px]"
+                className="h-full w-full object-cover"
               />
-            </article>
+            </div>
           </div>
 
           <section id="weekly-boxes" className="mt-10">
