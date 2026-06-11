@@ -20,14 +20,80 @@ function formatPrice(value: number) {
 }
 
 function getPlannerAliases(itemName: string) {
-  if (itemName === "Rose Harissa Paste") return ["Rose Harissa"];
-  if (itemName === "Gochujang Sauce") return ["Signature Gochujang"];
-  if (itemName === "Mutti Polpa Tomatoes") return ["Premium Whole Tomatoes"];
-  if (itemName.includes("Butter Beans")) return ["Butter Beans"];
-  if (itemName.includes("Chickpeas")) return ["Chickpeas"];
-  if (itemName.includes("White Beans")) return ["Cannellini Beans"];
-  if (itemName === "Orzo Pasta") return ["Orzo"];
-  if (itemName === "Blanched Almonds") return ["Almonds"];
+  if (itemName === "Sorrel & Walnut Pesto") {
+    return ["Sorrel & Walnut Pesto", "Green pesto", "Pesto"];
+  }
+
+  if (itemName === "Rose Harissa Paste") {
+    return ["Rose Harissa Paste", "Rose Harissa", "Rose harissa"];
+  }
+
+  if (itemName === "Vegetable Stock") {
+    return ["Vegetable Stock", "Vegetable Stock Concentrate", "Stock", "stock"];
+  }
+
+  if (itemName === "Gochujang Sauce") {
+    return ["Gochujang Sauce", "Signature Gochujang", "Gochujang"];
+  }
+
+  if (itemName === "Orzo Pasta") {
+    return ["Orzo Pasta", "Orzo"];
+  }
+
+  if (itemName === "Risotto Rice") {
+    return ["Risotto Rice", "Short Grain Rice", "Risotto rice"];
+  }
+
+  if (itemName === "Mutti Polpa Tomatoes") {
+    return [
+      "Mutti Polpa Tomatoes",
+      "Premium Whole Tomatoes",
+      "Tomatoes",
+      "tomatoes",
+    ];
+  }
+
+  if (itemName.includes("Butter Beans")) {
+    return [
+      itemName,
+      "Bold Bean Co Queen Butter Beans",
+      "Butter Beans",
+      "Butter beans",
+      "butter beans",
+    ];
+  }
+
+  if (itemName.includes("Chickpeas")) {
+    return [itemName, "Bold Bean Co Queen Chickpeas", "Chickpeas", "chickpeas"];
+  }
+
+  if (itemName.includes("White Beans")) {
+    return [
+      itemName,
+      "Bold Bean Co Queen White Beans",
+      "Cannellini Beans",
+      "Cannellini beans",
+      "White Beans",
+      "White beans",
+      "cannellini beans",
+    ];
+  }
+
+  if (itemName === "Blanched Almonds") {
+    return ["Blanched Almonds", "Almonds", "almonds"];
+  }
+
+  if (itemName === "Walnuts") {
+    return ["Walnuts", "walnuts"];
+  }
+
+  if (itemName === "Hazelnuts") {
+    return ["Hazelnuts", "hazelnuts"];
+  }
+
+  if (itemName === "Cashews") {
+    return ["Cashews", "cashews"];
+  }
 
   return [itemName];
 }
