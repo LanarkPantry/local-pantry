@@ -298,20 +298,18 @@ export default function MyKitchenPage() {
       <section className="px-4 pb-8 pt-4 sm:px-6 md:px-10 md:pb-10 md:pt-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
-            <article className="rounded-[32px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.9)] p-5 shadow-[0_14px_34px_rgba(36,51,40,0.07)] md:p-8">
+            <article className="order-2 rounded-[32px] border border-[#ddd4c8] bg-[rgba(247,242,235,0.9)] p-5 shadow-[0_14px_34px_rgba(36,51,40,0.07)] md:p-8 lg:order-1">
+              {" "}
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#6b776c]">
                 My Kitchen
               </p>
-
               <h1 className="mt-3 max-w-3xl font-serif text-[2.45rem] leading-[1.02] tracking-tight text-[#243328] md:text-[4rem]">
                 Your favourite dinners, saved.
               </h1>
-
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f675c] md:text-base">
                 Keep the meals you love, save useful weekly plans, and make
                 future food weeks easier to build.
               </p>
-
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
                   href="/planner"
@@ -329,11 +327,12 @@ export default function MyKitchenPage() {
               </div>
             </article>
 
-            <aside className="overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-white shadow-[0_14px_34px_rgba(36,51,40,0.07)]">
+            <aside className="order-1 overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-white shadow-[0_14px_34px_rgba(36,51,40,0.07)] lg:order-2">
+              {" "}
               <img
                 src="/images/home/build-your-basket.jpg"
                 alt="Fresh food and weekly planning"
-                className="h-56 w-full object-cover md:h-72 lg:h-full"
+                className="h-auto w-full object-contain md:h-72 md:object-cover lg:h-full"
               />
             </aside>
           </div>
