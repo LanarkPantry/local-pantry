@@ -1817,4 +1817,661 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
       "Serve the salmon over rice with coconut greens and coriander.",
     ],
   },
+
+  // 88. Chicken, Pesto Potatoes & Green Beans
+  {
+    id: "chicken-pesto-potatoes-green-beans",
+    title: "Chicken, Pesto Potatoes & Green Beans",
+    description:
+      "Golden chicken with pesto-dressed potatoes and crisp green beans.",
+    imageUrl: "/images/recipes/chicken-pesto-potatoes-green-beans.jpg",
+    mood: "balanced",
+    eatingStyle: "protein",
+    focusTags: ["family-friendly"],
+    ingredients: [
+      "Chicken",
+      "Potatoes",
+      "Green beans",
+      "Sorrel & Walnut Pesto",
+      "Lemon",
+    ],
+    matchedProducts: ["Sorrel & Walnut Pesto"],
+    steps: [
+      "Roast or pan-fry the chicken until golden and cooked through.",
+      "Boil the potatoes until tender, then crush lightly while still warm.",
+      "Toss the potatoes with sorrel and walnut pesto so they turn glossy.",
+      "Serve with green beans, lemon and a final spoon of pesto.",
+    ],
+  },
+
+  // 89. Pesto Pea Orzo with Greens
+  {
+    id: "pesto-pea-orzo-greens",
+    title: "Pesto Pea Orzo with Greens",
+    description:
+      "A quick green orzo with peas, leafy greens and fresh sorrel pesto.",
+    imageUrl: "/images/recipes/pesto-pea-orzo-greens.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "low-waste"],
+    ingredients: ["Orzo", "Peas", "Greens", "Sorrel & Walnut Pesto", "Lemon"],
+    matchedProducts: ["Orzo", "Sorrel & Walnut Pesto"],
+    steps: [
+      "Cook the orzo until tender, saving a little cooking water.",
+      "Add peas and greens near the end so they stay bright.",
+      "Stir through sorrel and walnut pesto with a splash of cooking water.",
+      "Finish with lemon, black pepper and extra herbs.",
+    ],
+  },
+
+  // 90. Roasted Courgettes with Pesto Butter Beans
+  {
+    id: "roasted-courgettes-pesto-butter-beans",
+    title: "Roasted Courgettes with Pesto Butter Beans",
+    description:
+      "Roasted courgettes over creamy butter beans folded with green pesto.",
+    imageUrl: "/images/recipes/roasted-courgettes-pesto-butter-beans.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["veg-heavy", "low-waste"],
+    ingredients: [
+      "Courgettes",
+      "Butter beans",
+      "Sorrel & Walnut Pesto",
+      "Lemon",
+      "Parsley",
+    ],
+    matchedProducts: ["Butter Beans", "Sorrel & Walnut Pesto"],
+    steps: [
+      "Roast courgettes until golden at the edges and soft in the middle.",
+      "Warm butter beans gently with a splash of stock or water.",
+      "Fold through sorrel and walnut pesto so the beans stay creamy.",
+      "Top with courgettes, parsley, lemon and black pepper.",
+    ],
+  },
+
+  // 91. Green Grain Bowl with Farro & Pesto
+  {
+    id: "green-grain-bowl-farro-pesto",
+    title: "Green Grain Bowl with Farro & Pesto",
+    description:
+      "A fresh farro bowl with greens, herbs and a generous spoon of pesto.",
+    imageUrl: "/images/recipes/green-grain-bowl-farro-pesto.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["veg-heavy", "low-waste"],
+    ingredients: [
+      "Farro",
+      "Greens",
+      "Sorrel & Walnut Pesto",
+      "Courgette",
+      "Lemon",
+    ],
+    matchedProducts: ["Farro", "Sorrel & Walnut Pesto"],
+    steps: [
+      "Cook the farro until chewy, then dress it while warm.",
+      "Char or roast the vegetables until lightly browned.",
+      "Fold greens and herbs through the warm grains.",
+      "Finish with sorrel and walnut pesto, lemon and black pepper.",
+    ],
+  },
+
+  // 92. Pesto Chickpeas & Roast Tomatoes on Toast
+  {
+    id: "pesto-chickpeas-roast-tomatoes-toast",
+    title: "Pesto Chickpeas & Roast Tomatoes on Toast",
+    description:
+      "Warm chickpeas, jammy tomatoes and green pesto piled onto toast.",
+    imageUrl: "/images/recipes/pesto-chickpeas-roast-tomatoes-toast.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "low-waste"],
+    ingredients: [
+      "Chickpeas",
+      "Roast tomatoes",
+      "Toast",
+      "Sorrel & Walnut Pesto",
+      "Basil",
+    ],
+    matchedProducts: [
+      "Chickpeas",
+      "Premium Whole Tomatoes",
+      "Sorrel & Walnut Pesto",
+    ],
+    steps: [
+      "Roast tomatoes until soft and jammy.",
+      "Warm chickpeas gently with a splash of stock or tomato juices.",
+      "Toast the bread until crisp enough to hold the topping.",
+      "Spoon chickpeas and tomatoes over the toast and finish with pesto.",
+    ],
+  },
+
+  // 93. Harissa Chicken Couscous Traybake
+  {
+    id: "harissa-chicken-couscous-traybake",
+    title: "Harissa Chicken Couscous Traybake",
+    description:
+      "Harissa chicken roasted with vegetables and served over giant couscous.",
+    imageUrl: "/images/recipes/harissa-chicken-couscous-traybake.jpg",
+    mood: "comforting",
+    eatingStyle: "protein",
+    focusTags: ["family-friendly"],
+    ingredients: [
+      "Chicken",
+      "Giant couscous",
+      "Rose harissa",
+      "Peppers",
+      "Courgette",
+    ],
+    matchedProducts: ["Rose Harissa", "Giant Couscous", "Vegetable Stock"],
+    steps: [
+      "Rub the chicken with rose harissa, oil and a little salt.",
+      "Roast with peppers, onions and seasonal vegetables until golden.",
+      "Cook the giant couscous in vegetable stock until tender.",
+      "Serve the chicken and vegetables over the couscous with herbs and lemon.",
+    ],
+  },
+
+  // 94. Harissa Lentil & Walnut Salad
+  {
+    id: "harissa-lentil-walnut-salad",
+    title: "Harissa Lentil & Walnut Salad",
+    description:
+      "Puy lentils with walnuts, herbs and a warm rose harissa dressing.",
+    imageUrl: "/images/recipes/harissa-lentil-walnut-salad.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["low-waste"],
+    ingredients: [
+      "Puy lentils",
+      "Walnuts",
+      "Rose harissa",
+      "Parsley",
+      "Red onion",
+    ],
+    matchedProducts: ["Rose Harissa", "Puy Lentils", "Walnuts"],
+    steps: [
+      "Cook the puy lentils until tender but still structured.",
+      "Whisk rose harissa with lemon, olive oil and a little sweetness.",
+      "Toss the warm lentils through the dressing so they absorb flavour.",
+      "Finish with walnuts, herbs and red onion.",
+    ],
+  },
+
+  // 95. Harissa White Beans & Roast Tomatoes
+  {
+    id: "harissa-white-beans-roast-tomatoes",
+    title: "Harissa White Beans & Roast Tomatoes",
+    description:
+      "Creamy white beans with roast tomatoes, greens and rose harissa.",
+    imageUrl: "/images/recipes/harissa-white-beans-roast-tomatoes.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "low-waste"],
+    ingredients: [
+      "White beans",
+      "Tomatoes",
+      "Rose harissa",
+      "Greens",
+      "Parsley",
+    ],
+    matchedProducts: [
+      "Rose Harissa",
+      "Cannellini Beans",
+      "Premium Whole Tomatoes",
+    ],
+    steps: [
+      "Roast tomatoes until they collapse and turn jammy.",
+      "Warm white beans gently with rose harissa and a splash of stock.",
+      "Fold through greens until just wilted.",
+      "Serve with herbs, black pepper and toast if liked.",
+    ],
+  },
+
+  // 96. Harissa Sweet Potato Farro Bowl
+  {
+    id: "harissa-sweet-potato-farro-bowl",
+    title: "Harissa Sweet Potato Farro Bowl",
+    description:
+      "Roasted sweet potato, chewy farro and greens with rose harissa dressing.",
+    imageUrl: "/images/recipes/harissa-sweet-potato-farro-bowl.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["veg-heavy", "family-friendly"],
+    ingredients: [
+      "Sweet potato",
+      "Farro",
+      "Rose harissa",
+      "Greens",
+      "Chickpeas",
+    ],
+    matchedProducts: ["Rose Harissa", "Farro", "Vegetable Stock"],
+    steps: [
+      "Roast sweet potato with rose harissa until tender and caramelised.",
+      "Cook farro in vegetable stock until chewy.",
+      "Fold greens through the warm grains.",
+      "Top with the sweet potato and extra harissa dressing.",
+    ],
+  },
+
+  // 97. Harissa Butter Beans with Greens
+  {
+    id: "harissa-butter-beans-greens",
+    title: "Harissa Butter Beans with Greens",
+    description:
+      "Creamy butter beans and greens in a warm rose harissa tomato sauce.",
+    imageUrl: "/images/recipes/harissa-butter-beans-greens.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "low-waste"],
+    ingredients: [
+      "Butter beans",
+      "Greens",
+      "Rose harissa",
+      "Tomatoes",
+      "Parsley",
+    ],
+    matchedProducts: ["Rose Harissa", "Butter Beans", "Vegetable Stock"],
+    steps: [
+      "Soften garlic or onion gently in olive oil.",
+      "Add butter beans, rose harissa and a splash of stock.",
+      "Fold through greens until glossy and wilted.",
+      "Finish with parsley, lemon and black pepper.",
+    ],
+  },
+
+  // 98. Sticky Gochujang Chicken Rice Bowl
+  {
+    id: "sticky-gochujang-chicken-rice-bowl",
+    title: "Sticky Gochujang Chicken Rice Bowl",
+    description: "Sticky gochujang chicken over rice with cucumber and greens.",
+    imageUrl: "/images/recipes/sticky-gochujang-chicken-rice-bowl.jpg",
+    mood: "quick",
+    eatingStyle: "protein",
+    focusTags: ["family-friendly"],
+    ingredients: ["Chicken", "Rice", "Gochujang", "Cucumber", "Greens"],
+    matchedProducts: ["Signature Gochujang", "Vegetable Stock"],
+    steps: [
+      "Cook the rice until fluffy and keep warm.",
+      "Pan-fry chicken until golden and cooked through.",
+      "Toss the chicken with gochujang until glossy and sticky.",
+      "Serve over rice with cucumber, greens and spring onions.",
+    ],
+  },
+
+  // 99. Gochujang Cashew Noodle Salad
+  {
+    id: "gochujang-cashew-noodle-salad",
+    title: "Gochujang Cashew Noodle Salad",
+    description:
+      "Noodles tossed with gochujang dressing, vegetables and toasted cashews.",
+    imageUrl: "/images/recipes/gochujang-cashew-noodle-salad.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "veg-heavy"],
+    ingredients: ["Noodles", "Gochujang", "Cashews", "Greens", "Red pepper"],
+    matchedProducts: ["Signature Gochujang", "Cashews"],
+    steps: [
+      "Cook the noodles until just tender, then rinse or toss so they stay loose.",
+      "Mix gochujang with lime, soy and a little warm water into a dressing.",
+      "Toss noodles with greens, peppers and herbs.",
+      "Finish with toasted cashews and spring onions.",
+    ],
+  },
+
+  // 100. Gochujang Chickpeas & Roast Broccoli
+  {
+    id: "gochujang-chickpeas-roast-broccoli",
+    title: "Gochujang Chickpeas & Roast Broccoli",
+    description: "Sticky gochujang chickpeas roasted with charred broccoli.",
+    imageUrl: "/images/recipes/gochujang-chickpeas-roast-broccoli.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["veg-heavy", "family-friendly"],
+    ingredients: [
+      "Chickpeas",
+      "Broccoli",
+      "Gochujang",
+      "Spring onions",
+      "Sesame",
+    ],
+    matchedProducts: ["Signature Gochujang", "Chickpeas"],
+    steps: [
+      "Roast broccoli until the tips char and the stems soften.",
+      "Toss chickpeas with gochujang until evenly coated.",
+      "Return everything to the tray until sticky and glossy.",
+      "Finish with spring onions, sesame and lime.",
+    ],
+  },
+
+  // 101. Gochujang Tomato Beans
+  {
+    id: "gochujang-tomato-beans",
+    title: "Gochujang Tomato Beans",
+    description:
+      "Tomato-rich white beans with gochujang warmth and wilted greens.",
+    imageUrl: "/images/recipes/gochujang-tomato-beans.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["low-waste", "family-friendly"],
+    ingredients: [
+      "White beans",
+      "Tomatoes",
+      "Gochujang",
+      "Greens",
+      "Spring onions",
+    ],
+    matchedProducts: [
+      "Signature Gochujang",
+      "Cannellini Beans",
+      "Premium Whole Tomatoes",
+    ],
+    steps: [
+      "Simmer tomatoes with garlic until the sauce thickens.",
+      "Stir in gochujang until the sauce turns glossy.",
+      "Fold through white beans and warm gently.",
+      "Add greens at the end and finish with spring onions.",
+    ],
+  },
+
+  // 102. Gochujang Butter Beans & Greens
+  {
+    id: "gochujang-butter-beans-greens",
+    title: "Gochujang Butter Beans & Greens",
+    description:
+      "Plump butter beans and greens coated in a sticky gochujang glaze.",
+    imageUrl: "/images/recipes/gochujang-butter-beans-greens.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "low-waste"],
+    ingredients: [
+      "Butter beans",
+      "Greens",
+      "Gochujang",
+      "Spring onions",
+      "Sesame",
+    ],
+    matchedProducts: ["Signature Gochujang", "Butter Beans"],
+    steps: [
+      "Warm butter beans gently so they stay whole.",
+      "Stir gochujang with a splash of stock or water into a glossy sauce.",
+      "Fold through greens until just wilted.",
+      "Finish with spring onions, sesame and a little lime.",
+    ],
+  },
+
+  // 103. Mushroom & Herb Risotto
+  {
+    id: "mushroom-herb-risotto",
+    title: "Mushroom & Herb Risotto",
+    description:
+      "A creamy risotto with deeply browned mushrooms, herbs and black pepper.",
+    imageUrl: "/images/recipes/mushroom-herb-risotto.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly"],
+    ingredients: [
+      "Risotto rice",
+      "Mushrooms",
+      "Vegetable Stock",
+      "Thyme",
+      "Parmesan",
+    ],
+    matchedProducts: ["Risotto Rice", "Vegetable Stock"],
+    steps: [
+      "Brown the mushrooms hard in a hot pan until concentrated and savoury.",
+      "Soften the risotto base gently, then stir in the rice.",
+      "Add hot vegetable stock gradually until the rice turns creamy.",
+      "Fold through mushrooms, herbs and parmesan before serving.",
+    ],
+  },
+
+  // 104. Pea & Lemon Risotto
+  {
+    id: "pea-lemon-risotto",
+    title: "Pea & Lemon Risotto",
+    description: "A bright green risotto with peas, lemon and leafy greens.",
+    imageUrl: "/images/recipes/pea-lemon-risotto.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly"],
+    ingredients: ["Risotto rice", "Peas", "Lemon", "Greens", "Parmesan"],
+    matchedProducts: ["Risotto Rice", "Vegetable Stock"],
+    steps: [
+      "Soften the risotto base gently, then add the rice.",
+      "Add hot vegetable stock gradually, stirring until creamy.",
+      "Add peas and greens near the end so they stay bright.",
+      "Finish with lemon zest, herbs and parmesan.",
+    ],
+  },
+
+  // 105. Roast Tomato Risotto
+  {
+    id: "roast-tomato-risotto",
+    title: "Roast Tomato Risotto",
+    description: "Creamy risotto with roast tomatoes, basil and black pepper.",
+    imageUrl: "/images/recipes/roast-tomato-risotto.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly"],
+    ingredients: [
+      "Risotto rice",
+      "Tomatoes",
+      "Vegetable Stock",
+      "Basil",
+      "Parmesan",
+    ],
+    matchedProducts: [
+      "Risotto Rice",
+      "Premium Whole Tomatoes",
+      "Vegetable Stock",
+    ],
+    steps: [
+      "Roast tomatoes until soft, sweet and slightly blistered.",
+      "Start the risotto base gently, then stir in the rice.",
+      "Add hot vegetable stock gradually until the rice turns creamy.",
+      "Fold through the roast tomatoes and finish with basil.",
+    ],
+  },
+
+  // 106. Chicken & Greens Risotto
+  {
+    id: "chicken-greens-risotto",
+    title: "Chicken & Greens Risotto",
+    description: "Creamy risotto with golden chicken, greens and parmesan.",
+    imageUrl: "/images/recipes/chicken-greens-risotto.jpg",
+    mood: "comforting",
+    eatingStyle: "protein",
+    focusTags: ["family-friendly"],
+    ingredients: [
+      "Chicken",
+      "Risotto rice",
+      "Greens",
+      "Vegetable Stock",
+      "Parmesan",
+    ],
+    matchedProducts: ["Risotto Rice", "Vegetable Stock"],
+    steps: [
+      "Pan-fry chicken until golden and cooked through, then slice or shred.",
+      "Cook the risotto slowly with hot vegetable stock until creamy.",
+      "Fold through greens near the end so they wilt into the rice.",
+      "Top with chicken, parmesan and black pepper.",
+    ],
+  },
+
+  // 107. Creamy Polenta with Roast Tomatoes
+  {
+    id: "creamy-polenta-roast-tomatoes",
+    title: "Creamy Polenta with Roast Tomatoes",
+    description:
+      "Soft golden polenta topped with jammy roast tomatoes and herbs.",
+    imageUrl: "/images/recipes/creamy-polenta-roast-tomatoes.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly"],
+    ingredients: [
+      "Polenta",
+      "Tomatoes",
+      "Vegetable Stock",
+      "Basil",
+      "Parmesan",
+    ],
+    matchedProducts: ["Polenta", "Premium Whole Tomatoes", "Vegetable Stock"],
+    steps: [
+      "Roast tomatoes until blistered, soft and sweet.",
+      "Cook polenta slowly with vegetable stock until creamy and spoonable.",
+      "Season the polenta well so it tastes rounded.",
+      "Top with roast tomatoes, herbs and black pepper.",
+    ],
+  },
+
+  // 108. Polenta with White Beans & Greens
+  {
+    id: "polenta-white-beans-greens",
+    title: "Polenta with White Beans & Greens",
+    description: "Creamy polenta topped with white beans, greens and parmesan.",
+    imageUrl: "/images/recipes/polenta-white-beans-greens.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["low-waste", "family-friendly"],
+    ingredients: [
+      "Polenta",
+      "White beans",
+      "Greens",
+      "Vegetable Stock",
+      "Parmesan",
+    ],
+    matchedProducts: ["Polenta", "Cannellini Beans", "Vegetable Stock"],
+    steps: [
+      "Cook polenta with vegetable stock until soft and creamy.",
+      "Warm white beans gently with garlic and a splash of stock.",
+      "Fold greens through the beans until just wilted.",
+      "Spoon the beans over the polenta and finish with black pepper.",
+    ],
+  },
+
+  // 109. Crispy Polenta & Harissa Vegetables
+  {
+    id: "crispy-polenta-harissa-vegetables",
+    title: "Crispy Polenta & Harissa Vegetables",
+    description:
+      "Crispy golden polenta with roasted vegetables and rose harissa.",
+    imageUrl: "/images/recipes/crispy-polenta-harissa-vegetables.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["veg-heavy", "family-friendly"],
+    ingredients: [
+      "Polenta",
+      "Rose harissa",
+      "Roast vegetables",
+      "Peppers",
+      "Courgette",
+    ],
+    matchedProducts: ["Polenta", "Rose Harissa"],
+    steps: [
+      "Cook polenta, cool until firm, then cut into pieces.",
+      "Pan-fry or roast the polenta until crisp and golden.",
+      "Roast vegetables with rose harissa until tender and glossy.",
+      "Serve the vegetables over the crispy polenta with herbs.",
+    ],
+  },
+
+  // 110. Mushroom Polenta Bowl
+  {
+    id: "mushroom-polenta-bowl",
+    title: "Mushroom Polenta Bowl",
+    description:
+      "Creamy polenta topped with savoury mushrooms, greens and herbs.",
+    imageUrl: "/images/recipes/mushroom-polenta-bowl.jpg",
+    mood: "comforting",
+    eatingStyle: "veg",
+    focusTags: ["low-waste"],
+    ingredients: ["Polenta", "Mushrooms", "Greens", "Vegetable Stock", "Thyme"],
+    matchedProducts: ["Polenta", "Vegetable Stock"],
+    steps: [
+      "Cook polenta slowly with vegetable stock until creamy.",
+      "Brown mushrooms deeply in a hot pan with thyme and garlic.",
+      "Wilt greens briefly into the mushrooms.",
+      "Spoon mushrooms and greens over the polenta with black pepper.",
+    ],
+  },
+
+  // 111. Apple, Walnut & Farro Salad
+  {
+    id: "apple-walnut-farro-salad",
+    title: "Apple, Walnut & Farro Salad",
+    description:
+      "A fresh farro salad with apple, walnuts, herbs and sharp dressing.",
+    imageUrl: "/images/recipes/apple-walnut-farro-salad.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["low-waste"],
+    ingredients: ["Apple", "Farro", "Walnuts", "Rocket", "Parsley"],
+    matchedProducts: ["Farro", "Walnuts"],
+    steps: [
+      "Cook the farro until chewy, then dress while still warm.",
+      "Slice the apple just before serving so it stays crisp.",
+      "Fold apple, herbs and rocket through the farro.",
+      "Finish with walnuts, lemon and black pepper.",
+    ],
+  },
+
+  // 112. Pear, Hazelnut & Rocket Salad
+  {
+    id: "pear-hazelnut-rocket-salad",
+    title: "Pear, Hazelnut & Rocket Salad",
+    description:
+      "A fresh rocket salad with pear, toasted hazelnuts and simple dressing.",
+    imageUrl: "/images/recipes/pear-hazelnut-rocket-salad.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["low-waste"],
+    ingredients: ["Pear", "Hazelnuts", "Rocket", "Lemon", "Olive oil"],
+    matchedProducts: ["Hazelnuts"],
+    steps: [
+      "Toast hazelnuts until fragrant, then roughly chop.",
+      "Slice the pear just before serving.",
+      "Toss rocket with lemon, olive oil and black pepper.",
+      "Layer through pear and hazelnuts and serve straight away.",
+    ],
+  },
+
+  // 113. Roast Beetroot, Apple & Puy Lentils
+  {
+    id: "beetroot-apple-puy-lentils",
+    title: "Roast Beetroot, Apple & Puy Lentils",
+    description:
+      "Earthy beetroot, crisp apple and puy lentils in a sharp herb dressing.",
+    imageUrl: "/images/recipes/beetroot-apple-puy-lentils.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["low-waste"],
+    ingredients: ["Beetroot", "Apple", "Puy lentils", "Parsley", "Mustard"],
+    matchedProducts: ["Puy Lentils"],
+    steps: [
+      "Roast beetroot until tender, then cut into chunks.",
+      "Cook puy lentils until tender but still holding their shape.",
+      "Dress the warm lentils with mustard, lemon and olive oil.",
+      "Fold through beetroot, apple and parsley before serving.",
+    ],
+  },
+
+  // 114. Warm Apple, Farro & Herb Bowl
+  {
+    id: "warm-apple-farro-herb-bowl",
+    title: "Warm Apple, Farro & Herb Bowl",
+    description: "A warm autumnal farro bowl with apples, walnuts and herbs.",
+    imageUrl: "/images/recipes/warm-apple-farro-herb-bowl.jpg",
+    mood: "balanced",
+    eatingStyle: "veg",
+    focusTags: ["low-waste", "family-friendly"],
+    ingredients: ["Apple", "Farro", "Walnuts", "Parsley", "Sage"],
+    matchedProducts: ["Farro"],
+    steps: [
+      "Cook the farro until chewy and dress it while warm.",
+      "Warm apple slices gently with herbs until just softened.",
+      "Fold apples and herbs through the farro.",
+      "Finish with walnuts, black pepper and a little lemon.",
+    ],
+  },
 ];
