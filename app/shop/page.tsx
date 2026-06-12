@@ -98,25 +98,115 @@ function getPlannerAliases(itemName: string) {
   return [itemName];
 }
 
-function getPlannerRecipeCount(itemName: string) {
-  const aliases = getPlannerAliases(itemName);
-
-  return recipes.filter((recipe) =>
-    recipe.pantryMatches.some((pantryMatch) => aliases.includes(pantryMatch)),
-  ).length;
+function normalisePlannerText(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
-function PlannerRecipeBadge({ count }: { count: number }) {
+function getPlannerRecipeMatches(itemName: string) {
+  const aliases = getPlannerAliases(itemName).map(normalisePlannerText);
+
+  return recipes.filter((recipe) =>
+    recipe.pantryMatches.some((pantryMatch) =>
+      aliases.includes(normalisePlannerText(pantryMatch)),
+    ),
+  );
+}
+
+function getPlannerRecipeCount(itemName: string) {
+  return getPlannerRecipeMatches(itemName).length;
+}
+
+function getPreferredRecipeTitle(itemName: string) {
+  if (itemName === "Sorrel & Walnut Pesto") {
+    return "Pesto Pea Orzo with Greens";
+  }
+
+  if (itemName === "Rose Harissa Paste") {
+    return "Harissa Chicken Couscous Traybake";
+  }
+
+  if (itemName === "Vegetable Stock") {
+    return "Mushroom & Herb Risotto";
+  }
+
+  if (itemName === "Gochujang Sauce") {
+    return "Sticky Gochujang Chicken Rice Bowl";
+  }
+
+  if (itemName === "Farro") return "Apple, Walnut & Farro Salad";
+  if (itemName === "Polenta") return "Creamy Polenta with Roast Tomatoes";
+  if (itemName === "Bucatini")
+    return "Bucatini with Charred Courgette & Green Pesto";
+  if (itemName === "Casarecce Pasta")
+    return "Roast Pepper Cashew Cream Casarecce";
+  if (itemName === "Orzo Pasta") return "Pesto Pea Orzo with Greens";
+  if (itemName === "Giant Couscous") return "Harissa Chicken Couscous Traybake";
+  if (itemName === "Puy Lentils") return "Roast Beetroot, Apple & Puy Lentils";
+  if (itemName === "Risotto Rice") return "Pea & Lemon Risotto";
+
+  if (itemName === "Blanched Almonds") return "Apple, Almond & Farro Salad";
+  if (itemName === "Walnuts") return "Apple, Walnut & Farro Salad";
+  if (itemName === "Hazelnuts") return "Pear, Hazelnut & Rocket Salad";
+  if (itemName === "Cashews") return "Gochujang Cashew Noodle Salad";
+
+  if (itemName.includes("Butter Beans"))
+    return "Harissa Butter Beans with Greens";
+  if (itemName.includes("Chickpeas"))
+    return "Gochujang Chickpeas & Roast Broccoli";
+  if (itemName.includes("White Beans"))
+    return "Harissa White Beans & Roast Tomatoes";
+  if (itemName === "Mutti Polpa Tomatoes") return "Roast Tomato Risotto";
+
+  return null;
+}
+
+function getPopularRecipeTitle(itemName: string) {
+  const matches = getPlannerRecipeMatches(itemName);
+
+  if (matches.length === 0) return null;
+
+  const preferredTitle = getPreferredRecipeTitle(itemName);
+
+  if (preferredTitle) {
+    const preferredMatch = matches.find(
+      (recipe) => recipe.title === preferredTitle,
+    );
+
+    if (preferredMatch) return preferredMatch.title;
+  }
+
+  return matches[0].title;
+}
+
+function PlannerRecipeBadge({
+  count,
+  popularRecipeTitle,
+}: {
+  count: number;
+  popularRecipeTitle: string | null;
+}) {
   if (count <= 0) return null;
 
   return (
-    <div className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d9d1c5] bg-[#f7f2eb] px-2.5 py-1 text-[11px] font-medium text-[#4f5e52]">
-      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#243328] text-[10px] leading-none text-white">
-        ✓
-      </span>
-      <span>
-        Used in {count} planner recipe{count === 1 ? "" : "s"}
-      </span>
+    <div className="mt-2 space-y-1.5">
+      <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d9d1c5] bg-[#f7f2eb] px-2.5 py-1 text-[11px] font-medium text-[#4f5e52]">
+        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#243328] text-[10px] leading-none text-white">
+          ✓
+        </span>
+        <span>
+          Used in {count} planner recipe{count === 1 ? "" : "s"}
+        </span>
+      </div>
+
+      {popularRecipeTitle ? (
+        <p className="text-[11px] leading-4 text-[#6b776c]">
+          Popular recipe: {popularRecipeTitle}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -242,6 +332,7 @@ export default function ShopPage() {
     large?: boolean;
   }) {
     const plannerRecipeCount = large ? 0 : getPlannerRecipeCount(item.name);
+    const popularRecipeTitle = large ? null : getPopularRecipeTitle(item.name);
 
     return (
       <article className="overflow-hidden rounded-[24px] border border-[#ddd4c8] bg-white/82 shadow-[0_8px_20px_rgba(36,51,40,0.045)] transition hover:-translate-y-0.5 hover:bg-white">
@@ -294,7 +385,10 @@ export default function ShopPage() {
                 {getShortLine(item)}
               </p>
 
-              <PlannerRecipeBadge count={plannerRecipeCount} />
+              <PlannerRecipeBadge
+                count={plannerRecipeCount}
+                popularRecipeTitle={popularRecipeTitle}
+              />
 
               <div className="mt-3">
                 <span className="inline-flex rounded-full border border-[#ddd4c8] bg-white/90 px-3 py-1.5 text-sm font-medium text-[#243328]">

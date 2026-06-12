@@ -237,23 +237,99 @@ function writePlannerRecipes(value: PlannerRecipe[]) {
 
 function getProductGroupTitle(item: ShopDisplayItem) {
   if (item.category === "boxes") return "Weekly Fruit & Veg Boxes";
-  if (item.category === "pantry") return "Gourmet Jars";
+  if (item.category === "pantry") return "Signature Pantry Products";
   if (looksLikeNutItem(item)) return "Nuts";
   if (item.category === "cupboard") return "Pantry Staples";
   return "Extras";
 }
 
 function getWorksWellWith(item: ShopDisplayItem) {
-  if (item.category === "pantry") {
-    return ["toast", "crackers", "roast veg"];
+  if (item.name === "Sorrel & Walnut Pesto") {
+    return ["orzo", "potatoes", "beans", "farro", "greens"];
+  }
+
+  if (item.name === "Rose Harissa Paste") {
+    return ["butter beans", "couscous", "chicken", "lentils", "sweet potato"];
+  }
+
+  if (item.name === "Vegetable Stock") {
+    return ["risotto", "farro", "couscous", "beans", "soups"];
+  }
+
+  if (item.name === "Gochujang Sauce") {
+    return ["noodles", "rice bowls", "chickpeas", "chicken", "greens"];
+  }
+
+  if (item.name === "Farro") {
+    return ["apples", "walnuts", "pesto", "roast veg", "salads"];
+  }
+
+  if (item.name === "Polenta") {
+    return ["roast tomatoes", "white beans", "mushrooms", "greens", "harissa"];
+  }
+
+  if (item.name === "Risotto Rice") {
+    return ["mushrooms", "peas", "lemon", "roast tomatoes", "stock"];
+  }
+
+  if (item.name === "Puy Lentils") {
+    return ["beetroot", "apple", "walnuts", "harissa", "herbs"];
+  }
+
+  if (item.name === "Giant Couscous") {
+    return ["harissa", "chicken", "roast veg", "herbs", "salads"];
+  }
+
+  if (item.name === "Orzo Pasta") {
+    return ["pesto", "peas", "greens", "tomatoes", "stock"];
+  }
+
+  if (item.name === "Casarecce Pasta") {
+    return ["roast peppers", "cashews", "cream", "chicken", "leeks"];
+  }
+
+  if (item.name === "Bucatini") {
+    return ["pesto", "courgette", "kale", "lemon", "parmesan"];
+  }
+
+  if (item.name === "Walnuts") {
+    return ["apples", "farro", "lentils", "salads", "pesto"];
+  }
+
+  if (item.name === "Hazelnuts") {
+    return ["pears", "rocket", "salads", "baking", "breakfasts"];
+  }
+
+  if (item.name === "Cashews") {
+    return ["noodles", "gochujang", "sauces", "broccoli", "lime"];
+  }
+
+  if (item.name === "Blanched Almonds") {
+    return ["apples", "breakfasts", "baking", "salads", "snacking"];
+  }
+
+  if (item.name.includes("Butter Beans")) {
+    return ["harissa", "gochujang", "greens", "tomatoes", "toast"];
+  }
+
+  if (item.name.includes("Chickpeas")) {
+    return ["gochujang", "broccoli", "harissa", "tomatoes", "couscous"];
+  }
+
+  if (item.name.includes("White Beans")) {
+    return ["harissa", "tomatoes", "polenta", "greens", "garlic"];
+  }
+
+  if (item.name === "Mutti Polpa Tomatoes") {
+    return ["risotto", "white beans", "gochujang", "pasta", "stews"];
   }
 
   if (looksLikeNutItem(item)) {
-    return ["porridge", "yoghurt", "snacking"];
+    return ["porridge", "yoghurt", "salads", "baking", "snacking"];
   }
 
   if (item.category === "cupboard") {
-    return ["pasta", "soups", "traybakes"];
+    return ["pasta", "soups", "traybakes", "bowls", "batch cooking"];
   }
 
   return ["simple meals", "weekly planning", "easy top-ups"];
@@ -311,7 +387,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
   const productGroups = useMemo<ProductGroup[]>(() => {
     const orderedGroups = [
       "Weekly Fruit & Veg Boxes",
-      "Gourmet Jars",
+      "Signature Pantry Products",
       "Pantry Staples",
       "Nuts",
       "Extras",

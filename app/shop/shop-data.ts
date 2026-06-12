@@ -49,7 +49,7 @@ export const pantryItems: ShopDisplayItem[] = [
     description:
       "A fresh savoury pesto made with sorrel, walnuts and parmesan.",
     details:
-      "Use with pasta, potatoes, beans, roasted vegetables or stirred through grains.",
+      "Use with pasta, potatoes, beans, orzo, roast vegetables and warm grains.",
     note: "Usually added as a one-off",
     weight: "200ml",
   },
@@ -62,7 +62,7 @@ export const pantryItems: ShopDisplayItem[] = [
     description:
       "A fragrant North African-inspired chilli paste with warmth rather than intense heat.",
     details:
-      "Excellent with beans, roasted vegetables, couscous, grains and dressings.",
+      "Excellent with butter beans, white beans, chicken traybakes, couscous, grains and dressings.",
     note: "Usually added as a one-off",
     weight: "200ml",
   },
@@ -73,9 +73,9 @@ export const pantryItems: ShopDisplayItem[] = [
     category: "pantry",
     checkoutType: "one-off",
     description:
-      "A concentrated vegetable stock made for soups, grains, sauces and everyday cooking.",
+      "A concentrated vegetable stock made for soups, risottos, grains, sauces and everyday cooking.",
     details:
-      "Adds depth and savoury flavour without needing multiple ingredients.",
+      "Adds depth to risotto rice, farro, couscous, beans and simple one-pan dinners.",
     note: "Usually added as a one-off",
     weight: "200ml",
   },
@@ -88,7 +88,7 @@ export const pantryItems: ShopDisplayItem[] = [
     description:
       "A sweet, savoury and gently spicy Korean-inspired cooking sauce.",
     details:
-      "Ideal for traybakes, roasted vegetables, noodles, rice bowls and quick midweek dinners.",
+      "Ideal for chicken rice bowls, noodles, sticky chickpeas, tomato beans and quick midweek dinners.",
     note: "Usually added as a one-off",
     weight: "200ml",
   },
@@ -105,7 +105,7 @@ export const dryGoodsItems: ShopDisplayItem[] = [
     description:
       "A nutty chewy grain for bowls, salads and simple vegetable-led dinners.",
     details:
-      "Works well with roast vegetables, herbs, soft cheeses and harissa.",
+      "Works well with roast vegetables, herbs, apples, walnuts, pesto and harissa.",
     note: "Usually added as a one-off",
   },
   {
@@ -117,7 +117,8 @@ export const dryGoodsItems: ShopDisplayItem[] = [
     weight: "500g",
     description:
       "A soft comforting base for roasted vegetables, beans and simple suppers.",
-    details: "Naturally gluten-free and useful for quick savoury bowls.",
+    details:
+      "Naturally gluten-free and useful with roast tomatoes, mushrooms, greens and white beans.",
     note: "Usually added as a one-off",
   },
   {
@@ -177,7 +178,8 @@ export const dryGoodsItems: ShopDisplayItem[] = [
     weight: "500g",
     description:
       "Structured lentils for warm salads, batch cooking, bowls and sides.",
-    details: "Useful to cook ahead and keep in the fridge for quick meals.",
+    details:
+      "Useful with beetroot, apple, walnuts, squash, herbs and harissa dressings.",
     note: "Usually added as a one-off",
   },
   {
@@ -188,8 +190,9 @@ export const dryGoodsItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "Short grain rice for risotto-style cooking, simple sides and puddings.",
-    details: "A flexible cupboard basic that works sweet or savoury.",
+      "Short grain rice for creamy risottos, simple sides and puddings.",
+    details:
+      "Works well with mushrooms, peas, lemon, roast tomatoes, chicken, greens and vegetable stock.",
     note: "Usually added as a one-off",
   },
 ];
@@ -214,7 +217,7 @@ export const extraItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A savoury-leaning extra for grains, leaves, roast veg and cheese.",
+      "A savoury-leaning extra for grains, leaves, apples, roast veg and cheese.",
     note: "Usually added as a one-off",
   },
   {
@@ -225,7 +228,7 @@ export const extraItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "500g",
     description:
-      "A slightly special nut for sweet things, baking and darker flavours.",
+      "A slightly special nut for salads, pears, baking and darker flavours.",
     note: "Usually added as a one-off",
   },
   {
@@ -235,7 +238,8 @@ export const extraItems: ShopDisplayItem[] = [
     category: "extras",
     checkoutType: "one-off",
     weight: "500g",
-    description: "A soft useful nut for snacking, cooking and adding richness.",
+    description:
+      "A soft useful nut for snacking, noodles, sauces and adding richness.",
     note: "Usually added as a one-off",
   },
 ];
@@ -250,7 +254,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     weight: "540g",
     description:
       "Large soft butter beans for fast dinners, traybakes and simple weeknight cooking.",
-    details: "Works well with tomatoes, harissa, greens and roast vegetables.",
+    details:
+      "Works well with harissa, gochujang, tomatoes, greens and roast vegetables.",
     note: "Usually added as a one-off",
   },
   {
@@ -262,7 +267,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     weight: "540g",
     description:
       "Tender jarred chickpeas for quick bowls, traybakes and easy dinners.",
-    details: "Works well with harissa, tomatoes, herbs, couscous and tahini.",
+    details:
+      "Works well with harissa, gochujang, roast broccoli, tomatoes, herbs, couscous and tahini.",
     note: "Usually added as a one-off",
   },
   {
@@ -274,7 +280,8 @@ export const cupboardItems: ShopDisplayItem[] = [
     weight: "540g",
     description:
       "Creamy white beans for soups, greens, tomato dishes and simple bowls.",
-    details: "Works well with garlic, lemon, miso, herbs and soft vegetables.",
+    details:
+      "Works well with harissa, gochujang, roast tomatoes, garlic, lemon, herbs and soft vegetables.",
     note: "Usually added as a one-off",
   },
   {
@@ -285,8 +292,9 @@ export const cupboardItems: ShopDisplayItem[] = [
     checkoutType: "one-off",
     weight: "400g",
     description:
-      "Finely chopped tomatoes for sauces, beans and quick one-pan meals.",
-    details: "One of the most useful bases to keep in the cupboard.",
+      "Finely chopped tomatoes for sauces, beans, risottos and quick one-pan meals.",
+    details:
+      "One of the most useful bases to keep in the cupboard, especially with white beans and risotto rice.",
     note: "Usually added as a one-off",
   },
 ];
