@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../cart-context";
 import SiteFooter from "../components/SiteFooter";
@@ -61,6 +61,14 @@ export default function BasketPage() {
   >("weekly");
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [launchGift, setLaunchGift] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [deliveryAddressLine1, setDeliveryAddressLine1] = useState("");
+  const [deliveryAddressLine2, setDeliveryAddressLine2] = useState("");
+  const [deliveryTown, setDeliveryTown] = useState("");
+  const [deliveryPostcode, setDeliveryPostcode] = useState("");
+  const [orderSuccess, setOrderSuccess] = useState(false);
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [pauseEmail, setPauseEmail] = useState("");
@@ -69,7 +77,14 @@ export default function BasketPage() {
   const [pauseMessage, setPauseMessage] = useState("");
   const [pauseError, setPauseError] = useState("");
   const totalItems = cart.length;
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
 
+    if (params.get("success") === "true") {
+      setOrderSuccess(true);
+      setLaunchGift("");
+    }
+  }, []);
   const subscriptionSubtotal = useMemo(() => {
     return subscriptionItems.reduce((sum, item) => sum + item.price, 0);
   }, [subscriptionItems]);
@@ -155,7 +170,26 @@ Thanks!`,
         );
         return;
       }
+      if (!customerName.trim()) {
+        setCheckoutError("Please enter your name before checkout.");
+        return;
+      }
 
+      if (!customerEmail.trim()) {
+        setCheckoutError("Please enter your email before checkout.");
+        return;
+      }
+
+      if (
+        !deliveryAddressLine1.trim() ||
+        !deliveryTown.trim() ||
+        !deliveryPostcode.trim()
+      ) {
+        setCheckoutError(
+          "Please enter your full delivery address before checkout.",
+        );
+        return;
+      }
       setIsLoadingCheckout(true);
 
       const response = await fetch("/api/checkout", {
@@ -174,6 +208,13 @@ Thanks!`,
           total: orderTotal,
           subscriptionItems,
           oneOffItems,
+          customerName,
+          customerEmail,
+          customerPhone,
+          deliveryAddressLine1,
+          deliveryAddressLine2,
+          deliveryTown,
+          deliveryPostcode,
         }),
       });
 
@@ -843,6 +884,88 @@ Thanks!`,
 
               <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
                 <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
+                  <div className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-4 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-6">
+                    <div className="rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4 md:p-6">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                        Delivery details
+                      </p>
+
+                      <h2 className="mt-2 font-serif text-3xl">
+                        Where should we deliver?
+                      </h2>
+
+                      <p className="mt-3 text-sm leading-6 text-[#667164]">
+                        We'll use these details for your deliveries and order
+                        updates.
+                      </p>
+
+                      <div className="mt-5 grid gap-4">
+                        <input
+                          type="text"
+                          placeholder="Full name *"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          className="w-full rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm"
+                        />
+
+                        <input
+                          type="email"
+                          placeholder="Email address *"
+                          value={customerEmail}
+                          onChange={(e) => setCustomerEmail(e.target.value)}
+                          className="w-full rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm"
+                        />
+
+                        <input
+                          type="tel"
+                          placeholder="Phone number"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          className="w-full rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm"
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Address line 1 *"
+                          value={deliveryAddressLine1}
+                          onChange={(e) =>
+                            setDeliveryAddressLine1(e.target.value)
+                          }
+                          className="w-full rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm"
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Address line 2"
+                          value={deliveryAddressLine2}
+                          onChange={(e) =>
+                            setDeliveryAddressLine2(e.target.value)
+                          }
+                          className="w-full rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm"
+                        />
+
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <input
+                            type="text"
+                            placeholder="Town *"
+                            value={deliveryTown}
+                            onChange={(e) => setDeliveryTown(e.target.value)}
+                            className="w-full rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm"
+                          />
+
+                          <input
+                            type="text"
+                            placeholder="Postcode *"
+                            value={deliveryPostcode}
+                            onChange={(e) =>
+                              setDeliveryPostcode(e.target.value.toUpperCase())
+                            }
+                            className="w-full rounded-2xl border border-[#ddd4c8] bg-[rgba(251,250,248,0.86)] px-4 py-3 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
                     Delivery notes
                   </p>
