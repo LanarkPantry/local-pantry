@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabase-admin";
 
-const adminEmail =
-  process.env.ORDERS_ADMIN_EMAIL?.trim().toLowerCase() ??
-  "ainsleykingyoga@gmail.com";
+function getAdminEmails() {
+  const emails =
+    process.env.ADMIN_EMAILS ??
+    process.env.ORDERS_ADMIN_EMAIL ??
+    "ainsleykingyoga@gmail.com";
+
+  return emails
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
 
 async function getAuthorisedUser(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -22,7 +30,7 @@ async function getAuthorisedUser(req: Request) {
 
   const userEmail = data.user.email.toLowerCase();
 
-  if (userEmail !== adminEmail) {
+  if (!getAdminEmails().includes(userEmail)) {
     return null;
   }
 

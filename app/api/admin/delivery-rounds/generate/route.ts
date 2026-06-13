@@ -44,7 +44,12 @@ function getSupabaseAnonKey() {
 }
 
 function getAdminEmails() {
-  return (process.env.ADMIN_EMAILS ?? "")
+  const emails =
+    process.env.ADMIN_EMAILS ??
+    process.env.ORDERS_ADMIN_EMAIL ??
+    "ainsleykingyoga@gmail.com";
+
+  return emails
     .split(",")
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
