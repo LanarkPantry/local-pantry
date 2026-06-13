@@ -224,7 +224,7 @@ export default function ShopPage() {
   }, [groupedCart]);
 
   const weeklyProduceBox =
-    produceBoxes.find((item) => item.name === "Weekly Produce Box") ??
+    produceBoxes.find((item) => item.name === "Harvest Box") ??
     produceBoxes[0] ??
     null;
 
@@ -262,7 +262,7 @@ export default function ShopPage() {
     if (item.name.includes("White Beans")) return "Creamy white beans";
     if (item.name === "Mutti Polpa Tomatoes") return "Sauce base";
 
-    if (item.name === "Weekly Produce Box") return "Fruit & veg for the week";
+    if (item.name === "Harvest Box") return "Fruit & veg for the week";
     if (item.name === "Family Produce Box") return "For fuller weekly cooking";
 
     return item.description;

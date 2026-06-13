@@ -489,7 +489,7 @@ export const recipes: Recipe[] = [
     body: "Cook the sliced potatoes until tender and lightly golden. Soften the peppers and onion in the same pan until sweet. Pour in seasoned eggs and cook gently until the edges begin to set. Finish under the grill, then scatter with parsley before serving. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -527,7 +527,7 @@ export const recipes: Recipe[] = [
     body: "Boil the potatoes until tender, then lightly crush them on a tray. Roast the crushed potatoes until crisp at the edges. Add salmon and green beans for the final stretch so the fish stays soft. Finish with lemon, dill and a spoon of yoghurt if liked. Give everything enough space on the tray so it roasts rather than steams. Taste before serving and add lemon, herbs or yoghurt at the end to freshen the richer roasted edges.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -594,7 +594,7 @@ export const recipes: Recipe[] = [
     body: "Cook the noodles until just tender, then rinse or toss lightly so they do not clump. Char the broccoli until smoky at the edges but still green. Stir cashew butter or blended cashews with lime, soy and warm water into a loose sauce. Toss everything together and finish with coriander and extra lime. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -630,7 +630,7 @@ export const recipes: Recipe[] = [
     body: "Press and cube the tofu, then fry until crisp and golden. Cook the rice until fluffy and season lightly. Mix peanut sauce with lime, soy and warm water until spoonable. Serve tofu over rice with cucumber, carrots and plenty of sauce. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -733,7 +733,7 @@ export const recipes: Recipe[] = [
     body: "Boil the potatoes until tender, then toss with olive oil and herbs. Cook the salmon gently until just flaky. Crush the peas with mint, lemon, salt and a little olive oil. Serve the salmon with herby potatoes and the bright crushed peas. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -763,7 +763,7 @@ export const recipes: Recipe[] = [
     body: "Roast fennel and tomatoes until soft, sweet and slightly jammy. Toast the sourdough until crisp enough to hold the topping. Pile the roasted vegetables over the toast while still warm. Tear over burrata and finish with basil, olive oil and black pepper. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -793,7 +793,7 @@ export const recipes: Recipe[] = [
     body: "Halve the peppers and roast until beginning to soften. Mix cooked rice with spinach, ricotta, herbs and seasoning. Fill the peppers generously and bake until the tops turn golden. Serve with extra herbs and a simple green salad. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -823,7 +823,7 @@ export const recipes: Recipe[] = [
     body: "Cook the rice until fluffy and keep warm. Pan-fry the chicken until golden on the outside. Add soy, ginger and a little sweetness to make a glossy glaze. Serve with quickly wilted greens and a sharp squeeze of lime. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -928,7 +928,7 @@ export const recipes: Recipe[] = [
     body: "Cook the rice until fluffy. Fry the tofu until crisp and golden on the edges. Simmer the greens briefly with coconut milk, lime and seasoning. Serve the tofu over rice with coconut greens and extra lime. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
@@ -965,7 +965,7 @@ export const recipes: Recipe[] = [
     body: "Roast tomatoes with garlic, olive oil and salt until they collapse. Pan-fry or bake the gnocchi until golden and crisp-edged. Toss the gnocchi through the roasted tomato juices. Finish with torn burrata, basil and black pepper. Keep a little cooking water back so you can loosen the sauce rather than adding more oil. Taste before serving and adjust with lemon, black pepper or parmesan so the pasta feels glossy rather than heavy.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
@@ -1032,7 +1032,7 @@ export const recipes: Recipe[] = [
     body: "Roast sweet potato with smoky spices until soft and caramelised. Warm the black beans with lime, garlic and seasoning. Cook the rice until fluffy. Serve with avocado yoghurt, coriander and extra lime. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
@@ -1111,7 +1111,7 @@ export const recipes: Recipe[] = [
     body: "Roast the carrots until tender, browned and sweet at the edges. Toast the sourdough until crisp. Spread thick labneh over the toast. Top with carrots, parsley, dukkah and a drizzle of olive oil. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box-v2.png",
     },
@@ -1141,7 +1141,7 @@ export const recipes: Recipe[] = [
     body: "Cook the rice noodles until tender, then rinse lightly so they stay separate. Wilt the greens quickly in a hot pan. Mix peanut sauce with lime and warm water until loose and glossy. Toss noodles and greens with the sauce, then finish with coriander. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.png",
     },
@@ -1342,7 +1342,7 @@ export const recipes: Recipe[] = [
     body: "Simmer the green lentils until tender. Add coconut milk and gentle spices, then cook until creamy. Fold through the greens near the end. Serve with rice, coriander and lime. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -1556,7 +1556,7 @@ export const recipes: Recipe[] = [
     body: "Cook the rice until fluffy. Fry tofu until lightly golden on the edges. Warm the korma sauce with greens until the leaves soften. Serve tofu and sauce over rice with coriander. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -1587,7 +1587,7 @@ export const recipes: Recipe[] = [
     body: "Roast the potatoes first until golden and crisp at the edges. Add salmon and greens for the final stretch so the fish stays flaky. Mix yoghurt, mustard, lemon and dill into a sharp spooning sauce. Serve everything from the tray with the sauce on the side. Give everything enough space on the tray so it roasts rather than steams. Taste before serving and add lemon, herbs or yoghurt at the end to freshen the richer roasted edges.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -1820,7 +1820,7 @@ export const recipes: Recipe[] = [
     body: "Boil the potatoes until tender, then dress while still warm. Soft-boil the eggs, cool slightly and halve. Blend yoghurt, herbs, lemon and spring onions into a green dressing. Toss potatoes through the dressing and top with eggs. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -1905,7 +1905,7 @@ export const recipes: Recipe[] = [
     body: "Cook carrots and ginger until the carrots are fully soft. Blend with coconut milk until silky and bright. Cook rice separately until fluffy. Serve the soup with rice, lime and coriander. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -1991,7 +1991,7 @@ export const recipes: Recipe[] = [
     body: "Char the corn in a hot pan until smoky and sweet. Warm black beans with lime, garlic and seasoning. Cook the rice until fluffy. Build the bowls with coriander, yoghurt and extra lime. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2022,7 +2022,7 @@ export const recipes: Recipe[] = [
     body: "Bake the aubergine until soft, smoky and collapsing. Mix yoghurt with lemon, garlic and salt. Spread the yoghurt over plates and top with warm aubergine. Finish with parsley, olive oil and any crunchy seeds or nuts. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2053,7 +2053,7 @@ export const recipes: Recipe[] = [
     body: "Cook mushrooms in a hot pan until deeply browned. Simmer barley in stock until chewy and tender. Stir in cream, thyme and garlic until the pot turns glossy. Finish with black pepper and herbs. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2129,7 +2129,7 @@ export const recipes: Recipe[] = [
     body: "Roast squash until golden and sweet at the edges. Simmer red lentils until soft and creamy. Stir in coconut milk and fold through the roasted squash. Finish with coriander, lime and chilli oil if liked. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2167,7 +2167,7 @@ export const recipes: Recipe[] = [
     body: "Boil potatoes until tender, then halve while warm. Cook green beans briefly so they keep some snap. Whisk mustard, lemon, olive oil and herbs into a sharp dressing. Toss everything together while warm so the potatoes absorb the flavour. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2243,7 +2243,7 @@ export const recipes: Recipe[] = [
     body: "Blanch the broad beans briefly, then season with lemon and herbs. Toast the sourdough until crisp and golden. Spread ricotta generously over the toast. Pile on broad beans and finish with mint, olive oil and black pepper. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2379,7 +2379,7 @@ export const recipes: Recipe[] = [
     body: "Simmer red lentils until soft and creamy. Stir in coconut milk and cook until silky. Fold through spinach at the end so it stays bright. Finish with lime, coriander and chilli if liked. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2424,7 +2424,7 @@ export const recipes: Recipe[] = [
     body: "Boil potatoes until tender, then dress while warm. Roughly chop watercress and herbs. Whisk mustard, lemon and olive oil into a bright dressing. Fold everything together gently and serve with extra herbs. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2486,7 +2486,7 @@ export const recipes: Recipe[] = [
     body: "Cook the grains until tender and dress while warm. Shred cabbage finely and toss with mustard, lemon and salt. Fold in apple slices and herbs for crunch. Serve as bowls with extra dressing spooned over. Dress the grains while they are still warm so they absorb more flavour. Taste before serving and add extra lemon, herbs or olive oil if the bowl needs lifting.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2517,7 +2517,7 @@ export const recipes: Recipe[] = [
     body: "Cook noodles until tender, then toss lightly so they do not clump. Char or steam tenderstem until bright and just tender. Mix sesame, lime and soy into a loose dressing. Toss together and finish with cashews and spring onions. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2585,7 +2585,7 @@ export const recipes: Recipe[] = [
     body: "Warm the flatbreads until soft with lightly crisped edges. Wilt spinach quickly, then mix with yoghurt, lemon and herbs. Spoon the spinach yoghurt over the flatbreads. Finish with olive oil, black pepper and extra herbs. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2616,7 +2616,7 @@ export const recipes: Recipe[] = [
     body: "Slice the pear just before serving so it stays fresh. Toss leaves with a sharp honey-mustard dressing. Layer pear, gorgonzola and walnuts through the salad so every forkful has something crisp, creamy and sharp. Finish with black pepper and a final drizzle of dressing. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2647,7 +2647,7 @@ export const recipes: Recipe[] = [
     body: "Warm lentils with rosemary, olive oil and a little mustard. Wilt greens briefly so they stay vibrant. Fold in crisp apple slices for sweetness and crunch. Finish with lemon and extra rosemary. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2685,7 +2685,7 @@ export const recipes: Recipe[] = [
     body: "Cook potatoes and peas until tender. Add watercress and herbs at the end so the soup stays green. Blend until smooth and season with lemon. Finish with yoghurt, peas and olive oil. Simmer gently rather than boiling hard so the flavours round out properly. Taste before serving and adjust the thickness with a splash more vegetable stock if needed.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2723,7 +2723,7 @@ export const recipes: Recipe[] = [
     body: "Boil potatoes until tender, then halve while warm. Cook asparagus briefly so it stays bright with a little bite. Mix yoghurt, dill, lemon and salt into a creamy dressing. Toss gently and finish with extra dill. Dress the heavier ingredients first so they take on flavour before adding delicate leaves or herbs. Taste before serving and adjust with lemon, salt or extra crunch.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2754,7 +2754,7 @@ export const recipes: Recipe[] = [
     body: "Blanch broad beans briefly and toss with mint, lemon and olive oil. Toast the bread until crisp and sturdy. Spread thick labneh over the toast. Pile on broad beans and finish with black pepper. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2785,7 +2785,7 @@ export const recipes: Recipe[] = [
     body: "Char tenderstem and greens quickly in a hot pan. Warm ginger, sesame and soy into a glossy dressing. Toss the greens through the dressing while still hot. Serve with rice, spring onions and sesame seeds. Keep the heat gentle once everything is simmering so the base thickens without sticking. Taste before serving and adjust with vegetable stock, lemon or herbs until the flavour feels rounded.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2853,7 +2853,7 @@ export const recipes: Recipe[] = [
     body: "Cook runner beans until tender but still bright. Toast walnuts with crumbs, garlic and herbs until fragrant. Toss the beans with lemon and yoghurt or olive oil. Scatter the walnut herb crumbs over the top just before serving. Simmer gently so the beans stay whole but the sauce has time to thicken around them. Taste before serving and add lemon, herbs or a drizzle of olive oil to brighten the dish.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2884,7 +2884,7 @@ export const recipes: Recipe[] = [
     body: "Warm flatbreads until soft with crisp edges. Layer on pear slices and blue cheese, then heat briefly until the cheese softens. Top with rocket after baking so it stays peppery and fresh. Finish with walnuts, honey and black pepper. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -2983,7 +2983,7 @@ export const recipes: Recipe[] = [
     body: "Press and cube the tofu, then fry until crisp and deeply golden. Cook the noodles until tender and toss lightly to prevent sticking. Mix peanut sauce with lime, soy and warm water until creamy. Serve with crunchy vegetables, coriander and plenty of satay sauce. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -3057,7 +3057,7 @@ export const recipes: Recipe[] = [
     body: "Cook the rice until fluffy and keep warm. Fry turkey mince with ginger, garlic and soy until savoury and browned. Add greens and cook just until wilted. Serve with rice, cucumber, spring onions and sesame. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -3137,7 +3137,7 @@ export const recipes: Recipe[] = [
     body: "Boil the eggs until jammy, then cool, peel and halve. Warm lentils with olive oil, lemon and seasoning. Fold through greens and herbs until just wilted. Serve with green tahini dressing and the halved eggs. Keep the pan hot enough to colour the vegetables but not so hot that the garlic catches. Taste before serving and adjust with lemon, herbs or a spoon of yoghurt if it needs freshness.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },
@@ -3241,7 +3241,7 @@ export const recipes: Recipe[] = [
     body: "Cook the rice until fluffy. Cook the salmon until just flaky and still soft in the centre. Simmer greens briefly with coconut milk and lime. Serve the salmon over rice with coconut greens and coriander. Keep the rice warm and season it lightly before building the bowl so it does not taste flat underneath the toppings. Taste before serving and balance with lime, herbs or a little extra sauce.",
     pantryLabel: "Weekly planner meal",
     product: {
-      name: "Weekly Produce Box",
+      name: "Harvest Box",
       price: 20,
       image: "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png",
     },

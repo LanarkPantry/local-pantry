@@ -113,7 +113,7 @@ export default function HomePage() {
   }, [groupedCart]);
 
   const weeklyProduceBox =
-    produceBoxes.find((item) => item.name === "Weekly Produce Box") ??
+    produceBoxes.find((item) => item.name === "Harvest Box") ??
     produceBoxes[0] ??
     null;
 

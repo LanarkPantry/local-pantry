@@ -15,7 +15,7 @@ export type ShopDisplayItem = {
 
 export const produceBoxes: ShopDisplayItem[] = [
   {
-    name: "Weekly Produce Box",
+    name: "Harvest Box",
     price: 20,
     image: "/weekly-harvest-box-v2.png",
     category: "boxes",
@@ -32,8 +32,7 @@ export const produceBoxes: ShopDisplayItem[] = [
     category: "boxes",
     checkoutType: "subscription",
     buttonLabel: "Add family box",
-    description:
-      "A fuller weekly produce box for households that cook most nights.",
+    description: "A fuller Harvest Box for households that cook most nights.",
     details:
       "Contents shift slightly through the seasons depending on availability.",
   },

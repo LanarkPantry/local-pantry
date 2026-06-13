@@ -360,7 +360,7 @@ export default function RecipesPage() {
       setGeneratedRecipe(null);
       setGeneratedImageUrl(null);
       setPaywallMessage(
-        "You’ve used your free recipe ideas. Unlock unlimited recipes and the full planner, or get it included with a weekly produce box.",
+        "You’ve used your free recipe ideas. Unlock unlimited recipes and the full planner, or get it included with a Harvest Box.",
       );
       return;
     }
@@ -427,7 +427,7 @@ export default function RecipesPage() {
   function handleSaveFavourite() {
     if (!hasPlannerAccess) {
       setSaveMessage(
-        "Saving favourites is included with the planner, or free with any weekly produce box.",
+        "Saving favourites is included with the planner, or free with any Harvest Box.",
       );
       return;
     }
@@ -484,7 +484,7 @@ export default function RecipesPage() {
   function handleAddSavedRecipeToPlanner(recipe: SavedRecipe) {
     if (!hasPlannerAccess) {
       setPlannerMessage(
-        "The weekly planner is included with the planner subscription, or free with any weekly produce box.",
+        "The weekly planner is included with the planner subscription, or free with any Harvest Box.",
       );
       return;
     }

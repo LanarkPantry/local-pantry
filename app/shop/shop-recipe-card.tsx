@@ -757,7 +757,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
 
   function handleUseVegBoxOnly() {
     const boxName =
-      starterBoxFromShop?.name ?? starterBox?.name ?? "Weekly Produce Box";
+      starterBoxFromShop?.name ?? starterBox?.name ?? "Harvest Box";
     setSelectedProductNames([boxName]);
     setInput("");
     setUseBasketItems(true);
@@ -853,7 +853,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
     }
 
     const boxName =
-      starterBoxFromShop?.name ?? starterBox?.name ?? "Weekly Produce Box";
+      starterBoxFromShop?.name ?? starterBox?.name ?? "Harvest Box";
 
     setSelectedProductNames([boxName]);
     setQuickStart(quickStartValue);
@@ -870,7 +870,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
 
   async function handleVegBoxInspiration() {
     const boxName =
-      starterBoxFromShop?.name ?? starterBox?.name ?? "Weekly Produce Box";
+      starterBoxFromShop?.name ?? starterBox?.name ?? "Harvest Box";
 
     setSelectedProductNames([boxName]);
     setInput("");
@@ -1049,7 +1049,7 @@ export default function ShopRecipeCard(props: ShopRecipeCardProps) {
                     starterBoxFromShop?.image ??
                     "//weekly-harvest-box-v2.pngarvest-box-v2.pngarvest-box.png"
                   }
-                  alt={starterBoxFromShop?.name ?? "Weekly Produce Box"}
+                  alt={starterBoxFromShop?.name ?? "Harvest Box"}
                   className="h-full w-full object-contain"
                 />
               </div>

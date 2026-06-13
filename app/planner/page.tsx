@@ -502,8 +502,7 @@ export default function PlannerPage() {
   );
 
   const weeklyProduceBox =
-    produceBoxes.find((item) => item.name === "Weekly Produce Box") ??
-    produceBoxes[0];
+    produceBoxes.find((item) => item.name === "Harvest Box") ?? produceBoxes[0];
 
   const familyProduceBox =
     produceBoxes.find((item) => item.name === "Family Produce Box") ??
