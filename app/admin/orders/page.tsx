@@ -1210,7 +1210,12 @@ export default function AdminOrdersPage() {
               >
                 Delivery Rounds
               </Link>
-
+              <Link
+                href="/admin/delivery-manifest"
+                className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium"
+              >
+                Delivery Manifest
+              </Link>
               <Link
                 href="/"
                 className="rounded-full bg-[#243328] px-4 py-2 text-sm font-medium text-white"
