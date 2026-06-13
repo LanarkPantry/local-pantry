@@ -43,6 +43,11 @@ function addDaysToToday(days: number) {
   return date.toISOString().slice(0, 10);
 }
 
+function unixToIsoDate(value: number | null | undefined) {
+  if (!value) return null;
+  return new Date(value * 1000).toISOString().slice(0, 10);
+}
+
 function getSubscriptionBoxName(order: PaidOrder) {
   const items = Array.isArray(order.items) ? order.items : [];
 
@@ -50,6 +55,34 @@ function getSubscriptionBoxName(order: PaidOrder) {
     items.find((item) => item.checkoutType === "subscription") ?? items[0];
 
   return subscriptionItem?.name?.trim() || "Produce Box";
+}
+
+function getLocalStatusFromStripe(subscription: Stripe.Subscription) {
+  if (subscription.cancel_at_period_end || subscription.status === "canceled") {
+    return "cancelled";
+  }
+
+  if (subscription.pause_collection) {
+    return "paused";
+  }
+
+  if (
+    subscription.status === "active" ||
+    subscription.status === "trialing" ||
+    subscription.status === "past_due"
+  ) {
+    return "active";
+  }
+
+  if (
+    subscription.status === "incomplete" ||
+    subscription.status === "incomplete_expired" ||
+    subscription.status === "unpaid"
+  ) {
+    return "paused";
+  }
+
+  return "active";
 }
 
 async function createOrUpdatePantrySubscription(orderId: string) {
@@ -152,6 +185,69 @@ async function createOrUpdatePantrySubscription(orderId: string) {
   }
 }
 
+async function syncPantrySubscriptionFromStripe(
+  subscription: Stripe.Subscription,
+) {
+  const stripeSubscriptionId = subscription.id;
+  const stripeCustomerId =
+    typeof subscription.customer === "string" ? subscription.customer : null;
+
+  const localStatus = getLocalStatusFromStripe(subscription);
+  const pauseUntil =
+    localStatus === "paused"
+      ? unixToIsoDate(subscription.pause_collection?.resumes_at)
+      : null;
+
+  const { data: existingSubscription, error: findError } = await supabaseAdmin
+    .from("pantry_subscriptions")
+    .select("id, admin_notes")
+    .eq("stripe_subscription_id", stripeSubscriptionId)
+    .maybeSingle();
+
+  if (findError) {
+    console.error("Could not find pantry subscription to sync:", findError);
+    throw new Error("Could not find pantry subscription to sync.");
+  }
+
+  if (!existingSubscription?.id) {
+    console.warn(
+      `No pantry_subscriptions row found for Stripe subscription ${stripeSubscriptionId}.`,
+    );
+    return;
+  }
+
+  const note =
+    localStatus === "cancelled"
+      ? "Stripe subscription cancelled or set to cancel."
+      : localStatus === "paused"
+        ? "Stripe subscription paused or unpaid."
+        : "Stripe subscription active.";
+
+  const existingNotes =
+    typeof existingSubscription.admin_notes === "string"
+      ? existingSubscription.admin_notes
+      : "";
+
+  const adminNotes = existingNotes.includes(note)
+    ? existingNotes
+    : `${existingNotes}${existingNotes ? "\n" : ""}${note}`;
+
+  const { error: updateError } = await supabaseAdmin
+    .from("pantry_subscriptions")
+    .update({
+      status: localStatus,
+      pause_until: pauseUntil,
+      stripe_customer_id: stripeCustomerId,
+      admin_notes: adminNotes,
+    })
+    .eq("id", existingSubscription.id);
+
+  if (updateError) {
+    console.error("Could not sync pantry subscription:", updateError);
+    throw new Error("Could not sync pantry subscription.");
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -236,6 +332,14 @@ export async function POST(req: Request) {
       if (session.mode === "subscription" && stripeSubscriptionId) {
         await createOrUpdatePantrySubscription(orderId);
       }
+    }
+
+    if (
+      event.type === "customer.subscription.updated" ||
+      event.type === "customer.subscription.deleted"
+    ) {
+      const subscription = event.data.object as Stripe.Subscription;
+      await syncPantrySubscriptionFromStripe(subscription);
     }
 
     return NextResponse.json({ received: true });

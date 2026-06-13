@@ -42,6 +42,26 @@ const LAUNCH_GIFT_OPTIONS = [
       "A concentrated stock for soups, grains, sauces and everyday cooking.",
   },
 ] as const;
+type CustomerSubscription = {
+  id: string;
+  customer_email: string;
+  box_name: string;
+  frequency: "weekly" | "fortnightly";
+  next_delivery_date: string | null;
+  preferred_delivery_day: "Tuesday" | "Wednesday" | null;
+  status: "active" | "paused" | "cancelled";
+  pause_until: string | null;
+};
+
+function formatSubscriptionDate(value: string | null | undefined) {
+  if (!value) return "Not set";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(`${value}T12:00:00`));
+}
 
 export default function BasketPage() {
   const {
@@ -78,6 +98,15 @@ export default function BasketPage() {
   const [pauseMessage, setPauseMessage] = useState("");
   const [pauseError, setPauseError] = useState("");
   const totalItems = cart.length;
+  const [subscriptionLookupEmail, setSubscriptionLookupEmail] = useState("");
+  const [customerSubscription, setCustomerSubscription] =
+    useState<CustomerSubscription | null>(null);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
+  const [isOpeningCustomerPortal, setIsOpeningCustomerPortal] = useState(false);
+  const [subscriptionLookupMessage, setSubscriptionLookupMessage] =
+    useState("");
+  const [subscriptionLookupError, setSubscriptionLookupError] = useState("");
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
@@ -88,6 +117,11 @@ export default function BasketPage() {
       window.history.replaceState({}, "", "/basket");
     }
   }, [clearCart]);
+  useEffect(() => {
+    if (customerEmail.trim() && !subscriptionLookupEmail.trim()) {
+      setSubscriptionLookupEmail(customerEmail.trim().toLowerCase());
+    }
+  }, [customerEmail, subscriptionLookupEmail]);
   const subscriptionSubtotal = useMemo(() => {
     return subscriptionItems.reduce((sum, item) => sum + item.price, 0);
   }, [subscriptionItems]);
@@ -282,6 +316,97 @@ Thanks!`,
       );
     } finally {
       setIsPausingSubscription(false);
+    }
+  };
+
+  const checkCustomerSubscription = async () => {
+    try {
+      setSubscriptionLookupMessage("");
+      setSubscriptionLookupError("");
+      setCustomerSubscription(null);
+      setIsCheckingSubscription(true);
+
+      const email = subscriptionLookupEmail.trim().toLowerCase();
+
+      if (!email) {
+        setSubscriptionLookupError(
+          "Please enter the email address used for your subscription.",
+        );
+        return;
+      }
+
+      const response = await fetch("/api/account/subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not check subscription.");
+      }
+
+      if (!data.subscription) {
+        setSubscriptionLookupMessage(
+          data.message || "No subscription was found for that email address.",
+        );
+        return;
+      }
+
+      setCustomerSubscription(data.subscription);
+    } catch (error) {
+      setSubscriptionLookupError(
+        error instanceof Error
+          ? error.message
+          : "Could not check subscription.",
+      );
+    } finally {
+      setIsCheckingSubscription(false);
+    }
+  };
+
+  const openCustomerPortal = async () => {
+    try {
+      setSubscriptionLookupError("");
+      setIsOpeningCustomerPortal(true);
+
+      const email = subscriptionLookupEmail.trim().toLowerCase();
+
+      if (!email) {
+        setSubscriptionLookupError(
+          "Please enter the email address used for your subscription.",
+        );
+        return;
+      }
+
+      const response = await fetch("/api/customer-portal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not open subscription portal.");
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      setSubscriptionLookupError(
+        error instanceof Error
+          ? error.message
+          : "Could not open subscription portal.",
+      );
+    } finally {
+      setIsOpeningCustomerPortal(false);
     }
   };
 
@@ -504,6 +629,117 @@ Thanks!`,
                   ? "Free delivery"
                   : `£${DELIVERY_FEE.toFixed(2)} delivery under £${FREE_DELIVERY_THRESHOLD}`}
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-6 rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-5 shadow-[0_12px_30px_rgba(36,51,40,0.05)] backdrop-blur-md md:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#6b776c]">
+                Existing subscription
+              </p>
+              <h2 className="mt-2 font-serif text-3xl">
+                Manage your regular box
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-[#667164]">
+                Enter the email address used at checkout to check your
+                subscription, pause, update payment details, or cancel through
+                Stripe.
+              </p>
+            </div>
+
+            <div className="w-full max-w-xl rounded-2xl border border-[#e5ddcf] bg-[rgba(255,255,255,0.78)] p-4">
+              <label className="text-sm font-medium text-[#243328]">
+                Subscription email
+              </label>
+
+              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                <input
+                  type="email"
+                  value={subscriptionLookupEmail}
+                  onChange={(event) =>
+                    setSubscriptionLookupEmail(event.target.value)
+                  }
+                  placeholder="you@example.com"
+                  className="min-h-[48px] flex-1 rounded-full border border-[#d6cec2] bg-white px-4 text-sm outline-none focus:border-[#243328]"
+                />
+
+                <button
+                  type="button"
+                  onClick={checkCustomerSubscription}
+                  disabled={isCheckingSubscription}
+                  className="rounded-full bg-[#243328] px-5 py-3 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {isCheckingSubscription ? "Checking..." : "Check"}
+                </button>
+              </div>
+
+              {subscriptionLookupError ? (
+                <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  {subscriptionLookupError}
+                </p>
+              ) : null}
+
+              {subscriptionLookupMessage ? (
+                <p className="mt-3 rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-3 text-sm text-[#667164]">
+                  {subscriptionLookupMessage}
+                </p>
+              ) : null}
+
+              {customerSubscription ? (
+                <div className="mt-4 rounded-2xl border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="font-serif text-2xl">
+                        {customerSubscription.box_name}
+                      </p>
+                      <p className="mt-1 text-sm text-[#667164]">
+                        {customerSubscription.frequency === "weekly"
+                          ? "Weekly"
+                          : "Fortnightly"}{" "}
+                        delivery
+                      </p>
+                      <p className="mt-1 text-sm text-[#667164]">
+                        Next delivery:{" "}
+                        {formatSubscriptionDate(
+                          customerSubscription.next_delivery_date,
+                        )}
+                      </p>
+                    </div>
+
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        customerSubscription.status === "active"
+                          ? "bg-[#e8f3e5] text-[#315333]"
+                          : customerSubscription.status === "paused"
+                            ? "bg-[#fbf0dc] text-[#725a20]"
+                            : "bg-red-50 text-red-700"
+                      }`}
+                    >
+                      {customerSubscription.status}
+                    </span>
+                  </div>
+
+                  {customerSubscription.pause_until ? (
+                    <p className="mt-3 text-sm text-[#667164]">
+                      Paused until:{" "}
+                      {formatSubscriptionDate(customerSubscription.pause_until)}
+                    </p>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={openCustomerPortal}
+                    disabled={isOpeningCustomerPortal}
+                    className="mt-4 w-full rounded-full bg-[#2f4635] px-5 py-3 text-sm font-medium text-white disabled:opacity-50"
+                  >
+                    {isOpeningCustomerPortal
+                      ? "Opening..."
+                      : "Manage / pause / cancel subscription"}
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
@@ -1141,8 +1377,8 @@ Thanks!`,
                     </p>
 
                     <p className="mt-2 text-sm leading-6 text-[#667164]">
-                      Already subscribed? Enter your subscription email once to
-                      pause, cancel or update your box.
+                      Already subscribed? You can also manage your subscription
+                      from the panel near the top of this page.
                     </p>
 
                     <div className="mt-4 space-y-3">
