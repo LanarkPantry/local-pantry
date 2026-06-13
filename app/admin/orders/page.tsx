@@ -71,6 +71,14 @@ const FULFILMENT_STATUSES = [
 
 const ACTIVE_STATUSES = ["new", "packing", "packed"];
 
+type OrderFilter =
+  | "all"
+  | "needs-packing"
+  | "packed"
+  | "delivered"
+  | "cancelled"
+  | "problem";
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
@@ -256,13 +264,96 @@ type PackingSummaryLine = {
   quantity: number;
 };
 
+type PackingCategory = "produceBoxes" | "jars" | "dryGoods" | "other";
+
+type CategorisedPackingSummary = {
+  orderCount: number;
+  subscriptionCount: number;
+  oneOffCount: number;
+  produceBoxes: PackingSummaryLine[];
+  jars: PackingSummaryLine[];
+  dryGoods: PackingSummaryLine[];
+  other: PackingSummaryLine[];
+  gifts: PackingSummaryLine[];
+};
+
 function itemQuantity(item: OrderItem) {
   const quantity = Number(item.quantity ?? 1);
   return Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
 }
 
-function buildPackingSummary(orders: Order[]) {
-  const itemCounts = new Map<string, number>();
+const JAR_PRODUCT_NAMES = [
+  "rose harissa",
+  "sorrel",
+  "pesto",
+  "gochujang",
+  "stock concentrate",
+  "vegetable stock",
+];
+
+const DRY_GOOD_NAMES = [
+  "bucatini",
+  "casarecce",
+  "orzo",
+  "giant couscous",
+  "farro",
+  "polenta",
+  "risotto",
+  "puy lentils",
+  "lentils",
+  "almonds",
+  "walnuts",
+  "cashews",
+  "butter beans",
+  "cannellini",
+  "chickpeas",
+  "tomatoes",
+  "san marzano",
+];
+
+function getPackingCategory(item: OrderItem): PackingCategory {
+  const name = (item.name ?? "").toLowerCase();
+  const category = (item.category ?? "").toLowerCase();
+  const checkoutType = (item.checkoutType ?? "").toLowerCase();
+
+  if (
+    category.includes("box") ||
+    category.includes("produce") ||
+    checkoutType.includes("subscription") ||
+    name.includes("produce box") ||
+    name.includes("weekly box") ||
+    name.includes("family box") ||
+    name.includes("harvest box")
+  ) {
+    return "produceBoxes";
+  }
+
+  if (
+    category.includes("jar") ||
+    JAR_PRODUCT_NAMES.some((jarName) => name.includes(jarName))
+  ) {
+    return "jars";
+  }
+
+  if (
+    category.includes("dry") ||
+    category.includes("pantry") ||
+    DRY_GOOD_NAMES.some((dryGoodName) => name.includes(dryGoodName))
+  ) {
+    return "dryGoods";
+  }
+
+  return "other";
+}
+
+function buildPackingSummary(orders: Order[]): CategorisedPackingSummary {
+  const itemCounts = {
+    produceBoxes: new Map<string, number>(),
+    jars: new Map<string, number>(),
+    dryGoods: new Map<string, number>(),
+    other: new Map<string, number>(),
+  };
+
   const giftCounts = new Map<string, number>();
   let orderCount = 0;
   let subscriptionCount = 0;
@@ -281,7 +372,11 @@ function buildPackingSummary(orders: Order[]) {
 
     items.forEach((item) => {
       const name = item.name?.trim() || "Unnamed item";
-      itemCounts.set(name, (itemCounts.get(name) ?? 0) + itemQuantity(item));
+      const category = getPackingCategory(item);
+      itemCounts[category].set(
+        name,
+        (itemCounts[category].get(name) ?? 0) + itemQuantity(item),
+      );
     });
 
     if (order.launch_gift) {
@@ -298,16 +393,20 @@ function buildPackingSummary(orders: Order[]) {
     return nameA.localeCompare(nameB);
   };
 
+  const toLines = (map: Map<string, number>) =>
+    Array.from(map.entries())
+      .sort(sortLines)
+      .map(([name, quantity]) => ({ name, quantity }));
+
   return {
     orderCount,
     subscriptionCount,
     oneOffCount,
-    items: Array.from(itemCounts.entries())
-      .sort(sortLines)
-      .map(([name, quantity]) => ({ name, quantity })),
-    gifts: Array.from(giftCounts.entries())
-      .sort(sortLines)
-      .map(([name, quantity]) => ({ name, quantity })),
+    produceBoxes: toLines(itemCounts.produceBoxes),
+    jars: toLines(itemCounts.jars),
+    dryGoods: toLines(itemCounts.dryGoods),
+    other: toLines(itemCounts.other),
+    gifts: toLines(giftCounts),
   };
 }
 
@@ -336,6 +435,114 @@ function PackingSummaryList({
         </div>
       ))}
     </div>
+  );
+}
+
+function PackingCategoryPanel({
+  title,
+  description,
+  emptyText,
+  lines,
+}: {
+  title: string;
+  description: string;
+  emptyText: string;
+  lines: PackingSummaryLine[];
+}) {
+  return (
+    <div className="rounded-[24px] border border-[#ddd4c8] bg-white/75 p-4">
+      <div className="mb-3">
+        <p className="font-serif text-2xl">{title}</p>
+        <p className="mt-1 text-xs leading-5 text-[#667164]">{description}</p>
+      </div>
+
+      <PackingSummaryList lines={lines} emptyText={emptyText} />
+    </div>
+  );
+}
+
+function DeliveryManifest({
+  groups,
+}: {
+  groups: { label: string; orders: Order[]; sortValue: number }[];
+}) {
+  if (groups.length === 0) {
+    return (
+      <p className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4 text-sm text-[#667164]">
+        No delivery rounds need packed.
+      </p>
+    );
+  }
+
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {groups.map((group) => (
+        <div
+          key={group.label}
+          className="rounded-[24px] border border-[#ddd4c8] bg-white/75 p-4"
+        >
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <p className="font-serif text-2xl">{group.label}</p>
+              <p className="text-sm text-[#667164]">
+                {group.orders.length} deliver
+                {group.orders.length === 1 ? "y" : "ies"}
+              </p>
+            </div>
+
+            <p className="rounded-full bg-[#243328] px-3 py-1 text-xs font-medium text-white">
+              {formatMoney(
+                group.orders.reduce(
+                  (sum, order) => sum + Number(order.total ?? 0),
+                  0,
+                ),
+              )}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            {group.orders.map((order) => (
+              <div
+                key={order.id}
+                className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-3"
+              >
+                <p className="text-sm font-medium text-[#243328]">
+                  □ {order.customer_name}
+                </p>
+                <p className="mt-1 text-xs text-[#667164]">
+                  {order.delivery_postcode} ·{" "}
+                  {normaliseStatus(order.fulfilment_status)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function QuickFilterButton({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-4 py-2 text-sm font-medium ${
+        active
+          ? "border-[#243328] bg-[#243328] text-white"
+          : "border-[#d6cec2] bg-white text-[#243328]"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -417,6 +624,9 @@ export default function AdminOrdersPage() {
   const [error, setError] = useState("");
   const [subscriptionError, setSubscriptionError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [orderFilter, setOrderFilter] = useState<OrderFilter>("all");
+  const [showDelivered, setShowDelivered] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
 
@@ -717,6 +927,63 @@ export default function AdminOrdersPage() {
     () => groupOrdersByDelivery(ordersStillNeedingPacked),
     [ordersStillNeedingPacked],
   );
+
+  const visibleActivePaidOrders = useMemo(() => {
+    if (orderFilter === "needs-packing") return ordersStillNeedingPacked;
+    if (orderFilter === "packed") return packedOrders;
+    if (orderFilter === "problem") return unpaidOrders;
+    return activePaidOrders;
+  }, [
+    activePaidOrders,
+    orderFilter,
+    ordersStillNeedingPacked,
+    packedOrders,
+    unpaidOrders,
+  ]);
+
+  const visibleActivePaidDeliveryGroups = useMemo(
+    () => groupOrdersByDelivery(visibleActivePaidOrders),
+    [visibleActivePaidOrders],
+  );
+
+  const nextDeliveryGroup = packingDeliveryGroups[0];
+
+  const todayActionText = useMemo(() => {
+    const actions = [];
+
+    if (dueSubscriptions.length > 0) {
+      actions.push(
+        `${dueSubscriptions.length} subscription${dueSubscriptions.length === 1 ? "" : "s"} due`,
+      );
+    }
+
+    if (ordersStillNeedingPacked.length > 0) {
+      actions.push(
+        `${ordersStillNeedingPacked.length} order${ordersStillNeedingPacked.length === 1 ? "" : "s"} need packing`,
+      );
+    }
+
+    if (newOrders.length > 0) {
+      actions.push(
+        `${newOrders.length} order${newOrders.length === 1 ? "" : "s"} still marked new`,
+      );
+    }
+
+    if (nextDeliveryGroup) {
+      actions.push(`Next round: ${nextDeliveryGroup.label}`);
+    }
+
+    if (actions.length === 0) {
+      actions.push("No urgent admin actions");
+    }
+
+    return actions;
+  }, [
+    dueSubscriptions.length,
+    newOrders.length,
+    nextDeliveryGroup,
+    ordersStillNeedingPacked.length,
+  ]);
 
   function renderOrderCard(order: Order) {
     const items = Array.isArray(order.items) ? order.items : [];
@@ -1161,17 +1428,17 @@ export default function AdminOrdersPage() {
           </section>
         ) : null}
 
-        {!loading && ordersStillNeedingPacked.length > 0 ? (
+        {!loading ? (
           <section className="mb-6 rounded-[28px] border border-[#ddd4c8] bg-white/88 p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)]">
             <div className="flex flex-col gap-3 border-b border-[#eee5d8] pb-4 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.16em] text-[#7a8478]">
-                  Packing summary
+                  Production dashboard
                 </p>
                 <h2 className="mt-1 font-serif text-3xl">What needs packed</h2>
                 <p className="mt-1 text-sm text-[#667164]">
-                  Counts only paid orders marked new or packing. Packed,
-                  delivered, cancelled, and unpaid orders are excluded.
+                  Paid orders marked new or packing. Packed, delivered,
+                  cancelled and unpaid orders are excluded.
                 </p>
               </div>
 
@@ -1197,62 +1464,62 @@ export default function AdminOrdersPage() {
               </div>
             </div>
 
-            {packingDeliveryGroups.length > 0 ? (
-              <div className="mt-5">
-                <p className="mb-3 text-sm font-medium">
-                  Delivery rounds needing packed
-                </p>
-                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                  {packingDeliveryGroups.map((group) => (
-                    <div
-                      key={group.label}
-                      className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4"
-                    >
-                      <p className="font-medium text-[#243328]">
-                        {group.label}
-                      </p>
-                      <p className="mt-1 text-sm text-[#667164]">
-                        {group.orders.length} order
-                        {group.orders.length === 1 ? "" : "s"} still needing
-                        packed
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_0.65fr]">
-              <div>
-                <p className="mb-3 text-sm font-medium">Items</p>
-                <PackingSummaryList
-                  lines={packingSummary.items}
-                  emptyText="No item data found for orders needing packed."
-                />
-              </div>
-
-              <div>
-                <p className="mb-3 text-sm font-medium">Free launch gifts</p>
-                <PackingSummaryList
-                  lines={packingSummary.gifts}
-                  emptyText="No launch gifts to prepare."
-                />
+            <div className="mt-5 rounded-[24px] border border-[#ddd4c8] bg-[#fbfaf8] p-4">
+              <p className="font-serif text-2xl">Today&apos;s actions</p>
+              <div className="mt-3 grid gap-2">
+                {todayActionText.map((action) => (
+                  <p
+                    key={action}
+                    className="rounded-2xl border border-[#eee5d8] bg-white/80 px-4 py-3 text-sm font-medium"
+                  >
+                    {action}
+                  </p>
+                ))}
               </div>
             </div>
-          </section>
-        ) : null}
 
-        {!loading &&
-        ordersStillNeedingPacked.length === 0 &&
-        orders.length > 0 ? (
-          <section className="mb-6 rounded-[28px] border border-[#d8dfd2] bg-white/88 p-5">
-            <p className="font-serif text-2xl">
-              Nothing currently needs packed
-            </p>
-            <p className="mt-1 text-sm text-[#667164]">
-              Paid orders are either packed, delivered, cancelled, or there are
-              no active paid orders.
-            </p>
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              <PackingCategoryPanel
+                title="Produce boxes"
+                description="Boxes to build before delivery."
+                lines={packingSummary.produceBoxes}
+                emptyText="No produce boxes currently need packed."
+              />
+
+              <PackingCategoryPanel
+                title="Jars"
+                description="Jarred products to prepare or pull from stock."
+                lines={packingSummary.jars}
+                emptyText="No jars currently need packed."
+              />
+
+              <PackingCategoryPanel
+                title="Dry goods"
+                description="Pouches, tins and pantry extras to pack."
+                lines={packingSummary.dryGoods}
+                emptyText="No dry goods currently need packed."
+              />
+
+              <PackingCategoryPanel
+                title="Other / gifts"
+                description="Anything not recognised plus launch gifts."
+                lines={[...packingSummary.other, ...packingSummary.gifts]}
+                emptyText="No other items or launch gifts currently need packed."
+              />
+            </div>
+
+            <div className="mt-5">
+              <div className="mb-3 flex items-end justify-between gap-3">
+                <div>
+                  <p className="font-serif text-2xl">Delivery manifest</p>
+                  <p className="text-sm text-[#667164]">
+                    Use this as the quick loading and driving checklist.
+                  </p>
+                </div>
+              </div>
+
+              <DeliveryManifest groups={packingDeliveryGroups} />
+            </div>
           </section>
         ) : null}
 
@@ -1277,16 +1544,58 @@ export default function AdminOrdersPage() {
           </div>
         ) : null}
 
-        {!loading && activePaidOrders.length > 0 ? (
+        {!loading && orders.length > 0 ? (
+          <section className="mb-6 rounded-[28px] border border-[#ddd4c8] bg-white/85 p-5">
+            <div className="mb-4">
+              <p className="font-serif text-2xl">Quick filters</p>
+              <p className="mt-1 text-sm text-[#667164]">
+                Use these on mobile to reduce scrolling.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <QuickFilterButton
+                label={`All active (${activePaidOrders.length})`}
+                active={orderFilter === "all"}
+                onClick={() => setOrderFilter("all")}
+              />
+              <QuickFilterButton
+                label={`Need packing (${ordersStillNeedingPacked.length})`}
+                active={orderFilter === "needs-packing"}
+                onClick={() => setOrderFilter("needs-packing")}
+              />
+              <QuickFilterButton
+                label={`Packed (${packedOrders.length})`}
+                active={orderFilter === "packed"}
+                onClick={() => setOrderFilter("packed")}
+              />
+              <QuickFilterButton
+                label={`Problem (${unpaidOrders.length})`}
+                active={orderFilter === "problem"}
+                onClick={() => setOrderFilter("problem")}
+              />
+            </div>
+          </section>
+        ) : null}
+
+        {!loading && visibleActivePaidOrders.length > 0 ? (
           <section>
             <SectionHeading
-              title="To do now"
-              count={activePaidOrders.length}
-              description="Paid orders grouped by delivery round. Work through the earliest delivery group first."
+              title={
+                orderFilter === "needs-packing"
+                  ? "Need packing"
+                  : orderFilter === "packed"
+                    ? "Packed orders"
+                    : orderFilter === "problem"
+                      ? "Problem orders"
+                      : "To do now"
+              }
+              count={visibleActivePaidOrders.length}
+              description="Orders grouped by delivery round. Work through the earliest delivery group first."
             />
 
             <div className="space-y-7">
-              {activePaidDeliveryGroups.map((group) => (
+              {visibleActivePaidDeliveryGroups.map((group) => (
                 <div key={group.label}>
                   <div className="mb-3 rounded-[22px] border border-[#ddd4c8] bg-[#fbfaf8] px-4 py-3">
                     <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
@@ -1307,7 +1616,7 @@ export default function AdminOrdersPage() {
           </section>
         ) : null}
 
-        {!loading && unpaidOrders.length > 0 ? (
+        {!loading && unpaidOrders.length > 0 && orderFilter !== "problem" ? (
           <section>
             <SectionHeading
               title="Unpaid or problem orders"
@@ -1320,27 +1629,57 @@ export default function AdminOrdersPage() {
 
         {!loading && deliveredOrders.length > 0 ? (
           <section>
-            <SectionHeading
-              title="Delivered"
-              count={deliveredOrders.length}
-              description="Completed orders are kept below the working list."
-            />
-            <div className="space-y-5">
-              {deliveredOrders.map(renderOrderCard)}
+            <div className="mb-3 mt-8 flex flex-col gap-3 border-b border-[#ddd4c8] pb-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="font-serif text-2xl">
+                  Delivered ({deliveredOrders.length})
+                </h2>
+                <p className="text-sm text-[#667164]">
+                  Completed orders are hidden by default.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDelivered((value) => !value)}
+                className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium"
+              >
+                {showDelivered ? "Hide delivered" : "Show delivered"}
+              </button>
             </div>
+
+            {showDelivered ? (
+              <div className="space-y-5">
+                {deliveredOrders.map(renderOrderCard)}
+              </div>
+            ) : null}
           </section>
         ) : null}
 
         {!loading && cancelledOrders.length > 0 ? (
           <section>
-            <SectionHeading
-              title="Cancelled"
-              count={cancelledOrders.length}
-              description="Cancelled orders stay visible but out of the way."
-            />
-            <div className="space-y-5">
-              {cancelledOrders.map(renderOrderCard)}
+            <div className="mb-3 mt-8 flex flex-col gap-3 border-b border-[#ddd4c8] pb-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="font-serif text-2xl">
+                  Cancelled ({cancelledOrders.length})
+                </h2>
+                <p className="text-sm text-[#667164]">
+                  Cancelled orders are hidden by default.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCancelled((value) => !value)}
+                className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium"
+              >
+                {showCancelled ? "Hide cancelled" : "Show cancelled"}
+              </button>
             </div>
+
+            {showCancelled ? (
+              <div className="space-y-5">
+                {cancelledOrders.map(renderOrderCard)}
+              </div>
+            ) : null}
           </section>
         ) : null}
       </div>
