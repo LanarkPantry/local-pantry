@@ -22,7 +22,6 @@ export async function POST(req: Request) {
     }
 
     const body = await req.text();
-
     const signature = req.headers.get("stripe-signature");
 
     if (!signature) {
@@ -49,55 +48,44 @@ export async function POST(req: Request) {
       );
     }
 
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
 
-        const orderId =
-          session.metadata?.orderId ?? session.client_reference_id ?? "";
+      const orderId =
+        session.metadata?.orderId || session.client_reference_id || "";
 
-        if (!orderId) {
-          console.error(
-            "checkout.session.completed received without orderId",
-            session.id,
-          );
-
-          break;
-        }
-
-        const { error } = await supabaseAdmin
-          .from("orders")
-          .update({
-            payment_status: "paid",
-            stripe_session_id: session.id,
-            stripe_customer_id:
-              typeof session.customer === "string" ? session.customer : null,
-            stripe_subscription_id:
-              typeof session.subscription === "string"
-                ? session.subscription
-                : null,
-            stripe_payment_intent_id:
-              typeof session.payment_intent === "string"
-                ? session.payment_intent
-                : null,
-            paid_at: new Date().toISOString(),
-          })
-          .eq("id", orderId);
-
-        if (error) {
-          console.error("Supabase order update error:", error);
-
-          return NextResponse.json(
-            { error: "Could not update order." },
-            { status: 500 },
-          );
-        }
-
-        break;
+      if (!orderId) {
+        console.error("Webhook received checkout session without orderId.");
+        return NextResponse.json({ received: true });
       }
 
-      default:
-        break;
+      const { error } = await supabaseAdmin
+        .from("orders")
+        .update({
+          payment_status: "paid",
+          stripe_session_id: session.id,
+          stripe_customer_id:
+            typeof session.customer === "string" ? session.customer : null,
+          stripe_subscription_id:
+            typeof session.subscription === "string"
+              ? session.subscription
+              : null,
+          stripe_payment_intent_id:
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : null,
+          paid_at: new Date().toISOString(),
+        })
+        .eq("id", orderId);
+
+      if (error) {
+        console.error("Supabase order update error:", error);
+
+        return NextResponse.json(
+          { error: "Could not update order payment status." },
+          { status: 500 },
+        );
+      }
     }
 
     return NextResponse.json({ received: true });
