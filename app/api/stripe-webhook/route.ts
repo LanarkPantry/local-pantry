@@ -10,6 +10,148 @@ if (!stripeSecretKey) {
 
 const stripe = new Stripe(stripeSecretKey);
 
+type SubscriptionFrequency = "weekly" | "fortnightly";
+
+type OrderItem = {
+  name?: string;
+  price?: number;
+  image?: string;
+  category?: string;
+  checkoutType?: string;
+};
+
+type PaidOrder = {
+  id: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string | null;
+  delivery_address_line_1: string;
+  delivery_address_line_2: string | null;
+  delivery_town: string;
+  delivery_postcode: string;
+  delivery_notes: string | null;
+  items: OrderItem[] | null;
+  order_type: "oneoff" | "subscription";
+  subscription_frequency: SubscriptionFrequency | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+};
+
+function addDaysToToday(days: number) {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function getSubscriptionBoxName(order: PaidOrder) {
+  const items = Array.isArray(order.items) ? order.items : [];
+
+  const subscriptionItem =
+    items.find((item) => item.checkoutType === "subscription") ?? items[0];
+
+  return subscriptionItem?.name?.trim() || "Produce Box";
+}
+
+async function createOrUpdatePantrySubscription(orderId: string) {
+  const { data: order, error: orderError } = await supabaseAdmin
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .single();
+
+  if (orderError || !order) {
+    console.error(
+      "Could not load paid order for subscription setup:",
+      orderError,
+    );
+    throw new Error("Could not load paid order for subscription setup.");
+  }
+
+  const paidOrder = order as PaidOrder;
+
+  if (
+    paidOrder.order_type !== "subscription" ||
+    !paidOrder.subscription_frequency ||
+    !paidOrder.stripe_subscription_id
+  ) {
+    return;
+  }
+
+  const daysToAdd = paidOrder.subscription_frequency === "fortnightly" ? 14 : 7;
+
+  const nextDeliveryDate = addDaysToToday(daysToAdd);
+  const boxName = getSubscriptionBoxName(paidOrder);
+
+  const { data: existingSubscription, error: existingError } =
+    await supabaseAdmin
+      .from("pantry_subscriptions")
+      .select("id")
+      .eq("stripe_subscription_id", paidOrder.stripe_subscription_id)
+      .maybeSingle();
+
+  if (existingError) {
+    console.error(
+      "Could not check existing pantry subscription:",
+      existingError,
+    );
+    throw new Error("Could not check existing pantry subscription.");
+  }
+
+  if (existingSubscription?.id) {
+    const { error: updateError } = await supabaseAdmin
+      .from("pantry_subscriptions")
+      .update({
+        customer_name: paidOrder.customer_name,
+        customer_email: paidOrder.customer_email,
+        customer_phone: paidOrder.customer_phone,
+        delivery_address_line_1: paidOrder.delivery_address_line_1,
+        delivery_address_line_2: paidOrder.delivery_address_line_2,
+        delivery_town: paidOrder.delivery_town,
+        delivery_postcode: paidOrder.delivery_postcode,
+        delivery_notes: paidOrder.delivery_notes,
+        box_name: boxName,
+        frequency: paidOrder.subscription_frequency,
+        stripe_customer_id: paidOrder.stripe_customer_id,
+        status: "active",
+      })
+      .eq("id", existingSubscription.id);
+
+    if (updateError) {
+      console.error("Could not update pantry subscription:", updateError);
+      throw new Error("Could not update pantry subscription.");
+    }
+
+    return;
+  }
+
+  const { error: insertError } = await supabaseAdmin
+    .from("pantry_subscriptions")
+    .insert({
+      customer_name: paidOrder.customer_name,
+      customer_email: paidOrder.customer_email,
+      customer_phone: paidOrder.customer_phone,
+      delivery_address_line_1: paidOrder.delivery_address_line_1,
+      delivery_address_line_2: paidOrder.delivery_address_line_2,
+      delivery_town: paidOrder.delivery_town,
+      delivery_postcode: paidOrder.delivery_postcode,
+      delivery_notes: paidOrder.delivery_notes,
+      box_name: boxName,
+      frequency: paidOrder.subscription_frequency,
+      next_delivery_date: nextDeliveryDate,
+      preferred_delivery_day: null,
+      status: "active",
+      pause_until: null,
+      stripe_customer_id: paidOrder.stripe_customer_id,
+      stripe_subscription_id: paidOrder.stripe_subscription_id,
+      admin_notes: `Created automatically from order ${paidOrder.id}`,
+    });
+
+  if (insertError) {
+    console.error("Could not create pantry subscription:", insertError);
+    throw new Error("Could not create pantry subscription.");
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -59,21 +201,25 @@ export async function POST(req: Request) {
         return NextResponse.json({ received: true });
       }
 
+      const stripeCustomerId =
+        typeof session.customer === "string" ? session.customer : null;
+
+      const stripeSubscriptionId =
+        typeof session.subscription === "string" ? session.subscription : null;
+
+      const stripePaymentIntentId =
+        typeof session.payment_intent === "string"
+          ? session.payment_intent
+          : null;
+
       const { error } = await supabaseAdmin
         .from("orders")
         .update({
           payment_status: "paid",
           stripe_session_id: session.id,
-          stripe_customer_id:
-            typeof session.customer === "string" ? session.customer : null,
-          stripe_subscription_id:
-            typeof session.subscription === "string"
-              ? session.subscription
-              : null,
-          stripe_payment_intent_id:
-            typeof session.payment_intent === "string"
-              ? session.payment_intent
-              : null,
+          stripe_customer_id: stripeCustomerId,
+          stripe_subscription_id: stripeSubscriptionId,
+          stripe_payment_intent_id: stripePaymentIntentId,
           paid_at: new Date().toISOString(),
         })
         .eq("id", orderId);
@@ -85,6 +231,10 @@ export async function POST(req: Request) {
           { error: "Could not update order payment status." },
           { status: 500 },
         );
+      }
+
+      if (session.mode === "subscription" && stripeSubscriptionId) {
+        await createOrUpdatePantrySubscription(orderId);
       }
     }
 
