@@ -10,6 +10,7 @@ type OrderItem = {
   image?: string;
   category?: string;
   checkoutType?: string;
+  quantity?: number;
 };
 
 type Order = {
@@ -23,6 +24,8 @@ type Order = {
   delivery_town: string;
   delivery_postcode: string;
   delivery_notes: string | null;
+  delivery_date?: string | null;
+  delivery_day?: string | null;
   items: OrderItem[] | null;
   launch_gift: string | null;
   order_type: "oneoff" | "subscription";
@@ -43,21 +46,7 @@ const FULFILMENT_STATUSES = [
   "cancelled",
 ];
 
-const STATUS_PRIORITY: Record<string, number> = {
-  new: 1,
-  packing: 2,
-  packed: 3,
-  delivered: 10,
-  cancelled: 20,
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  new: "New",
-  packing: "Packing",
-  packed: "Packed",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
+const ACTIVE_STATUSES = ["new", "packing", "packed"];
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
@@ -66,102 +55,269 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-function formatShortDate(value: string) {
+function formatDeliveryDateOnly(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
-    weekday: "short",
+    weekday: "long",
     day: "numeric",
     month: "short",
   }).format(new Date(value));
+}
+
+function getDeliveryLabel(order: Order) {
+  if (order.delivery_date) {
+    return formatDeliveryDateOnly(order.delivery_date);
+  }
+
+  if (order.delivery_day) {
+    return order.delivery_day;
+  }
+
+  return "Delivery day not set";
+}
+
+function getDeliverySortValue(order: Order) {
+  if (order.delivery_date) {
+    const time = new Date(order.delivery_date).getTime();
+    return Number.isFinite(time) ? time : Number.MAX_SAFE_INTEGER;
+  }
+
+  const day = order.delivery_day?.toLowerCase();
+
+  if (day === "monday") return 1;
+  if (day === "tuesday") return 2;
+  if (day === "wednesday") return 3;
+  if (day === "thursday") return 4;
+  if (day === "friday") return 5;
+  if (day === "saturday") return 6;
+  if (day === "sunday") return 7;
+
+  return Number.MAX_SAFE_INTEGER;
+}
+
+function groupOrdersByDelivery(orders: Order[]) {
+  const groups = new Map<string, Order[]>();
+
+  orders.forEach((order) => {
+    const label = getDeliveryLabel(order);
+    groups.set(label, [...(groups.get(label) ?? []), order]);
+  });
+
+  return Array.from(groups.entries())
+    .map(([label, groupedOrders]) => ({
+      label,
+      orders: groupedOrders.sort((a, b) => {
+        const deliveryA = getDeliverySortValue(a);
+        const deliveryB = getDeliverySortValue(b);
+
+        if (deliveryA !== deliveryB) {
+          return deliveryA - deliveryB;
+        }
+
+        return (
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      }),
+      sortValue: Math.min(...groupedOrders.map(getDeliverySortValue)),
+    }))
+    .sort((a, b) => {
+      if (a.sortValue !== b.sortValue) {
+        return a.sortValue - b.sortValue;
+      }
+
+      return a.label.localeCompare(b.label);
+    });
 }
 
 function formatMoney(value: number | null | undefined) {
   return `£${Number(value ?? 0).toFixed(2)}`;
 }
 
-function normaliseStatus(status: string | null | undefined) {
-  return status || "new";
+function normaliseStatus(value: string | null | undefined) {
+  return value || "new";
 }
 
-function statusLabel(status: string | null | undefined) {
-  const normalised = normaliseStatus(status);
-  return STATUS_LABELS[normalised] ?? normalised;
+function getOrderSortPriority(order: Order) {
+  if (order.payment_status !== "paid") return 50;
+
+  const status = normaliseStatus(order.fulfilment_status);
+
+  if (status === "new") return 1;
+  if (status === "packing") return 2;
+  if (status === "packed") return 3;
+  if (status === "delivered") return 20;
+  if (status === "cancelled") return 30;
+
+  return 10;
 }
 
-function getStatusClasses(status: string | null | undefined) {
-  const normalised = normaliseStatus(status);
+function sortOrdersForWorkflow(orders: Order[]) {
+  return [...orders].sort((a, b) => {
+    const priorityA = getOrderSortPriority(a);
+    const priorityB = getOrderSortPriority(b);
 
-  if (normalised === "new") {
-    return "border-[#d7b56d] bg-[#fff6df] text-[#6f4e05]";
-  }
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
 
-  if (normalised === "packing") {
-    return "border-[#b8c7a3] bg-[#f0f6e8] text-[#40542b]";
-  }
-
-  if (normalised === "packed") {
-    return "border-[#9bb6c9] bg-[#eef7fb] text-[#294c61]";
-  }
-
-  if (normalised === "delivered") {
-    return "border-[#d9d4ca] bg-[#f5f2ec] text-[#6d7168]";
-  }
-
-  if (normalised === "cancelled") {
-    return "border-red-200 bg-red-50 text-red-700";
-  }
-
-  return "border-[#d6cec2] bg-[#f7f2eb] text-[#243328]";
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 }
 
-function getPaymentClasses(status: string | null | undefined) {
-  if (status === "paid") {
-    return "border-[#bdd7b6] bg-[#e8f3e5] text-[#315333]";
-  }
-
-  return "border-[#ebd4a5] bg-[#fbf0dc] text-[#725a20]";
-}
-
-function copyOrderText(order: Order) {
+function buildCopyText(order: Order) {
   const items = Array.isArray(order.items) ? order.items : [];
-  const itemLines = items.map((item) => `- ${item.name ?? "Item"}`).join("\n");
+  const itemLines = items
+    .map((item) => `- ${item.name ?? "Unnamed item"}`)
+    .join("\n");
 
   return [
-    `Order: ${order.customer_name}`,
-    `Status: ${statusLabel(order.fulfilment_status)}`,
-    `Payment: ${order.payment_status}`,
-    `Type: ${order.order_type}${order.subscription_frequency ? ` / ${order.subscription_frequency}` : ""}`,
+    `ORDER: ${order.customer_name}`,
+    `STATUS: ${order.fulfilment_status}`,
+    `TYPE: ${order.order_type}${order.subscription_frequency ? ` / ${order.subscription_frequency}` : ""}`,
+    `TOTAL: ${formatMoney(order.total)}`,
     "",
-    "Delivery address:",
+    "DELIVERY:",
     order.delivery_address_line_1,
     order.delivery_address_line_2,
     order.delivery_town,
     order.delivery_postcode,
     "",
-    order.delivery_notes
-      ? `Delivery notes: ${order.delivery_notes}`
-      : "Delivery notes: none",
+    `DELIVERY ROUND: ${getDeliveryLabel(order)}`,
+    order.delivery_notes ? `NOTES: ${order.delivery_notes}` : "NOTES: none",
     "",
-    "Items:",
+    "ITEMS:",
     itemLines || "No item data found.",
-    order.launch_gift ? `\nLaunch gift: ${order.launch_gift}` : "",
     "",
-    `Total: ${formatMoney(order.total)}`,
+    order.launch_gift
+      ? `LAUNCH GIFT: ${order.launch_gift}`
+      : "LAUNCH GIFT: none",
+    "",
+    `CUSTOMER EMAIL: ${order.customer_email}`,
+    order.customer_phone
+      ? `CUSTOMER PHONE: ${order.customer_phone}`
+      : "CUSTOMER PHONE: none",
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+type PackingSummaryLine = {
+  name: string;
+  quantity: number;
+};
+
+function itemQuantity(item: OrderItem) {
+  const quantity = Number(item.quantity ?? 1);
+  return Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+}
+
+function buildPackingSummary(orders: Order[]) {
+  const itemCounts = new Map<string, number>();
+  const giftCounts = new Map<string, number>();
+  let orderCount = 0;
+  let subscriptionCount = 0;
+  let oneOffCount = 0;
+
+  orders.forEach((order) => {
+    orderCount += 1;
+
+    if (order.order_type === "subscription") {
+      subscriptionCount += 1;
+    } else {
+      oneOffCount += 1;
+    }
+
+    const items = Array.isArray(order.items) ? order.items : [];
+
+    items.forEach((item) => {
+      const name = item.name?.trim() || "Unnamed item";
+      itemCounts.set(name, (itemCounts.get(name) ?? 0) + itemQuantity(item));
+    });
+
+    if (order.launch_gift) {
+      const giftName = order.launch_gift.trim();
+      giftCounts.set(giftName, (giftCounts.get(giftName) ?? 0) + 1);
+    }
+  });
+
+  const sortLines = (
+    [nameA, quantityA]: [string, number],
+    [nameB, quantityB]: [string, number],
+  ) => {
+    if (quantityA !== quantityB) return quantityB - quantityA;
+    return nameA.localeCompare(nameB);
+  };
+
+  return {
+    orderCount,
+    subscriptionCount,
+    oneOffCount,
+    items: Array.from(itemCounts.entries())
+      .sort(sortLines)
+      .map(([name, quantity]) => ({ name, quantity })),
+    gifts: Array.from(giftCounts.entries())
+      .sort(sortLines)
+      .map(([name, quantity]) => ({ name, quantity })),
+  };
+}
+
+function PackingSummaryList({
+  emptyText,
+  lines,
+}: {
+  emptyText: string;
+  lines: PackingSummaryLine[];
+}) {
+  if (lines.length === 0) {
+    return <p className="text-sm text-[#667164]">{emptyText}</p>;
+  }
+
+  return (
+    <div className="grid gap-2">
+      {lines.map((line) => (
+        <div
+          key={line.name}
+          className="flex items-center justify-between rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] px-4 py-3 text-sm"
+        >
+          <span className="font-medium text-[#243328]">{line.name}</span>
+          <span className="rounded-full bg-[#243328] px-3 py-1 text-xs font-medium text-white">
+            x {line.quantity}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SectionHeading({
+  title,
+  count,
+  description,
+}: {
+  title: string;
+  count: number;
+  description: string;
+}) {
+  return (
+    <div className="mb-3 mt-8 flex flex-col gap-1 border-b border-[#ddd4c8] pb-3 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h2 className="font-serif text-2xl">{title}</h2>
+        <p className="text-sm text-[#667164]">{description}</p>
+      </div>
+      <p className="text-sm font-medium text-[#243328]">{count} orders</p>
+    </div>
+  );
 }
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
 
   async function loadOrders() {
     setLoading(true);
     setError("");
-    setNotice("");
 
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
@@ -197,7 +353,6 @@ export default function AdminOrdersPage() {
   ) {
     setUpdatingOrderId(orderId);
     setError("");
-    setNotice("");
 
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
@@ -229,154 +384,155 @@ export default function AdminOrdersPage() {
     }
 
     await loadOrders();
-    setNotice(`Order marked ${statusLabel(fulfilmentStatus).toLowerCase()}.`);
     setUpdatingOrderId(null);
   }
 
   async function copyOrder(order: Order) {
-    try {
-      await navigator.clipboard.writeText(copyOrderText(order));
-      setNotice("Order details copied.");
-    } catch {
-      setError("Could not copy order details.");
-    }
+    await navigator.clipboard.writeText(buildCopyText(order));
+    setCopiedOrderId(order.id);
+
+    window.setTimeout(() => {
+      setCopiedOrderId(null);
+    }, 1800);
   }
 
   useEffect(() => {
     void loadOrders();
   }, []);
 
+  const sortedOrders = useMemo(() => sortOrdersForWorkflow(orders), [orders]);
+
+  const activePaidOrders = useMemo(
+    () =>
+      sortedOrders.filter(
+        (order) =>
+          order.payment_status === "paid" &&
+          ACTIVE_STATUSES.includes(normaliseStatus(order.fulfilment_status)),
+      ),
+    [sortedOrders],
+  );
+
+  const deliveredOrders = useMemo(
+    () =>
+      sortedOrders.filter(
+        (order) =>
+          order.payment_status === "paid" &&
+          normaliseStatus(order.fulfilment_status) === "delivered",
+      ),
+    [sortedOrders],
+  );
+
+  const cancelledOrders = useMemo(
+    () =>
+      sortedOrders.filter(
+        (order) => normaliseStatus(order.fulfilment_status) === "cancelled",
+      ),
+    [sortedOrders],
+  );
+
+  const unpaidOrders = useMemo(
+    () => sortedOrders.filter((order) => order.payment_status !== "paid"),
+    [sortedOrders],
+  );
+
   const paidOrders = useMemo(
     () => orders.filter((order) => order.payment_status === "paid"),
     [orders],
   );
 
-  const activeOrders = useMemo(
+  const newOrders = useMemo(
     () =>
-      orders.filter(
-        (order) =>
-          order.payment_status === "paid" &&
-          !["delivered", "cancelled"].includes(
-            normaliseStatus(order.fulfilment_status),
-          ),
+      activePaidOrders.filter(
+        (order) => normaliseStatus(order.fulfilment_status) === "new",
       ),
-    [orders],
+    [activePaidOrders],
   );
 
-  const unpaidOrders = useMemo(
-    () => orders.filter((order) => order.payment_status !== "paid"),
-    [orders],
-  );
-
-  const deliveredOrders = useMemo(
+  const packingOrders = useMemo(
     () =>
-      orders.filter(
-        (order) => normaliseStatus(order.fulfilment_status) === "delivered",
+      activePaidOrders.filter(
+        (order) => normaliseStatus(order.fulfilment_status) === "packing",
       ),
-    [orders],
+    [activePaidOrders],
   );
 
-  const cancelledOrders = useMemo(
+  const packedOrders = useMemo(
     () =>
-      orders.filter(
-        (order) => normaliseStatus(order.fulfilment_status) === "cancelled",
+      activePaidOrders.filter(
+        (order) => normaliseStatus(order.fulfilment_status) === "packed",
       ),
-    [orders],
+    [activePaidOrders],
   );
 
-  const sortedOrders = useMemo(
+  const ordersStillNeedingPacked = useMemo(
     () =>
-      [...orders].sort((a, b) => {
-        const priorityA =
-          STATUS_PRIORITY[normaliseStatus(a.fulfilment_status)] ?? 5;
-        const priorityB =
-          STATUS_PRIORITY[normaliseStatus(b.fulfilment_status)] ?? 5;
-
-        if (a.payment_status !== "paid" && b.payment_status === "paid") {
-          return 1;
-        }
-
-        if (a.payment_status === "paid" && b.payment_status !== "paid") {
-          return -1;
-        }
-
-        if (priorityA !== priorityB) {
-          return priorityA - priorityB;
-        }
-
-        return (
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+      activePaidOrders.filter((order) => {
+        const status = normaliseStatus(order.fulfilment_status);
+        return status === "new" || status === "packing";
       }),
-    [orders],
+    [activePaidOrders],
   );
 
-  const activeSortedOrders = sortedOrders.filter(
-    (order) =>
-      order.payment_status === "paid" &&
-      !["delivered", "cancelled"].includes(
-        normaliseStatus(order.fulfilment_status),
-      ),
+  const packingSummary = useMemo(
+    () => buildPackingSummary(ordersStillNeedingPacked),
+    [ordersStillNeedingPacked],
   );
 
-  const completedSortedOrders = sortedOrders.filter((order) =>
-    ["delivered", "cancelled"].includes(
-      normaliseStatus(order.fulfilment_status),
-    ),
+  const activePaidDeliveryGroups = useMemo(
+    () => groupOrdersByDelivery(activePaidOrders),
+    [activePaidOrders],
   );
 
-  const unpaidSortedOrders = sortedOrders.filter(
-    (order) => order.payment_status !== "paid",
+  const packingDeliveryGroups = useMemo(
+    () => groupOrdersByDelivery(ordersStillNeedingPacked),
+    [ordersStillNeedingPacked],
   );
 
-  function renderOrderCard(order: Order, subdued = false) {
+  function renderOrderCard(order: Order) {
     const items = Array.isArray(order.items) ? order.items : [];
     const isUpdating = updatingOrderId === order.id;
+    const status = normaliseStatus(order.fulfilment_status);
 
     return (
       <article
         key={order.id}
-        className={`overflow-hidden rounded-[28px] border border-[#ddd4c8] bg-white/90 shadow-[0_12px_28px_rgba(36,51,40,0.06)] ${
-          subdued ? "opacity-80" : ""
+        className={`overflow-hidden rounded-[28px] border bg-white/88 shadow-[0_12px_28px_rgba(36,51,40,0.06)] ${
+          status === "cancelled"
+            ? "border-red-200 opacity-75"
+            : status === "delivered"
+              ? "border-[#d8dfd2] opacity-85"
+              : "border-[#ddd4c8]"
         }`}
       >
-        <div className="grid gap-4 border-b border-[#eee5d8] p-5 lg:grid-cols-[1fr_1fr_0.7fr]">
+        <div className="grid gap-4 border-b border-[#eee5d8] p-5 lg:grid-cols-[1.1fr_0.9fr_0.8fr]">
           <div>
-            <div className="flex flex-wrap gap-2">
-              <span
-                className={`rounded-full border px-3 py-1 text-xs font-medium ${getStatusClasses(
-                  order.fulfilment_status,
-                )}`}
-              >
-                {statusLabel(order.fulfilment_status)}
-              </span>
-
-              <span
-                className={`rounded-full border px-3 py-1 text-xs font-medium ${getPaymentClasses(
-                  order.payment_status,
-                )}`}
-              >
-                Payment: {order.payment_status}
-              </span>
-            </div>
-
-            <p className="mt-4 text-xs uppercase tracking-[0.16em] text-[#7a8478]">
+            <p className="text-xs uppercase tracking-[0.16em] text-[#7a8478]">
               {formatDate(order.created_at)}
             </p>
 
-            <h2 className="mt-2 font-serif text-2xl leading-tight">
-              {order.customer_name}
-            </h2>
+            <h3 className="mt-2 font-serif text-2xl">{order.customer_name}</h3>
 
-            <div className="mt-3 space-y-1 text-sm text-[#667164]">
+            <div className="mt-2 space-y-1 text-sm text-[#667164]">
               <p>{order.customer_email}</p>
+
               {order.customer_phone ? <p>{order.customer_phone}</p> : null}
             </div>
+
+            <button
+              type="button"
+              onClick={() => copyOrder(order)}
+              className="mt-4 rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium text-[#243328] hover:bg-[#f7f2eb]"
+            >
+              {copiedOrderId === order.id ? "Copied" : "Copy order"}
+            </button>
           </div>
 
-          <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4 text-sm leading-6 text-[#667164]">
-            <p className="font-medium text-[#243328]">Delivery address</p>
-            <p className="mt-2">{order.delivery_address_line_1}</p>
+          <div className="text-sm leading-6 text-[#667164]">
+            <p className="font-medium text-[#243328]">Delivery</p>
+            <p className="mb-2 inline-flex rounded-full bg-[#243328] px-3 py-1 text-xs font-medium text-white">
+              {getDeliveryLabel(order)}
+            </p>
+            <p>{order.delivery_address_line_1}</p>
 
             {order.delivery_address_line_2 ? (
               <p>{order.delivery_address_line_2}</p>
@@ -384,22 +540,60 @@ export default function AdminOrdersPage() {
 
             <p>{order.delivery_town}</p>
 
-            <p className="font-semibold text-[#243328]">
+            <p className="font-medium text-[#243328]">
               {order.delivery_postcode}
             </p>
 
             {order.delivery_notes ? (
-              <div className="mt-3 rounded-xl border border-[#d8cbbd] bg-[#f7f2eb] p-3">
-                <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
-                  Notes
-                </p>
-                <p className="mt-1 text-[#243328]">{order.delivery_notes}</p>
-              </div>
+              <p className="mt-2 rounded-xl bg-[#f7f2eb] p-3">
+                <span className="font-medium text-[#243328]">Notes: </span>
+                {order.delivery_notes}
+              </p>
             ) : null}
           </div>
 
           <div>
-            <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
+            <div className="flex flex-wrap gap-2">
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-medium ${
+                  order.payment_status === "paid"
+                    ? "bg-[#e8f3e5] text-[#315333]"
+                    : "bg-[#fbf0dc] text-[#725a20]"
+                }`}
+              >
+                Payment: {order.payment_status}
+              </span>
+
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-medium ${
+                  status === "new"
+                    ? "bg-[#fbf0dc] text-[#725a20]"
+                    : status === "packing"
+                      ? "bg-[#edf1df] text-[#596126]"
+                      : status === "packed"
+                        ? "bg-[#e6eef5] text-[#29445c]"
+                        : status === "delivered"
+                          ? "bg-[#e8f3e5] text-[#315333]"
+                          : status === "cancelled"
+                            ? "bg-red-50 text-red-700"
+                            : "bg-[#f7f2eb] text-[#243328]"
+                }`}
+              >
+                Fulfilment: {status}
+              </span>
+
+              <span className="rounded-full bg-[#f7f2eb] px-3 py-1 text-xs">
+                {order.order_type}
+              </span>
+
+              {order.subscription_frequency ? (
+                <span className="rounded-full bg-[#f7f2eb] px-3 py-1 text-xs">
+                  {order.subscription_frequency}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
               <div className="flex justify-between text-sm">
                 <span>Subtotal</span>
                 <span>{formatMoney(order.subtotal)}</span>
@@ -415,52 +609,28 @@ export default function AdminOrdersPage() {
                 <span>{formatMoney(order.total)}</span>
               </div>
             </div>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="rounded-full bg-[#f7f2eb] px-3 py-1 text-xs">
-                {order.order_type}
-              </span>
-
-              {order.subscription_frequency ? (
-                <span className="rounded-full bg-[#f7f2eb] px-3 py-1 text-xs">
-                  {order.subscription_frequency}
-                </span>
-              ) : null}
-            </div>
           </div>
         </div>
 
-        <div className="grid gap-5 p-5 lg:grid-cols-[1fr_0.42fr]">
+        <div className="grid gap-5 p-5 lg:grid-cols-[1fr_0.55fr]">
           <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-semibold">Packing list</p>
+            <p className="text-sm font-medium">Items to pack</p>
 
-              <button
-                type="button"
-                onClick={() => copyOrder(order)}
-                className="rounded-full border border-[#d6cec2] bg-white px-3 py-1.5 text-xs font-medium hover:bg-[#f7f2eb]"
-              >
-                Copy order
-              </button>
-            </div>
-
-            <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
               {items.length > 0 ? (
                 items.map((item, index) => (
                   <div
                     key={`${item.name ?? "item"}-${index}`}
                     className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-3"
                   >
-                    <p className="font-medium leading-snug">{item.name}</p>
+                    <p className="font-medium">{item.name}</p>
                     <p className="mt-1 text-sm text-[#667164]">
                       {formatMoney(item.price)} · {item.checkoutType ?? "item"}
                     </p>
                   </div>
                 ))
               ) : (
-                <p className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4 text-sm text-[#667164]">
-                  No item data found.
-                </p>
+                <p className="text-sm text-[#667164]">No item data found.</p>
               )}
             </div>
 
@@ -472,26 +642,26 @@ export default function AdminOrdersPage() {
             ) : null}
           </div>
 
-          <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
-            <p className="text-sm font-semibold">Move order through</p>
-            <p className="mt-1 text-xs text-[#667164]">
-              New → Packing → Packed → Delivered
-            </p>
+          <div>
+            <p className="text-sm font-medium">Move order through workflow</p>
 
-            <div className="mt-4 grid gap-2">
-              {FULFILMENT_STATUSES.map((status) => (
+            <div className="mt-3 grid gap-2">
+              {FULFILMENT_STATUSES.map((fulfilmentStatus) => (
                 <button
-                  key={status}
+                  key={fulfilmentStatus}
                   type="button"
                   disabled={isUpdating}
-                  onClick={() => updateFulfilmentStatus(order.id, status)}
-                  className={`w-full rounded-full border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                    normaliseStatus(order.fulfilment_status) === status
+                  onClick={() =>
+                    updateFulfilmentStatus(order.id, fulfilmentStatus)
+                  }
+                  className={`w-full rounded-full border px-4 py-2.5 text-sm font-medium transition disabled:opacity-50 ${
+                    status === fulfilmentStatus
                       ? "border-[#243328] bg-[#243328] text-white"
                       : "border-[#d6cec2] bg-white text-[#243328] hover:bg-[#f7f2eb]"
                   }`}
                 >
-                  {isUpdating ? "Updating..." : `Mark ${STATUS_LABELS[status]}`}
+                  {status === fulfilmentStatus ? "Current: " : "Mark "}
+                  {fulfilmentStatus}
                 </button>
               ))}
             </div>
@@ -513,8 +683,8 @@ export default function AdminOrdersPage() {
             <div>
               <h1 className="font-serif text-4xl">Orders</h1>
               <p className="mt-2 text-sm text-[#667164]">
-                Work from top to bottom. Paid active orders stay first.
-                Delivered and cancelled orders move below.
+                Work from the top down: delivery round first, then new, packing,
+                packed, and finished orders.
               </p>
             </div>
 
@@ -522,7 +692,7 @@ export default function AdminOrdersPage() {
               <button
                 type="button"
                 onClick={loadOrders}
-                className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium hover:bg-[#f7f2eb]"
+                className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium"
               >
                 Refresh
               </button>
@@ -535,48 +705,139 @@ export default function AdminOrdersPage() {
               </Link>
             </div>
           </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
-                Needs done
-              </p>
-              <p className="mt-1 font-serif text-3xl">{activeOrders.length}</p>
-            </div>
-
-            <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
-                Paid
-              </p>
-              <p className="mt-1 font-serif text-3xl">{paidOrders.length}</p>
-            </div>
-
-            <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
-                Unpaid
-              </p>
-              <p className="mt-1 font-serif text-3xl">{unpaidOrders.length}</p>
-            </div>
-
-            <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
-                Delivered
-              </p>
-              <p className="mt-1 font-serif text-3xl">
-                {deliveredOrders.length}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
-                Cancelled
-              </p>
-              <p className="mt-1 font-serif text-3xl">
-                {cancelledOrders.length}
-              </p>
-            </div>
-          </div>
         </header>
+
+        <section className="mb-6 grid gap-3 md:grid-cols-5">
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Total
+            </p>
+            <p className="mt-1 font-serif text-3xl">{orders.length}</p>
+          </div>
+
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Paid
+            </p>
+            <p className="mt-1 font-serif text-3xl">{paidOrders.length}</p>
+          </div>
+
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              New
+            </p>
+            <p className="mt-1 font-serif text-3xl">{newOrders.length}</p>
+          </div>
+
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Packing
+            </p>
+            <p className="mt-1 font-serif text-3xl">{packingOrders.length}</p>
+          </div>
+
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Packed
+            </p>
+            <p className="mt-1 font-serif text-3xl">{packedOrders.length}</p>
+          </div>
+        </section>
+
+        {!loading && ordersStillNeedingPacked.length > 0 ? (
+          <section className="mb-6 rounded-[28px] border border-[#ddd4c8] bg-white/88 p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)]">
+            <div className="flex flex-col gap-3 border-b border-[#eee5d8] pb-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.16em] text-[#7a8478]">
+                  Packing summary
+                </p>
+                <h2 className="mt-1 font-serif text-3xl">What needs packed</h2>
+                <p className="mt-1 text-sm text-[#667164]">
+                  Counts only paid orders marked new or packing. Packed,
+                  delivered, cancelled, and unpaid orders are excluded.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-2xl bg-[#f7f2eb] px-4 py-3">
+                  <p className="text-xs text-[#667164]">Orders</p>
+                  <p className="font-serif text-2xl">
+                    {packingSummary.orderCount}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-[#f7f2eb] px-4 py-3">
+                  <p className="text-xs text-[#667164]">One-off</p>
+                  <p className="font-serif text-2xl">
+                    {packingSummary.oneOffCount}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-[#f7f2eb] px-4 py-3">
+                  <p className="text-xs text-[#667164]">Subs</p>
+                  <p className="font-serif text-2xl">
+                    {packingSummary.subscriptionCount}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {packingDeliveryGroups.length > 0 ? (
+              <div className="mt-5">
+                <p className="mb-3 text-sm font-medium">
+                  Delivery rounds needing packed
+                </p>
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {packingDeliveryGroups.map((group) => (
+                    <div
+                      key={group.label}
+                      className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4"
+                    >
+                      <p className="font-medium text-[#243328]">
+                        {group.label}
+                      </p>
+                      <p className="mt-1 text-sm text-[#667164]">
+                        {group.orders.length} order
+                        {group.orders.length === 1 ? "" : "s"} still needing
+                        packed
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_0.65fr]">
+              <div>
+                <p className="mb-3 text-sm font-medium">Items</p>
+                <PackingSummaryList
+                  lines={packingSummary.items}
+                  emptyText="No item data found for orders needing packed."
+                />
+              </div>
+
+              <div>
+                <p className="mb-3 text-sm font-medium">Free launch gifts</p>
+                <PackingSummaryList
+                  lines={packingSummary.gifts}
+                  emptyText="No launch gifts to prepare."
+                />
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {!loading &&
+        ordersStillNeedingPacked.length === 0 &&
+        orders.length > 0 ? (
+          <section className="mb-6 rounded-[28px] border border-[#d8dfd2] bg-white/88 p-5">
+            <p className="font-serif text-2xl">
+              Nothing currently needs packed
+            </p>
+            <p className="mt-1 text-sm text-[#667164]">
+              Paid orders are either packed, delivered, cancelled, or there are
+              no active paid orders.
+            </p>
+          </section>
+        ) : null}
 
         {loading ? (
           <div className="rounded-[28px] border border-[#ddd4c8] bg-white/85 p-8 text-center">
@@ -590,12 +851,6 @@ export default function AdminOrdersPage() {
           </div>
         ) : null}
 
-        {notice ? (
-          <div className="mb-5 rounded-[20px] border border-[#bdd7b6] bg-[#e8f3e5] p-4 text-sm text-[#315333]">
-            {notice}
-          </div>
-        ) : null}
-
         {!loading && orders.length === 0 ? (
           <div className="rounded-[28px] border border-[#ddd4c8] bg-white/85 p-8 text-center">
             <h2 className="font-serif text-3xl">No orders yet</h2>
@@ -605,45 +860,70 @@ export default function AdminOrdersPage() {
           </div>
         ) : null}
 
-        {!loading && activeSortedOrders.length > 0 ? (
-          <section className="space-y-5">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="font-serif text-3xl">Needs action</h2>
-                <p className="mt-1 text-sm text-[#667164]">
-                  Pack these first. Oldest status priority appears first, newest
-                  order within each status appears first.
-                </p>
-              </div>
-            </div>
+        {!loading && activePaidOrders.length > 0 ? (
+          <section>
+            <SectionHeading
+              title="To do now"
+              count={activePaidOrders.length}
+              description="Paid orders grouped by delivery round. Work through the earliest delivery group first."
+            />
 
-            {activeSortedOrders.map((order) => renderOrderCard(order))}
+            <div className="space-y-7">
+              {activePaidDeliveryGroups.map((group) => (
+                <div key={group.label}>
+                  <div className="mb-3 rounded-[22px] border border-[#ddd4c8] bg-[#fbfaf8] px-4 py-3">
+                    <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                      <h3 className="font-serif text-2xl">{group.label}</h3>
+                      <p className="text-sm font-medium text-[#243328]">
+                        {group.orders.length} order
+                        {group.orders.length === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    {group.orders.map(renderOrderCard)}
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
         ) : null}
 
-        {!loading && unpaidSortedOrders.length > 0 ? (
-          <section className="mt-10 space-y-5">
-            <div>
-              <h2 className="font-serif text-3xl">Payment not confirmed</h2>
-              <p className="mt-1 text-sm text-[#667164]">
-                Do not pack these until payment is marked paid.
-              </p>
-            </div>
-
-            {unpaidSortedOrders.map((order) => renderOrderCard(order, true))}
+        {!loading && unpaidOrders.length > 0 ? (
+          <section>
+            <SectionHeading
+              title="Unpaid or problem orders"
+              count={unpaidOrders.length}
+              description="Do not pack these until payment is clear."
+            />
+            <div className="space-y-5">{unpaidOrders.map(renderOrderCard)}</div>
           </section>
         ) : null}
 
-        {!loading && completedSortedOrders.length > 0 ? (
-          <section className="mt-10 space-y-5 pb-10">
-            <div>
-              <h2 className="font-serif text-3xl">Completed or closed</h2>
-              <p className="mt-1 text-sm text-[#667164]">
-                Delivered and cancelled orders are kept here for reference.
-              </p>
+        {!loading && deliveredOrders.length > 0 ? (
+          <section>
+            <SectionHeading
+              title="Delivered"
+              count={deliveredOrders.length}
+              description="Completed orders are kept below the working list."
+            />
+            <div className="space-y-5">
+              {deliveredOrders.map(renderOrderCard)}
             </div>
+          </section>
+        ) : null}
 
-            {completedSortedOrders.map((order) => renderOrderCard(order, true))}
+        {!loading && cancelledOrders.length > 0 ? (
+          <section>
+            <SectionHeading
+              title="Cancelled"
+              count={cancelledOrders.length}
+              description="Cancelled orders stay visible but out of the way."
+            />
+            <div className="space-y-5">
+              {cancelledOrders.map(renderOrderCard)}
+            </div>
           </section>
         ) : null}
       </div>
