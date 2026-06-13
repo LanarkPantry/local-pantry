@@ -229,7 +229,7 @@ export default function ShopPage() {
     null;
 
   const familyProduceBox =
-    produceBoxes.find((item) => item.name === "Family Produce Box") ??
+    produceBoxes.find((item) => item.name === "Family Harvest Box") ??
     produceBoxes.find((item) => item.name !== weeklyProduceBox?.name) ??
     null;
 
@@ -263,7 +263,7 @@ export default function ShopPage() {
     if (item.name === "Mutti Polpa Tomatoes") return "Sauce base";
 
     if (item.name === "Harvest Box") return "Fruit & veg for the week";
-    if (item.name === "Family Produce Box") return "For fuller weekly cooking";
+    if (item.name === "Family Harvest Box") return "For fuller weekly cooking";
 
     return item.description;
   }

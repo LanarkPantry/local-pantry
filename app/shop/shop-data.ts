@@ -26,7 +26,7 @@ export const produceBoxes: ShopDisplayItem[] = [
       "Contents shift slightly through the seasons depending on availability.",
   },
   {
-    name: "Family Produce Box",
+    name: "Family Harvest Box",
     price: 30,
     image: "/family-harvest-box-v2.png",
     category: "boxes",

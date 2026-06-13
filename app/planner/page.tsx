@@ -505,7 +505,7 @@ export default function PlannerPage() {
     produceBoxes.find((item) => item.name === "Harvest Box") ?? produceBoxes[0];
 
   const familyProduceBox =
-    produceBoxes.find((item) => item.name === "Family Produce Box") ??
+    produceBoxes.find((item) => item.name === "Family Harvest Box") ??
     produceBoxes[1];
 
   const currentWeekSlugs = useMemo(

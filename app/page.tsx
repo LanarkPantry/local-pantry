@@ -118,7 +118,7 @@ export default function HomePage() {
     null;
 
   const familyProduceBox =
-    produceBoxes.find((item) => item.name === "Family Produce Box") ??
+    produceBoxes.find((item) => item.name === "Family Harvest Box") ??
     produceBoxes.find((item) => item.name !== weeklyProduceBox?.name) ??
     null;
 
