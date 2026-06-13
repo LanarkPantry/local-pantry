@@ -34,7 +34,7 @@ type SavedWeekRow = {
   created_at: string;
   saved_week_meals: SavedWeekMealRow[];
 };
-
+const [isAdmin, setIsAdmin] = useState(false);
 const EMPTY_STATE_RECIPE_SLUGS = [
   "harissa-butterbeans-peppers-couscous",
   "bucatini-courgette-pesto",
@@ -157,7 +157,7 @@ export default function MyKitchenPage() {
     }
 
     setIsLoggedIn(true);
-
+    setIsAdmin(user.email?.toLowerCase() === "ainsleykingyoga@gmail.com");
     const [weeksResult, recipesResult] = await Promise.all([
       supabase
         .from("saved_weeks")
@@ -326,7 +326,14 @@ export default function MyKitchenPage() {
                 </Link>
               </div>
             </article>
-
+            {isAdmin && (
+              <Link
+                href="/admin/orders"
+                className="rounded-full bg-[#8b5e3c] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Orders Dashboard
+              </Link>
+            )}
             <aside className="order-1 overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-white shadow-[0_14px_34px_rgba(36,51,40,0.07)] lg:order-2">
               {" "}
               <img
