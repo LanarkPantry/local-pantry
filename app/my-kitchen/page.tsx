@@ -34,7 +34,7 @@ type SavedWeekRow = {
   created_at: string;
   saved_week_meals: SavedWeekMealRow[];
 };
-const [isAdmin, setIsAdmin] = useState(false);
+
 const EMPTY_STATE_RECIPE_SLUGS = [
   "harissa-butterbeans-peppers-couscous",
   "bucatini-courgette-pesto",
@@ -137,6 +137,7 @@ export default function MyKitchenPage() {
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [deletingWeekId, setDeletingWeekId] = useState<string | null>(null);
   const [removingRecipeId, setRemovingRecipeId] = useState<string | null>(null);
 
@@ -150,6 +151,7 @@ export default function MyKitchenPage() {
 
     if (!user) {
       setIsLoggedIn(false);
+      setIsAdmin(false);
       setSavedWeeks([]);
       setSavedRecipes([]);
       setLoading(false);
@@ -324,16 +326,17 @@ export default function MyKitchenPage() {
                 >
                   Shop food
                 </Link>
+
+                {isAdmin && (
+                  <Link
+                    href="/admin/orders"
+                    className="rounded-full bg-[#8b5e3c] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
+                  >
+                    Orders Dashboard
+                  </Link>
+                )}
               </div>
             </article>
-            {isAdmin && (
-              <Link
-                href="/admin/orders"
-                className="rounded-full bg-[#8b5e3c] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                Orders Dashboard
-              </Link>
-            )}
             <aside className="order-1 overflow-hidden rounded-[32px] border border-[#ddd4c8] bg-white shadow-[0_14px_34px_rgba(36,51,40,0.07)] lg:order-2">
               {" "}
               <img
