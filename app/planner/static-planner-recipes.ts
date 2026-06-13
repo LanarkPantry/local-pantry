@@ -2474,4 +2474,133 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
       "Finish with walnuts, black pepper and a little lemon.",
     ],
   },
+
+  // 115. Harissa Red Lentil & Tomato Soup
+  {
+    id: "harissa-lentil-tomato-soup",
+    title: "Harissa Red Lentil & Tomato Soup",
+    description:
+      "A warming tomato and red lentil soup with rose harissa, soft herbs and a bright lemon finish.",
+    imageUrl: "/images/recipes/harissa-lentil-tomato-soup.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "low-waste"],
+    ingredients: [
+      "Red lentils",
+      "Tomatoes",
+      "Rose harissa",
+      "Onion",
+      "Vegetable Stock",
+      "Lemon",
+    ],
+    matchedProducts: [
+      "Rose Harissa Paste",
+      "Mutti Polpa Tomatoes",
+      "Vegetable Stock",
+    ],
+    steps: [
+      "Soften onion and garlic gently in olive oil until sweet.",
+      "Stir in rose harissa, red lentils, tomatoes and vegetable stock.",
+      "Simmer until the lentils collapse and the soup thickens.",
+      "Finish with lemon, parsley and a spoon of yoghurt if liked.",
+    ],
+  },
+
+  // 116. Creamy Butter Bean, Lemon & Greens Soup
+  {
+    id: "butterbean-lemon-greens-soup",
+    title: "Creamy Butter Bean, Lemon & Greens Soup",
+    description:
+      "A creamy butter bean soup with leafy greens, lemon zest and a soft garlic base.",
+    imageUrl: "/images/recipes/butterbean-lemon-greens-soup.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "veg-heavy"],
+    ingredients: [
+      "Butter beans",
+      "Greens",
+      "Lemon",
+      "Garlic",
+      "Vegetable Stock",
+    ],
+    matchedProducts: ["Bold Bean Co Queen Butter Beans", "Vegetable Stock"],
+    steps: [
+      "Soften onion and garlic in olive oil until mellow.",
+      "Add butter beans and vegetable stock, then simmer until creamy.",
+      "Mash or blend a small ladleful back into the pan to thicken the soup.",
+      "Fold through greens and finish with lemon zest, black pepper and olive oil.",
+    ],
+  },
+
+  // 117. Tomato, Chickpea & Orzo Soup
+  {
+    id: "tomato-chickpea-orzo-soup",
+    title: "Tomato, Chickpea & Orzo Soup",
+    description:
+      "A hearty tomato soup with chickpeas, orzo, greens and herbs for an easy one-pot dinner.",
+    imageUrl: "/images/recipes/tomato-chickpea-orzo-soup.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "low-waste"],
+    ingredients: [
+      "Orzo",
+      "Chickpeas",
+      "Tomatoes",
+      "Greens",
+      "Garlic",
+      "Vegetable Stock",
+    ],
+    matchedProducts: [
+      "Orzo Pasta",
+      "Bold Bean Co Queen Chickpeas",
+      "Mutti Polpa Tomatoes",
+      "Vegetable Stock",
+    ],
+    steps: [
+      "Soften garlic in olive oil until fragrant.",
+      "Add tomatoes, chickpeas, orzo and vegetable stock.",
+      "Simmer gently until the orzo is tender and the soup has thickened slightly.",
+      "Fold through greens and finish with parsley, black pepper and olive oil.",
+    ],
+  },
+
+  // 118. White Bean, Kale & Garlic Broth
+  {
+    id: "whitebean-kale-garlic-soup",
+    title: "White Bean, Kale & Garlic Broth",
+    description:
+      "A simple garlicky broth with white beans, kale, olive oil and plenty of black pepper.",
+    imageUrl: "/images/recipes/whitebean-kale-garlic-soup.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["low-waste", "veg-heavy"],
+    ingredients: ["White beans", "Kale", "Garlic", "Lemon", "Vegetable Stock"],
+    matchedProducts: ["Bold Bean Co Queen White Beans", "Vegetable Stock"],
+    steps: [
+      "Soften onion and sliced garlic gently in olive oil until sweet and fragrant.",
+      "Add white beans and vegetable stock, then simmer until rounded.",
+      "Stir through kale until tender but still green.",
+      "Finish with black pepper, lemon and a final drizzle of olive oil.",
+    ],
+  },
+
+  // 119. Pea, Lemon & Risotto Rice Soup
+  {
+    id: "pea-lemon-risotto-soup",
+    title: "Pea, Lemon & Risotto Rice Soup",
+    description:
+      "A bright green pea soup with risotto rice, lemon, herbs and a silky stock base.",
+    imageUrl: "/images/recipes/pea-lemon-risotto-soup.jpg",
+    mood: "quick",
+    eatingStyle: "veg",
+    focusTags: ["family-friendly", "veg-heavy"],
+    ingredients: ["Peas", "Risotto rice", "Lemon", "Mint", "Vegetable Stock"],
+    matchedProducts: ["Short Grain Rice", "Vegetable Stock"],
+    steps: [
+      "Soften onion gently in olive oil, then stir in risotto rice and vegetable stock.",
+      "Simmer until the rice is tender and the soup has thickened slightly.",
+      "Add peas for the final few minutes so they stay sweet and green.",
+      "Finish with lemon zest, herbs and black pepper.",
+    ],
+  },
 ];
