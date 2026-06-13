@@ -58,20 +58,23 @@ function getSubscriptionBoxName(order: PaidOrder) {
 }
 
 function getLocalStatusFromStripe(subscription: Stripe.Subscription) {
-  if (subscription.cancel_at_period_end || subscription.status === "canceled") {
+  const subscriptionWithCancel = subscription as Stripe.Subscription & {
+    cancel_at_period_end?: boolean;
+    canceled_at?: number | null;
+    cancel_at?: number | null;
+  };
+
+  if (
+    subscriptionWithCancel.cancel_at_period_end === true ||
+    subscriptionWithCancel.canceled_at ||
+    subscriptionWithCancel.cancel_at ||
+    subscription.status === "canceled"
+  ) {
     return "cancelled";
   }
 
   if (subscription.pause_collection) {
     return "paused";
-  }
-
-  if (
-    subscription.status === "active" ||
-    subscription.status === "trialing" ||
-    subscription.status === "past_due"
-  ) {
-    return "active";
   }
 
   if (
@@ -84,7 +87,6 @@ function getLocalStatusFromStripe(subscription: Stripe.Subscription) {
 
   return "active";
 }
-
 async function createOrUpdatePantrySubscription(orderId: string) {
   const { data: order, error: orderError } = await supabaseAdmin
     .from("orders")
