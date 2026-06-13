@@ -1,4 +1,4 @@
-import { recipes, Recipe } from "../recipes/recipes-data";
+import { recipes, type MealType, type Recipe } from "../recipes/recipes-data";
 
 export type PlannerStyle =
   | "mixed"
@@ -7,14 +7,26 @@ export type PlannerStyle =
   | "gluten-free"
   | "quick";
 
+const MEAL_TYPE_ROTATION: MealType[] = [
+  "pasta",
+  "rice-bowl",
+  "grain-bowl",
+  "traybake",
+  "soup",
+  "salad",
+  "beans",
+  "quick-pan",
+  "one-pot",
+];
+
 function shuffleArray<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
-function uniqueBySlug(recipes: Recipe[]) {
-  const seen = new Set();
+function uniqueBySlug(recipeList: Recipe[]): Recipe[] {
+  const seen = new Set<string>();
 
-  return recipes.filter((recipe) => {
+  return recipeList.filter((recipe) => {
     if (seen.has(recipe.slug)) {
       return false;
     }
@@ -24,14 +36,15 @@ function uniqueBySlug(recipes: Recipe[]) {
   });
 }
 
-export function generateWeek(style: PlannerStyle): Recipe[] {
-  let filteredRecipes = [...recipes];
-
-  // FILTER BY STYLE
+function filterByStyle(recipeList: Recipe[], style: PlannerStyle): Recipe[] {
+  let filteredRecipes = recipeList.filter(
+    (recipe) => recipe.category === "savoury",
+  );
 
   if (style === "mostly-veggie") {
-    filteredRecipes = filteredRecipes.filter((recipe) =>
-      recipe.dietary.includes("veggie"),
+    filteredRecipes = filteredRecipes.filter(
+      (recipe) =>
+        recipe.dietary.includes("veggie") || recipe.dietary.includes("vegan"),
     );
   }
 
@@ -51,75 +64,66 @@ export function generateWeek(style: PlannerStyle): Recipe[] {
     filteredRecipes = filteredRecipes.filter((recipe) => recipe.isQuick);
   }
 
-  // REMOVE SWEETS
+  return uniqueBySlug(filteredRecipes);
+}
 
-  filteredRecipes = filteredRecipes.filter(
-    (recipe) => recipe.category === "savoury",
+function getUnusedCandidates({
+  filteredRecipes,
+  selectedSlugs,
+  mealType,
+}: {
+  filteredRecipes: Recipe[];
+  selectedSlugs: Set<string>;
+  mealType: MealType;
+}) {
+  return filteredRecipes.filter(
+    (recipe) => recipe.mealType === mealType && !selectedSlugs.has(recipe.slug),
   );
+}
 
-  // CREATE GROUPS
+export function generateWeek(style: PlannerStyle, mealCount = 5): Recipe[] {
+  const targetMealCount = Math.min(Math.max(mealCount, 1), 7);
+  const filteredRecipes = filterByStyle(recipes, style);
 
-  const quickMeals = filteredRecipes.filter((recipe) => recipe.isQuick);
+  const week: Recipe[] = [];
+  const selectedSlugs = new Set<string>();
 
-  const pastaMeals = filteredRecipes.filter(
-    (recipe) => recipe.mealType === "pasta",
-  );
+  function addRecipe(recipe: Recipe | undefined) {
+    if (!recipe) return;
+    if (week.length >= targetMealCount) return;
+    if (selectedSlugs.has(recipe.slug)) return;
 
-  const grainBowls = filteredRecipes.filter(
-    (recipe) => recipe.mealType === "grain-bowl",
-  );
-
-  const traybakes = filteredRecipes.filter(
-    (recipe) => recipe.mealType === "traybake",
-  );
-
-  const onePots = filteredRecipes.filter(
-    (recipe) => recipe.mealType === "one-pot",
-  );
-
-  // BUILD WEEK
-
-  let week: Recipe[] = [];
-
-  if (quickMeals.length > 0) {
-    week.push(shuffleArray(quickMeals)[0]);
+    week.push(recipe);
+    selectedSlugs.add(recipe.slug);
   }
 
-  if (grainBowls.length > 0) {
-    week.push(shuffleArray(grainBowls)[0]);
-  }
+  const shuffledMealTypes = shuffleArray(MEAL_TYPE_ROTATION);
 
-  if (pastaMeals.length > 0) {
-    week.push(shuffleArray(pastaMeals)[0]);
-  }
-
-  if (traybakes.length > 0) {
-    week.push(shuffleArray(traybakes)[0]);
-  }
-
-  if (onePots.length > 0) {
-    week.push(shuffleArray(onePots)[0]);
-  }
-
-  // REMOVE DUPLICATES
-
-  week = uniqueBySlug(week);
-
-  // FILL TO 5 IF NEEDED
-
-  const shuffled = shuffleArray(filteredRecipes);
-
-  for (const recipe of shuffled) {
-    if (week.length >= 5) {
+  for (const mealType of shuffledMealTypes) {
+    if (week.length >= targetMealCount) {
       break;
     }
 
-    const alreadyIncluded = week.find((item) => item.slug === recipe.slug);
+    const candidates = getUnusedCandidates({
+      filteredRecipes,
+      selectedSlugs,
+      mealType,
+    });
 
-    if (!alreadyIncluded) {
-      week.push(recipe);
-    }
+    addRecipe(shuffleArray(candidates)[0]);
   }
 
-  return week.slice(0, 5);
+  const fillers = shuffleArray(filteredRecipes).filter(
+    (recipe) => !selectedSlugs.has(recipe.slug),
+  );
+
+  for (const recipe of fillers) {
+    if (week.length >= targetMealCount) {
+      break;
+    }
+
+    addRecipe(recipe);
+  }
+
+  return week.slice(0, targetMealCount);
 }

@@ -560,7 +560,7 @@ export default function PlannerPage() {
         mealCount: requestedNights,
       });
     } else {
-      baseRecipes = generateWeek(eatingStyle as PlannerStyle);
+      baseRecipes = generateWeek(eatingStyle as PlannerStyle, requestedNights);
     }
 
     const selectedRecipes: Recipe[] = [];
