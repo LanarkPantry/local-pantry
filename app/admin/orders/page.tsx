@@ -38,6 +38,29 @@ type Order = {
   paid_at: string | null;
 };
 
+type PantrySubscription = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string | null;
+  delivery_address_line_1: string;
+  delivery_address_line_2: string | null;
+  delivery_town: string;
+  delivery_postcode: string;
+  delivery_notes: string | null;
+  box_name: string;
+  frequency: "weekly" | "fortnightly";
+  next_delivery_date: string;
+  preferred_delivery_day: "Tuesday" | "Wednesday" | null;
+  status: "active" | "paused" | "cancelled";
+  pause_until: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  admin_notes: string | null;
+};
+
 const FULFILMENT_STATUSES = [
   "new",
   "packing",
@@ -61,6 +84,34 @@ function formatDeliveryDateOnly(value: string) {
     day: "numeric",
     month: "short",
   }).format(new Date(value));
+}
+
+function formatShortDate(value: string | null | undefined) {
+  if (!value) return "Not set";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(new Date(`${value}T12:00:00`));
+}
+
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function isSubscriptionDue(subscription: PantrySubscription) {
+  return (
+    subscription.status === "active" &&
+    subscription.next_delivery_date <= todayIsoDate()
+  );
+}
+
+function sortSubscriptionsByNextDelivery(
+  a: PantrySubscription,
+  b: PantrySubscription,
+) {
+  return a.next_delivery_date.localeCompare(b.next_delivery_date);
 }
 
 function getDeliveryLabel(order: Order) {
@@ -288,6 +339,55 @@ function PackingSummaryList({
   );
 }
 
+function DashboardLink({
+  href,
+  label,
+  description,
+}: {
+  href: string;
+  label: string;
+  description: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4 transition hover:bg-[#fbfaf8]"
+    >
+      <p className="font-serif text-2xl">{label}</p>
+      <p className="mt-1 text-sm leading-5 text-[#667164]">{description}</p>
+    </Link>
+  );
+}
+
+function SubscriptionDueCard({
+  subscription,
+}: {
+  subscription: PantrySubscription;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4">
+      <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="font-medium text-[#243328]">
+            {subscription.customer_name}
+          </p>
+          <p className="text-sm text-[#667164]">{subscription.box_name}</p>
+          <p className="text-sm text-[#667164]">
+            {subscription.delivery_postcode}
+          </p>
+        </div>
+
+        <div className="text-left md:text-right">
+          <p className="text-sm font-medium">
+            {formatShortDate(subscription.next_delivery_date)}
+          </p>
+          <p className="text-sm text-[#667164]">{subscription.frequency}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SectionHeading({
   title,
   count,
@@ -310,8 +410,13 @@ function SectionHeading({
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [subscriptions, setSubscriptions] = useState<PantrySubscription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSubscriptions, setLoadingSubscriptions] = useState(true);
+  const [generatingDeliveries, setGeneratingDeliveries] = useState(false);
   const [error, setError] = useState("");
+  const [subscriptionError, setSubscriptionError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
 
@@ -345,6 +450,85 @@ export default function AdminOrdersPage() {
 
     setOrders(Array.isArray(data.orders) ? data.orders : []);
     setLoading(false);
+  }
+
+  async function getToken() {
+    const { data: sessionData } = await supabase.auth.getSession();
+    return sessionData.session?.access_token ?? null;
+  }
+
+  async function loadSubscriptions() {
+    setLoadingSubscriptions(true);
+    setSubscriptionError("");
+
+    const token = await getToken();
+
+    if (!token) {
+      setSubscriptionError("Please sign in first.");
+      setLoadingSubscriptions(false);
+      return;
+    }
+
+    const response = await fetch("/api/admin/subscriptions", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setSubscriptionError(data.error || "Could not load subscriptions.");
+      setLoadingSubscriptions(false);
+      return;
+    }
+
+    setSubscriptions(
+      Array.isArray(data.subscriptions) ? data.subscriptions : [],
+    );
+    setLoadingSubscriptions(false);
+  }
+
+  async function generateDeliveryOrders() {
+    const confirmed = window.confirm(
+      "Generate delivery orders for all active subscriptions due today or earlier?",
+    );
+
+    if (!confirmed) return;
+
+    setGeneratingDeliveries(true);
+    setError("");
+    setSubscriptionError("");
+    setSuccessMessage("");
+
+    const token = await getToken();
+
+    if (!token) {
+      setSubscriptionError("Please sign in first.");
+      setGeneratingDeliveries(false);
+      return;
+    }
+
+    const response = await fetch("/api/admin/delivery-rounds/generate", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setSubscriptionError(data.error || "Could not generate delivery orders.");
+      setGeneratingDeliveries(false);
+      return;
+    }
+
+    setSuccessMessage(data.message || "Delivery orders generated.");
+    await loadOrders();
+    await loadSubscriptions();
+    setGeneratingDeliveries(false);
   }
 
   async function updateFulfilmentStatus(
@@ -398,6 +582,7 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     void loadOrders();
+    void loadSubscriptions();
   }, []);
 
   const sortedOrders = useMemo(() => sortOrdersForWorkflow(orders), [orders]);
@@ -462,6 +647,51 @@ export default function AdminOrdersPage() {
         (order) => normaliseStatus(order.fulfilment_status) === "packed",
       ),
     [activePaidOrders],
+  );
+
+  const activeSubscriptions = useMemo(
+    () =>
+      subscriptions
+        .filter((subscription) => subscription.status === "active")
+        .sort(sortSubscriptionsByNextDelivery),
+    [subscriptions],
+  );
+
+  const pausedSubscriptions = useMemo(
+    () =>
+      subscriptions
+        .filter((subscription) => subscription.status === "paused")
+        .sort(sortSubscriptionsByNextDelivery),
+    [subscriptions],
+  );
+
+  const dueSubscriptions = useMemo(
+    () => activeSubscriptions.filter(isSubscriptionDue),
+    [activeSubscriptions],
+  );
+
+  const upcomingSubscriptions = useMemo(
+    () =>
+      activeSubscriptions.filter(
+        (subscription) => !isSubscriptionDue(subscription),
+      ),
+    [activeSubscriptions],
+  );
+
+  const dueWeeklySubscriptions = useMemo(
+    () =>
+      dueSubscriptions.filter(
+        (subscription) => subscription.frequency === "weekly",
+      ),
+    [dueSubscriptions],
+  );
+
+  const dueFortnightlySubscriptions = useMemo(
+    () =>
+      dueSubscriptions.filter(
+        (subscription) => subscription.frequency === "fortnightly",
+      ),
+    [dueSubscriptions],
   );
 
   const ordersStillNeedingPacked = useMemo(
@@ -691,11 +921,28 @@ export default function AdminOrdersPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={loadOrders}
+                onClick={() => {
+                  void loadOrders();
+                  void loadSubscriptions();
+                }}
                 className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium"
               >
                 Refresh
               </button>
+
+              <Link
+                href="/admin/subscriptions"
+                className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium"
+              >
+                Subscriptions
+              </Link>
+
+              <Link
+                href="/admin/delivery-rounds"
+                className="rounded-full border border-[#d6cec2] bg-white px-4 py-2 text-sm font-medium"
+              >
+                Delivery Rounds
+              </Link>
 
               <Link
                 href="/"
@@ -743,6 +990,176 @@ export default function AdminOrdersPage() {
             <p className="mt-1 font-serif text-3xl">{packedOrders.length}</p>
           </div>
         </section>
+
+        <section className="mb-6 grid gap-3 md:grid-cols-4">
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Active subs
+            </p>
+            <p className="mt-1 font-serif text-3xl">
+              {loadingSubscriptions ? "…" : activeSubscriptions.length}
+            </p>
+          </div>
+
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Subs due
+            </p>
+            <p className="mt-1 font-serif text-3xl">
+              {loadingSubscriptions ? "…" : dueSubscriptions.length}
+            </p>
+          </div>
+
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Weekly due
+            </p>
+            <p className="mt-1 font-serif text-3xl">
+              {loadingSubscriptions ? "…" : dueWeeklySubscriptions.length}
+            </p>
+          </div>
+
+          <div className="rounded-[22px] border border-[#ddd4c8] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-[#7a8478]">
+              Fortnightly due
+            </p>
+            <p className="mt-1 font-serif text-3xl">
+              {loadingSubscriptions ? "…" : dueFortnightlySubscriptions.length}
+            </p>
+          </div>
+        </section>
+
+        <section className="mb-6 grid gap-3 md:grid-cols-3">
+          <DashboardLink
+            href="/admin/orders"
+            label="Orders"
+            description="Pack, update, copy and complete customer orders."
+          />
+          <DashboardLink
+            href="/admin/subscriptions"
+            label="Subscriptions"
+            description="View active, paused and cancelled regular customers."
+          />
+          <DashboardLink
+            href="/admin/delivery-rounds"
+            label="Delivery rounds"
+            description="Generate due subscription delivery orders."
+          />
+        </section>
+
+        {subscriptionError ? (
+          <div className="mb-5 rounded-[20px] border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {subscriptionError}
+          </div>
+        ) : null}
+
+        {successMessage ? (
+          <div className="mb-5 rounded-[20px] border border-[#c8dbc2] bg-[#eef8ea] p-4 text-sm text-[#315333]">
+            {successMessage}
+          </div>
+        ) : null}
+
+        {!loadingSubscriptions ? (
+          <section className="mb-6 rounded-[28px] border border-[#ddd4c8] bg-white/88 p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)]">
+            <div className="flex flex-col gap-4 border-b border-[#eee5d8] pb-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.16em] text-[#7a8478]">
+                  Subscription delivery control
+                </p>
+                <h2 className="mt-1 font-serif text-3xl">Regular boxes due</h2>
+                <p className="mt-1 text-sm leading-6 text-[#667164]">
+                  Use this before packing. Generate due subscription orders,
+                  then they will appear in the normal order workflow below.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                disabled={generatingDeliveries || dueSubscriptions.length === 0}
+                onClick={generateDeliveryOrders}
+                className="rounded-full bg-[#243328] px-5 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                {generatingDeliveries
+                  ? "Generating..."
+                  : dueSubscriptions.length === 0
+                    ? "Nothing due"
+                    : "Generate delivery orders"}
+              </button>
+            </div>
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_1fr]">
+              <div>
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium">Due now</p>
+                    <p className="text-xs text-[#667164]">
+                      Active subscriptions due today or earlier.
+                    </p>
+                  </div>
+                  <p className="text-sm font-medium">
+                    {dueSubscriptions.length}
+                  </p>
+                </div>
+
+                <div className="grid gap-3">
+                  {dueSubscriptions.length > 0 ? (
+                    dueSubscriptions
+                      .slice(0, 8)
+                      .map((subscription) => (
+                        <SubscriptionDueCard
+                          key={subscription.id}
+                          subscription={subscription}
+                        />
+                      ))
+                  ) : (
+                    <p className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4 text-sm text-[#667164]">
+                      No subscriptions are due today.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium">Coming next</p>
+                    <p className="text-xs text-[#667164]">
+                      Next regular customers in the calendar.
+                    </p>
+                  </div>
+                  <p className="text-sm font-medium">
+                    {upcomingSubscriptions.length}
+                  </p>
+                </div>
+
+                <div className="grid gap-3">
+                  {upcomingSubscriptions.length > 0 ? (
+                    upcomingSubscriptions
+                      .slice(0, 8)
+                      .map((subscription) => (
+                        <SubscriptionDueCard
+                          key={subscription.id}
+                          subscription={subscription}
+                        />
+                      ))
+                  ) : (
+                    <p className="rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4 text-sm text-[#667164]">
+                      No upcoming active subscriptions found.
+                    </p>
+                  )}
+                </div>
+
+                {pausedSubscriptions.length > 0 ? (
+                  <p className="mt-3 rounded-2xl border border-[#eee5d8] bg-[#fbfaf8] p-4 text-sm text-[#667164]">
+                    {pausedSubscriptions.length} paused subscription
+                    {pausedSubscriptions.length === 1 ? "" : "s"} hidden from
+                    delivery generation.
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {!loading && ordersStillNeedingPacked.length > 0 ? (
           <section className="mb-6 rounded-[28px] border border-[#ddd4c8] bg-white/88 p-5 shadow-[0_12px_28px_rgba(36,51,40,0.06)]">
