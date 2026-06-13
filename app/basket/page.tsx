@@ -51,6 +51,7 @@ export default function BasketPage() {
     addToCart,
     removeOneFromCart,
     clearItemFromCart,
+    clearCart,
     subscriptionItems,
     oneOffItems,
   } = useCart();
@@ -81,10 +82,12 @@ export default function BasketPage() {
     const params = new URLSearchParams(window.location.search);
 
     if (params.get("success") === "true") {
-      setOrderSuccess(true);
+      clearCart();
       setLaunchGift("");
+      setOrderSuccess(true);
+      window.history.replaceState({}, "", "/basket");
     }
-  }, []);
+  }, [clearCart]);
   const subscriptionSubtotal = useMemo(() => {
     return subscriptionItems.reduce((sum, item) => sum + item.price, 0);
   }, [subscriptionItems]);
@@ -505,7 +508,40 @@ Thanks!`,
           </div>
         </section>
 
-        {cart.length === 0 ? (
+        {orderSuccess ? (
+          <section className="rounded-[28px] border border-[#d8cbbd] bg-[rgba(247,242,235,0.86)] p-6 text-center shadow-[0_12px_30px_rgba(36,51,40,0.06)] md:p-10">
+            <div className="mx-auto max-w-xl">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#243328] text-2xl text-white">
+                ✓
+              </div>
+
+              <h2 className="mt-5 font-serif text-3xl md:text-4xl">
+                Order received
+              </h2>
+
+              <p className="mx-auto mt-3 text-sm leading-6 text-[#667164] md:text-base">
+                Thank you. Your order has been received and your basket has been
+                cleared.
+              </p>
+
+              <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Link
+                  href="/shop"
+                  className="w-full rounded-full bg-[#2f4635] px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
+                >
+                  Back to shop
+                </Link>
+
+                <Link
+                  href="/planner"
+                  className="w-full rounded-full border border-[#d6cec2] bg-[rgba(255,255,255,0.86)] px-6 py-3 text-sm font-medium text-[#243328] transition hover:bg-white sm:w-auto"
+                >
+                  Open planner
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : cart.length === 0 ? (
           <section className="rounded-[28px] border border-[rgba(221,212,200,0.95)] bg-[rgba(247,242,235,0.76)] p-6 shadow-[0_12px_30px_rgba(36,51,40,0.06)] backdrop-blur-md md:p-10">
             <div className="mx-auto max-w-xl text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#ddd4c8] bg-[rgba(255,255,255,0.84)] text-2xl">
