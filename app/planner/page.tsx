@@ -670,12 +670,44 @@ export default function PlannerPage() {
     setSwapMealId(null);
   }
 
+  function normaliseProductName(name: string) {
+    return name
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  const PRODUCT_NAME_ALIASES: Record<string, string> = {
+    "puy lentils": "Puy Lentils",
+    farro: "Farro",
+    walnuts: "Walnuts",
+    "risotto rice": "Short Grain Rice",
+    "short grain rice": "Short Grain Rice",
+  };
+
   function addProductByName(productName: string) {
-    const product = [...produceBoxes, ...pantryItems, ...cupboardItems].find(
-      (item) => item.name === productName,
+    const allProducts = [...produceBoxes, ...pantryItems, ...cupboardItems];
+
+    const aliasName =
+      PRODUCT_NAME_ALIASES[normaliseProductName(productName)] ?? productName;
+
+    const product = allProducts.find(
+      (item) =>
+        normaliseProductName(item.name) === normaliseProductName(aliasName) ||
+        normaliseProductName(item.name).includes(
+          normaliseProductName(aliasName),
+        ) ||
+        normaliseProductName(aliasName).includes(
+          normaliseProductName(item.name),
+        ),
     );
 
-    if (!product) return;
+    if (!product) {
+      console.warn(`No product found for: ${productName}`);
+      return;
+    }
 
     addToCart({
       name: product.name,
