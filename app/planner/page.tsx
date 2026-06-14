@@ -5,6 +5,8 @@ import { useCart } from "../cart-context";
 import {
   produceBoxes,
   pantryItems,
+  dryGoodsItems,
+  extraItems,
   cupboardItems,
   type ShopDisplayItem,
 } from "../shop/shop-data";
@@ -537,8 +539,12 @@ export default function PlannerPage() {
 
     names.add("Vegetable Stock");
 
-    const allAddOns = [...pantryItems, ...cupboardItems];
-
+    const allAddOns = [
+      ...pantryItems,
+      ...dryGoodsItems,
+      ...extraItems,
+      ...cupboardItems,
+    ];
     return allAddOns.filter((item) => names.has(item.name)).slice(0, 4);
   }, [week]);
 
@@ -688,8 +694,13 @@ export default function PlannerPage() {
   };
 
   function addProductByName(productName: string) {
-    const allProducts = [...produceBoxes, ...pantryItems, ...cupboardItems];
-
+    const allProducts = [
+      ...produceBoxes,
+      ...pantryItems,
+      ...dryGoodsItems,
+      ...extraItems,
+      ...cupboardItems,
+    ];
     const aliasName =
       PRODUCT_NAME_ALIASES[normaliseProductName(productName)] ?? productName;
 
