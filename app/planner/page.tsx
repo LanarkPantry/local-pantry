@@ -1066,11 +1066,17 @@ export default function PlannerPage() {
 
                           {meal.matchedProducts.length > 0 ? (
                             <div className="mt-6 rounded-[20px] border border-[#ddd4c8] bg-[#f7f2eb] p-4">
-                              <p className="text-sm font-medium text-[#243328]">
-                                Useful with this meal
-                              </p>
+                              <div>
+                                <p className="text-sm font-medium text-[#243328]">
+                                  Useful with this meal
+                                </p>
 
-                              <div className="mt-3 flex flex-wrap gap-2">
+                                <p className="mt-1 text-xs leading-5 text-[#667164]">
+                                  Add pantry extras for this recipe.
+                                </p>
+                              </div>
+
+                              <div className="mt-3 grid gap-2 sm:grid-cols-2">
                                 {meal.matchedProducts.map((productName) => (
                                   <button
                                     key={productName}
@@ -1078,9 +1084,15 @@ export default function PlannerPage() {
                                     onClick={() =>
                                       addProductByName(productName)
                                     }
-                                    className="rounded-full border border-[#d6cec2] bg-white/82 px-3 py-1.5 text-xs font-medium text-[#243328] transition hover:bg-white"
+                                    className="flex items-center justify-between gap-3 rounded-[14px] border border-[#d6cec2] bg-white/82 px-3 py-2 text-left text-xs text-[#243328] transition hover:bg-white"
                                   >
-                                    Add {productName}
+                                    <span className="min-w-0 truncate font-medium">
+                                      {productName}
+                                    </span>
+
+                                    <span className="shrink-0 rounded-full bg-[#243328] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white">
+                                      Add
+                                    </span>
                                   </button>
                                 ))}
                               </div>
