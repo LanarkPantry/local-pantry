@@ -1084,9 +1084,9 @@ export default function PlannerPage() {
                                     onClick={() =>
                                       addProductByName(productName)
                                     }
-                                    className="flex items-center justify-between gap-3 rounded-[14px] border border-[#d6cec2] bg-white/82 px-3 py-2 text-left text-xs text-[#243328] transition hover:bg-white"
+                                    className="grid w-full grid-cols-[1fr_auto] items-center gap-2 rounded-[14px] border border-[#d6cec2] bg-white/82 px-3 py-2 text-left text-xs text-[#243328] transition hover:bg-white"
                                   >
-                                    <span className="min-w-0 truncate font-medium">
+                                    <span className="min-w-0 break-words font-medium leading-5">
                                       {productName}
                                     </span>
 
