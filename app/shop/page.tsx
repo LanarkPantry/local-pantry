@@ -41,7 +41,7 @@ function getPlannerAliases(itemName: string) {
   }
 
   if (itemName === "Risotto Rice") {
-    return ["Risotto Rice", "Short Grain Rice", "Risotto rice"];
+    return ["Risotto Rice", "risotto rice", "Risotto rice"];
   }
 
   if (itemName === "Mutti Polpa Tomatoes") {

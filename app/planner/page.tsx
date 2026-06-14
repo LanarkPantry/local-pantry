@@ -689,8 +689,7 @@ export default function PlannerPage() {
     "puy lentils": "Puy Lentils",
     farro: "Farro",
     walnuts: "Walnuts",
-    "risotto rice": "Short Grain Rice",
-    "short grain rice": "Short Grain Rice",
+    "risotto rice": "risotto rice",
   };
 
   function addProductByName(productName: string) {

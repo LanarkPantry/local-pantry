@@ -69,11 +69,11 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     eatingStyle: "veg",
     focusTags: ["veg-heavy", "low-waste"],
     ingredients: ["Mushrooms", "Farro", "Greens", "White miso", "Garlic"],
-    matchedProducts: ["Farro", "White Miso"],
+    matchedProducts: ["Farro", "Vegetable Stock"],
     steps: [
       "Cook the farro until chewy but tender, then drain well.",
       "Fry the mushrooms in a hot pan until deeply browned and concentrated.",
-      "Stir in garlic, white miso and a splash of water to make a savoury glaze.",
+      "Stir in garlic, vegetable stock, and a splash of water to make a savoury glaze.",
       "Fold through the greens until just wilted, then spoon over the farro.",
     ],
   },
@@ -2595,7 +2595,7 @@ export const staticPlannerRecipes: StaticPlannerRecipe[] = [
     eatingStyle: "veg",
     focusTags: ["family-friendly", "veg-heavy"],
     ingredients: ["Peas", "Risotto rice", "Lemon", "Mint", "Vegetable Stock"],
-    matchedProducts: ["Short Grain Rice", "Vegetable Stock"],
+    matchedProducts: ["risotto rice", "Vegetable Stock"],
     steps: [
       "Soften onion gently in olive oil, then stir in risotto rice and vegetable stock.",
       "Simmer until the rice is tender and the soup has thickened slightly.",

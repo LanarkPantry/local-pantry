@@ -188,8 +188,7 @@ export const dryGoodsItems: ShopDisplayItem[] = [
     category: "cupboard",
     checkoutType: "one-off",
     weight: "500g",
-    description:
-      "Short grain rice for creamy risottos, simple sides and puddings.",
+    description: "risotto rice for creamy risottos, simple sides and puddings.",
     details:
       "Works well with mushrooms, peas, lemon, roast tomatoes, chicken, greens and vegetable stock.",
     note: "Usually added as a one-off",
