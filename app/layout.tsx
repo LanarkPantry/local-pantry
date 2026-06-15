@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
 import MobileNav from "./mobile-nav";
-
+import { Analytics } from "@vercel/analytics/react";
 export const metadata: Metadata = {
   title: "The Local Pantry",
   description: "Seasonal groceries from local farms",
@@ -42,6 +42,8 @@ export default function RootLayout({
             <MobileNav />
           </div>
         </Providers>
+
+        <Analytics />
       </body>
     </html>
   );
